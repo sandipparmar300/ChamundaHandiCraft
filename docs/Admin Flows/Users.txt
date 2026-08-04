@@ -1,0 +1,483 @@
+Module 02 - User Management
+Module Overview
+Module Name
+
+User Management
+
+Purpose
+
+The User Management module enables administrators to manage both internal system users (Admin Users) and website customers. It provides role-based access control (RBAC), permission management, customer lifecycle management, security auditing, and account monitoring.
+
+Business Goals
+Manage internal administrative users securely.
+Assign roles and permissions based on job responsibilities.
+Track user activities and login history.
+Manage customer accounts and their lifecycle.
+Improve security through access control and audit trails.
+Sub Module 1 - Admin User Management
+Features
+1. Admin User List
+Purpose
+
+Displays all administrative users with their account details and current status.
+
+Columns
+Profile Photo
+Full Name
+Employee ID (Optional)
+Username
+Email
+Mobile Number
+Role
+Department
+Status
+Last Login
+Created Date
+Created By
+Actions
+Features
+Search
+Advanced Filters
+Sorting
+Pagination
+Export
+Print
+Bulk Actions
+Row Actions
+View
+Edit
+Change Password
+Assign Role
+Manage Permissions
+Enable / Disable
+Lock / Unlock
+View Login History
+View Activity Logs
+Delete
+2. Create Admin User
+Purpose
+
+Create a new administrator account.
+
+Form Fields
+Profile Photo
+First Name
+Last Name
+Full Name (Auto Generated)
+Username
+Email
+Mobile Number
+Password
+Confirm Password
+Department
+Designation
+Role
+Time Zone
+Language
+Status
+Two Factor Authentication (Future)
+Validation
+Username must be unique.
+Email must be unique.
+Mobile number must be unique.
+Password policy (minimum length, complexity).
+Required fields validation.
+Actions
+Save
+Save & New
+Cancel
+3. Edit Admin User
+
+Allows modification of:
+
+Personal Information
+Contact Details
+Role
+Status
+Department
+Language
+Time Zone
+
+Password changes should be managed separately.
+
+4. View Admin User
+
+Displays read-only details including:
+
+Profile Information
+Assigned Role
+Permissions
+Login History
+Activity History
+Security Settings
+5. Delete Admin User
+Business Rules
+Soft Delete only.
+Super Admin cannot be deleted.
+Users with active sessions should not be deleted.
+Confirmation dialog required.
+Record audit entry.
+6. Role Assignment
+Purpose
+
+Assign predefined roles.
+
+Examples
+
+Super Admin
+Admin
+Product Manager
+Inventory Manager
+Sales Manager
+Customer Support
+Finance Manager
+Marketing Manager
+Content Manager
+
+One or multiple roles (configurable).
+
+7. Permission Management
+Permission Types
+View
+Create
+Edit
+Delete
+Export
+Import
+Print
+Approve
+Publish
+Unpublish
+Restore
+Module Permissions
+
+Dashboard
+
+Products
+
+Categories
+
+Orders
+
+Customers
+
+Reports
+
+Coupons
+
+Offers
+
+CMS
+
+Blog
+
+SEO
+
+Settings
+
+Inventory
+
+Payments
+
+Shipping
+
+Users
+
+Notifications
+
+Reviews
+
+Newsletter
+
+Permissions can be granted at:
+
+Module Level
+Feature Level
+Action Level
+8. Login History
+Purpose
+
+Track user login activity.
+
+Columns
+Login Date
+Logout Date
+IP Address
+Device
+Browser
+Operating System
+Location (Approximate)
+Login Status
+Failure Reason
+Session Duration
+Filters
+Date
+User
+Device
+Status
+9. Activity Log
+
+Tracks all admin actions.
+
+Examples
+
+Login
+Logout
+Product Created
+Product Updated
+Product Deleted
+Order Updated
+Customer Blocked
+Coupon Created
+Settings Changed
+10. Security Features
+Password Expiry
+Force Password Reset
+Account Lock after Failed Attempts
+Session Timeout
+Concurrent Session Control
+IP Restriction (Future)
+Two-Factor Authentication (Future)
+Sub Module 2 - Customer Management
+Purpose
+
+Manage registered website customers and monitor their shopping activities.
+
+1. Customer List
+Columns
+Profile Image
+Customer ID
+Customer Name
+Email
+Mobile
+Registration Date
+Total Orders
+Total Purchase
+Reward Points
+Status
+Last Login
+Actions
+Features
+Search
+Filters
+Sorting
+Export
+Bulk Actions
+2. Customer Profile
+
+Displays:
+
+Personal Information
+Profile Photo
+Full Name
+Gender
+Date of Birth
+Email
+Mobile
+Registration Date
+Last Login
+Account Summary
+Total Orders
+Total Purchase
+Average Order Value
+Reward Points
+Wishlist Count
+Reviews Submitted
+Support Tickets
+3. Customer Orders
+
+Displays complete order history.
+
+Columns
+
+Order Number
+Date
+Amount
+Payment Status
+Delivery Status
+Order Status
+Invoice
+Actions
+
+Actions
+
+View Order
+Download Invoice
+Refund Details
+4. Wishlist
+
+Displays:
+
+Product
+Added Date
+Current Price
+Availability
+Stock Status
+
+Actions
+
+Remove
+Move to Cart (Admin View Only)
+View Product
+5. Customer Addresses
+
+Support multiple addresses.
+
+Types
+
+Home
+Office
+Billing
+Shipping
+
+Display
+
+Address Line
+City
+State
+Country
+Postal Code
+Default Address
+6. Reward Points
+
+Displays:
+
+Available Points
+Earned Points
+Redeemed Points
+Expired Points
+
+History
+
+Date
+Order
+Earned
+Redeemed
+Balance
+
+Admin Actions
+
+Add Points
+Deduct Points
+Adjust Balance
+7. Customer Status
+
+Available statuses:
+
+Active
+Inactive
+Pending Verification
+Blocked
+Suspended
+Deleted (Soft Delete)
+8. Block / Unblock Customer
+Business Rules
+
+Blocking a customer should:
+
+Prevent login.
+Prevent placing new orders.
+Preserve existing order history.
+Record the reason for blocking.
+Notify the customer (optional).
+
+Unblocking restores account access.
+
+9. Customer Communication
+
+Admin can initiate:
+
+Email
+SMS
+WhatsApp
+Push Notification
+
+Templates supported.
+
+10. Customer Notes
+
+Internal notes visible only to administrators.
+
+Examples
+
+VIP Customer
+Fraud Alert
+Manual Discount Approved
+High Return Rate
+Global Search & Filters
+
+Search by:
+
+Name
+Email
+Mobile
+Username
+Customer ID
+Employee ID
+
+Filters:
+
+Role
+Status
+Registration Date
+Last Login
+Reward Points
+Total Purchase
+Country
+State
+User Permissions
+Permission	Description
+View Users	View admin and customer records
+Create Users	Create admin accounts
+Edit Users	Modify user details
+Delete Users	Soft delete admin users
+Assign Roles	Assign or change roles
+Manage Permissions	Configure permissions
+View Login History	Access login audit logs
+Block/Unblock Customers	Control customer access
+Export Data	Export user/customer information
+Business Rules
+Every admin must have at least one role.
+Permissions are inherited from assigned roles unless explicitly overridden.
+Super Admin has unrestricted access and cannot be deleted.
+Customer accounts are never permanently deleted; use soft delete or deactivate.
+All security-sensitive actions (password changes, role changes, blocking, permission updates) must be recorded in the audit log.
+Every login attempt, successful or failed, should be logged.
+Blocked customers retain their order history and reward point history.
+Navigation Flow
+User Management
+      │
+      ├── Admin Users
+      │      ├── List
+      │      ├── Create
+      │      ├── Edit
+      │      ├── View
+      │      ├── Assign Roles
+      │      ├── Manage Permissions
+      │      ├── Login History
+      │      └── Activity Logs
+      │
+      └── Customers
+             ├── Customer List
+             ├── Profile
+             ├── Orders
+             ├── Wishlist
+             ├── Addresses
+             ├── Reward Points
+             ├── Communication
+             ├── Block / Unblock
+             └── Activity Summary
+Future Enhancements
+Multi-Organization / Multi-Tenant User Management
+Single Sign-On (SSO)
+OAuth / OpenID Connect
+Azure AD / Google Workspace Integration
+AI-Based Fraud Detection
+Risk-Based Login Alerts
+Behavioral Analytics
+Customer Segmentation with AI
+Customer Lifetime Value (CLV) Prediction
+Role Approval Workflow
+Delegated Administration
+
+This scope provides a complete foundation for designing the UI, database schema, APIs, role-based authorization, audit logging, and future scalability of the User Management module.

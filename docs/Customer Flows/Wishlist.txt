@@ -1,0 +1,375 @@
+Module 9 - Wishlist
+1. Module Overview
+Module Name
+
+Wishlist
+
+Purpose
+
+The Wishlist module allows customers to save products for future purchase, organize favorite items, move products to the shopping cart, remove products, and receive notifications about stock availability and price changes.
+
+Business Goals
+Increase customer retention.
+Encourage repeat visits.
+Reduce purchase hesitation.
+Increase future conversions.
+Support personalized marketing.
+Increase Average Order Value (AOV).
+Track customer interests.
+Improve shopping experience.
+2. Wishlist Workflow
+Customer Browses Product
+        │
+        ▼
+Click "Add to Wishlist"
+        │
+        ▼
+Wishlist Updated
+        │
+ ┌──────┼───────────────┐
+ │      │               │
+ ▼      ▼               ▼
+View Wishlist Remove Item Move to Cart
+ │      │               │
+ └──────┴───────────────┘
+        │
+        ▼
+Shopping Cart
+        │
+        ▼
+Checkout
+3. Wishlist Page Layout
+Header
+Logo
+Navigation Menu
+Search
+Wishlist Count
+Cart
+My Account
+Breadcrumb
+
+Example
+
+Home
+>
+My Account
+>
+Wishlist
+4. Wishlist Product List
+
+Each saved product displays:
+
+Product Image
+Product Name
+SKU
+Category
+Brand
+Selected Variant (If Applicable)
+Price
+Original Price
+Discount Percentage
+Rating
+Review Count
+Stock Status
+Availability
+Date Added
+
+Actions
+
+View Product
+Move to Cart
+Remove from Wishlist
+Share Product (Future)
+Compare Product (Future)
+5. Save Product
+
+Customers can save products from:
+
+Product Details Page
+Product Listing
+Search Results
+Quick View
+Recommended Products
+
+Behavior
+
+Heart icon toggles between Save/Remove.
+Wishlist count updates instantly.
+Saved products remain linked to the customer's account.
+Guests may store items temporarily (configurable).
+6. Move to Cart
+
+Actions
+
+Move Single Product
+Move Multiple Products (Future)
+Move All Products (Future)
+
+Validation
+
+Product Available
+Variant Selected (If Required)
+Stock Available
+
+Behavior
+
+Product is added to the cart.
+Product may remain in the wishlist (configurable) or be removed automatically.
+7. Remove Product
+
+Actions
+
+Remove Single Product
+Remove Selected Products (Future)
+Clear Wishlist (Future)
+
+Confirmation
+
+Optional confirmation dialog.
+8. Stock Availability
+
+Display
+
+In Stock
+Low Stock
+Out of Stock
+Backorder (Future)
+
+Behavior
+
+Out-of-stock products remain visible.
+Notify customers when products are back in stock (Future).
+9. Price Updates
+
+Display
+
+Current Price
+Original Price
+Discount
+Price Drop Indicator
+
+Future
+
+Notify customers of price drops.
+Highlight newly discounted products.
+10. Product Availability Alerts
+
+Future Features
+
+Back in Stock Notification
+Price Drop Notification
+Limited Stock Alert
+New Offer Alert
+
+Channels
+
+Email
+SMS
+WhatsApp
+Push Notification
+11. Wishlist Sharing (Future)
+
+Support
+
+Share via WhatsApp
+Facebook
+Email
+Copy Link
+
+Use Cases
+
+Gift Suggestions
+Family Sharing
+Social Sharing
+12. Search & Filters
+
+Search By
+
+Product Name
+SKU
+Brand
+Category
+
+Filters
+
+In Stock
+Out of Stock
+Discounted
+Recently Added
+Category
+Brand
+
+Sorting
+
+Recently Added
+Oldest
+Price Low to High
+Price High to Low
+Highest Rated
+Most Popular
+13. Empty Wishlist
+
+Display
+
+Illustration
+"Your Wishlist is Empty" message.
+Continue Shopping button.
+Recommended Products.
+14. Analytics
+
+Track
+
+Products Added to Wishlist
+Products Removed
+Wishlist Views
+Move to Cart
+Wishlist Conversion Rate
+Most Wishlisted Products
+Price Drop Clicks
+Back-in-Stock Notification Signups
+15. SEO Considerations
+Wishlist pages should be NoIndex.
+Exclude wishlist URLs from XML sitemap.
+Force HTTPS.
+Prevent caching of customer-specific pages.
+Secure authentication required.
+16. Performance Considerations
+AJAX add/remove operations.
+Lazy loading product images.
+Optimized wishlist queries.
+Server-side pagination for large wishlists.
+Redis/MemoryCache for wishlist counts.
+Skeleton loading while fetching data.
+17. Accessibility (WCAG)
+Keyboard navigation.
+Screen reader support.
+Accessible action buttons.
+High contrast support.
+Responsive layout.
+Proper ARIA labels.
+Focus indicators.
+18. Business Rules
+Only authenticated customers can maintain a permanent wishlist.
+Guest wishlists may be stored in the browser session or cookies (configurable).
+Wishlist items should not reserve inventory.
+Products removed from the catalog should be hidden or marked as unavailable.
+Price and stock information should always reflect current product data.
+Products requiring variant selection must prompt the customer before moving to the cart.
+Wishlist count should update in real time across all pages.
+Duplicate wishlist entries for the same product/variant are not allowed.
+19. User Permissions
+
+Customer
+
+Add Product to Wishlist
+Remove Product
+Move Product to Cart
+View Wishlist
+Search Wishlist
+Filter Wishlist
+
+Admin
+
+View Wishlist Analytics
+Configure Wishlist Rules
+Enable/Disable Wishlist Features
+20. Navigation Flow
+My Account
+      │
+      ▼
+Wishlist
+      │
+      ├── Product List
+      ├── View Product
+      ├── Move to Cart
+      ├── Remove Product
+      ├── Search
+      ├── Filter
+      └── Continue Shopping
+21. Future AI Enhancements
+AI Shopping Experience
+AI product recommendations based on wishlist.
+AI price drop predictions.
+AI personalized offers.
+AI bundle recommendations.
+AI similar product suggestions.
+AI restock predictions.
+AI purchase intent scoring.
+AI reminder notifications.
+AI gift recommendations.
+AI cross-sell opportunities.
+Enterprise Features
+Multiple wishlists (e.g., Birthday, Wedding, Favorites).
+Shared wishlists.
+Gift registry.
+Wishlist notes.
+Wishlist folders.
+Bulk move to cart.
+Bulk delete.
+Public/Private wishlist.
+Team wishlist (B2B).
+Wishlist synchronization across devices.
+22. Acceptance Criteria
+Customers can save products from any product listing or details page.
+Wishlist updates instantly without page refresh.
+Products can be moved to the cart while validating stock and variants.
+Price and stock information remain current.
+Wishlist supports search, filters, and sorting.
+Empty wishlist displays meaningful recommendations.
+Wishlist is responsive and accessible.
+Customer actions are recorded for analytics.
+23. Recommended Database Tables
+Wishlist
+Wishlists
+WishlistItems
+WishlistItemVariants
+WishlistShareLinks (Future)
+Notifications
+WishlistPriceAlerts
+WishlistStockAlerts
+Analytics
+WishlistActivityLogs
+WishlistAnalytics
+WishlistConversions
+24. UI/UX Screens
+Wishlist Dashboard
+Wishlist with Products
+Empty Wishlist
+Product Card in Wishlist
+Move to Cart Confirmation
+Remove Item Confirmation
+Wishlist Search & Filter
+Mobile Wishlist
+Shared Wishlist (Future)
+Wishlist Notification Settings (Future)
+25. API Integration Points
+Wishlist API
+Add to Wishlist API
+Remove from Wishlist API
+Move to Cart API
+Product Details API
+Inventory API
+Pricing API
+Customer Account API
+Notification API
+Analytics API
+26. Recommended UI Components
+
+Build reusable wishlist components:
+
+Wishlist Product Card
+Wishlist Counter Badge
+Heart/Favorite Toggle Button
+Move to Cart Button
+Remove Item Dialog
+Empty Wishlist Illustration
+Search Bar
+Filter Panel
+Sort Dropdown
+Product Availability Badge
+Price Change Badge
+Skeleton Loader
+Toast Notifications
+27. Recommended .NET 8 Architecture
+
+Implement the Wishlist as an independent Wishlist Module within the Customer Domain of your .NET 8 Modular Monolithic Architecture. Use CQRS with command handlers for add, remove, and move-to-cart operations, and optimized query handlers for retrieving customer wishlists. Store wishlist data in SQL Server using Entity Framework Core, while leveraging Dapper for fast read operations. Cache wishlist counts using Redis or IMemoryCache to provide instant UI updates. Publish domain events when products are added or removed to support analytics, personalized recommendations, marketing campaigns, and future notification features (such as price drop and back-in-stock alerts). This approach provides a scalable, maintainable, and enterprise-ready wishlist solution.

@@ -1,0 +1,462 @@
+Excellent. A Blog Module is not just for writing articles—it is a Content Marketing Platform that helps improve SEO, organic traffic, brand authority, customer education, and product promotion. For your handicraft eCommerce website, the blog should integrate with CMS, Products, Categories, SEO, Comments, Users, and Analytics.
+
+Module 13 - Blog Management
+1. Module Overview
+Module Name
+
+Blog Management
+
+Purpose
+
+The Blog Management module enables administrators to create, manage, publish, and optimize blog articles. It supports blog categories, SEO optimization, featured images, comments, scheduling, author management, and content analytics.
+
+Business Goals
+Improve website SEO.
+Increase organic traffic.
+Educate customers.
+Promote handicraft products.
+Build brand authority.
+Increase customer engagement.
+Generate sales through content marketing.
+2. Blog Workflow
+Create Blog Category
+        │
+        ▼
+Create Blog Article
+        │
+        ▼
+Write Content
+        │
+        ▼
+Upload Images
+        │
+        ▼
+Configure SEO
+        │
+        ▼
+Preview
+        │
+        ▼
+Publish
+        │
+        ▼
+Customer Reads Blog
+        │
+        ▼
+Comment / Share
+        │
+        ▼
+Analytics Updated
+3. Blog Dashboard
+
+Display KPI Cards
+
+Total Articles
+Published Articles
+Draft Articles
+Scheduled Articles
+Total Categories
+Total Comments
+Pending Comments
+Approved Comments
+Most Viewed Article
+Most Commented Article
+Total Blog Views
+SEO Score (Future)
+4. Blog Categories
+Purpose
+
+Organize articles into categories.
+
+Examples
+
+Handicraft Ideas
+Home Decoration
+Wooden Crafts
+Gift Collections
+Festival Decoration
+DIY Crafts
+Interior Design
+Artisan Stories
+Product Guides
+Company News
+Category Fields
+Category Name
+Slug (SEO URL)
+Description
+Category Image
+Parent Category
+Display Order
+Status
+Actions
+Create
+Edit
+Delete
+Activate
+Deactivate
+Reorder
+5. Blog Articles
+Purpose
+
+Manage all blog posts.
+
+Article Fields
+Basic Information
+Blog Title
+Subtitle
+Short Description
+Full Content (Rich Text Editor)
+Featured Image
+Featured Video (Optional)
+Author
+Category
+Tags
+Additional Information
+Reading Time
+Featured Article
+Publish Status
+Allow Comments
+Language (Future)
+Status
+Draft
+Pending Review
+Scheduled
+Published
+Archived
+Actions
+Create
+Edit
+Preview
+Publish
+Schedule
+Duplicate
+Archive
+Delete
+6. Rich Text Editor
+
+Support
+
+Headings
+Paragraphs
+Lists
+Tables
+Images
+Videos
+Quotes
+Buttons
+Hyperlinks
+Code Block
+File Attachments
+7. SEO Management
+
+Each blog supports
+
+SEO Fields
+SEO Title
+Meta Description
+Meta Keywords
+SEO URL (Slug)
+Canonical URL
+Open Graph Title
+Open Graph Description
+Open Graph Image
+Twitter Card
+Schema Markup (Future)
+SEO Validation
+Missing Meta Description
+Duplicate SEO URL
+Image Alt Text
+Title Length
+Keyword Density (Future)
+8. Comments Management
+Purpose
+
+Manage customer comments.
+
+Comment Fields
+Name
+Email
+Comment
+Date
+Blog Title
+Status
+IP Address
+User Account (If Logged In)
+Status
+Pending
+Approved
+Rejected
+Spam
+Actions
+Approve
+Reject
+Mark Spam
+Delete
+Reply
+Edit
+Features
+Nested Replies
+Admin Replies
+Guest Comments
+Logged-in User Comments
+Comment Moderation
+Profanity Filter (Future)
+9. Media Management
+
+Support
+
+Featured Image
+Gallery Images
+Videos
+PDF Files
+
+Formats
+
+JPG
+PNG
+SVG
+WebP
+MP4
+PDF
+10. Scheduling
+
+Fields
+
+Publish Date
+Publish Time
+Expiry Date (Optional)
+
+Status
+
+Draft
+Scheduled
+Published
+Archived
+11. Related Content
+
+Automatically display
+
+Related Articles
+Same Category Articles
+Recent Articles
+Popular Articles
+
+Future
+
+AI Recommended Articles
+12. Search
+
+Search By
+
+Blog Title
+Author
+Category
+Tags
+Keywords
+13. Filters
+Category
+Author
+Status
+Published
+Draft
+Featured
+Date Range
+14. Bulk Actions
+Publish
+Unpublish
+Archive
+Delete
+Export
+Change Category
+15. Import / Export
+
+Import
+
+CSV
+Excel
+
+Export
+
+Excel
+CSV
+PDF
+16. Blog Analytics
+
+Display
+
+Views
+Unique Visitors
+Reading Time
+Bounce Rate
+Shares
+Comments
+Likes (Future)
+Conversion to Product Page
+Revenue Generated (Future)
+
+Charts
+
+Daily Views
+Monthly Views
+Top Articles
+Category Performance
+17. Social Sharing
+
+Support
+
+Facebook
+Instagram
+X (Twitter)
+WhatsApp
+LinkedIn
+Pinterest
+Copy Link
+18. Notifications
+
+Notify Admin
+
+New Comment
+Pending Review
+Scheduled Article Published
+
+Notify Subscribers
+
+New Blog Published
+Featured Article
+Weekly Digest (Future)
+
+Channels
+
+Email
+Push Notification
+WhatsApp (Future)
+19. Activity Log
+
+Track
+
+Blog Created
+Blog Updated
+Blog Published
+Blog Archived
+Comment Approved
+Comment Rejected
+SEO Updated
+20. Business Rules
+Every article must belong to at least one category.
+Blog titles and SEO URLs (slugs) must be unique.
+Published articles require SEO Title and Meta Description.
+Featured image is mandatory for published articles.
+Rich text content must be sanitized to prevent XSS attacks.
+Comments require moderation before public display (configurable).
+Deleted articles are soft deleted.
+Scheduled articles are published automatically.
+Every content change is recorded in the audit log.
+Article view counts should ignore repeated refreshes within a configurable time window.
+21. User Permissions
+Permission	Description
+View Blogs	View all blog articles
+Create Blogs	Create new articles
+Edit Blogs	Modify articles
+Publish Blogs	Publish or unpublish articles
+Delete Blogs	Archive or remove articles
+Manage Categories	Create and edit blog categories
+Manage Comments	Moderate comments
+Manage SEO	Edit SEO settings
+View Analytics	Access blog reports
+22. Navigation Flow
+Blog Management
+      │
+      ├── Dashboard
+      │
+      ├── Categories
+      │      ├── Create
+      │      ├── Edit
+      │      └── Ordering
+      │
+      ├── Articles
+      │      ├── Draft
+      │      ├── Published
+      │      ├── Scheduled
+      │      ├── Archived
+      │      └── Preview
+      │
+      ├── Comments
+      │      ├── Pending
+      │      ├── Approved
+      │      ├── Spam
+      │      └── Replies
+      │
+      ├── SEO
+      │
+      ├── Analytics
+      │
+      └── Activity Log
+23. Future Enhancements
+AI Features
+AI blog writing assistant.
+AI SEO optimization.
+AI title and meta description generation.
+AI grammar and readability improvements.
+AI article summarization.
+AI automatic tag generation.
+AI related article recommendations.
+AI image generation for blog banners.
+AI multilingual translation.
+AI content plagiarism detection.
+Enterprise Features
+Multi-author support.
+Editorial approval workflow.
+Version history and rollback.
+Multi-language blogs.
+Scheduled newsletters.
+Podcast embedding.
+Video blogs (Vlogs).
+Article reactions (Like, Love, Helpful).
+Bookmark articles.
+RSS Feed.
+AMP support.
+Content personalization.
+Headless CMS API.
+24. Acceptance Criteria
+Administrators can create, edit, preview, schedule, publish, archive, and restore blog articles.
+Blog categories support hierarchy and custom ordering.
+Every article includes SEO metadata and a unique URL.
+Rich text editor supports media, formatting, and links.
+Comments can be moderated, replied to, and filtered.
+Analytics accurately track views, engagement, and performance.
+Social sharing works for all published articles.
+Scheduled publishing and archiving function automatically.
+All blog activities are recorded in the audit log.
+Role-based permissions secure content creation and moderation.
+25. Recommended Database Tables
+
+For an enterprise-grade Blog Management system, consider the following tables:
+
+BlogCategories
+BlogArticles
+BlogArticleCategories
+BlogTags
+BlogArticleTags
+BlogComments
+BlogCommentReplies
+BlogAuthors
+BlogSeo
+BlogMedia
+BlogSchedules
+BlogViews
+BlogAnalytics
+BlogActivityLogs
+BlogSubscribers
+BlogShares
+BlogVersions
+Recommended URL Structure
+
+For better SEO and user experience:
+
+/blog
+/blog/category/home-decoration
+/blog/category/wooden-crafts
+/blog/how-to-decorate-your-home-with-handmade-items
+/blog/10-best-handmade-gift-ideas-for-diwali
+
+This URL structure is SEO-friendly, easy to navigate, and scales well as your blog library grows. It also aligns with modern eCommerce platforms and content marketing best practices.

@@ -1,0 +1,504 @@
+Module 04 - Category Management
+1. Module Overview
+Module Name
+
+Category Management
+
+Purpose
+
+The Category Management module enables administrators to organize products into a structured hierarchy, making it easier for customers to browse and discover products. It also manages menu navigation, SEO-friendly URLs, category images, icons, display order, and category visibility across the website.
+
+Business Goals
+Organize products efficiently.
+Improve website navigation.
+Enhance customer browsing experience.
+Improve SEO through optimized category URLs.
+Support scalable category hierarchy.
+Simplify product assignment and maintenance.
+Enable category-based promotions and reporting.
+2. Category Hierarchy
+
+The system should support unlimited hierarchical levels (configurable).
+
+Example:
+
+Home
+│
+├── Home Decor
+│      ├── Wall Decor
+│      ├── Wooden Decor
+│      ├── Metal Decor
+│      └── Handmade Paintings
+│
+├── Kitchen
+│      ├── Wooden Kitchenware
+│      ├── Ceramic
+│      └── Copper Products
+│
+├── Gifts
+│      ├── Birthday
+│      ├── Anniversary
+│      ├── Wedding
+│      └── Festival Gifts
+3. Category List
+Purpose
+
+Displays all categories in both Grid View and Tree View.
+
+Views
+Tree View
+
+Displays parent-child hierarchy.
+
+Example
+
+Home Decor
+    ├── Wooden Decor
+    ├── Wall Decor
+    └── Metal Decor
+
+Kitchen
+    ├── Wooden Kitchenware
+    └── Ceramic
+List View
+
+Columns
+
+Category Image
+Icon
+Category Name
+Parent Category
+Category Level
+Products Count
+Menu Order
+Status
+Featured
+Created Date
+Updated Date
+Actions
+4. Create Category
+General Information
+
+Fields
+
+Category Name
+Parent Category
+Category Code (Optional)
+Short Description
+Full Description
+Display Settings
+Menu Order
+Featured Category
+Show on Homepage
+Show in Navigation Menu
+Show in Footer
+Display Priority
+Media
+Category Icon
+
+Supported Formats
+
+SVG
+PNG
+JPG
+Category Image
+
+Upload
+
+Banner Image
+Thumbnail Image
+Mobile Banner
+SEO
+
+Fields
+
+SEO URL (Slug)
+Meta Title
+Meta Description
+Meta Keywords
+Canonical URL
+Open Graph Image
+Alt Text
+Visibility
+
+Status
+
+Draft
+Published
+Hidden
+Archived
+5. Edit Category
+
+Allows modification of
+
+Name
+Description
+Parent
+Images
+Icons
+SEO
+Display Order
+Visibility
+6. View Category
+
+Displays
+
+General Information
+
+Hierarchy
+
+Child Categories
+
+Products
+
+SEO
+
+Activity History
+
+7. Delete Category
+Business Rules
+
+Soft Delete Only.
+
+A category cannot be deleted if:
+
+Products are assigned.
+Child categories exist.
+
+Options
+
+Move Products
+Move Child Categories
+Archive Instead
+
+Confirmation Required.
+
+8. Sub Category Management
+
+Features
+
+Create
+
+Edit
+
+Delete
+
+Move
+
+Merge
+
+Archive
+
+Unlimited nesting support.
+
+9. Menu Ordering
+
+Purpose
+
+Control website navigation order.
+
+Methods
+
+Drag & Drop
+Manual Position Number
+
+Example
+
+1 Home Decor
+
+2 Kitchen
+
+3 Gifts
+
+4 Paintings
+
+5 Jewelry
+
+Supports
+
+Desktop Menu
+
+Mobile Menu
+
+Footer Menu
+
+Homepage Category Section
+
+10. Category Images
+
+Supports
+
+Banner
+
+Thumbnail
+
+Homepage Banner
+
+Mobile Banner
+
+Square Image
+
+Landscape Image
+
+Features
+
+Crop
+
+Resize
+
+Compress
+
+Replace
+
+Delete
+
+Preview
+
+11. Category Icons
+
+Supports
+
+Upload Custom Icons
+
+Bootstrap Icons
+
+SVG Icons
+
+Material Icons (Future)
+
+Preview Before Save
+
+12. Search
+
+Search By
+
+Category Name
+
+Category Code
+
+Parent Category
+
+SEO URL
+
+13. Filters
+
+Category Status
+
+Published
+
+Draft
+
+Hidden
+
+Archived
+
+Featured
+
+Homepage Categories
+
+Parent Category
+
+Date Created
+
+Updated Date
+
+14. Sorting
+
+Sort By
+
+Category Name
+
+Menu Order
+
+Product Count
+
+Created Date
+
+Updated Date
+
+Alphabetical
+
+Ascending
+
+Descending
+
+15. Bulk Actions
+
+Publish
+
+Unpublish
+
+Archive
+
+Delete
+
+Move
+
+Export
+
+Update Display Order
+
+Assign Parent
+
+16. Import / Export
+
+Import
+
+Excel
+
+CSV
+
+Export
+
+Excel
+
+CSV
+
+PDF
+
+Import Validation
+
+Duplicate Detection
+
+Hierarchy Validation
+
+Parent Validation
+
+17. Product Assignment
+
+Displays
+
+Assigned Products
+
+Products Count
+
+Quick Add Product
+
+Move Products
+
+Remove Products
+
+Bulk Assign
+
+18. Homepage Configuration
+
+Settings
+
+Featured Category
+
+Trending Category
+
+Popular Category
+
+Festival Category
+
+New Collection
+
+Display Banner
+
+Display Icon
+
+Display Products
+
+Maximum Products
+
+19. Activity Log
+
+Track
+
+Category Created
+
+Category Updated
+
+Category Deleted
+
+Category Published
+
+Category Hidden
+
+Image Changed
+
+SEO Updated
+
+Display Order Changed
+
+20. Business Rules
+Category Name is mandatory.
+Category Name must be unique within the same parent category.
+SEO URL must be unique.
+Parent Category cannot reference itself.
+Circular category hierarchy is not allowed.
+Child categories inherit visibility rules unless overridden.
+Products can belong to one or multiple categories (configurable).
+Soft Delete only.
+Archived categories remain available for reporting.
+21. User Permissions
+Permission	Description
+View Categories	View category hierarchy
+Create Categories	Add new categories
+Edit Categories	Modify category information
+Delete Categories	Archive or soft delete
+Publish Categories	Publish or unpublish
+Manage Menu Order	Reorder navigation
+Manage SEO	Edit SEO metadata
+Import Categories	Bulk import
+Export Categories	Export category data
+22. Navigation Flow
+Category Management
+      │
+      ├── Category List
+      │      ├── Tree View
+      │      ├── List View
+      │      ├── Search
+      │      ├── Filters
+      │      └── Export
+      │
+      ├── Add Category
+      │      ├── General Information
+      │      ├── Parent Selection
+      │      ├── Images
+      │      ├── Icons
+      │      ├── Display Settings
+      │      ├── SEO
+      │      └── Preview
+      │
+      ├── Edit Category
+      ├── View Category
+      ├── Manage Sub Categories
+      ├── Menu Ordering
+      ├── Homepage Configuration
+      ├── Import / Export
+      └── Activity History
+23. Future Enhancements
+AI Features
+AI category suggestions based on product content.
+AI-generated SEO metadata.
+AI category description generation.
+AI image recommendations.
+AI duplicate category detection.
+AI category merge recommendations.
+AI product classification.
+Enterprise Features
+Multi-language categories.
+Multi-store category management.
+Multi-tenant category hierarchy.
+Category approval workflow.
+Category version history.
+Scheduled publishing.
+Category analytics.
+Dynamic categories (rule-based product assignment).
+Category-specific landing pages.
+Drag-and-drop visual category builder.
+24. Acceptance Criteria
+Categories and subcategories can be created, edited, viewed, archived, and published.
+Unlimited hierarchy is supported without circular references.
+Menu ordering updates navigation correctly across the storefront.
+Category images, icons, and banners are managed with previews.
+SEO URLs are unique and configurable.
+Products can be assigned, moved, and managed within categories.
+Import and export handle hierarchy validation and duplicates.
+Audit logs record all category changes.
+Role-based permissions restrict category operations appropriately.
+Responsive management screens support desktop, tablet, and mobile administration.
+
+This specification creates a scalable Category Management module that supports your current handicraft catalog while being robust enough for future expansion into a large multi-category or multi-vendor e-commerce platform.

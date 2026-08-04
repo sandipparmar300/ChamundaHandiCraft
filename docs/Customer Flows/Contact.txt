@@ -1,0 +1,480 @@
+Module 11 - Contact
+1. Module Overview
+Module Name
+
+Contact
+
+Purpose
+
+The Contact module enables customers to communicate with the business through multiple channels including contact forms, WhatsApp, email, phone, Google Maps, and social media. It also manages customer inquiries, support requests, custom product requests, wholesale inquiries, and business communications.
+
+Business Goals
+Improve customer communication.
+Increase customer trust.
+Reduce customer support response time.
+Generate business leads.
+Support custom handicraft orders.
+Handle wholesale and export inquiries.
+Increase customer engagement.
+Improve customer satisfaction.
+2. Contact Workflow
+Customer Opens Contact Page
+          │
+          ▼
+Choose Contact Method
+          │
+ ┌────────┼───────────────┬──────────────┐
+ │        │               │              │
+ ▼        ▼               ▼              ▼
+Contact  WhatsApp      Call          Email
+ Form
+ │
+ ▼
+Submit Inquiry
+ │
+ ▼
+Validation
+ │
+ ▼
+Create Inquiry
+ │
+ ▼
+Send Email Notification
+ │
+ ▼
+Admin Receives Inquiry
+ │
+ ▼
+Customer Receives Confirmation
+3. Contact Page Layout
+Header
+Logo
+Navigation Menu
+Search
+Wishlist
+Cart
+My Account
+Breadcrumb
+
+Example
+
+Home
+>
+Contact Us
+4. Contact Information
+
+Display
+
+Company Information
+
+Company Name
+Business Logo
+GST Number (Optional)
+Business Registration Number (Optional)
+
+Contact Details
+
+Mobile Number
+Alternate Mobile
+WhatsApp Number
+Customer Support Number
+Email Address
+Business Hours
+
+Office Address
+
+Street
+Area
+City
+State
+Country
+PIN Code
+5. Contact Form
+Fields
+Personal Information
+Full Name
+Email Address
+Mobile Number
+Inquiry Information
+Subject
+
+Examples
+
+General Inquiry
+Product Inquiry
+Order Support
+Return Request
+Refund
+Wholesale Inquiry
+Bulk Order
+Custom Handmade Product
+Export Inquiry
+Partnership
+Feedback
+Complaint
+Other
+Message
+Rich Text (Optional)
+Plain Text
+
+Maximum Length
+
+2000 Characters
+Attachment (Future)
+
+Support
+
+Images
+PDF
+Documents
+
+Maximum Size
+
+Configurable
+CAPTCHA
+
+Support
+
+Google reCAPTCHA
+
+Buttons
+
+Submit
+Reset
+6. Form Validation
+
+Validate
+
+Required Fields
+Email Format
+Mobile Format
+Subject Selected
+Message Length
+CAPTCHA
+
+Display
+
+Validation Messages
+Success Message
+Error Message
+7. WhatsApp Integration
+
+Display
+
+WhatsApp Button
+WhatsApp Floating Button
+
+Actions
+
+Open WhatsApp Chat
+Pre-filled Message
+
+Example
+
+Hello,
+I would like to know more about your handmade products.
+
+Future
+
+WhatsApp Business API
+Automated Responses
+8. Phone Support
+
+Display
+
+Customer Support Number
+Sales Number
+Wholesale Number
+
+Actions
+
+Click to Call (Mobile)
+Copy Number
+9. Email Support
+
+Display
+
+Support Email
+Sales Email
+Wholesale Email
+
+Actions
+
+Open Email Client
+Copy Email
+10. Google Maps
+
+Display
+
+Embedded Google Map
+Business Location
+Navigation Button
+
+Actions
+
+View Larger Map
+Get Directions
+Open in Google Maps
+11. Business Hours
+
+Display
+
+Monday - Friday
+
+9:00 AM – 6:00 PM
+
+Saturday
+
+10:00 AM – 4:00 PM
+
+Sunday
+
+Closed
+
+Future
+
+Holiday Schedule
+12. Social Media
+
+Display
+
+Facebook
+Instagram
+YouTube
+Pinterest
+LinkedIn
+X (Twitter)
+
+Actions
+
+Open Profile
+Share Website
+13. FAQ Shortcut
+
+Display
+
+Frequently Asked Questions
+
+Examples
+
+Shipping
+Returns
+Payments
+Custom Orders
+
+Button
+
+Visit FAQ
+14. Customer Support
+
+Display
+
+Support Options
+
+Live Chat (Future)
+WhatsApp
+Email
+Phone
+
+Expected Response Time
+
+Example
+
+Within 24 Hours
+15. Inquiry Tracking
+
+After submission
+
+Generate
+
+Inquiry Number
+Submission Date
+Inquiry Status
+
+Statuses
+
+Submitted
+Assigned
+In Progress
+Resolved
+Closed
+16. Notifications
+
+Customer Receives
+
+Confirmation Email
+Confirmation SMS (Optional)
+WhatsApp Confirmation (Future)
+
+Admin Receives
+
+Email Notification
+Admin Dashboard Notification
+17. Analytics
+
+Track
+
+Contact Page Views
+Contact Form Submissions
+WhatsApp Clicks
+Phone Call Clicks
+Email Clicks
+Google Map Clicks
+Social Media Clicks
+Inquiry Categories
+Conversion Rate
+18. SEO Considerations
+SEO-friendly Contact URL.
+Meta Title.
+Meta Description.
+Local Business Schema.
+Google Business Profile integration.
+Open Graph tags.
+Canonical URL.
+XML sitemap inclusion.
+Mobile-friendly page.
+19. Performance Considerations
+Lazy load Google Maps.
+Optimize embedded content.
+AJAX form submission.
+Image optimization.
+Spam protection.
+Rate limiting for form submissions.
+CDN for static assets.
+20. Accessibility (WCAG)
+Keyboard navigation.
+Screen reader support.
+Accessible forms.
+High contrast mode.
+Proper labels.
+Focus indicators.
+Responsive design.
+ARIA support.
+21. Business Rules
+Contact form submissions require successful validation.
+CAPTCHA is mandatory to prevent spam.
+Every inquiry receives a unique reference number.
+Admins are notified immediately after submission.
+Customers receive an automatic confirmation email.
+WhatsApp links should open with a pre-filled message.
+Google Maps should display the configured business location.
+Contact information is managed through the Admin CMS module.
+Support response time should be configurable.
+22. User Permissions
+Guest
+View Contact Information
+Submit Contact Form
+Open WhatsApp
+View Google Map
+Call Business
+Send Email
+Customer
+All Guest Permissions
+Track Previous Inquiries (Future)
+Admin
+View Inquiries
+Assign Inquiries
+Update Inquiry Status
+Reply to Customer
+Configure Contact Information
+23. Navigation Flow
+Contact Us
+      │
+      ├── Contact Information
+      ├── Contact Form
+      ├── WhatsApp
+      ├── Phone
+      ├── Email
+      ├── Google Map
+      ├── Business Hours
+      ├── Social Media
+      ├── FAQ
+      └── Submit Inquiry
+24. Future AI Enhancements
+AI Customer Support
+AI chatbot.
+AI inquiry categorization.
+AI automatic ticket assignment.
+AI reply suggestions.
+AI multilingual customer support.
+AI sentiment analysis.
+AI spam detection.
+AI lead qualification.
+AI FAQ recommendations.
+AI response prioritization.
+Enterprise Features
+Live Chat.
+Video Call Support.
+Callback Request.
+CRM Integration.
+Ticketing System.
+Multi-branch Contact Information.
+Department-wise Contact Routing.
+Appointment Booking.
+Export Inquiry Portal.
+Vendor Registration.
+25. Acceptance Criteria
+Customers can contact the business using multiple communication channels.
+Contact forms validate all required information.
+Inquiries generate unique reference numbers.
+Customers receive confirmation after successful submission.
+Admins receive instant notifications for new inquiries.
+WhatsApp opens with a predefined message.
+Google Maps displays the correct business location.
+Contact page is responsive, secure, and accessible.
+Analytics capture customer interactions across all contact methods.
+26. Recommended Database Tables
+Contact
+ContactInquiries
+InquiryAttachments
+InquiryStatusHistory
+InquiryCategories
+Company Information
+CompanySettings
+BusinessLocations
+BusinessHours
+SocialMediaLinks
+Analytics
+ContactPageAnalytics
+InquiryAnalytics
+CommunicationLogs
+27. UI/UX Screens
+Contact Us Page
+Contact Form
+Inquiry Success Page
+Inquiry Details Page (Future)
+Business Information Card
+Google Maps Section
+Business Hours Section
+Social Media Section
+WhatsApp Floating Button
+Mobile Contact Page
+28. API Integration Points
+Contact Form API
+Inquiry Management API
+Email Notification API
+SMS API
+WhatsApp API
+Google Maps API
+Google reCAPTCHA API
+Analytics API
+29. Recommended UI Components
+
+Create reusable contact components:
+
+Contact Information Card
+Contact Form
+Inquiry Type Dropdown
+Business Hours Card
+Google Map Component
+WhatsApp Floating Button
+Click-to-Call Button
+Email Card
+Social Media Icons
+Success Notification
+Error Notification
+Loading Spinner
+CAPTCHA Component
+30. Recommended .NET 8 Architecture
+
+Implement the Contact module as a dedicated Customer Communication Module within your .NET 8 Modular Monolithic Architecture. Use CQRS to separate inquiry creation from inquiry retrieval. Persist inquiries using Entity Framework Core, while using background services or a message queue to asynchronously send email, SMS, and WhatsApp notifications, ensuring fast response times for customers. Store company contact information in the Settings/CMS module so administrators can update phone numbers, email addresses, business hours, Google Maps location, and social media links without code changes. Design the module with service abstractions (IEmailService, IWhatsAppService, ISmsService, IGoogleMapsService) to support future integrations and enterprise scalability.

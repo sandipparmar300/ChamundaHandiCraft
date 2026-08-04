@@ -1,0 +1,528 @@
+Module 4 - Product Details
+1. Module Overview
+Module Name
+
+Product Details
+
+Purpose
+
+The Product Details module provides customers with comprehensive information about a product, including images, videos, specifications, pricing, availability, reviews, related products, and purchase options. It enables customers to make informed purchasing decisions while providing a rich shopping experience.
+
+Business Goals
+Increase product conversion rate.
+Improve customer confidence.
+Reduce product return rate.
+Increase Average Order Value (AOV).
+Encourage cross-selling and upselling.
+Improve customer engagement.
+Enhance SEO visibility.
+Provide complete product transparency.
+2. Product Details Workflow
+Customer Opens Product
+        │
+        ▼
+Load Product Information
+        │
+        ▼
+Display Images & Details
+        │
+        ▼
+Select Variant
+        │
+        ▼
+Check Stock
+        │
+        ▼
+Choose Quantity
+        │
+ ┌──────┼──────────────┐
+ │      │              │
+ ▼      ▼              ▼
+Wishlist  Add to Cart  Buy Now
+ │         │              │
+ ▼         ▼              ▼
+Wishlist   Cart       Checkout
+3. Product Details Page Layout
+Header
+Logo
+Navigation Menu
+Search
+Wishlist
+Cart
+Login / My Account
+Breadcrumb
+
+Example
+
+Home
+>
+Home Decor
+>
+Wooden Crafts
+>
+Handmade Wooden Elephant
+Product Gallery
+Features
+Multiple Images
+Thumbnail Gallery
+Large Image Preview
+Zoom on Hover
+Full Screen Gallery
+Swipe Support (Mobile)
+Lazy Loading
+Image Carousel
+360° Product View
+Product Video
+Image Counter
+Product Information
+
+Display
+
+Product Name
+SKU
+Product Code
+Barcode
+Brand
+Category
+Handmade By
+Country of Origin
+Material
+Style
+Collection
+Product Rating
+Review Count
+Availability
+Pricing Section
+
+Display
+
+Selling Price
+Original Price
+Discount Amount
+Discount Percentage
+Tax Information
+Inclusive/Exclusive Tax
+EMI (Future)
+
+Badges
+
+Bestseller
+New Arrival
+Trending
+Limited Stock
+Handmade
+Exclusive
+Stock Information
+
+Display
+
+In Stock
+Low Stock
+Out of Stock
+Available Quantity (Optional)
+Estimated Delivery
+Ready to Ship
+4. Product Variants
+
+Support
+
+Size
+Color
+Material
+Finish
+Design
+Weight
+
+Variant Selection
+
+Dropdown
+Color Swatches
+Buttons
+Image-based Selection
+
+Business Rules
+
+Price changes dynamically.
+Stock updates dynamically.
+Product image changes based on selected variant.
+SKU changes based on selected variant.
+5. Quantity Selector
+
+Buttons
+
+Increase
+Decrease
+Manual Entry
+
+Validation
+
+Minimum Quantity
+Maximum Quantity
+Available Stock
+6. Product Description
+
+Display
+
+Short Description
+Full Description
+Product Story
+Handmade Process
+Artisan Information
+
+Support
+
+Rich Text
+Images
+Videos
+7. Product Specifications
+
+Display
+
+Dimensions
+Weight
+Material
+Color
+Finish
+Style
+Country of Origin
+Manufacturer
+Care Instructions
+Package Contents
+Warranty (If Applicable)
+8. Product Reviews
+
+Display
+
+Average Rating
+Rating Distribution
+Customer Reviews
+Verified Purchase Badge
+Images
+Videos
+Review Date
+
+Actions
+
+Write Review
+Edit Review
+Report Review
+Helpful Button
+
+Sorting
+
+Most Recent
+Highest Rating
+Lowest Rating
+Most Helpful
+9. Related Products
+
+Purpose
+
+Cross-selling
+
+Display
+
+Similar Category
+Frequently Bought Together
+Matching Products
+10. Similar Products
+
+Purpose
+
+Alternative recommendations.
+
+Display
+
+Similar Material
+Similar Price
+Similar Design
+11. Wishlist
+
+Actions
+
+Add to Wishlist
+Remove from Wishlist
+
+Real-Time Update
+
+Wishlist Count
+12. Add to Cart
+
+Actions
+
+Add Product
+Update Quantity
+Continue Shopping
+Go to Cart
+
+Validation
+
+Variant Required
+Stock Available
+13. Buy Now
+
+Flow
+
+Click Buy Now
+      │
+      ▼
+Validate Variant
+      │
+      ▼
+Validate Stock
+      │
+      ▼
+Checkout Page
+14. Shipping Information
+
+Display
+
+Delivery Estimate
+Shipping Charges
+Free Shipping Eligibility
+Courier Information
+
+Future
+
+Enter PIN Code to Check Delivery
+15. Return Information
+
+Display
+
+Return Policy
+Replacement Policy
+Refund Policy
+Cancellation Policy
+16. Trust Indicators
+
+Display
+
+100% Handmade
+Secure Payment
+Easy Returns
+Fast Shipping
+Quality Assurance
+Customer Support
+GST Invoice Available
+17. Product Sharing
+
+Support
+
+WhatsApp
+Facebook
+Instagram
+X (Twitter)
+LinkedIn
+Copy Link
+Email
+18. Recently Viewed Products
+
+Display
+
+Last Viewed Products
+Continue Shopping
+19. Search
+
+Within Product
+
+Support
+
+Search Reviews
+Search Specifications (Future)
+20. Analytics
+
+Track
+
+Product Views
+Image Views
+Video Plays
+Zoom Usage
+Variant Selection
+Wishlist Clicks
+Add to Cart
+Buy Now
+Review Submission
+Social Shares
+Time on Page
+Scroll Depth
+21. SEO Considerations
+SEO-friendly product URL.
+Unique meta title.
+Meta description.
+Product schema (Schema.org).
+Review schema.
+Breadcrumb schema.
+Open Graph tags.
+Canonical URL.
+Optimized H1 tag.
+Image alt text.
+XML sitemap inclusion.
+22. Performance Considerations
+Lazy loading images.
+WebP image support.
+Image CDN.
+Optimized thumbnails.
+Video streaming optimization.
+API response caching.
+Skeleton loaders.
+Deferred loading for reviews.
+Optimized SQL queries.
+23. Accessibility (WCAG)
+Keyboard navigation.
+Alt text for all images.
+Screen reader support.
+Accessible image gallery.
+Focus indicators.
+Color contrast compliance.
+Responsive layout.
+24. Business Rules
+Only published products should be visible.
+Customers cannot purchase unpublished or disabled products.
+Variant selection is mandatory before purchase when variants exist.
+Price, SKU, and stock update dynamically based on the selected variant.
+Customers cannot add quantities greater than available stock.
+Only verified purchasers can submit reviews (configurable).
+Only approved reviews are displayed publicly.
+Related and similar products are determined by category, tags, brand, and product attributes.
+Discounts and offers should be applied in real time.
+Shipping and return policies should reflect current system settings.
+25. User Permissions
+
+Customer
+
+View Product
+Zoom Images
+Watch Product Videos
+Select Variants
+Read Reviews
+Write Review
+Add to Wishlist
+Add to Cart
+Buy Now
+Share Product
+
+Admin
+
+Manage Product Details
+Manage Images
+Manage Videos
+Manage Variants
+Manage Reviews
+Configure Related Products
+Configure Similar Products
+26. Navigation Flow
+Product Details
+      │
+      ├── Product Gallery
+      ├── Product Information
+      ├── Pricing
+      ├── Variants
+      ├── Quantity
+      ├── Description
+      ├── Specifications
+      ├── Reviews
+      ├── Related Products
+      ├── Similar Products
+      ├── Wishlist
+      ├── Add to Cart
+      ├── Buy Now
+      ├── Shipping Info
+      ├── Return Policy
+      └── Recently Viewed
+27. Future AI Enhancements
+AI Shopping Experience
+AI personalized product recommendations.
+AI "Frequently Bought Together" suggestions.
+AI dynamic upselling.
+AI review summarization.
+AI product Q&A chatbot.
+AI image recognition for similar products.
+AI size/material recommendation.
+AI personalized discounts.
+AI customer sentiment analysis.
+AI visual search.
+Enterprise Features
+Product comparison.
+AR (Augmented Reality) product preview.
+3D product viewer.
+Live inventory across warehouses.
+Back-in-stock notifications.
+Price drop alerts.
+Product subscriptions.
+Multi-language product pages.
+Multi-currency pricing.
+Digital product downloads.
+Product bundles.
+Gift wrapping options.
+28. Acceptance Criteria
+Customers can view complete product information, images, videos, and specifications.
+Product variants dynamically update price, SKU, stock, and images.
+Customers can zoom images and view media on desktop and mobile.
+Customers can add products to Wishlist, Cart, or proceed directly to Checkout.
+Related and Similar Products are displayed based on configurable business rules.
+Product reviews are searchable, sortable, and moderated.
+Shipping and return information is clearly presented.
+Product pages are SEO-friendly, responsive, and accessible.
+Analytics accurately track customer interactions.
+The page performs efficiently under high traffic and large product catalogs.
+29. Recommended Database Tables
+Product Core
+Products
+ProductVariants
+ProductVariantAttributes
+ProductImages
+ProductVideos
+ProductSpecifications
+ProductDescriptions
+Customer Interaction
+ProductReviews
+ProductReviewImages
+ProductReviewHelpfulVotes
+ProductWishlists
+RecentlyViewedProducts
+ProductShares
+Recommendations
+RelatedProducts
+SimilarProducts
+FrequentlyBoughtTogether
+ProductRecommendations
+Analytics
+ProductViewLogs
+ProductInteractionLogs
+VariantSelectionLogs
+ProductAnalytics
+30. UI/UX Screens
+Product Details Page
+Image Gallery
+Full Screen Image Viewer
+Image Zoom Viewer
+Product Video Player
+Variant Selection Component
+Quantity Selector
+Product Description Tab
+Specifications Tab
+Reviews & Ratings Tab
+Write Review Modal
+Related Products Carousel
+Similar Products Carousel
+Shipping Information Section
+Return Policy Section
+Social Share Modal
+Mobile Product Details Page
+Sticky Add-to-Cart Bar (Mobile)
+31. API Integration Points
+Product Details API
+Product Images API
+Product Variants API
+Inventory API
+Pricing & Offers API
+Product Reviews API
+Wishlist API
+Cart API
+Related Products API
+Similar Products API
+Shipping Estimation API
+Analytics API
+Recommended .NET 8 Architecture
+
+Build the Product Details page using a Product Aggregate with separate query services for media, variants, pricing, reviews, recommendations, and inventory. Use CQRS for read operations, Dapper for optimized product detail queries, and Entity Framework Core for transactional updates. Cache product metadata, images, and recommendations using Redis or IMemoryCache, while keeping inventory and pricing real-time. Design reusable components (gallery, variants, reviews, recommendations) so they can be shared across the Customer Website, Mobile App, and future marketplace integrations. This architecture provides enterprise-grade scalability and a premium shopping experience.

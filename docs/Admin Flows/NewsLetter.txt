@@ -1,0 +1,476 @@
+Module 16 - Newsletter Management
+1. Module Overview
+Module Name
+
+Newsletter Management
+
+Purpose
+
+The Newsletter Management module enables administrators to collect subscribers, manage mailing lists, create and send email campaigns, schedule newsletters, monitor campaign performance, and automate email marketing to increase customer engagement and sales.
+
+Business Goals
+Grow email subscribers.
+Increase repeat purchases.
+Promote new products.
+Announce offers and festivals.
+Drive traffic to blogs.
+Build long-term customer relationships.
+Improve conversion rates.
+2. Newsletter Workflow
+Customer Visits Website
+        │
+        ▼
+Subscribe Newsletter
+        │
+        ▼
+Verify Email (Optional)
+        │
+        ▼
+Subscriber Added
+        │
+        ▼
+Create Email Campaign
+        │
+        ▼
+Select Audience
+        │
+        ▼
+Schedule Campaign
+        │
+        ▼
+Send Emails
+        │
+        ▼
+Track Opens & Clicks
+        │
+        ▼
+Campaign Analytics
+3. Newsletter Dashboard
+
+Display KPI Cards
+
+Total Subscribers
+Active Subscribers
+New Subscribers Today
+New Subscribers This Month
+Unsubscribed Users
+Email Campaigns
+Scheduled Campaigns
+Emails Sent
+Open Rate
+Click Rate
+Bounce Rate
+Conversion Rate
+4. Subscriber Management
+Purpose
+
+Manage all newsletter subscribers.
+
+Subscriber Information
+
+Fields
+
+Subscriber ID
+Email Address
+Full Name (Optional)
+Mobile Number (Optional)
+Customer Account
+Subscription Date
+Status
+Source
+Tags
+Subscription Source
+
+Examples
+
+Website Footer
+Homepage Popup
+Checkout
+Registration
+Contact Page
+Manual Import
+Admin Panel
+Subscriber Status
+Pending Verification
+Active
+Unsubscribed
+Blocked
+Bounced
+Actions
+View
+Edit
+Activate
+Deactivate
+Unsubscribe
+Delete
+Export
+5. Audience Segmentation
+
+Create subscriber groups.
+
+Examples
+
+All Subscribers
+Customers
+Non-Customers
+New Customers
+VIP Customers
+Festival Buyers
+High Value Customers
+Inactive Customers
+
+Future
+
+Purchase History
+Product Interest
+City
+Country
+Language
+6. Email Campaign Management
+Purpose
+
+Create marketing campaigns.
+
+Campaign Information
+
+Fields
+
+Campaign Name
+Subject Line
+Preview Text
+From Name
+Reply To Email
+Campaign Type
+Audience
+Status
+Campaign Types
+Newsletter
+Promotional
+Festival Offer
+Product Launch
+Flash Sale
+Blog Update
+Customer Announcement
+Survey
+Welcome Email
+7. Email Builder
+
+Support
+
+Drag & Drop Builder (Future)
+HTML Editor
+Rich Text Editor
+Template Selection
+
+Components
+
+Header
+Logo
+Banner
+Product Grid
+Images
+Buttons
+Offers
+Footer
+Social Media Links
+Unsubscribe Link
+8. Email Templates
+
+Default Templates
+
+Welcome Email
+Newsletter
+Festival Offer
+Product Promotion
+Flash Sale
+Blog Update
+Order Follow-up
+Thank You
+Re-engagement
+9. Scheduling
+
+Campaign can be
+
+Send Immediately
+Schedule Later
+Recurring Campaign (Future)
+
+Fields
+
+Send Date
+Send Time
+Time Zone
+10. Campaign Status
+Draft
+Scheduled
+Sending
+Completed
+Cancelled
+Failed
+11. Email Analytics
+
+Display
+
+Total Sent
+Delivered
+Opened
+Clicked
+Click Through Rate
+Bounce Rate
+Unsubscribed
+Spam Reports
+Conversion Rate
+
+Charts
+
+Open Rate Trend
+Click Trend
+Delivery Trend
+Subscriber Growth
+12. Search
+
+Search By
+
+Email Address
+Subscriber Name
+Campaign Name
+Subject
+13. Filters
+
+Subscribers
+
+Active
+Pending
+Unsubscribed
+Source
+Date Range
+
+Campaigns
+
+Draft
+Scheduled
+Sent
+Failed
+Campaign Type
+14. Bulk Actions
+
+Subscribers
+
+Activate
+Deactivate
+Delete
+Export
+Assign Tag
+
+Campaigns
+
+Duplicate
+Schedule
+Cancel
+Archive
+Delete
+15. Import / Export
+
+Import
+
+Excel
+CSV
+
+Export
+
+Excel
+CSV
+PDF
+16. Subscription Form
+
+Website Locations
+
+Footer
+Homepage
+Popup
+Checkout
+Blog
+Contact Page
+
+Fields
+
+Email
+Name (Optional)
+Mobile (Optional)
+
+Actions
+
+Subscribe
+Verify Email
+Success Message
+17. Unsubscribe Management
+
+Customers can
+
+Unsubscribe
+Update Preferences
+Pause Emails (Future)
+
+Admin can
+
+View Unsubscribed Users
+Restore Subscription
+Export List
+18. Activity Log
+
+Track
+
+Subscriber Added
+Subscriber Removed
+Campaign Created
+Campaign Updated
+Campaign Sent
+Campaign Cancelled
+Template Modified
+19. Notifications
+
+Notify Admin
+
+Campaign Completed
+Campaign Failed
+High Bounce Rate
+New Subscriber Milestone
+
+Notify Customer
+
+Subscription Confirmation
+Welcome Email
+Campaign Emails
+Unsubscribe Confirmation
+
+Channels
+
+Email
+Push Notification (Admin)
+20. Business Rules
+Email addresses must be unique.
+Email format must be validated before subscription.
+Double Opt-In (email verification) should be configurable.
+Every marketing email must include an unsubscribe link.
+Unsubscribed users must not receive future campaigns.
+Email templates should support responsive layouts.
+Campaign scheduling must use the configured time zone.
+Campaign statistics should update in real time where possible.
+Imported subscribers should be validated for duplicates.
+All newsletter activities are recorded in the audit log.
+21. User Permissions
+Permission	Description
+View Subscribers	Access subscriber list
+Manage Subscribers	Add, edit, or remove subscribers
+Create Campaigns	Create email campaigns
+Edit Campaigns	Modify campaigns
+Send Campaigns	Send or schedule emails
+Manage Templates	Create and edit templates
+View Analytics	Access campaign reports
+Export Reports	Download subscriber and campaign reports
+22. Navigation Flow
+Newsletter Management
+        │
+        ├── Dashboard
+        │
+        ├── Subscribers
+        │      ├── Active
+        │      ├── Pending
+        │      ├── Unsubscribed
+        │      └── Import/Export
+        │
+        ├── Email Campaigns
+        │      ├── Draft
+        │      ├── Scheduled
+        │      ├── Sending
+        │      ├── Completed
+        │      └── Failed
+        │
+        ├── Email Templates
+        │
+        ├── Audience Segments
+        │
+        ├── Analytics
+        │
+        └── Activity Log
+23. Future Enhancements
+AI Features
+AI-generated email subject lines.
+AI email content generation.
+AI personalized product recommendations.
+AI send-time optimization.
+AI customer segmentation.
+AI spam score prediction.
+AI A/B testing recommendations.
+AI campaign performance forecasting.
+AI abandoned cart recovery emails.
+AI re-engagement campaigns.
+Enterprise Features
+Multi-language campaigns.
+Marketing automation workflows.
+Drip email campaigns.
+Welcome email series.
+Birthday and anniversary emails.
+Cart abandonment campaigns.
+Wishlist reminder emails.
+Product back-in-stock notifications.
+Price drop alerts.
+Dynamic product recommendations.
+Customer journey automation.
+Integration with Mailchimp, SendGrid, Amazon SES, Brevo, Mailgun, and SMTP providers.
+Webhook support.
+Email approval workflow.
+Campaign cloning.
+Suppression lists.
+24. Acceptance Criteria
+Visitors can subscribe and unsubscribe from newsletters.
+Subscriber information is validated and stored securely.
+Administrators can create, schedule, send, and monitor email campaigns.
+Campaigns support reusable templates and audience segmentation.
+Analytics accurately report delivery, open, click, and conversion metrics.
+All marketing emails include unsubscribe functionality.
+Imported subscriber lists are validated and deduplicated.
+Role-based permissions secure subscriber and campaign management.
+All newsletter activities are recorded in the audit log.
+The architecture supports future marketing automation and AI-driven personalization.
+25. Recommended Database Tables
+
+For an enterprise-grade Newsletter Management system, consider these tables:
+
+NewsletterSubscribers
+NewsletterSubscriptionSources
+NewsletterSegments
+NewsletterSegmentMembers
+EmailCampaigns
+EmailCampaignRecipients
+EmailTemplates
+EmailTemplateVersions
+EmailCampaignSchedules
+EmailDeliveryLogs
+EmailOpenLogs
+EmailClickLogs
+EmailBounceLogs
+EmailUnsubscribeLogs
+NewsletterActivityLogs
+NewsletterSettings
+26. Third-Party Email Providers (Recommended)
+
+Design the module using an abstraction (e.g., IEmailProvider) so you can switch providers without changing business logic.
+
+Initially support:
+
+SMTP
+SendGrid
+Amazon SES
+Brevo (formerly Sendinblue)
+Mailgun
+
+Future integrations:
+
+Mailchimp
+Constant Contact
+HubSpot Marketing
+Klaviyo
+ActiveCampaign
+
+This provider-based architecture ensures your .NET 8 Modular Monolith remains flexible, scalable, and ready for enterprise-grade email marketing as your handicraft business grows.

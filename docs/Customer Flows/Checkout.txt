@@ -1,0 +1,516 @@
+Excellent. The Checkout Module is the most business-critical module in your entire eCommerce platform. This is where the customer converts from a visitor into a paying customer. Every second, every validation, and every interaction should be optimized for speed, trust, and security.
+
+The Checkout module integrates with Authentication, Customer Profile, Address Management, Cart, Inventory, Coupons, Shipping, Payment Gateway, Orders, Notifications, Tax, GST, and Reports.
+
+Module 6 - Checkout
+1. Module Overview
+Module Name
+
+Checkout
+
+Purpose
+
+The Checkout module enables customers to securely review their order, select or manage delivery addresses, choose a shipping method, select a payment method, verify pricing, and place an order. It ensures all validations are completed before creating an order and initiating payment.
+
+Business Goals
+Reduce checkout abandonment.
+Increase order conversion rate.
+Provide a fast and secure checkout experience.
+Ensure pricing, inventory, and shipping accuracy.
+Support multiple payment methods.
+Generate valid orders with complete audit trails.
+Improve customer trust and satisfaction.
+Minimize payment failures.
+2. Checkout Workflow
+Shopping Cart
+      │
+      ▼
+Checkout
+      │
+      ▼
+Address Selection
+      │
+      ▼
+Delivery Method
+      │
+      ▼
+Coupon Validation
+      │
+      ▼
+Order Summary
+      │
+      ▼
+Payment Selection
+      │
+      ▼
+Inventory Validation
+      │
+      ▼
+Place Order
+      │
+      ▼
+Payment Gateway
+      │
+      ▼
+Payment Success / Failure
+      │
+      ▼
+Order Confirmation
+3. Checkout Page Layout
+Header
+Logo
+Checkout Progress
+Secure Checkout Badge
+Customer Name
+Help/Support
+Checkout Progress Indicator
+
+Display
+
+Cart ✓
+Address
+Delivery
+Payment
+Review
+Confirmation
+4. Delivery Address
+Address List
+
+Display
+
+Full Name
+Mobile Number
+Address Line 1
+Address Line 2
+City
+State
+Country
+PIN Code
+Default Badge
+
+Actions
+
+Select Address
+Add New Address
+Edit Address
+Delete Address
+Set as Default
+Add Address
+
+Fields
+
+Full Name
+Mobile Number
+Alternate Mobile
+Address Line 1
+Address Line 2
+Landmark
+Country
+State
+City
+PIN Code
+Address Type
+Home
+Office
+Other
+Delivery Instructions (Optional)
+Default Address
+
+Validation
+
+Mandatory Fields
+Mobile Format
+PIN Code Format
+Serviceable Location
+5. Delivery Method
+
+Supported Methods
+
+Standard Delivery
+Express Delivery
+Free Shipping
+Store Pickup (Future)
+Scheduled Delivery (Future)
+
+Display
+
+Delivery Charge
+Estimated Delivery Date
+Courier Partner
+Delivery Time
+
+Validation
+
+Service Availability
+PIN Code Coverage
+Weight Restrictions
+6. Payment Methods
+
+Supported
+
+Cash on Delivery (COD)
+Razorpay
+Stripe
+UPI
+Net Banking
+Credit Card
+Debit Card
+Wallet (Future)
+EMI (Future)
+Gift Card (Future)
+
+Display
+
+Payment Icons
+Charges (If Any)
+Available Offers
+Secure Payment Badge
+
+Validation
+
+Payment Method Enabled
+COD Eligibility
+Minimum / Maximum Order Amount
+Payment Gateway Availability
+7. Order Summary
+
+Display
+
+Products
+Product Image
+Product Name
+SKU
+Selected Variant
+Quantity
+Unit Price
+Discount
+Line Total
+Price Summary
+Total Items
+Total Quantity
+Original Price
+Product Discount
+Coupon Discount
+Shipping Charges
+GST / Tax
+Handling Charges (Future)
+Grand Total
+Total Savings
+8. Coupon Summary
+
+Display
+
+Applied Coupon
+Discount Amount
+Remove Coupon
+
+Validation
+
+Revalidate before payment
+9. Inventory Validation
+
+Before order placement
+
+Validate
+
+Product Availability
+Variant Availability
+Quantity
+Reserved Stock
+Price Changes
+
+If validation fails
+
+Display message
+Refresh cart
+Prevent order placement
+10. Order Notes
+
+Optional
+
+Customer can enter
+
+Gift Message
+Delivery Instructions
+Special Notes
+
+Maximum
+
+500 Characters
+11. Terms & Conditions
+
+Customer must accept
+
+Terms & Conditions
+Privacy Policy
+Return Policy
+
+Checkbox required before placing order.
+
+12. Place Order
+
+Flow
+
+Click Place Order
+        │
+        ▼
+Validate Checkout
+        │
+        ▼
+Validate Inventory
+        │
+        ▼
+Validate Coupon
+        │
+        ▼
+Create Pending Order
+        │
+        ▼
+Redirect to Payment
+        │
+        ▼
+Payment Response
+        │
+ ┌──────┴─────────┐
+ │                │
+ ▼                ▼
+Success         Failure
+ │                │
+ ▼                ▼
+Order Confirmed  Retry Payment
+13. Order Confirmation
+
+Display
+
+Order Number
+Order Date
+Payment Status
+Estimated Delivery
+Order Total
+Download Invoice (When Available)
+Continue Shopping
+View Orders
+
+Notifications
+
+Email
+SMS
+WhatsApp
+Push Notification
+14. Checkout Validation
+
+System validates
+
+Customer Login
+Address
+Stock
+Variant
+Price
+Coupon
+GST
+Shipping
+Payment Method
+Fraud Rules (Future)
+15. Guest Checkout
+
+Support
+
+Guest Checkout (Configurable)
+Login During Checkout
+Register During Checkout
+Guest to Customer Conversion
+16. Analytics
+
+Track
+
+Checkout Started
+Address Selected
+Address Added
+Delivery Method Selected
+Payment Method Selected
+Coupon Applied
+Coupon Removed
+Checkout Abandoned
+Payment Success
+Payment Failure
+Order Created
+Checkout Duration
+17. SEO Considerations
+Checkout pages should be NoIndex.
+Exclude checkout URLs from sitemap.
+Prevent indexing of payment URLs.
+Secure HTTPS only.
+Disable browser caching for sensitive pages.
+18. Performance Considerations
+AJAX updates for address, shipping, and payment selection.
+Cache shipping rules.
+Optimize tax calculation.
+Lazy loading payment SDKs.
+Minimize API calls.
+Asynchronous inventory validation.
+Fast payment gateway initialization.
+Skeleton loaders.
+Distributed cache for checkout session.
+19. Accessibility (WCAG)
+Keyboard navigation.
+Accessible forms.
+Screen reader support.
+Proper focus management.
+High contrast mode.
+Mobile-friendly layout.
+Accessible error messages.
+ARIA labels for payment controls.
+20. Business Rules
+Checkout requires a valid customer session unless guest checkout is enabled.
+At least one valid delivery address is required.
+Delivery methods depend on serviceable PIN codes and shipping rules.
+Inventory must be revalidated before order creation.
+Coupons must be revalidated immediately before payment.
+Prices and taxes should be recalculated during checkout.
+Orders should be created with Pending Payment status before redirecting to the payment gateway (except COD, which may directly create a confirmed order based on business rules).
+Payment responses must be verified using gateway signatures/webhooks.
+Failed payments should allow customers to retry without creating duplicate orders.
+Every checkout action must be logged for auditing.
+21. User Permissions
+
+Customer
+
+Manage Addresses
+Select Delivery Method
+Apply Coupon
+Choose Payment Method
+Place Order
+View Confirmation
+
+Admin
+
+Configure Checkout
+Configure Shipping Rules
+Configure Payment Methods
+Configure Tax Rules
+Configure Guest Checkout
+22. Navigation Flow
+Checkout
+     │
+     ├── Address
+     ├── Delivery Method
+     ├── Coupon
+     ├── Order Summary
+     ├── Payment
+     ├── Order Notes
+     ├── Terms & Conditions
+     ├── Place Order
+     └── Confirmation
+23. Future AI Enhancements
+AI Checkout Experience
+AI preferred payment recommendation.
+AI delivery method recommendation.
+AI fraud detection.
+AI checkout abandonment prediction.
+AI coupon suggestion.
+AI address auto-completion.
+AI shipping optimization.
+AI estimated delivery prediction.
+AI smart payment retry.
+AI personalized checkout flow.
+Enterprise Features
+One-Page Checkout.
+Multi-Address Checkout.
+Split Shipment.
+Gift Wrapping.
+Gift Message.
+Scheduled Delivery.
+Store Pickup.
+Loyalty Point Redemption.
+Gift Card Payment.
+EMI Support.
+Partial Payments.
+Invoice to Business Account (B2B).
+Subscription Orders.
+Digital Product Checkout.
+24. Acceptance Criteria
+Customers can complete checkout with valid address, shipping, and payment information.
+Address management supports add, edit, delete, and default selection.
+Delivery methods are dynamically determined based on shipping rules.
+Payment methods respect business configuration and eligibility.
+Inventory, pricing, taxes, and coupons are validated before payment.
+Orders are created without duplication, even if payment is retried.
+Payment responses are securely verified.
+Confirmation page displays accurate order details.
+Notifications are sent after successful order placement.
+Checkout is responsive, accessible, and secure.
+25. Recommended Database Tables
+Checkout
+CheckoutSessions
+CheckoutAddresses
+CheckoutDeliveryMethods
+CheckoutPayments
+CheckoutCoupons
+CheckoutOrderNotes
+Orders
+Orders
+OrderItems
+OrderAddresses
+OrderPayments
+OrderShipments
+OrderTaxes
+Payment
+PaymentTransactions
+PaymentGatewayResponses
+PaymentRetryHistory
+Analytics
+CheckoutActivityLogs
+CheckoutAbandonments
+CheckoutAnalytics
+26. UI/UX Screens
+Checkout Page
+Address Selection
+Add/Edit Address Modal
+Delivery Method Selection
+Payment Method Selection
+Order Summary Panel
+Coupon Summary
+Order Notes Section
+Terms & Conditions Section
+Payment Processing Screen
+Payment Success Page
+Payment Failure Page
+Retry Payment Screen
+Order Confirmation Page
+Mobile Checkout
+Guest Checkout
+Empty Checkout/Error State
+27. API Integration Points
+Checkout API
+Customer Address API
+Shipping Calculation API
+Delivery Method API
+Coupon Validation API
+Inventory Validation API
+Tax Calculation API
+Order Creation API
+Payment Gateway API (Razorpay, Stripe, UPI)
+Payment Webhook API
+Notification API
+Analytics API
+28. Recommended UI Components
+
+Build reusable components for a consistent checkout experience:
+
+Checkout Progress Stepper
+Address Card
+Address Form
+Delivery Method Card
+Payment Method Card
+Coupon Summary
+Price Breakdown Card
+Order Summary Panel
+Order Notes Textarea
+Terms & Conditions Checkbox
+Sticky Place Order Button (Mobile)
+Payment Status Modal
+Success/Error Notification Toast
+Loading/Skeleton Components
+Recommended .NET 8 Architecture
+
+Implement Checkout as an independent Checkout Module orchestrating the Cart, Inventory, Pricing, Coupon, Shipping, Tax, Order, and Payment modules. Use CQRS to separate commands (place order, apply payment, update address) from queries (checkout summary, shipping options). Create the order in a Pending Payment state before initiating online payments and finalize it only after successful payment verification via gateway webhook/signature validation. Use Entity Framework Core for transactional consistency, Dapper for optimized read operations, and Redis for temporary checkout sessions. Employ an event-driven approach for post-order activities (inventory reservation, notifications, invoice generation, loyalty points), ensuring a robust, scalable, and enterprise-grade checkout process.

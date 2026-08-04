@@ -1,0 +1,543 @@
+Module 06 - Order Management
+1. Module Overview
+Module Name
+
+Order Management
+
+Purpose
+
+The Order Management module manages the complete lifecycle of customer orders from order placement through fulfillment, shipping, delivery, returns, refunds, and closure. It provides administrators with full visibility and control over order processing while ensuring accurate inventory, payment, and customer communication.
+
+Business Goals
+Centralize order processing.
+Track every order status.
+Streamline fulfillment workflow.
+Improve customer experience.
+Reduce manual errors.
+Integrate payment, inventory, shipping, and invoicing.
+Maintain complete audit history.
+2. Order Lifecycle
+Customer Places Order
+        │
+        ▼
+New Order
+        │
+        ▼
+Payment Verification
+        │
+        ▼
+Processing
+        │
+        ▼
+Packed
+        │
+        ▼
+Shipping Label Generated
+        │
+        ▼
+Shipped
+        │
+        ▼
+In Transit
+        │
+        ▼
+Delivered
+        │
+        ▼
+Completed
+        │
+        ├──────────────┐
+        ▼              ▼
+Cancelled        Return Request
+                       │
+                       ▼
+                Return Approved
+                       │
+                       ▼
+                Refund Process
+                       │
+                       ▼
+                Order Closed
+3. Order Dashboard
+
+Display summary cards
+
+Total Orders
+Today's Orders
+Pending Orders
+Processing Orders
+Packed Orders
+Shipped Orders
+Delivered Orders
+Cancelled Orders
+Returned Orders
+Refund Pending
+Refund Completed
+Average Order Value
+Total Sales
+4. Order List
+Purpose
+
+Displays all customer orders with advanced search, filters, and bulk actions.
+
+Order List Columns
+Order Number
+Order Date
+Customer Name
+Customer ID
+Total Amount
+Payment Method
+Payment Status
+Order Status
+Shipping Status
+Courier
+Tracking Number
+Item Count
+Delivery Date
+Created By
+Actions
+Row Actions
+View Order
+Edit Order (limited)
+Update Status
+Generate Invoice
+Print Invoice
+Generate Shipping Label
+Print Shipping Label
+Assign Courier
+Track Shipment
+Process Return
+Process Refund
+Cancel Order
+Download PDF
+View Activity Log
+5. New Orders
+
+Automatically created after successful checkout.
+
+Display
+
+Customer Information
+Billing Address
+Shipping Address
+Product Details
+Payment Information
+Order Summary
+
+Actions
+
+Accept Order
+Reject Order
+Verify Payment
+Cancel Order
+6. Processing Orders
+
+Purpose
+
+Prepare the order for shipment.
+
+Tasks
+
+Verify Inventory
+Reserve Stock
+Generate Picking List
+Assign Warehouse
+Assign Packing Staff
+Verify Payment
+Generate Invoice
+7. Packed Orders
+
+Purpose
+
+Track orders packed and ready for shipping.
+
+Display
+
+Packing Date
+Packed By
+Package Weight
+Package Dimensions
+Number of Packages
+Packing Notes
+
+Actions
+
+Generate Shipping Label
+Assign Courier
+Ship Order
+8. Shipped Orders
+
+Display
+
+Courier Name
+Tracking Number
+Dispatch Date
+Estimated Delivery Date
+Shipping Charges
+
+Actions
+
+Track Shipment
+Print Label
+Update Delivery Status
+9. Delivered Orders
+
+Display
+
+Delivery Date
+Delivery Time
+Receiver Name
+Proof of Delivery (Optional)
+Customer Confirmation
+
+Actions
+
+View Invoice
+Request Feedback
+Create Return
+10. Cancelled Orders
+
+Reasons
+
+Customer Request
+Payment Failure
+Out of Stock
+Duplicate Order
+Fraud Detection
+Admin Cancellation
+
+Actions
+
+View Reason
+Restore (Before Shipment)
+Refund
+
+Business Rules
+
+Stock must be released.
+Payment refunded if applicable.
+Coupon usage restored (configurable).
+11. Return Management
+
+Return Reasons
+
+Damaged Product
+Wrong Product
+Missing Item
+Quality Issue
+Customer Changed Mind
+Other
+
+Workflow
+
+Return Request
+        │
+        ▼
+Admin Review
+        │
+        ▼
+Approve / Reject
+        │
+        ▼
+Pickup Scheduled
+        │
+        ▼
+Item Received
+        │
+        ▼
+Inspection
+        │
+   ┌────┴─────┐
+   ▼          ▼
+Restock     Damage
+        │
+        ▼
+Refund
+12. Refund Management
+
+Refund Types
+
+Full Refund
+Partial Refund
+
+Refund Methods
+
+Original Payment Method
+Bank Transfer
+Wallet Credit
+Store Credit
+
+Refund Status
+
+Pending
+Approved
+Processing
+Completed
+Failed
+Rejected
+13. Invoice Management
+
+Generate GST-compliant invoices.
+
+Invoice Fields
+
+Invoice Number
+Invoice Date
+Customer Details
+Billing Address
+Shipping Address
+Product List
+GST Details
+HSN Code
+Discounts
+Shipping Charges
+Grand Total
+
+Actions
+
+View
+Print
+Download PDF
+Email Invoice
+14. Shipping Label
+
+Generate shipping label containing
+
+Order Number
+Customer Name
+Address
+Courier
+Tracking Number
+Barcode
+QR Code
+Package Weight
+
+Actions
+
+Print
+Download
+Reprint
+15. Order Details Page
+
+Sections
+
+Customer Information
+Billing Information
+Shipping Information
+Product Details
+Payment Details
+Order Timeline
+Shipment Information
+Invoice
+Activity History
+Internal Notes
+Customer Notes
+16. Order Timeline
+
+Example
+
+10:00 AM
+
+Order Placed
+
+↓
+
+10:05 AM
+
+Payment Completed
+
+↓
+
+11:15 AM
+
+Order Accepted
+
+↓
+
+01:00 PM
+
+Packed
+
+↓
+
+03:15 PM
+
+Shipped
+
+↓
+
+Next Day
+
+Delivered
+17. Search
+
+Search By
+
+Order Number
+Customer Name
+Email
+Mobile
+Invoice Number
+Tracking Number
+Product SKU
+18. Filters
+Order Status
+Payment Status
+Shipping Status
+Date Range
+Courier
+Payment Method
+Warehouse
+Customer
+Amount Range
+19. Bulk Actions
+Print Invoice
+Generate Labels
+Assign Courier
+Update Status
+Export Orders
+Send Notifications
+20. Import / Export
+
+Export
+
+Excel
+CSV
+PDF
+
+Reports
+
+Orders
+Returns
+Refunds
+Shipping
+21. Customer Notifications
+
+Automatically notify customers on
+
+Order Confirmation
+Payment Confirmation
+Processing
+Packed
+Shipped
+Out for Delivery (Future)
+Delivered
+Return Approved
+Refund Completed
+
+Channels
+
+Email
+SMS
+WhatsApp
+Push Notification
+22. Activity Log
+
+Track
+
+Order Created
+Payment Verified
+Status Changed
+Invoice Generated
+Label Generated
+Courier Assigned
+Shipment Updated
+Delivered
+Returned
+Refunded
+Cancelled
+23. Business Rules
+Order numbers must be unique.
+Stock is reserved immediately after successful order placement (or payment, based on configuration).
+Orders cannot move directly from New to Shipped; required intermediate statuses must be followed.
+Delivered orders cannot be edited.
+Cancelled orders cannot be shipped.
+Returns are allowed only within the configured return window.
+Refunds require approval based on business policy.
+Invoice numbers must be unique and sequential.
+Every status change is recorded in the audit log.
+Inventory is automatically updated during order fulfillment, cancellation, and approved returns.
+24. User Permissions
+Permission	Description
+View Orders	Access order records
+Update Order Status	Change order lifecycle status
+Cancel Orders	Cancel eligible orders
+Process Returns	Handle return requests
+Process Refunds	Approve and issue refunds
+Generate Invoices	Create and print invoices
+Generate Shipping Labels	Create shipping labels
+Assign Courier	Manage shipment assignments
+Export Orders	Export order data
+25. Navigation Flow
+Order Management
+        │
+        ├── Dashboard
+        │
+        ├── New Orders
+        ├── Processing
+        ├── Packed
+        ├── Shipped
+        ├── Delivered
+        ├── Cancelled
+        ├── Returns
+        ├── Refunds
+        │
+        ├── Order Details
+        │      ├── Customer
+        │      ├── Products
+        │      ├── Payment
+        │      ├── Shipment
+        │      ├── Invoice
+        │      ├── Timeline
+        │      └── Activity Log
+        │
+        ├── Invoice Management
+        ├── Shipping Labels
+        ├── Reports
+        └── Export
+26. Future Enhancements
+AI Features
+AI fraud detection for suspicious orders.
+AI delivery delay prediction.
+AI return risk scoring.
+AI order prioritization.
+AI shipping cost optimization.
+AI customer purchase pattern analysis.
+AI refund anomaly detection.
+Enterprise Features
+Multi-warehouse order routing.
+Split shipments.
+Partial deliveries.
+Partial cancellations.
+Partial refunds.
+Backorder management.
+Click & Collect.
+Dropshipping support.
+Order approval workflow.
+Gift orders and gift messages.
+Subscription orders.
+International shipping.
+Customs documentation.
+ERP integration.
+27. Acceptance Criteria
+Orders progress through the defined lifecycle without invalid transitions.
+Inventory, payments, invoices, and shipments remain synchronized with order status.
+Shipping labels and invoices are generated accurately.
+Returns and refunds follow configurable approval workflows.
+Customer notifications are sent automatically for key status changes.
+Search, filtering, exports, and reports work across all order states.
+All significant actions are recorded in the audit log.
+Role-based permissions restrict access to order operations.
+The module supports future enhancements such as split shipments, partial refunds, and multi-warehouse fulfillment without requiring architectural changes.
+Recommendation for Enterprise Design
+
+Since you're building this as a .NET 8 Modular Monolithic application, I recommend treating Order as the central business entity that coordinates with:
+
+Inventory Module (reserve/release stock)
+Payment Module (payment and refund status)
+Shipping Module (courier and tracking)
+Customer Module (order history and notifications)
+Invoice Module (tax-compliant invoicing)
+Notification Module (emails, SMS, WhatsApp, push notifications)
+
+Keeping these concerns modular while orchestrating them through the Order module will make the system easier to maintain and extend as your business grows.

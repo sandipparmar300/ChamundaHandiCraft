@@ -1,0 +1,532 @@
+Module 10 - Offer Management
+1. Module Overview
+Module Name
+
+Offer Management
+
+Purpose
+
+The Offer Management module enables administrators to create, schedule, and manage promotional campaigns that are automatically applied during customer shopping. It supports multiple offer types such as festival offers, combo offers, Buy X Get Y promotions, flash sales, category discounts, brand discounts, and future promotional campaigns.
+
+Business Goals
+Increase sales during promotional periods.
+Boost average order value.
+Promote slow-moving inventory.
+Increase customer engagement.
+Automate promotional campaigns.
+Improve seasonal marketing.
+Support future marketing strategies.
+2. Offer Lifecycle
+Create Offer
+      │
+      ▼
+Configure Offer Rules
+      │
+      ▼
+Select Products/Categories
+      │
+      ▼
+Schedule Offer
+      │
+      ▼
+Activate Offer
+      │
+      ▼
+Customer Shops
+      │
+      ▼
+Offer Validation Engine
+      │
+      ▼
+Offer Automatically Applied
+      │
+      ▼
+Order Completed
+      │
+      ▼
+Offer Analytics Updated
+3. Offer Dashboard
+
+Display KPI Cards
+
+Total Offers
+Active Offers
+Upcoming Offers
+Expired Offers
+Flash Sales
+Festival Offers
+Combo Offers
+Buy X Get Y Offers
+Revenue Generated
+Discount Given
+Conversion Rate
+Best Performing Offer
+4. Offer List
+
+Display all offers.
+
+Columns
+
+Offer Name
+Offer Type
+Offer Code (Optional)
+Applicable Products
+Applicable Categories
+Start Date
+End Date
+Priority
+Status
+Created By
+Actions
+
+Actions
+
+View
+Edit
+Duplicate
+Activate
+Deactivate
+Archive
+Delete
+View Analytics
+5. Create Offer
+General Information
+
+Fields
+
+Offer Name
+Internal Name
+Description
+Promotion Banner
+Display Label
+Priority
+Status
+6. Offer Types
+A. Festival Offer
+
+Examples
+
+Diwali Sale
+Navratri Offer
+Christmas Sale
+New Year Sale
+Independence Day Sale
+Raksha Bandhan Offer
+
+Configuration
+
+Percentage Discount
+Flat Discount
+Category Discount
+Product Discount
+Free Shipping
+Free Gift (Future)
+
+Applicable On
+
+Entire Store
+Categories
+Products
+Brands
+B. Combo Offer
+
+Examples
+
+Buy Table + Chair
+
+Get 20% OFF
+
+Buy Tea Set + Tray
+
+Get ₹500 OFF
+
+Configuration
+
+Fields
+
+Combo Name
+Products Included
+Combo Price
+Combo Discount
+Quantity Rules
+Maximum Purchase
+
+Offer Types
+
+Fixed Combo Price
+Percentage Discount
+Flat Discount
+C. Buy X Get Y
+
+Examples
+
+Buy 2
+
+Get 1 Free
+
+Buy 3
+
+Get 20% OFF
+
+Buy ₹5000
+
+Get ₹500 Discount
+
+Configuration
+
+Fields
+
+Buy Product
+Buy Quantity
+Get Product
+Get Quantity
+Discount
+Maximum Redemption
+
+Supported
+
+Same Product
+Different Product
+Same Category
+Different Category
+D. Flash Sale
+
+Purpose
+
+Limited-time promotional sale.
+
+Configuration
+
+Fields
+
+Sale Name
+Products
+Sale Price
+Discount
+Start Time
+End Time
+Stock Allocation
+
+Features
+
+Countdown Timer
+
+Limited Quantity
+
+Auto Start
+
+Auto End
+
+Homepage Banner
+
+7. Offer Rules
+
+Offer can be applied based on
+
+Products
+
+Categories
+
+Brands
+
+Customer Groups
+
+Minimum Order Amount
+
+Maximum Order Amount
+
+Order Quantity
+
+Payment Method
+
+Shipping Zone
+
+First Order
+
+Repeat Customer
+
+8. Offer Schedule
+
+Fields
+
+Start Date
+Start Time
+End Date
+End Time
+Time Zone
+
+Status
+
+Draft
+Scheduled
+Active
+Expired
+Disabled
+Archived
+9. Offer Priority
+
+Purpose
+
+Resolve conflicts between multiple active offers.
+
+Example
+
+Priority	Offer
+1	Flash Sale
+2	Festival Offer
+3	Combo Offer
+4	Category Discount
+
+Lower number = Higher Priority
+
+10. Automatic Offer Engine
+
+Validation Steps
+
+Customer Adds Product
+
+↓
+
+Check Active Offers
+
+↓
+
+Validate Rules
+
+↓
+
+Check Priority
+
+↓
+
+Apply Best Offer
+
+↓
+
+Update Cart
+
+↓
+
+Show Discount
+
+↓
+
+Checkout
+11. Product Eligibility
+
+Offer can apply to
+
+Entire Store
+Selected Products
+Selected Categories
+Selected Brands
+Handmade Collections
+New Arrivals
+Best Sellers
+12. Customer Eligibility
+
+Support
+
+All Customers
+New Customers
+Existing Customers
+VIP Customers
+Selected Customers
+13. Usage Limits
+
+Configure
+
+Unlimited
+Total Usage
+Per Customer
+Daily
+Weekly
+Monthly
+14. Offer Analytics
+
+Display
+
+Total Orders
+Revenue Generated
+Total Discount
+Conversion Rate
+Average Order Value
+Best Products
+Most Redeemed Offers
+
+Charts
+
+Revenue Graph
+Daily Usage
+Discount Trend
+15. Search
+
+Search By
+
+Offer Name
+Offer Type
+Product
+Category
+Brand
+16. Filters
+Offer Type
+Active
+Scheduled
+Expired
+Status
+Category
+Brand
+Date Range
+17. Bulk Actions
+Activate
+Deactivate
+Archive
+Delete
+Export
+Duplicate
+18. Import / Export
+
+Import
+
+Excel
+CSV
+
+Export
+
+Excel
+CSV
+PDF
+19. Notifications
+
+Notify Customer
+
+Flash Sale Started
+Festival Sale Started
+Offer Ending Soon
+Combo Offer Available
+
+Notify Admin
+
+Offer Started
+Offer Expired
+Usage Limit Reached
+
+Channels
+
+Email
+SMS
+WhatsApp
+Push Notification
+20. Activity Log
+
+Track
+
+Offer Created
+Offer Updated
+Offer Activated
+Offer Deactivated
+Offer Applied
+Offer Expired
+Offer Deleted
+21. Business Rules
+Offer names should be unique.
+Only active offers within the configured date and time are applied.
+Offer priority determines which promotion is applied when multiple offers are eligible.
+Flash Sales automatically start and end based on schedule.
+Buy X Get Y promotions validate quantities before applying discounts.
+Combo offers require all configured products to be present in the cart.
+Automatic offers cannot exceed configured discount limits.
+Offer stacking is disabled by default but can be enabled through settings.
+If both a coupon and an automatic offer are available, the system follows configurable promotion priority rules.
+Every offer application is recorded in the audit log.
+22. User Permissions
+Permission	Description
+View Offers	Access offer records
+Create Offers	Create new offers
+Edit Offers	Modify offer configuration
+Activate/Deactivate Offers	Control promotion availability
+Delete Offers	Archive or remove offers
+View Analytics	Access promotion performance
+Export Reports	Download reports
+23. Navigation Flow
+Offer Management
+        │
+        ├── Dashboard
+        │
+        ├── Offer List
+        │      ├── Search
+        │      ├── Filters
+        │      ├── Bulk Actions
+        │      └── Export
+        │
+        ├── Create Offer
+        │      ├── General Information
+        │      ├── Offer Type
+        │      ├── Rules
+        │      ├── Products
+        │      ├── Customers
+        │      ├── Schedule
+        │      ├── Priority
+        │      └── Preview
+        │
+        ├── Analytics
+        ├── Reports
+        └── Activity Log
+24. Future Enhancements
+AI Features
+AI-generated promotional campaigns.
+AI personalized offers based on browsing and purchase history.
+AI discount optimization to maximize profit.
+AI product bundling recommendations.
+AI seasonal promotion planning.
+AI offer performance prediction.
+AI customer segmentation for targeted promotions.
+AI recommendation engine for cross-sell and upsell.
+Enterprise Features
+Category-wide promotions.
+Brand-wide promotions.
+Cart-level discounts.
+Free shipping promotions.
+Free gift promotions.
+Loyalty-based offers.
+Referral campaigns.
+Cashback offers.
+Wallet cashback.
+Tiered discounts.
+Happy Hour promotions.
+Birthday and anniversary offers.
+Location-based offers.
+Multi-store promotions.
+Multi-currency promotions.
+Promotion approval workflow.
+A/B testing for offers.
+25. Acceptance Criteria
+Administrators can create, edit, activate, schedule, and archive all supported offer types.
+Offers are automatically evaluated and applied based on configured rules.
+Priority resolution prevents conflicting promotions from producing incorrect discounts.
+Festival, Combo, Buy X Get Y, and Flash Sale promotions work independently and together according to stacking rules.
+Analytics accurately report revenue, discounts, and redemption metrics.
+Notifications are sent for configured offer events.
+All offer lifecycle events are captured in the audit log.
+Role-based permissions secure promotion management.
+The architecture supports adding new promotion types without modifying existing business logic.
+Recommended Database Tables
+
+To build a scalable Promotion Engine, consider these tables:
+
+Offers
+OfferTypes
+OfferSchedules
+OfferRules
+OfferPriorities
+OfferApplicableProducts
+OfferApplicableCategories
+OfferApplicableBrands
+OfferEligibleCustomers
+OfferUsageLimits
+OfferRedemptions
+OfferAnalytics
+OfferActivityLogs
+OfferNotificationLogs
+
+This structure provides a flexible foundation for simple promotions today and sophisticated enterprise marketing campaigns as your handicraft eCommerce platform grows.

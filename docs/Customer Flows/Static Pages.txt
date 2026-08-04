@@ -1,0 +1,391 @@
+Module 13 - Static Pages
+1. Module Overview
+Module Name
+
+Static Pages
+
+Purpose
+
+The Static Pages module allows administrators to create and manage informational pages that help customers understand the business, policies, services, and frequently asked questions. All pages should be editable through the Admin Panel without requiring code deployment.
+
+Business Goals
+Build customer trust.
+Improve SEO.
+Reduce customer support inquiries.
+Explain company policies.
+Meet legal and compliance requirements.
+Improve customer experience.
+Centralize content management.
+Support future multilingual content.
+2. Static Pages Workflow
+Admin Creates/Updates Page
+            │
+            ▼
+Save as Draft
+            │
+            ▼
+Preview
+            │
+            ▼
+SEO Optimization
+            │
+            ▼
+Publish
+            │
+            ▼
+Customer Views Page
+            │
+            ▼
+Search / Navigation / Footer
+3. Static Pages
+
+The system should support the following default pages.
+
+About Us
+
+Purpose
+
+Introduce the company.
+
+Content
+
+Company Story
+Business Journey
+Founder Message
+Mission
+Vision
+Core Values
+Why Choose Us
+Manufacturing Process
+Handmade Process
+Team Information
+Awards & Certifications
+Gallery
+Customer Trust Badges
+FAQ
+
+Purpose
+
+Answer frequently asked customer questions.
+
+Categories
+
+Orders
+Payments
+Shipping
+Returns
+Refunds
+Product Care
+Account
+Security
+Wholesale
+Custom Orders
+
+Features
+
+Expand/Collapse
+Search Questions
+Category Filter
+Privacy Policy
+
+Content
+
+Personal Information
+Data Collection
+Cookies
+Payment Information
+Third-party Services
+Security
+User Rights
+GDPR (Future)
+Contact Information
+Return Policy
+
+Content
+
+Return Eligibility
+Return Window
+Non-returnable Products
+Return Process
+Refund Timeline
+Exchange Policy
+Damaged Products
+Cancellation Policy
+Shipping Policy
+
+Content
+
+Shipping Methods
+Shipping Charges
+Delivery Time
+International Shipping
+Packaging
+Tracking Orders
+Delivery Delays
+Lost Packages
+4. Page Layout
+
+Each page should include
+
+Header
+
+Logo
+Navigation
+Search
+Wishlist
+Cart
+My Account
+
+Main Content
+
+Hero Banner (Optional)
+Page Title
+Breadcrumb
+Rich Content
+Images
+Videos
+Downloadable PDFs (Optional)
+
+Sidebar (Optional)
+
+Related Pages
+Popular Articles
+Contact Support
+
+Footer
+
+Quick Links
+Contact Information
+Social Media
+Newsletter
+5. Content Management
+
+Content Editor
+
+Support
+
+Rich Text Editor
+Images
+Videos
+Tables
+Lists
+Hyperlinks
+Buttons
+Accordions
+Icons
+File Attachments
+HTML Embed (Configurable)
+6. Search
+
+Customers can search within
+
+FAQ Questions
+FAQ Answers
+Static Page Titles
+Static Page Content
+7. Breadcrumb
+
+Example
+
+Home
+>
+About Us
+
+Example
+
+Home
+>
+FAQ
+>
+Shipping Questions
+8. Related Content
+
+Display
+
+Related Static Pages
+Related Blog Articles
+Related Products
+Contact Support
+9. Downloads (Future)
+
+Support
+
+PDF
+Brochure
+Product Catalog
+Company Profile
+Warranty Documents
+10. Analytics
+
+Track
+
+Page Views
+Reading Time
+Scroll Depth
+Search Keywords
+FAQ Clicks
+Downloads
+Contact Button Clicks
+Related Product Clicks
+Exit Rate
+11. SEO Considerations
+
+Every page supports
+
+SEO URL
+Meta Title
+Meta Description
+Meta Keywords
+Canonical URL
+Open Graph Tags
+Twitter Cards
+Structured Data
+XML Sitemap
+Robots Meta
+Image Alt Text
+12. Performance Considerations
+CDN for images.
+Lazy loading.
+Browser caching.
+HTML compression.
+Optimized media.
+Redis cache.
+Responsive images.
+Server-side rendering (Future).
+13. Accessibility (WCAG)
+Keyboard navigation.
+Screen reader support.
+Proper heading hierarchy.
+Alt text for images.
+Accessible forms.
+Focus indicators.
+High contrast mode.
+ARIA labels.
+14. Business Rules
+Only published pages are visible to customers.
+Draft pages remain accessible only to administrators.
+Every page must have a unique SEO URL.
+Changes should support preview before publishing.
+Every published page should automatically update the sitemap.
+FAQs should be grouped into categories.
+Static pages should support version history.
+Content changes should be recorded in an audit log.
+Footer and navigation links are configurable through the CMS.
+15. User Permissions
+Guest
+View Static Pages
+Search FAQs
+Download Public Documents
+Customer
+Same permissions as Guest
+Admin
+Create Pages
+Edit Pages
+Delete Pages
+Publish/Unpublish
+Manage FAQs
+Upload Media
+Configure SEO
+Manage Navigation Links
+16. Navigation Flow
+Static Pages
+      │
+      ├── About Us
+      ├── FAQ
+      │      ├── Categories
+      │      └── Search
+      ├── Privacy Policy
+      ├── Return Policy
+      ├── Shipping Policy
+      ├── Related Content
+      └── Contact Us
+17. Future AI Enhancements
+AI Content Features
+AI content generation.
+AI FAQ suggestions.
+AI SEO optimization.
+AI grammar correction.
+AI multilingual translation.
+AI readability analysis.
+AI content summarization.
+AI internal link recommendations.
+AI image generation.
+AI content quality scoring.
+Enterprise Features
+Multi-language pages.
+Multi-store content.
+Scheduled publishing.
+Content approval workflow.
+Version history.
+Draft comparison.
+Digital asset management.
+Page templates.
+Custom page builder.
+Headless CMS support.
+18. Acceptance Criteria
+Customers can access all published static pages.
+FAQ supports categories and keyword search.
+Every page supports SEO metadata.
+Rich content (text, images, videos, links) renders correctly.
+Pages are editable from the Admin Panel.
+Content changes can be previewed before publishing.
+Navigation and footer automatically reflect published pages.
+All pages are responsive, accessible, and optimized for SEO.
+19. Recommended Database Tables
+Static Pages
+StaticPages
+StaticPageVersions
+StaticPageMedia
+StaticPageCategories
+FAQ
+FaqCategories
+FaqQuestions
+FaqViews
+SEO
+SeoMetadata
+SeoRedirects
+Analytics
+PageAnalytics
+PageViewLogs
+SearchLogs
+20. UI/UX Screens
+About Us Page
+FAQ Landing Page
+FAQ Category Page
+FAQ Search Results
+Privacy Policy Page
+Return Policy Page
+Shipping Policy Page
+Generic CMS Page Template
+Mobile Static Page
+No Search Results
+Loading Skeleton
+21. API Integration Points
+Static Page API
+FAQ API
+CMS API
+SEO API
+Search API
+Analytics API
+Media API
+Sitemap API
+22. Recommended UI Components
+
+Build reusable components for all static pages:
+
+Hero Banner
+Breadcrumb
+Rich Content Renderer
+FAQ Accordion
+FAQ Search Bar
+Category Filter
+Related Content Card
+Download Card
+Social Share Buttons
+Contact Support Card
+Newsletter Section
+Loading Skeleton
+Empty State Component
+23. Recommended .NET 8 Architecture
+
+Implement Static Pages as a dedicated CMS Module within your .NET 8 Modular Monolithic Architecture. Store page content, FAQs, media references, and SEO metadata using Entity Framework Core, while using Dapper for high-performance page retrieval and FAQ search. Use CQRS to separate content management from page rendering. Cache published pages, FAQs, and navigation menus using Redis or IMemoryCache to minimize database access. Implement versioning and audit logging so administrators can preview, publish, restore previous versions, and track all content changes. Design the module with service abstractions (IPageService, IFaqService, ISeoService, IMediaService) to support future multilingual content, headless CMS, approval workflows, and AI-assisted content management. This architecture provides an enterprise-grade, scalable, and maintainable CMS solution for your eCommerce platform.

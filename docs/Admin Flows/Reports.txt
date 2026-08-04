@@ -1,0 +1,489 @@
+Module 18 - Reports & Analytics
+1. Module Overview
+Module Name
+
+Reports & Analytics
+
+Purpose
+
+The Reports & Analytics module provides comprehensive business insights through interactive dashboards, reports, charts, KPIs, and data exports. It enables administrators and business owners to monitor sales, profits, customer behavior, inventory, payments, taxes, returns, and operational performance for informed decision-making.
+
+Business Goals
+Monitor business performance.
+Increase profitability.
+Analyze customer behavior.
+Track inventory movement.
+Simplify tax filing.
+Improve inventory planning.
+Support business decisions.
+Generate management reports.
+2. Report Workflow
+Business Transactions
+        │
+        ▼
+Collect Data
+        │
+        ▼
+Generate KPIs
+        │
+        ▼
+Generate Reports
+        │
+        ▼
+Charts & Analytics
+        │
+        ▼
+Export / Print
+        │
+        ▼
+Management Decision
+3. Reports Dashboard
+KPI Cards
+Total Revenue
+Net Profit
+Gross Profit
+Orders
+Customers
+Products Sold
+Average Order Value
+Refund Amount
+Tax Collected
+Inventory Value
+Pending Orders
+Return Rate
+Dashboard Charts
+Daily Sales
+Monthly Sales
+Revenue Trend
+Profit Trend
+Order Trend
+Customer Growth
+Inventory Movement
+Product Performance
+Payment Method Distribution
+Return Analysis
+4. Sales Reports
+Purpose
+
+Analyze sales performance.
+
+Reports
+Daily Sales
+Weekly Sales
+Monthly Sales
+Quarterly Sales
+Yearly Sales
+Custom Date Range
+Sales by Product
+Sales by Category
+Sales by Brand
+Sales by Customer
+Sales by Payment Method
+Sales by Shipping Method
+Sales by Coupon
+Sales by Offer
+Sales by Location
+Sales by Salesperson (Future)
+KPIs
+Gross Sales
+Net Sales
+Total Orders
+Average Order Value
+Highest Sale
+Lowest Sale
+5. Profit Reports
+
+Display
+
+Gross Profit
+Net Profit
+Profit Margin
+Cost Price
+Selling Price
+Product-wise Profit
+Category Profit
+Brand Profit
+Monthly Profit
+Annual Profit
+
+Charts
+
+Profit Trend
+Margin Analysis
+6. Customer Reports
+
+Display
+
+New Customers
+Active Customers
+Repeat Customers
+Inactive Customers
+Customer Lifetime Value (CLV)
+Top Customers
+Highest Spending Customers
+Customer Location Report
+Customer Registration Report
+
+Charts
+
+Customer Growth
+Customer Segmentation
+Repeat Purchase Rate
+7. Inventory Reports
+
+Display
+
+Current Stock
+Warehouse Stock
+Stock Movement
+Stock Adjustment
+Damaged Stock
+Returned Stock
+Low Stock
+Out of Stock
+Stock Valuation
+Fast Moving Products
+Slow Moving Products
+
+Charts
+
+Inventory Trend
+Warehouse Distribution
+8. Product Reports
+
+Display
+
+Best Selling Products
+Least Selling Products
+Most Viewed Products
+Most Wishlisted Products
+Product Performance
+Category Performance
+Brand Performance
+Product Rating Report
+
+Charts
+
+Top Products
+Product Revenue
+9. Tax Reports
+
+Display
+
+GST Collected
+GST Paid
+CGST
+SGST
+IGST
+Tax Summary
+Tax by Invoice
+Tax by State
+Tax by Product
+
+Exports
+
+GST Filing Report
+Tax Audit Report
+10. Payment Reports
+
+Display
+
+Payment Success
+Failed Payments
+Pending Payments
+COD Orders
+Razorpay Payments
+Stripe Payments
+UPI Payments
+Refunds
+Gateway Charges
+
+Charts
+
+Payment Method Distribution
+Success vs Failure
+11. Order Reports
+
+Display
+
+New Orders
+Processing
+Packed
+Shipped
+Delivered
+Cancelled
+Returned
+Delayed Orders
+
+Charts
+
+Order Lifecycle
+Order Status Distribution
+12. Return Reports
+
+Display
+
+Return Requests
+Approved Returns
+Rejected Returns
+Refund Amount
+Return Reasons
+Product Return Rate
+Customer Return Rate
+
+Charts
+
+Return Trend
+Return Reasons
+13. Search
+
+Search By
+
+Order Number
+Invoice Number
+Customer
+Product
+Category
+14. Filters
+
+Global Filters
+
+Date Range
+Product
+Category
+Brand
+Customer
+Payment Method
+Order Status
+Warehouse
+State
+City
+15. Export Reports
+
+Formats
+
+Excel
+CSV
+PDF
+Print
+
+Future
+
+Scheduled Email Reports
+16. Scheduled Reports
+
+Support
+
+Daily
+Weekly
+Monthly
+Quarterly
+Yearly
+
+Automatically Email Reports
+
+To
+
+Owner
+Admin
+Accountant
+17. Drill Down Reports
+
+Example
+
+Revenue
+
+↓
+
+Month
+
+↓
+
+Day
+
+↓
+
+Order
+
+↓
+
+Invoice
+
+↓
+
+Customer
+
+↓
+
+Product
+
+18. Report Analytics
+
+Display
+
+Top Products
+Top Categories
+Peak Sales Hours
+Customer Retention
+Conversion Rate
+Abandoned Cart Rate
+Coupon Usage
+Marketing ROI
+19. Activity Log
+
+Track
+
+Report Generated
+Exported
+Printed
+Scheduled
+Shared
+20. Business Rules
+Reports should reflect only finalized business transactions unless filters specify otherwise.
+Date range filtering must be available for every report.
+Exported reports must preserve filters, sorting, and grouping.
+Financial calculations should use consistent rounding rules.
+Tax reports must align with invoice data.
+Inventory valuation should support configurable costing methods (Average, FIFO, etc., future enhancement).
+Sensitive financial reports should be accessible only to authorized roles.
+Scheduled reports should be generated automatically at configured intervals.
+Large reports should be processed asynchronously to avoid performance issues.
+All report generation and export activities should be recorded in the audit log.
+21. User Permissions
+Permission	Description
+View Reports	Access reporting module
+Sales Reports	View sales reports
+Profit Reports	View profit analysis
+Customer Reports	View customer reports
+Inventory Reports	View inventory reports
+Product Reports	View product performance
+Tax Reports	View tax reports
+Payment Reports	View payment reports
+Order Reports	View order reports
+Return Reports	View return reports
+Export Reports	Download reports
+Schedule Reports	Configure automatic reports
+22. Navigation Flow
+Reports & Analytics
+        │
+        ├── Dashboard
+        │
+        ├── Sales Reports
+        │
+        ├── Profit Reports
+        │
+        ├── Customer Reports
+        │
+        ├── Inventory Reports
+        │
+        ├── Product Reports
+        │
+        ├── Tax Reports
+        │
+        ├── Payment Reports
+        │
+        ├── Order Reports
+        │
+        ├── Return Reports
+        │
+        ├── Scheduled Reports
+        │
+        ├── Export Center
+        │
+        └── Activity Log
+23. Future AI Enhancements
+AI Business Intelligence
+AI sales forecasting.
+AI demand prediction.
+AI inventory forecasting.
+AI customer churn prediction.
+AI profit optimization.
+AI fraud detection.
+AI product recommendation analysis.
+AI marketing ROI prediction.
+AI anomaly detection in sales.
+AI executive summary generation ("This month's sales increased by 18% compared to last month").
+Enterprise Features
+Multi-company reporting.
+Multi-store reporting.
+Multi-warehouse reporting.
+Real-time dashboards.
+Interactive charts.
+Custom report builder.
+Saved report templates.
+Scheduled email reports.
+Report sharing.
+Power BI integration.
+Microsoft Excel integration.
+Google Looker Studio integration.
+API access for BI tools.
+Data warehouse integration.
+24. Acceptance Criteria
+Administrators can generate reports across all business domains (Sales, Profit, Customers, Inventory, Products, Tax, Payments, Orders, Returns).
+All reports support filtering, searching, sorting, grouping, and drill-down.
+Reports can be exported to Excel, CSV, PDF, and printed.
+KPI dashboards update using current business data.
+Scheduled reports are automatically generated and emailed.
+Financial and tax calculations are accurate and auditable.
+Role-based permissions restrict access to sensitive reports.
+Large datasets are processed efficiently using asynchronous generation.
+All reporting activities are logged.
+The reporting architecture supports integration with external BI platforms.
+25. Recommended Database Tables
+
+Since reports primarily aggregate data from existing modules, only a few dedicated tables are typically required:
+
+Report Configuration
+ReportDefinitions
+SavedReports
+ScheduledReports
+ReportSchedules
+ReportRecipients
+Report Execution
+GeneratedReports
+ReportExecutionHistory
+ReportExportHistory
+ReportActivityLogs
+Dashboard & Analytics
+DashboardWidgets
+DashboardLayouts
+KpiDefinitions
+KpiSnapshots
+Future BI
+DataWarehouseSnapshots
+AnalyticsEvents
+BusinessMetrics
+26. UI Screens
+
+The Reports & Analytics module should include the following screens:
+
+Reports Dashboard
+Sales Reports
+Profit Reports
+Customer Reports
+Inventory Reports
+Product Reports
+Tax Reports
+Payment Reports
+Order Reports
+Return Reports
+Report Builder
+Saved Reports
+Scheduled Reports
+Dashboard Configuration
+Export Center
+KPI Dashboard
+Report Execution History
+Activity Log
+Recommended Architecture (.NET 8 Modular Monolith)
+
+To keep the system scalable and maintainable:
+
+Create a dedicated Reporting Module separate from business modules.
+Use CQRS (Query Side) for complex report generation.
+Use Dapper for high-performance reporting queries instead of Entity Framework for large datasets.
+Implement background jobs (Hangfire or Quartz.NET) for scheduled reports.
+Cache frequently accessed dashboards using Redis.
+Design report definitions to be reusable so the same reporting engine can serve the Admin Panel, future mobile app, and external BI tools.
+
+This approach gives you an enterprise-grade reporting system similar to Shopify, Magento, and Microsoft Dynamics while remaining suitable for your .NET 8 Modular Monolithic architecture.

@@ -1,0 +1,513 @@
+Module 20 - System Settings
+1. Module Overview
+Module Name
+
+System Settings
+
+Purpose
+
+The System Settings module provides centralized management of all application-wide configurations, including company information, taxation, currencies, payment gateways, communication services, shipping defaults, social media, security, localization, and other operational settings.
+
+Business Goals
+Centralize application configuration.
+Reduce dependency on code changes.
+Simplify administration.
+Improve system flexibility.
+Support multi-environment deployments.
+Enable feature toggling.
+Prepare the platform for future scalability.
+2. Settings Workflow
+Administrator Login
+        │
+        ▼
+Open Settings Module
+        │
+        ▼
+Select Configuration Category
+        │
+        ▼
+Update Configuration
+        │
+        ▼
+Validate Settings
+        │
+        ▼
+Save Configuration
+        │
+        ▼
+Audit Log
+        │
+        ▼
+Configuration Applied
+3. Settings Dashboard
+
+Display
+
+Company Information Status
+Payment Gateway Status
+Email Status
+SMS Status
+WhatsApp Status
+GST Configuration
+Currency
+Tax Configuration
+Security Status
+Backup Status
+License Information (Future)
+Environment (Development/Staging/Production)
+4. Company Settings
+
+Purpose
+
+Store business information.
+
+Company Information
+Company Name
+Legal Business Name
+GST Number
+PAN Number
+CIN Number (Optional)
+Company Logo
+Favicon
+Address
+City
+State
+Country
+PIN Code
+Contact Number
+Mobile Number
+Email
+Website
+Business Hours
+5. GST Settings
+
+Fields
+
+GST Number
+GST Enabled
+Default GST %
+CGST %
+SGST %
+IGST %
+GST Invoice Prefix
+GST Invoice Footer
+
+Validation
+
+GST Number Format
+Percentage Validation
+6. Currency Settings
+
+Support
+
+INR
+USD
+EUR
+GBP
+AED
+AUD
+CAD
+
+Fields
+
+Default Currency
+Currency Symbol
+Decimal Precision
+Thousand Separator
+Decimal Separator
+Exchange Rate (Future)
+7. Tax Settings
+
+Configuration
+
+Inclusive Tax
+Exclusive Tax
+Default Tax %
+Product Wise Tax
+Category Wise Tax
+Tax Priority
+
+Future
+
+State Wise Tax
+Country Wise Tax
+8. Email Settings
+
+Support
+
+SMTP
+SendGrid
+Amazon SES
+Brevo
+Mailgun
+
+Configuration
+
+SMTP Server
+Port
+Username
+Password
+SSL Enabled
+Default Sender Name
+Sender Email
+
+Actions
+
+Test Email
+Save
+Reset
+9. SMS Settings
+
+Support
+
+Twilio
+MSG91
+Textlocal
+
+Configuration
+
+Provider
+API Key
+Sender ID
+Country Code
+Test SMS
+10. WhatsApp Settings (Future)
+
+Support
+
+Meta WhatsApp Business API
+Twilio WhatsApp
+Gupshup
+
+Fields
+
+API Key
+Business Number
+Access Token
+Verify Token
+Webhook URL
+Test Message
+11. Payment Gateway Settings
+
+Supported Gateways
+
+Razorpay
+Stripe
+PayPal (Future)
+Cash On Delivery
+UPI
+
+Configuration
+
+API Key
+Secret Key
+Webhook Secret
+Merchant ID
+Test Mode
+Live Mode
+Enable/Disable
+
+Actions
+
+Test Connection
+Save
+12. Shipping Settings
+
+Fields
+
+Default Shipping Charges
+Free Shipping Limit
+Default Warehouse
+Estimated Delivery Days
+Shipping Calculation Method
+Default Courier
+
+Future
+
+Zone Based Shipping
+Weight Based Shipping
+13. Social Media Settings
+
+Store
+
+Facebook URL
+Instagram URL
+X (Twitter) URL
+LinkedIn URL
+Pinterest URL
+YouTube URL
+WhatsApp Link
+
+Purpose
+
+Display on website and emails.
+
+14. SEO Settings
+
+Global
+
+Default Meta Title
+Default Meta Description
+Default Keywords
+Google Analytics ID
+Google Tag Manager ID
+Facebook Pixel ID
+Robots Default
+Sitemap Auto Generate
+15. Notification Settings
+
+Enable/Disable
+
+Email
+SMS
+WhatsApp
+Push Notification
+
+Default Templates
+
+Retry Count
+
+Queue Size
+
+16. Authentication Settings
+
+Configuration
+
+Password Policy
+Session Timeout
+Login Attempts
+Account Lockout
+OTP Expiry
+Remember Me
+Google Login
+Facebook Login (Future)
+17. Security Settings
+
+Configuration
+
+HTTPS Required
+Two Factor Authentication (Future)
+IP Whitelist (Future)
+File Upload Size
+Allowed File Types
+Password Expiry
+CAPTCHA
+Audit Logging
+18. Localization Settings
+
+Fields
+
+Time Zone
+Date Format
+Time Format
+Language
+Country
+Currency
+Number Format
+
+Future
+
+Multi-language Support
+19. Backup & Maintenance
+
+Features
+
+Manual Backup
+Scheduled Backup (Future)
+Database Backup Status
+Maintenance Mode
+Cache Clear
+Log Cleanup
+20. Feature Management
+
+Enable/Disable
+
+Wishlist
+Reviews
+Coupons
+Rewards
+Blog
+Newsletter
+WhatsApp
+Guest Checkout
+COD
+OTP Login
+Multi Warehouse (Future)
+21. Search
+
+Search Settings By
+
+Company
+Email
+Payment
+Security
+Notification
+Shipping
+22. Activity Log
+
+Track
+
+Setting Updated
+Configuration Changed
+Test Email Sent
+Payment Gateway Updated
+Security Policy Changed
+Feature Enabled
+Feature Disabled
+23. Business Rules
+Only Super Administrators can modify system settings.
+Sensitive values (API keys, passwords, secrets) must be encrypted before storage.
+Configuration changes should be validated before saving.
+Payment gateway credentials must support Test and Live environments.
+Changes to authentication and security settings should require confirmation.
+System settings should support environment-specific overrides.
+Every configuration change must be recorded in the audit log.
+Critical changes may require application restart or cache refresh.
+Feature toggles should take effect without code deployment whenever possible.
+Backup and restore operations should be restricted to authorized administrators.
+24. User Permissions
+Permission	Description
+View Settings	View system configuration
+Manage Company Settings	Update company details
+Manage Tax & GST	Configure tax settings
+Manage Currency	Configure currencies
+Manage Email	Configure email providers
+Manage SMS	Configure SMS providers
+Manage Payment Gateways	Configure payment methods
+Manage Shipping	Configure shipping
+Manage Security	Update security policies
+Manage Features	Enable/Disable modules
+View Audit Logs	Review configuration changes
+25. Navigation Flow
+System Settings
+      │
+      ├── Dashboard
+      │
+      ├── Company
+      │
+      ├── GST
+      │
+      ├── Currency
+      │
+      ├── Tax
+      │
+      ├── Email
+      │
+      ├── SMS
+      │
+      ├── WhatsApp
+      │
+      ├── Payment Gateway
+      │
+      ├── Shipping
+      │
+      ├── Social Media
+      │
+      ├── SEO
+      │
+      ├── Notifications
+      │
+      ├── Authentication
+      │
+      ├── Security
+      │
+      ├── Localization
+      │
+      ├── Backup & Maintenance
+      │
+      ├── Feature Management
+      │
+      └── Activity Log
+26. Future AI Enhancements
+AI Configuration Assistant
+AI validates configuration changes before saving.
+AI detects misconfigured payment gateways.
+AI recommends optimal tax settings.
+AI suggests email delivery improvements.
+AI monitors failed integrations.
+AI predicts configuration risks.
+AI recommends security improvements.
+AI summarizes configuration changes.
+AI provides health checks for connected services.
+27. Acceptance Criteria
+All global application settings can be managed from a single module.
+Sensitive configuration values are encrypted and access-controlled.
+Administrators can test external integrations (Email, SMS, Payment Gateway) before enabling them.
+Feature toggles enable or disable functionality without code changes where applicable.
+Configuration changes are validated before being applied.
+All configuration changes are audited.
+The system supports environment-specific configuration.
+Role-based permissions protect critical settings.
+The module is extensible for future integrations.
+Configuration changes propagate correctly throughout the application.
+28. Recommended Database Tables
+Core Settings
+SystemSettings
+SystemSettingCategories
+SystemSettingValues
+Company
+CompanySettings
+Tax & Currency
+GstSettings
+TaxSettings
+CurrencySettings
+Communication
+EmailSettings
+SmsSettings
+WhatsAppSettings
+NotificationSettings
+Payment & Shipping
+PaymentGatewaySettings
+ShippingSettings
+Website
+SeoSettings
+SocialMediaSettings
+LocalizationSettings
+Security
+AuthenticationSettings
+SecuritySettings
+FeatureSettings
+Maintenance
+BackupSettings
+MaintenanceSettings
+Audit
+SystemSettingHistory
+SystemSettingAuditLogs
+29. UI Screens
+
+The System Settings module should include the following screens:
+
+Settings Dashboard
+Company Settings
+GST Settings
+Currency Settings
+Tax Settings
+Email Configuration
+SMS Configuration
+WhatsApp Configuration
+Payment Gateway Configuration
+Shipping Settings
+Social Media Settings
+SEO Settings
+Notification Settings
+Authentication Settings
+Security Settings
+Localization Settings
+Backup & Maintenance
+Feature Management
+Integration Test Screen
+Audit Log
+Final Recommendation (Enterprise Architecture)
+
+For your .NET 8 Modular Monolithic Architecture, do not hard-code configuration values in appsettings.json except for bootstrap settings (such as the database connection string and essential startup configuration).
+
+Instead:
+
+Store business and operational settings in the database.
+Cache frequently accessed settings using Redis or IMemoryCache.
+Expose settings through a centralized ISettingsService with strongly typed configuration objects.
+Encrypt sensitive values (API keys, secrets, passwords) using ASP.NET Core Data Protection or a dedicated secrets management solution.
+Support environment-specific overrides (Development, UAT, Production).
+Keep all configuration changes auditable with version history and rollback capability.
+
+This architecture provides the flexibility and maintainability expected in enterprise-grade eCommerce platforms while allowing non-technical administrators to manage system behavior without code deployments.

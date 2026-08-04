@@ -1,0 +1,535 @@
+Module 19 - SEO Management
+1. Module Overview
+Module Name
+
+SEO Management
+
+Purpose
+
+The SEO Management module enables administrators to optimize every page of the website for search engines through centralized management of metadata, URLs, canonical links, sitemap generation, robots configuration, structured data, redirects, and SEO analytics.
+
+Business Goals
+Increase Google rankings.
+Improve organic traffic.
+Improve product discoverability.
+Prevent duplicate content.
+Generate SEO-friendly URLs.
+Improve page indexing.
+Support AI search engines.
+Improve Core Web Vitals (Future).
+2. SEO Workflow
+Create Product / Category / Blog / CMS Page
+                │
+                ▼
+Generate SEO Information
+                │
+                ▼
+Validate SEO Rules
+                │
+                ▼
+Generate Sitemap
+                │
+                ▼
+Update Robots Rules
+                │
+                ▼
+Submit to Search Engine
+                │
+                ▼
+Track SEO Analytics
+3. SEO Dashboard
+
+Display KPI Cards
+
+Indexed Pages
+Total Pages
+Products Indexed
+Blog Pages Indexed
+Category Pages Indexed
+Missing Meta Titles
+Missing Meta Descriptions
+Duplicate URLs
+Broken Links
+SEO Score
+Sitemap Status
+Robots Status
+Dashboard Charts
+Organic Traffic
+Indexed Pages
+Crawl Errors
+Top Landing Pages
+Top Keywords (Future)
+Search Clicks (Future)
+4. Meta Tags Management
+
+Purpose
+
+Manage SEO metadata for every page.
+
+Supported Pages
+
+Homepage
+Products
+Categories
+Brands
+Blog
+CMS Pages
+Offers
+Landing Pages
+
+Fields
+
+SEO Title
+Meta Description
+Meta Keywords
+Robots Meta
+Author
+Language
+Revisit After
+
+Validation
+
+Missing Title
+Long Title
+Short Title
+Missing Description
+Duplicate Meta
+5. Sitemap Management
+
+Purpose
+
+Automatically generate XML sitemap.
+
+Include
+
+Homepage
+Products
+Categories
+Brands
+Blog
+CMS Pages
+Offers
+Images (Future)
+Videos (Future)
+
+Actions
+
+Generate Sitemap
+Regenerate
+Download
+View
+Submit
+
+Status
+
+Generated
+Pending
+Failed
+6. Robots.txt Management
+
+Purpose
+
+Manage crawler access.
+
+Features
+
+View robots.txt
+Edit Rules
+Preview
+Publish
+Restore Default
+
+Common Rules
+
+User-agent: *
+
+Allow: /
+
+Disallow: /admin/
+
+Disallow: /checkout/
+
+Disallow: /cart/
+
+Disallow: /login/
+
+Sitemap:
+7. Canonical URL Management
+
+Purpose
+
+Prevent duplicate content.
+
+Supported For
+
+Products
+Categories
+Blog
+CMS
+Landing Pages
+
+Fields
+
+Canonical URL
+Auto Generate
+Custom Canonical
+
+Validation
+
+Duplicate Canonical
+Missing Canonical
+8. SEO Friendly URL
+
+Automatically generate
+
+Examples
+
+/product/handmade-wooden-elephant
+
+/category/home-decoration
+
+/blog/how-to-decorate-your-home
+
+/about-us
+
+Rules
+
+Lowercase
+No Spaces
+Hyphen Separated
+Unique
+Editable
+9. Redirect Management
+
+Support
+
+301 Permanent Redirect
+
+302 Temporary Redirect
+
+Fields
+
+Old URL
+New URL
+Redirect Type
+Status
+
+Purpose
+
+Deleted Products
+URL Changes
+SEO Migration
+10. Structured Data (Schema.org)
+
+Support
+
+Organization
+
+Product
+
+Breadcrumb
+
+Article
+
+FAQ
+
+Review
+
+Rating
+
+Local Business
+
+Website
+
+Future
+
+Video
+
+Event
+
+Recipe
+
+11. Breadcrumb Management
+
+Automatically generate
+
+Example
+
+Home
+
+↓
+
+Home Decoration
+
+↓
+
+Wooden Craft
+
+↓
+
+Wooden Elephant
+
+Benefits
+
+Better Navigation
+Rich Search Results
+12. Open Graph Management
+
+Facebook
+
+LinkedIn
+
+WhatsApp
+
+Twitter (X)
+
+Fields
+
+OG Title
+OG Description
+OG Image
+OG URL
+13. Image SEO
+
+Support
+
+Alt Text
+Image Title
+Caption
+Image Compression
+WebP Conversion
+Lazy Loading
+
+Future
+
+AI Alt Text Generation
+
+14. SEO Validation
+
+Automatically Detect
+
+Missing Meta Title
+Missing Description
+Missing Alt Text
+Duplicate URL
+Duplicate Canonical
+Long URL
+Broken Link
+Missing H1
+Multiple H1
+Low Word Count
+Missing Schema
+15. Search Console Integration (Future)
+
+Support
+
+Google Search Console
+Bing Webmaster
+
+Display
+
+Clicks
+Impressions
+CTR
+Average Position
+16. Analytics
+
+Display
+
+Organic Visitors
+Indexed Pages
+Top SEO Pages
+Search Keywords
+Page Speed
+Broken Links
+Crawl Errors
+
+Charts
+
+Organic Growth
+Index Trend
+Crawl Trend
+17. Search
+
+Search By
+
+URL
+Page
+Product
+Category
+Blog
+18. Filters
+Missing Meta
+Duplicate URL
+Indexed
+Non Indexed
+Page Type
+SEO Score
+19. Bulk Actions
+Generate Meta
+Generate Canonical
+Regenerate Sitemap
+Update Robots
+Export
+Delete Redirect
+20. Activity Log
+
+Track
+
+Meta Updated
+Sitemap Generated
+Robots Modified
+Canonical Updated
+Redirect Created
+Schema Updated
+21. Business Rules
+Every public page must have a unique SEO title and meta description.
+URLs must be unique, lowercase, and SEO-friendly.
+Canonical URLs should be generated automatically but allow manual override.
+Sitemap must regenerate automatically after publishing or deleting products, categories, blogs, or CMS pages.
+Robots.txt should prevent indexing of admin, authentication, checkout, and cart pages.
+Redirects must preserve SEO ranking using HTTP 301 where appropriate.
+Structured data should follow Schema.org standards.
+Image alt text should be mandatory for all product and blog images.
+Broken links should be detected during scheduled SEO audits.
+All SEO configuration changes must be recorded in the audit log.
+22. User Permissions
+Permission	Description
+View SEO Dashboard	Access SEO overview
+Manage Meta Tags	Edit page metadata
+Manage Sitemap	Generate and publish sitemaps
+Manage Robots	Edit robots.txt
+Manage Canonical URLs	Configure canonical links
+Manage Redirects	Create and edit redirects
+Manage Structured Data	Configure Schema.org markup
+Run SEO Audit	Execute SEO validation
+Export SEO Reports	Download reports
+23. Navigation Flow
+SEO Management
+      │
+      ├── Dashboard
+      │
+      ├── Meta Tags
+      │
+      ├── SEO URLs
+      │
+      ├── Sitemap
+      │
+      ├── Robots.txt
+      │
+      ├── Canonical URLs
+      │
+      ├── Redirect Manager
+      │
+      ├── Structured Data
+      │
+      ├── Image SEO
+      │
+      ├── SEO Audit
+      │
+      ├── Analytics
+      │
+      └── Activity Log
+24. Future AI Enhancements
+AI SEO Features
+AI-generated SEO titles.
+AI-generated meta descriptions.
+AI keyword suggestions.
+AI content optimization.
+AI internal linking recommendations.
+AI image alt text generation.
+AI duplicate content detection.
+AI schema generation.
+AI competitor SEO analysis.
+AI search intent optimization.
+AI voice search optimization.
+AI optimization for ChatGPT, Gemini, Claude, and Perplexity indexing.
+Enterprise Features
+Multi-language SEO.
+Multi-store SEO.
+International hreflang management.
+XML Image Sitemap.
+XML Video Sitemap.
+Dynamic robots rules.
+SEO health monitoring.
+Scheduled SEO audits.
+Canonical conflict detection.
+Broken link crawler.
+Internal linking manager.
+Google Merchant Center feed generation.
+Google Search Console integration.
+Bing Webmaster integration.
+Core Web Vitals dashboard.
+AI-powered SEO recommendations.
+25. Acceptance Criteria
+Administrators can manage SEO metadata for all public pages.
+XML sitemaps are generated automatically and can be regenerated manually.
+Robots.txt is configurable with validation.
+Canonical URLs prevent duplicate content.
+SEO-friendly URLs are automatically generated and editable.
+Redirect management supports 301 and 302 redirects.
+Structured data follows Schema.org standards.
+SEO audits identify missing metadata, duplicate URLs, broken links, and other optimization issues.
+Analytics provide visibility into SEO health and indexing.
+All SEO actions are recorded in the audit log.
+The architecture supports future AI-assisted SEO optimization.
+26. Recommended Database Tables
+
+Create dedicated tables for SEO instead of scattering SEO data across modules:
+
+Core SEO
+SeoMetadata
+SeoUrls
+SeoCanonicalUrls
+SeoRedirects
+SeoSitemapEntries
+SeoRobotsConfiguration
+SeoStructuredData
+SeoImageMetadata
+Monitoring
+SeoAuditLogs
+SeoValidationResults
+SeoBrokenLinks
+SeoAnalytics
+SeoActivityLogs
+Future Integrations
+SearchConsoleData
+BingWebmasterData
+KeywordRankings
+PagePerformanceMetrics
+27. UI Screens
+
+The SEO Management module should include the following screens:
+
+SEO Dashboard
+Meta Tag Management
+SEO URL Manager
+Sitemap Manager
+Robots.txt Editor
+Canonical URL Manager
+Redirect Manager
+Structured Data (Schema) Manager
+Image SEO Manager
+SEO Audit Dashboard
+Broken Link Report
+SEO Analytics Dashboard
+Search Engine Integration Settings
+SEO Settings
+Activity Log
+Recommended Architecture (.NET 8 Modular Monolith)
+
+Implement SEO as a dedicated SEO Module rather than embedding SEO logic inside Products, Categories, Blogs, and CMS.
+
+Use a centralized SEO Service responsible for:
+
+Automatic meta tag generation.
+URL slug generation.
+Canonical URL creation.
+XML sitemap generation.
+Robots.txt management.
+Structured data generation.
+SEO validation and auditing.
+
+Each business module (Products, Categories, Blog, CMS, Offers, etc.) should simply provide its content to the SEO service. This keeps the architecture modular, reusable, and consistent while making future enhancements—such as multilingual SEO, AI-powered optimization, and headless CMS support—straightforward.
+
+20

@@ -1,0 +1,414 @@
+Module 15 - Testimonial Management
+1. Module Overview
+Module Name
+
+Testimonial Management
+
+Purpose
+
+The Testimonial Management module enables administrators to collect, manage, approve, publish, and showcase customer testimonials in text, image, and video formats. Testimonials help build credibility, improve customer trust, and increase conversion rates.
+
+Business Goals
+Build customer trust.
+Increase product credibility.
+Showcase customer success stories.
+Improve conversion rates.
+Highlight artisan craftsmanship.
+Strengthen brand reputation.
+Support multimedia testimonials.
+2. Testimonial Workflow
+Customer Purchases Product
+        │
+        ▼
+Customer Shares Experience
+        │
+        ▼
+Submit Testimonial
+        │
+        ▼
+Admin Review
+        │
+   ┌────┴────┐
+   ▼         ▼
+Approve    Reject
+   │
+   ▼
+Publish
+   │
+   ▼
+Display on Website
+   │
+   ▼
+Analytics Updated
+3. Testimonial Dashboard
+
+Display KPI Cards
+
+Total Testimonials
+Pending Approval
+Approved Testimonials
+Rejected Testimonials
+Featured Testimonials
+Video Testimonials
+Image Testimonials
+Homepage Testimonials
+Total Views
+Total Clicks
+Most Viewed Testimonial
+Latest Testimonials
+4. Testimonial List
+
+Display all testimonials.
+
+Columns
+
+Testimonial ID
+Customer Name
+Product
+Testimonial Type
+Rating (Optional)
+Status
+Featured
+Submitted Date
+Published Date
+Actions
+
+Actions
+
+View
+Approve
+Reject
+Edit
+Delete
+Publish
+Unpublish
+Feature
+Archive
+5. Customer Testimonial
+Basic Information
+
+Fields
+
+Customer Name
+Customer Photo
+Designation (Optional)
+Company Name (Optional)
+City
+Country
+Product Information
+Purchased Product
+Order Number
+Purchase Date
+Verified Purchase
+Testimonial Details
+Title
+Short Description
+Full Testimonial
+Rating (Optional)
+Recommendation
+
+Example
+
+⭐⭐⭐⭐⭐
+
+"I absolutely loved the handcrafted wooden temple. Excellent finishing and premium quality."
+
+6. Testimonial Types
+
+Supported Types
+
+Text Testimonial
+Customer Name
+Customer Image
+Testimonial Text
+Image Testimonial
+
+Support
+
+Before & After Images
+Product Images
+Customer Images
+
+Formats
+
+JPG
+PNG
+WebP
+Video Testimonial
+
+Support
+
+MP4 Upload
+Embedded YouTube Video
+Embedded Vimeo Video
+
+Fields
+
+Video URL
+Video Thumbnail
+Video Duration
+7. Display Locations
+
+Testimonials can be displayed on
+
+Homepage
+About Us
+Product Details Page
+Category Page
+Landing Pages
+Checkout Success Page
+Blog Articles
+Custom CMS Pages
+8. Featured Testimonials
+
+Purpose
+
+Highlight premium customer experiences.
+
+Features
+
+Pin to Top
+Homepage Display
+Carousel Display
+Random Rotation
+Manual Ordering
+9. Approval Workflow
+
+Status
+
+Draft
+Pending Approval
+Approved
+Published
+Rejected
+Archived
+
+Approval Actions
+
+Approve
+Reject
+Request Changes
+Archive
+10. Media Management
+
+Upload
+
+Customer Photo
+Product Images
+Video
+Supporting Images
+
+Features
+
+Preview
+Crop
+Compress
+Replace
+Delete
+11. Search
+
+Search By
+
+Customer Name
+Product
+City
+Country
+Testimonial Title
+12. Filters
+Status
+Featured
+Rating
+Product
+Category
+Video
+Image
+Date Range
+13. Bulk Actions
+Approve
+Reject
+Publish
+Unpublish
+Delete
+Archive
+Export
+14. Import / Export
+
+Import
+
+Excel
+CSV
+
+Export
+
+Excel
+CSV
+PDF
+15. Analytics
+
+Display
+
+Total Views
+Clicks
+Featured Testimonial Performance
+Homepage Views
+Video Plays
+Average Watch Time
+Conversion Rate (Future)
+
+Charts
+
+Monthly Views
+Testimonial Growth
+Video Performance
+Customer Engagement
+16. Notifications
+
+Notify Admin
+
+New Testimonial Submitted
+Pending Approval
+Featured Testimonial Expiring
+
+Notify Customer
+
+Testimonial Approved
+Testimonial Published
+Thank You Message
+
+Channels
+
+Email
+SMS
+WhatsApp
+Push Notification
+17. Activity Log
+
+Track
+
+Testimonial Submitted
+Edited
+Approved
+Published
+Featured
+Rejected
+Deleted
+Video Uploaded
+18. Business Rules
+Testimonials can be submitted only by verified customers (configurable).
+Customer name and testimonial content are mandatory.
+Images and videos must meet file size and format validation rules.
+Testimonials remain hidden until approved.
+Featured testimonials are displayed according to configured priority.
+Video testimonials support upload or external video links.
+Deleted testimonials are soft deleted for audit purposes.
+Every approval, rejection, and publication event is recorded in the audit log.
+Testimonials may optionally include product references and ratings.
+Homepage testimonial count should be configurable.
+19. User Permissions
+Permission	Description
+View Testimonials	View testimonial records
+Create Testimonials	Add testimonials
+Edit Testimonials	Modify testimonial details
+Approve Testimonials	Approve customer submissions
+Reject Testimonials	Reject submissions
+Publish Testimonials	Control website visibility
+Delete Testimonials	Archive or remove testimonials
+Manage Media	Upload images and videos
+View Analytics	Access testimonial reports
+Export Reports	Download reports
+20. Navigation Flow
+Testimonial Management
+        │
+        ├── Dashboard
+        │
+        ├── Testimonial List
+        │      ├── Pending
+        │      ├── Approved
+        │      ├── Published
+        │      ├── Featured
+        │      └── Archived
+        │
+        ├── Create Testimonial
+        │
+        ├── Media Management
+        │
+        ├── Featured Testimonials
+        │
+        ├── Analytics
+        │
+        └── Activity Log
+21. Future Enhancements
+AI Features
+AI sentiment analysis for testimonials.
+AI spam and fake testimonial detection.
+AI grammar correction and content enhancement.
+AI testimonial summarization.
+AI automatic categorization.
+AI video transcription.
+AI multilingual translation.
+AI recommendation of the best testimonials for homepage placement.
+Enterprise Features
+Multi-language testimonials.
+Multi-store support.
+Customer video interviews.
+Audio testimonials.
+Social media testimonial integration.
+Instagram and Facebook feed embedding.
+Testimonial carousel widgets.
+Approval workflow with multiple reviewers.
+Testimonial tagging.
+Dynamic filtering by product or category.
+API support for mobile applications.
+Headless CMS integration.
+22. Acceptance Criteria
+Customers can submit text, image, and video testimonials.
+Administrators can review, approve, reject, publish, archive, and feature testimonials.
+Testimonials support verified purchase linkage where applicable.
+Homepage and CMS pages can display configurable testimonial sections.
+Images and videos are validated and optimized.
+Analytics accurately measure engagement and performance.
+Notifications are sent during the testimonial lifecycle.
+All actions are recorded in the audit log.
+Role-based permissions secure testimonial management.
+The architecture supports future multimedia and AI-powered enhancements.
+23. Recommended Database Tables
+
+For an enterprise-grade Testimonial Management system, consider these tables:
+
+Testimonials
+TestimonialMedia
+TestimonialTypes
+TestimonialDisplayLocations
+TestimonialCategories (Future)
+TestimonialApprovalHistory
+TestimonialViews
+TestimonialAnalytics
+TestimonialActivityLogs
+TestimonialNotifications
+TestimonialSettings
+24. UI Screens
+
+The Testimonial Management module should include the following screens:
+
+Testimonial Dashboard
+Testimonial List
+Create/Edit Testimonial
+Testimonial Details
+Approval & Moderation Screen
+Media Gallery
+Featured Testimonial Management
+Display Location Configuration
+Analytics Dashboard
+Notification Settings
+Testimonial Settings
+Activity Log
+Recommendation
+
+For your handicraft eCommerce platform, enhance testimonials by supporting:
+
+Verified Buyer Badge to increase authenticity.
+Product-linked Testimonials, allowing testimonials to appear on both the homepage and the corresponding product detail page.
+Image and Video Testimonials, showcasing customers using or displaying handcrafted products in their homes.
+Featured Artisan Stories, where customers share the cultural or emotional value of handmade products.
+
+These features will significantly improve trust, engagement, and conversion rates while highlighting the craftsmanship behind your products.

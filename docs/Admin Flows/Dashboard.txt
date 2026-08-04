@@ -1,0 +1,616 @@
+Module 01 - Dashboard
+1. Module Overview
+Module Name
+
+Dashboard
+
+Purpose
+
+The Dashboard serves as the landing page of the Admin Panel, providing a real-time overview of business performance, operational status, inventory health, customer activities, and recent transactions.
+
+Business Goal
+Monitor overall business performance.
+Track sales and revenue.
+Monitor pending operational tasks.
+Identify inventory shortages.
+Display recent customer activities.
+Provide quick navigation to frequently used modules.
+Help management make faster business decisions.
+2. Dashboard Layout
+----------------------------------------------------------------------------------------------------
+Top Navigation
+----------------------------------------------------------------------------------------------------
+
+Sidebar
+
+Dashboard
+
+----------------------------------------------------------------------------------------------------
+Quick Statistics (KPI Cards)
+
+Total Sales
+Today's Sales
+Monthly Sales
+Revenue
+Profit
+Orders
+Customers
+Website Visitors
+
+----------------------------------------------------------------------------------------------------
+
+Sales Analytics Chart
+
+Monthly Sales
+Monthly Revenue
+Monthly Profit
+
+----------------------------------------------------------------------------------------------------
+
+Order Summary
+
+New Orders
+
+Pending Orders
+
+Processing Orders
+
+Shipped Orders
+
+Delivered Orders
+
+Cancelled Orders
+
+Returned Orders
+
+----------------------------------------------------------------------------------------------------
+
+Inventory Summary
+
+Best Selling Products
+
+Low Stock
+
+Out of Stock
+
+Recently Added Products
+
+----------------------------------------------------------------------------------------------------
+
+Recent Orders
+
+----------------------------------------------------------------------------------------------------
+
+Latest Customers
+
+----------------------------------------------------------------------------------------------------
+
+Latest Notifications
+
+----------------------------------------------------------------------------------------------------
+
+Website Analytics
+
+Visitors
+
+Sessions
+
+Conversion Rate
+
+Bounce Rate
+
+----------------------------------------------------------------------------------------------------
+3. Features
+3.1 KPI Cards
+
+Purpose
+
+Provide a quick overview of key business metrics.
+
+Cards
+Total Sales
+
+Description
+
+Displays total completed sales amount.
+
+Example
+
+₹25,45,000
+
+Click Action
+
+Open Sales Report.
+
+Today's Sales
+
+Displays today's completed sales.
+
+Monthly Sales
+
+Displays current month's sales.
+
+Orders
+
+Displays total orders.
+
+Can include
+
+New
+Processing
+Delivered
+Pending Orders
+
+Displays orders waiting for action.
+
+Click
+
+Navigate to Pending Orders.
+
+Cancelled Orders
+
+Displays cancelled orders.
+
+Click
+
+Navigate to Cancelled Orders.
+
+Customers
+
+Displays
+
+Total Customers
+New Customers Today
+Active Customers
+Revenue
+
+Displays
+
+Total Revenue
+
+Monthly Revenue
+
+Growth %
+
+Profit
+
+Displays
+
+Gross Profit
+
+Net Profit
+
+Margin %
+
+Website Visitors
+
+Displays
+
+Today's Visitors
+
+Weekly Visitors
+
+Monthly Visitors
+
+4. Sales Analytics
+
+Purpose
+
+Visualize sales trends.
+
+Charts
+
+Monthly Sales
+Weekly Sales
+Daily Sales
+
+Chart Type
+
+Line Chart
+
+Bar Chart
+
+Area Chart
+
+Features
+
+Date Filter
+
+Year Filter
+
+Month Filter
+
+Export
+
+Print
+
+5. Revenue Analytics
+
+Display
+
+Revenue
+
+Expenses
+
+Profit
+
+Tax
+
+Net Revenue
+
+Chart
+
+Stacked Bar
+
+Line
+
+Area
+
+6. Order Statistics
+
+Cards
+
+New Orders
+
+Pending Orders
+
+Packed
+
+Processing
+
+Shipped
+
+Delivered
+
+Cancelled
+
+Returned
+
+Refund Requested
+
+Refund Completed
+
+Each card
+
+Count
+
+Percentage
+
+Trend
+
+Click Navigation
+
+7. Best Selling Products
+
+Purpose
+
+Show top-performing products.
+
+Columns
+
+Product Image
+
+Product Name
+
+SKU
+
+Category
+
+Units Sold
+
+Revenue
+
+Stock
+
+Trend
+
+Actions
+
+View Product
+
+8. Low Stock Products
+
+Purpose
+
+Notify admin before stock runs out.
+
+Columns
+
+Image
+
+Product
+
+SKU
+
+Current Stock
+
+Minimum Stock
+
+Warehouse
+
+Status
+
+Actions
+
+Update Stock
+
+9. Out Of Stock Products
+
+Purpose
+
+Highlight unavailable products.
+
+Columns
+
+Image
+
+Product
+
+SKU
+
+Category
+
+Last Sold
+
+Supplier
+
+Actions
+
+Restock
+
+Disable Product
+
+10. Recent Orders
+
+Purpose
+
+Quick monitoring.
+
+Columns
+
+Order No
+
+Customer
+
+Items
+
+Amount
+
+Payment Status
+
+Order Status
+
+Delivery Status
+
+Date
+
+Actions
+
+View
+
+Invoice
+
+Print
+
+11. Notifications
+
+Display
+
+New Order
+
+Payment Received
+
+Payment Failed
+
+Stock Alert
+
+New Customer
+
+Refund Request
+
+Review Submitted
+
+Contact Request
+
+Coupon Expired
+
+Offer Expired
+
+Banner Expired
+
+System Alerts
+
+Security Alerts
+
+Server Alerts
+
+12. Website Analytics
+
+Widgets
+
+Today's Visitors
+
+Monthly Visitors
+
+Returning Visitors
+
+New Visitors
+
+Page Views
+
+Bounce Rate
+
+Conversion Rate
+
+Average Session
+
+Top Pages
+
+Top Products Viewed
+
+Top Search Keywords
+
+Traffic Sources
+
+13. Quick Actions
+
+Buttons
+
+Add Product
+
+Add Category
+
+Create Coupon
+
+Create Offer
+
+Create Banner
+
+View Orders
+
+View Customers
+
+Manage Inventory
+
+Generate Report
+
+Export Sales
+
+14. Global Filters
+
+Dashboard Filters
+
+Date Range
+
+Today
+
+Yesterday
+
+Last 7 Days
+
+Last 30 Days
+
+This Month
+
+Last Month
+
+This Year
+
+Custom Range
+
+Store (Future)
+
+Warehouse
+
+Category
+
+Brand
+
+Payment Method
+
+Order Status
+
+15. Search
+
+Global Search
+
+Orders
+
+Customers
+
+Products
+
+Invoices
+
+Categories
+
+Coupons
+
+16. Export
+
+Export Dashboard
+
+Excel
+
+CSV
+
+PDF
+
+Print
+
+Email Report
+
+17. User Permissions
+Permission	Description
+View Dashboard	View dashboard widgets
+View Revenue	Access financial widgets
+View Orders	View order statistics
+View Customers	View customer widgets
+Export Reports	Export dashboard reports
+Customize Dashboard	Configure dashboard widgets
+18. Business Rules
+Revenue is calculated only from completed orders.
+Profit = Revenue − Cost of Goods Sold.
+Cancelled orders are excluded from revenue.
+Returned orders reduce revenue after refund approval.
+Low stock threshold is configurable.
+Dashboard refreshes automatically every configurable interval (e.g., 5 minutes).
+Data visibility respects user roles and permissions.
+19. Dashboard Widgets (Future)
+Sales Target vs Achievement
+Top Categories
+Top Brands
+Customer Growth
+Heat Map
+Geographic Sales Map
+Real-time Active Users
+Cart Abandonment
+Conversion Funnel
+Marketing Campaign Performance
+Social Media Traffic
+Newsletter Performance
+20. Acceptance Criteria
+Dashboard loads within the defined performance target.
+KPI cards display accurate data.
+Charts reflect selected filters.
+Clicking widgets navigates to the correct module.
+Users only see data permitted by their role.
+Export functions generate correct reports.
+Responsive layout works across desktop, tablet, and mobile.
+Auto-refresh updates live metrics without losing applied filters.
+Dashboard Navigation Flow
+Admin Login
+      │
+      ▼
+Dashboard
+      │
+      ├── KPI Cards
+      │      ├── Sales Report
+      │      ├── Orders
+      │      ├── Customers
+      │      ├── Revenue
+      │      └── Profit
+      │
+      ├── Sales Analytics
+      │      └── Sales Reports
+      │
+      ├── Order Summary
+      │      └── Order Management
+      │
+      ├── Inventory Summary
+      │      └── Inventory Module
+      │
+      ├── Recent Orders
+      │      └── Order Details
+      │
+      ├── Notifications
+      │      └── Notification Center
+      │
+      └── Quick Actions
+             ├── Add Product
+             ├── Add Category
+             ├── Create Coupon
+             ├── Manage Orders
+             └── Reports
+
+This specification is intended to serve as the functional scope for the Dashboard module. It provides enough detail for UI/UX design, backend API planning, database design, development, and QA, while remaining extensible as the platform grows.

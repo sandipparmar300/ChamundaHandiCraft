@@ -1,0 +1,449 @@
+Module 03 - Product Management
+1. Module Overview
+Module Name
+
+Product Management
+
+Purpose
+
+The Product Management module enables administrators to create, organize, manage, publish, and maintain all products available in the e-commerce store. It centralizes product information, pricing, inventory, media assets, SEO, variants, and product visibility.
+
+Business Goals
+Maintain a centralized product catalog.
+Support handcrafted products with detailed attributes.
+Improve customer shopping experience with rich product information.
+Simplify inventory and pricing management.
+Improve organic search visibility through SEO.
+Enable scalable product management for future marketplace expansion.
+2. Product Lifecycle
+Create Product
+      │
+      ▼
+Save as Draft
+      │
+      ▼
+Add Images & Videos
+      │
+      ▼
+Configure Variants
+      │
+      ▼
+Set Pricing
+      │
+      ▼
+Manage Inventory
+      │
+      ▼
+Configure SEO
+      │
+      ▼
+Preview Product
+      │
+      ▼
+Publish Product
+      │
+      ▼
+Visible on Website
+      │
+      ▼
+Edit / Archive / Unpublish
+3. Product List
+Purpose
+
+Displays all products with advanced search, filters, and bulk actions.
+
+Features
+Product Listing
+Search
+Advanced Filters
+Sorting
+Pagination
+Bulk Actions
+Export
+Import
+Product Preview
+Product Status
+Product List Columns
+Product Image
+Product Name
+SKU
+Product Code
+Barcode
+Category
+Subcategory
+Brand
+Price
+Discount
+Stock
+Status
+Visibility
+Featured
+Bestseller
+Trending
+Created Date
+Updated Date
+Created By
+Actions
+Row Actions
+View
+Edit
+Duplicate
+Preview
+Publish
+Unpublish
+Archive
+Delete
+Manage Images
+Manage Variants
+Update Stock
+Update Price
+SEO
+Activity History
+4. Create Product
+General Information
+Product Details
+Product Name
+Product Code
+SKU
+Barcode
+Slug (SEO URL)
+Short Description
+Full Description
+Product Story (Handmade Story)
+Care Instructions
+Warranty Information (Optional)
+Product Classification
+Category
+Subcategory
+Collection
+Brand
+Material
+Style
+Color
+Handmade By (Artisan)
+Country of Origin
+Occasion
+Festival Collection
+Season
+Physical Attributes
+Weight
+Length
+Width
+Height
+Dimensions
+Package Weight
+Package Dimensions
+Pricing
+Cost Price
+Selling Price
+MRP
+Discount Type
+Discount Value
+Tax Category
+GST Rate
+Profit Margin (Calculated)
+Display Price
+Strike Price
+Inventory
+Stock Quantity
+Reserved Stock
+Available Stock
+Low Stock Threshold
+Reorder Quantity
+Warehouse
+Stock Status
+Product Visibility
+Draft
+Published
+Scheduled
+Hidden
+Archived
+
+Homepage Flags
+
+Featured
+New Arrival
+Bestseller
+Trending
+Recommended
+Flash Sale
+Festival Collection
+5. Product Images
+Features
+Multiple Images
+Drag & Drop Upload
+Reorder Images
+Crop Image
+Rotate
+Compress
+Delete
+Thumbnail
+
+Select Primary Product Image.
+
+Zoom Images
+
+High-resolution images for zoom functionality.
+
+Gallery
+
+Unlimited image gallery.
+
+360 Images
+
+Upload image sequence for 360° rotation.
+
+Product Videos
+
+Support
+
+Upload Video
+YouTube
+Vimeo
+
+Video Thumbnail
+
+6. Product Variants
+Purpose
+
+Support different product options.
+
+Variant Types
+Size
+Color
+Material
+Finish
+Design
+Pattern
+Weight
+
+Each Variant Can Have
+
+SKU
+Barcode
+Price Difference
+Stock
+Image
+Weight
+Variant Matrix
+
+Example
+
+Variant	Price	Stock
+Small - Brown	₹500	20
+Medium - Brown	₹650	15
+Large - Brown	₹800	8
+7. SEO
+Fields
+SEO Title
+Meta Description
+Meta Keywords
+Canonical URL
+SEO URL
+Open Graph Title
+Open Graph Image
+Twitter Card
+Alt Text
+Image SEO
+
+SEO Score (Future)
+
+8. Tags
+
+Supports multiple tags.
+
+Examples
+
+Handmade
+Wooden
+Traditional
+Festival
+Eco-Friendly
+Gift
+Premium
+9. Related Products
+Similar Products
+Frequently Bought Together
+Recommended Products
+Cross Sell
+Upsell
+10. Search & Filters
+Search By
+Product Name
+SKU
+Barcode
+Product Code
+Category
+Brand
+Advanced Filters
+Category
+Subcategory
+Brand
+Material
+Color
+Size
+Style
+Artisan
+Country
+Price Range
+Stock Status
+Published Status
+Featured
+Bestseller
+Trending
+Created Date
+11. Bulk Actions
+Publish
+Unpublish
+Delete
+Archive
+Update Category
+Update Brand
+Update Price
+Update Discount
+Export
+Print
+12. Import / Export
+Import
+Excel
+CSV
+
+Supports
+
+Products
+Variants
+Images (Reference URLs)
+
+Validation Report after import.
+
+Export
+Excel
+CSV
+PDF
+13. Product Preview
+
+Preview product exactly as it appears on the customer website before publishing.
+
+14. Product Status
+
+Available statuses
+
+Draft
+Pending Approval (Optional)
+Published
+Scheduled
+Hidden
+Archived
+15. Product Approval Workflow (Future)
+Create Product
+      │
+      ▼
+Draft
+      │
+      ▼
+Submit for Approval
+      │
+      ▼
+Approved
+      │
+      ▼
+Published
+16. Activity Log
+
+Track every product action.
+
+Examples
+
+Product Created
+Product Updated
+Price Changed
+Stock Updated
+Image Uploaded
+Variant Added
+Product Published
+Product Deleted
+17. Business Rules
+Product Name is mandatory.
+SKU must be unique.
+Product Code must be unique.
+Barcode must be unique.
+Selling Price cannot be less than Cost Price unless explicitly allowed.
+At least one category is required.
+At least one product image is required before publishing.
+Published products must have stock status defined.
+Variant SKUs must also be unique.
+Soft Delete only.
+Archived products remain available for reporting but are hidden from customers.
+18. User Permissions
+Permission	Description
+View Products	Access product catalog
+Create Products	Add new products
+Edit Products	Modify product information
+Delete Products	Archive or soft delete
+Publish Products	Publish or unpublish
+Manage Pricing	Update prices and discounts
+Manage Inventory	Update stock levels
+Manage SEO	Edit SEO metadata
+Import Products	Bulk import
+Export Products	Export catalog
+19. Navigation Flow
+Product Management
+      │
+      ├── Product List
+      │      ├── Search
+      │      ├── Filters
+      │      ├── Bulk Actions
+      │      └── Export
+      │
+      ├── Add Product
+      │      ├── General Information
+      │      ├── Classification
+      │      ├── Pricing
+      │      ├── Inventory
+      │      ├── Images & Videos
+      │      ├── Variants
+      │      ├── SEO
+      │      ├── Related Products
+      │      └── Preview
+      │
+      ├── Edit Product
+      ├── Duplicate Product
+      ├── Preview Product
+      ├── Publish / Unpublish
+      ├── Archive
+      ├── Import / Export
+      └── Activity History
+20. Future Enhancements
+AI Features
+AI-generated product descriptions.
+AI-generated SEO metadata.
+AI image enhancement and background removal.
+AI-generated product tags.
+AI pricing recommendations.
+AI category suggestions.
+AI duplicate product detection.
+AI product translation.
+AI product quality scoring.
+Enterprise Features
+Multi-vendor product management.
+Multi-language product catalog.
+Multi-currency pricing.
+Product version history.
+Approval workflows.
+Product bundles and kits.
+Digital products.
+Subscription products.
+Rental products.
+Product expiration management.
+21. Acceptance Criteria
+Products can be created, edited, viewed, duplicated, archived, and published.
+Unique identifiers (SKU, Product Code, Barcode) are validated.
+Variants maintain independent pricing and inventory.
+Media uploads support images, videos, and 360° views.
+SEO metadata is configurable for every product.
+Search, filtering, import, and export work correctly.
+Audit logs capture all significant product changes.
+Role-based permissions control access to product operations.
+Product preview accurately reflects the storefront before publishing.
+
+This scope is designed to support your current handicraft business while also providing a strong foundation for future growth into a larger e-commerce or marketplace platform without major redesign.

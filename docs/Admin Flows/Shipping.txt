@@ -1,0 +1,475 @@
+Module 08 - Shipping Management
+1. Module Overview
+Module Name
+
+Shipping Management
+
+Purpose
+
+The Shipping Management module handles shipping charges, shipping zones, courier integrations, shipment creation, tracking, delivery status, and shipping label generation. It ensures that orders are delivered accurately and efficiently while providing real-time shipment visibility.
+
+Business Goals
+Automate shipment processing.
+Calculate shipping charges accurately.
+Support multiple courier partners.
+Track shipments in real time.
+Improve delivery performance.
+Reduce shipping costs.
+Provide customers with shipment visibility.
+Maintain complete shipment history.
+2. Shipping Workflow
+Order Confirmed
+       │
+       ▼
+Ready for Shipment
+       │
+       ▼
+Calculate Shipping Charges
+       │
+       ▼
+Select Shipping Zone
+       │
+       ▼
+Assign Courier
+       │
+       ▼
+Generate Shipping Label
+       │
+       ▼
+Generate Tracking Number
+       │
+       ▼
+Shipment Pickup
+       │
+       ▼
+In Transit
+       │
+       ▼
+Out For Delivery
+       │
+       ▼
+Delivered
+       │
+       ├──────────────┐
+       ▼              ▼
+Return           Delivery Failed
+3. Shipping Dashboard
+
+Display KPI Cards
+
+Total Shipments
+Today's Shipments
+Pending Shipments
+Picked Up
+In Transit
+Out For Delivery
+Delivered
+Failed Deliveries
+Returned Shipments
+Average Delivery Time
+Shipping Revenue
+Shipping Cost
+4. Shipping Charges
+Purpose
+
+Manage shipping charges based on business rules.
+
+Shipping Charge Types
+Flat Rate
+Weight Based
+Quantity Based
+Price Based
+Free Shipping
+Zone Based
+Courier Based
+Shipping Rules
+
+Example
+
+Order Amount	Shipping Charge
+₹0 – ₹499	₹80
+₹500 – ₹999	₹50
+₹1000+	Free
+Weight Based
+Weight	Charge
+0–500 gm	₹50
+500 gm–1 kg	₹80
+1–2 kg	₹120
+Features
+Minimum Shipping Charge
+Maximum Shipping Charge
+Free Shipping Threshold
+Express Shipping
+Same Day Delivery (Future)
+Next Day Delivery
+5. Shipping Zones
+Purpose
+
+Define delivery regions with different pricing and courier availability.
+
+Zone Examples
+North India
+South India
+East India
+West India
+International (Future)
+Zone Configuration
+
+Fields
+
+Zone Name
+Country
+State
+City
+PIN Code Range
+Delivery Days
+Shipping Charges
+Active Status
+Zone Features
+Multiple PIN Codes
+Multiple States
+Zone Priority
+Courier Availability
+6. Courier Management
+Supported Couriers
+Delhivery
+Blue Dart
+DTDC
+XpressBees
+India Post
+Ekart
+DHL
+FedEx
+Courier Configuration
+
+Fields
+
+Courier Name
+API Credentials
+Service Type
+Pickup Address
+Contact Details
+Active Status
+Features
+Enable / Disable
+Priority Order
+Auto Selection
+Manual Selection
+Estimated Delivery Time
+7. Courier Integration
+Purpose
+
+Connect with courier APIs.
+
+Features
+Shipment Creation
+Label Generation
+Tracking Updates
+Pickup Request
+Cancel Shipment
+Return Shipment
+Rate Calculation
+Delivery Confirmation
+API Operations
+Create Shipment
+Get Shipping Rates
+Generate Label
+Schedule Pickup
+Cancel Shipment
+Track Shipment
+Return Shipment
+8. Tracking Number
+
+Automatically generated after shipment creation.
+
+Display
+Tracking Number
+Courier
+Tracking URL
+Shipment Date
+Estimated Delivery
+Current Status
+Actions
+Copy Tracking Number
+Open Tracking Page
+Print Label
+Download Label
+9. Delivery Status
+
+Available Statuses
+
+Pending
+Ready to Ship
+Pickup Scheduled
+Picked Up
+In Transit
+Arrived at Hub
+Out For Delivery
+Delivered
+Delivery Attempt Failed
+Customer Not Available
+Returned
+Lost Shipment
+Cancelled
+10. Shipment Details
+
+Display
+
+Order Information
+Order Number
+Customer
+Order Date
+Shipping Address
+Customer Name
+Address
+City
+State
+PIN Code
+Country
+Mobile
+Package Details
+Weight
+Dimensions
+Number of Packages
+Shipping Cost
+Courier Information
+Courier Name
+Tracking Number
+Pickup Date
+Delivery Date
+11. Shipping Label
+
+Generate labels containing
+
+Company Logo
+Order Number
+Tracking Number
+Barcode
+QR Code
+Customer Details
+Courier Details
+Package Weight
+
+Actions
+
+Print
+Download PDF
+Reprint
+12. Pickup Management
+
+Features
+
+Schedule Pickup
+Cancel Pickup
+Reschedule Pickup
+Pickup History
+
+Display
+
+Pickup Date
+Courier
+Status
+Driver Details (If Available)
+13. Shipment Timeline
+
+Example
+
+Order Ready
+
+↓
+
+Pickup Scheduled
+
+↓
+
+Picked Up
+
+↓
+
+Sorting Center
+
+↓
+
+Regional Hub
+
+↓
+
+Destination Hub
+
+↓
+
+Out For Delivery
+
+↓
+
+Delivered
+14. Search
+
+Search By
+
+Tracking Number
+Order Number
+Customer Name
+Courier
+Shipment Number
+15. Filters
+Courier
+Shipping Zone
+Delivery Status
+Date Range
+Warehouse
+Delivery Type
+Shipping Method
+16. Bulk Actions
+Generate Labels
+Assign Courier
+Print Labels
+Export Shipments
+Schedule Pickup
+Cancel Shipment
+17. Reports
+
+Generate
+
+Shipping Report
+Courier Performance Report
+Delivery Report
+Failed Delivery Report
+Shipping Cost Report
+Zone-wise Delivery Report
+Delivery Time Report
+18. Notifications
+
+Automatically notify customers when
+
+Shipment Created
+Pickup Completed
+Shipment Dispatched
+In Transit
+Out For Delivery
+Delivered
+Delivery Failed
+Return Initiated
+
+Channels
+
+Email
+SMS
+WhatsApp
+Push Notification
+19. Activity Log
+
+Track
+
+Shipment Created
+Courier Assigned
+Pickup Scheduled
+Label Generated
+Tracking Updated
+Delivery Completed
+Shipment Returned
+Shipment Cancelled
+20. Business Rules
+Shipping charges are calculated based on configured rules (weight, order value, quantity, or zone).
+Shipping zones determine available couriers and estimated delivery times.
+Every shipment must be linked to a valid order.
+Tracking numbers must be unique.
+Shipping labels cannot be generated until the order is packed.
+Delivered shipments are read-only.
+Returned shipments update inventory based on inspection results.
+Courier webhooks update shipment status automatically.
+Failed deliveries can be rescheduled based on business policy.
+All shipment events are recorded in the audit log.
+21. User Permissions
+Permission	Description
+View Shipments	Access shipment records
+Configure Shipping Charges	Manage pricing rules
+Manage Shipping Zones	Create and edit zones
+Manage Couriers	Configure courier partners
+Generate Shipping Labels	Create shipping labels
+Schedule Pickups	Arrange courier pickups
+Track Shipments	Monitor delivery progress
+Export Shipping Reports	Download reports
+22. Navigation Flow
+Shipping Management
+        │
+        ├── Shipping Dashboard
+        │
+        ├── Shipping Charges
+        │      ├── Flat Rate
+        │      ├── Weight Based
+        │      ├── Zone Based
+        │      └── Free Shipping Rules
+        │
+        ├── Shipping Zones
+        │      ├── Zone List
+        │      ├── PIN Code Mapping
+        │      └── Delivery Rules
+        │
+        ├── Courier Management
+        │      ├── Courier List
+        │      ├── API Configuration
+        │      └── Pickup Settings
+        │
+        ├── Shipments
+        │      ├── Shipment List
+        │      ├── Shipment Details
+        │      ├── Tracking
+        │      ├── Labels
+        │      └── Timeline
+        │
+        ├── Pickup Management
+        ├── Reports
+        └── Activity Log
+23. Future Enhancements
+AI Features
+AI courier recommendation based on cost, delivery speed, and historical performance.
+AI delivery delay prediction.
+AI route optimization.
+AI shipping cost optimization.
+AI failed delivery prediction.
+AI estimated delivery date calculation.
+AI packaging recommendations to reduce shipping costs.
+Enterprise Features
+Multi-warehouse shipment routing.
+Split shipments.
+Partial deliveries.
+International shipping.
+Customs documentation.
+Multi-package shipments.
+Reverse logistics automation.
+Delivery appointment scheduling.
+Cash-on-Delivery collection reconciliation.
+Real-time courier webhooks.
+Shipment insurance.
+Delivery proof (signature/photo).
+24. Acceptance Criteria
+Shipping charges are calculated correctly using configured business rules.
+Shipping zones control courier availability and pricing.
+Couriers can be integrated and managed independently.
+Tracking numbers and shipping labels are generated successfully.
+Delivery status updates are synchronized with courier systems.
+Customers receive shipment notifications at each milestone.
+Shipment reports and analytics are accurate.
+All shipment events are captured in the audit log.
+Role-based permissions control access to shipping operations.
+The module is extensible to support new courier providers without changing core business logic.
+Recommended Database Tables
+
+To support enterprise-grade shipping functionality, consider these tables:
+
+ShippingZones
+ShippingZonePinCodes
+ShippingChargeRules
+Couriers
+CourierConfigurations
+Shipments
+ShipmentPackages
+ShipmentTrackingHistory
+ShippingLabels
+PickupRequests
+DeliveryAttempts
+CourierWebhookLogs
+ShipmentActivityLogs
+
+These tables will provide a scalable foundation for handling domestic shipping today while making it straightforward to expand into multi-warehouse and international shipping in the future.

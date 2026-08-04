@@ -1,0 +1,425 @@
+Module 14 - Review Management
+1. Module Overview
+Module Name
+
+Review Management
+
+Purpose
+
+The Review Management module allows customers to rate and review purchased products while enabling administrators to moderate, approve, reject, and manage customer feedback. It supports verified purchase reviews, review moderation, abuse reporting, media attachments, and review analytics.
+
+Business Goals
+Build customer trust.
+Improve product credibility.
+Increase conversion rates.
+Gather customer feedback.
+Improve product quality.
+Detect fake or abusive reviews.
+Enhance SEO through user-generated content.
+2. Review Workflow
+Customer Purchases Product
+          │
+          ▼
+Order Delivered
+          │
+          ▼
+Customer Receives Review Invitation
+          │
+          ▼
+Customer Submits Review
+          │
+          ▼
+Moderation Queue
+          │
+     ┌────┴─────┐
+     ▼          ▼
+ Approved    Rejected
+     │          │
+     ▼          ▼
+Visible on Product   Notify Customer
+     │
+     ▼
+Customer Reports Abuse (Optional)
+     │
+     ▼
+Admin Reviews Report
+     │
+     ▼
+Keep / Hide / Delete Review
+3. Review Dashboard
+
+Display KPI Cards
+
+Total Reviews
+Pending Reviews
+Approved Reviews
+Rejected Reviews
+Reported Reviews
+Average Product Rating
+Verified Purchase Reviews
+Reviews This Month
+Reviews Today
+Top Rated Products
+Lowest Rated Products
+Most Reviewed Products
+4. Review List
+
+Display all product reviews.
+
+Columns
+
+Review ID
+Product
+Customer
+Order Number
+Rating
+Review Title
+Review Date
+Verified Purchase
+Status
+Abuse Reports
+Actions
+
+Actions
+
+View
+Approve
+Reject
+Edit
+Hide
+Delete
+Reply
+View Customer
+View Product
+5. Customer Review
+Basic Information
+
+Fields
+
+Product
+Rating (1–5 Stars)
+Review Title
+Review Description
+Recommend Product (Yes/No)
+Anonymous Review (Optional)
+Rating
+
+Support
+
+⭐ 1 Star
+⭐⭐ 2 Stars
+⭐⭐⭐ 3 Stars
+⭐⭐⭐⭐ 4 Stars
+⭐⭐⭐⭐⭐ 5 Stars
+Review Media
+
+Support
+
+Images
+Videos
+
+Formats
+
+JPG
+PNG
+WebP
+MP4
+
+Maximum Upload
+
+5 Images
+1 Video
+6. Verified Purchase
+
+Purpose
+
+Display whether the reviewer has actually purchased the product.
+
+Badge
+
+✔ Verified Purchase
+
+Business Rule
+
+Only customers with a delivered order can receive this badge.
+
+7. Review Moderation
+
+Status
+
+Pending
+Approved
+Rejected
+Hidden
+Deleted
+
+Admin Actions
+
+Approve
+Reject
+Hide
+Delete
+Edit
+Restore
+
+Moderation Reasons
+
+Spam
+Offensive Language
+Fake Review
+Duplicate
+Irrelevant
+Abuse
+8. Ratings Summary
+
+Display on Product Page
+
+Average Rating
+Total Reviews
+Rating Distribution
+
+Example
+
+★★★★★ 120
+
+★★★★ 40
+
+★★★ 18
+
+★★ 7
+
+★ 3
+9. Report Abuse
+
+Purpose
+
+Allow customers to report inappropriate reviews.
+
+Reasons
+
+Spam
+Fake Review
+Offensive Content
+Harassment
+Duplicate Review
+Misleading Information
+
+Workflow
+
+Customer Reports
+
+↓
+
+Admin Reviews
+
+↓
+
+Approve Report / Reject Report
+
+↓
+
+Hide or Restore Review
+
+10. Review Replies
+
+Allow
+
+Admin Reply
+Seller Reply (Future)
+
+Display
+
+Customer Review
+
+↓
+
+Admin Reply
+
+11. Search
+
+Search By
+
+Product
+Customer
+Review Title
+Order Number
+Review ID
+12. Filters
+Rating
+Status
+Verified Purchase
+Reported
+Product
+Category
+Date Range
+13. Bulk Actions
+Approve
+Reject
+Hide
+Delete
+Export
+14. Import / Export
+
+Export
+
+Excel
+CSV
+PDF
+15. Review Analytics
+
+Display
+
+Average Rating
+Total Reviews
+Product Rating Trend
+Most Reviewed Products
+Highest Rated Products
+Lowest Rated Products
+Review Growth
+Verified Purchase %
+
+Charts
+
+Monthly Reviews
+Rating Distribution
+Review Trend
+16. Notifications
+
+Notify Customer
+
+Review Approved
+Review Rejected
+Admin Reply
+
+Notify Admin
+
+New Review Submitted
+Abuse Report Received
+Low Rating Alert (1-Star Review)
+
+Channels
+
+Email
+SMS (Future)
+Push Notification
+17. Activity Log
+
+Track
+
+Review Submitted
+Review Approved
+Review Rejected
+Review Edited
+Review Deleted
+Abuse Reported
+Reply Added
+18. Business Rules
+Only customers with completed or delivered orders can submit reviews for purchased products.
+A customer can submit only one review per product unless review editing is enabled.
+Average product ratings update automatically after approval.
+Reviews remain invisible until approved (configurable).
+Reviews marked as abusive are hidden until moderation is completed.
+Deleted reviews are soft deleted for audit purposes.
+Review media must pass file type and size validation.
+Verified Purchase badges are assigned only when linked to a delivered order.
+All review actions are recorded in the audit log.
+19. User Permissions
+Permission	Description
+View Reviews	Access review records
+Approve Reviews	Approve pending reviews
+Reject Reviews	Reject reviews
+Edit Reviews	Modify review content
+Delete Reviews	Remove reviews
+Manage Abuse Reports	Process abuse reports
+Reply to Reviews	Respond to customer feedback
+Export Reviews	Download reports
+20. Navigation Flow
+Review Management
+        │
+        ├── Dashboard
+        │
+        ├── Review List
+        │      ├── Pending
+        │      ├── Approved
+        │      ├── Rejected
+        │      ├── Hidden
+        │      └── Reported
+        │
+        ├── Review Details
+        │      ├── Customer
+        │      ├── Product
+        │      ├── Media
+        │      ├── Moderation
+        │      └── Reply
+        │
+        ├── Abuse Reports
+        │
+        ├── Analytics
+        │
+        └── Activity Log
+21. Future Enhancements
+AI Features
+AI spam and fake review detection.
+AI sentiment analysis (Positive, Neutral, Negative).
+AI profanity and abusive language filtering.
+AI review summarization.
+AI automatic moderation suggestions.
+AI product quality insights from customer feedback.
+AI review authenticity scoring.
+AI multilingual review translation.
+Enterprise Features
+Seller replies.
+Review editing window.
+Review voting (Helpful / Not Helpful).
+Photo and video galleries.
+Review badges (Top Reviewer, Verified Buyer).
+Q&A section for products.
+Incentivized review campaigns.
+Multi-language reviews.
+Review approval workflow.
+Review API for mobile apps.
+22. Acceptance Criteria
+Customers can submit ratings and reviews for eligible products.
+Ratings are calculated accurately and reflected on product pages.
+Reviews support text, images, and videos.
+Verified Purchase badges are automatically assigned.
+Administrators can approve, reject, hide, restore, and reply to reviews.
+Abuse reports are tracked and moderated.
+Analytics provide meaningful insights into customer satisfaction.
+All review lifecycle events are recorded in the audit log.
+Role-based permissions secure review moderation.
+The architecture supports future AI moderation and advanced engagement features.
+23. Recommended Database Tables
+
+For an enterprise-grade Review Management system, consider these tables:
+
+ProductReviews
+ProductRatings
+ReviewMedia
+ReviewReplies
+ReviewAbuseReports
+ReviewModerationHistory
+ReviewAnalytics
+ReviewHelpfulVotes
+ReviewVerification
+ReviewActivityLogs
+ReviewNotifications
+ReviewSettings
+24. UI Screens
+
+The Review Management module should include the following screens:
+
+Review Dashboard
+Review List
+Review Details
+Approve/Reject Review
+Review Reply Screen
+Report Abuse Management
+Review Analytics Dashboard
+Rating Distribution Report
+Customer Review History
+Product Review History
+Review Settings
+Review Activity Log
+
+This design matches the capabilities of leading eCommerce platforms while remaining scalable for your handicraft business as it grows from a single online store to a multi-vendor or enterprise marketplace in the future.

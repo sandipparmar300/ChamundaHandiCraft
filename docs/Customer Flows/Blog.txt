@@ -1,0 +1,439 @@
+Module 12 - Blog
+1. Module Overview
+Module Name
+
+Blog
+
+Purpose
+
+The Blog module allows administrators to publish articles, guides, news, craft stories, tutorials, and promotional content while enabling customers to browse, search, and read blog posts. It also supports SEO optimization, category management, article sharing, and related product recommendations.
+
+Business Goals
+Improve SEO rankings.
+Increase organic website traffic.
+Educate customers about handicraft products.
+Build brand authority.
+Promote products through content.
+Increase customer engagement.
+Improve conversion rates.
+Support content marketing strategy.
+2. Blog Workflow
+Admin Creates Article
+        │
+        ▼
+Save as Draft
+        │
+        ▼
+SEO Optimization
+        │
+        ▼
+Publish Article
+        │
+        ▼
+Customer Reads Blog
+        │
+ ┌──────┼─────────────┐
+ ▼      ▼             ▼
+Search Categories Related Products
+ │      │             │
+ └──────┴─────────────┘
+        │
+        ▼
+Share / Subscribe / Purchase Product
+3. Blog Home Page
+
+Display
+
+Featured Blog Banner
+Featured Articles
+Latest Articles
+Popular Articles
+Categories
+Search Bar
+Tags
+Newsletter Subscription
+Related Products
+Recently Published Articles
+4. Blog Listing
+
+Each blog card displays
+
+Featured Image
+Blog Title
+Short Description
+Category
+Tags
+Author
+Published Date
+Estimated Reading Time
+View Count
+Comment Count (Optional)
+
+Actions
+
+Read More
+Share Article
+View Related Products
+5. Blog Details Page
+
+Display
+
+Article Information
+Featured Image
+Title
+Subtitle (Optional)
+Author
+Publish Date
+Last Updated Date
+Reading Time
+Category
+Tags
+Article Content
+
+Support
+
+Rich Text
+Images
+Videos
+Tables
+Code Blocks (Optional)
+Quote Blocks
+Lists
+Internal Links
+External Links
+Related Products
+
+Display
+
+Product Image
+Product Name
+Price
+Add to Cart
+View Product
+Related Articles
+
+Display
+
+Similar Articles
+Same Category Articles
+Recently Published
+Social Sharing
+
+Support
+
+Facebook
+Instagram
+WhatsApp
+X (Twitter)
+LinkedIn
+Pinterest
+Copy Link
+6. Blog Categories
+
+Examples
+
+Handmade Crafts
+Wooden Products
+Home Decor
+Festival Collection
+Gift Ideas
+DIY Crafts
+Artisan Stories
+Product Guides
+Care & Maintenance
+Company News
+
+Display
+
+Category Name
+Description
+Image
+Number of Articles
+7. Blog Search
+
+Search By
+
+Blog Title
+Keywords
+Tags
+Author
+Category
+Content
+
+Features
+
+Instant Search
+Auto Suggestion
+Search History (Future)
+8. Filters
+
+Customers can filter by
+
+Category
+Author
+Tags
+Publish Date
+Most Viewed
+Latest
+Popular
+9. Sorting
+
+Sort By
+
+Latest
+Oldest
+Most Viewed
+Most Popular
+Alphabetical
+10. Tags
+
+Examples
+
+Handmade
+Wooden
+Brass
+Ceramic
+Gift
+Home Decor
+Eco Friendly
+Festival
+Artisan
+
+Clicking a tag displays all related articles.
+
+11. Newsletter Integration
+
+Display
+
+Subscribe Form
+
+Fields
+
+Name
+Email
+
+Actions
+
+Subscribe
+Unsubscribe
+12. Comments (Future)
+
+Customer can
+
+Add Comment
+Reply
+Edit Own Comment
+Report Comment
+
+Admin can
+
+Approve
+Reject
+Delete
+13. Reading Progress
+
+Display
+
+Reading Progress Bar
+Estimated Reading Time
+Scroll Progress
+14. Breadcrumb
+
+Example
+
+Home
+>
+Blog
+>
+Category
+>
+Article
+15. Analytics
+
+Track
+
+Article Views
+Reading Time
+Bounce Rate
+Popular Articles
+Search Keywords
+Category Views
+Social Shares
+Newsletter Signups
+Related Product Clicks
+Product Purchases from Blog
+16. SEO Considerations
+
+Every blog should support
+
+SEO URL
+Meta Title
+Meta Description
+Meta Keywords
+Canonical URL
+Open Graph Tags
+Twitter Cards
+Structured Data (Article Schema)
+XML Sitemap
+Robots Meta
+Alt Text for Images
+17. Performance Considerations
+Lazy load images.
+Image compression.
+CDN support.
+Cache popular articles.
+Server-side pagination.
+Minify HTML/CSS/JS.
+Optimized SQL queries.
+Browser caching.
+18. Accessibility (WCAG)
+Keyboard navigation.
+Screen reader support.
+Accessible images with alt text.
+Proper heading hierarchy.
+Responsive design.
+High contrast mode.
+ARIA labels.
+19. Business Rules
+Only published articles are visible to customers.
+Draft articles remain accessible only to administrators.
+Each article belongs to at least one category.
+SEO fields should be configurable for every article.
+Featured articles are displayed on the homepage.
+Related products are manually or automatically linked.
+Blog search returns only published content.
+Categories cannot be deleted while articles are assigned.
+Blog URLs should remain stable for SEO.
+20. User Permissions
+Guest
+View Articles
+Search Blogs
+Browse Categories
+Share Articles
+Customer
+All Guest Permissions
+Subscribe to Newsletter
+Comment (Future)
+Save Articles (Future)
+Admin
+Create Articles
+Edit Articles
+Delete Articles
+Publish/Unpublish
+Manage Categories
+Manage Tags
+View Analytics
+21. Navigation Flow
+Blog Home
+    │
+    ├── Featured Articles
+    ├── Categories
+    ├── Search
+    ├── Latest Articles
+    ├── Popular Articles
+    │
+    ▼
+Article Details
+    │
+    ├── Related Products
+    ├── Related Articles
+    ├── Share
+    ├── Newsletter
+    └── Comments (Future)
+22. Future AI Enhancements
+AI Content Features
+AI article recommendations.
+AI content summarization.
+AI SEO optimization.
+AI related product suggestions.
+AI multilingual translation.
+AI personalized blog feed.
+AI content tagging.
+AI automatic category assignment.
+AI grammar checking.
+AI content generation assistance.
+Enterprise Features
+Multi-language blogs.
+Multi-author support.
+Scheduled publishing.
+Article version history.
+Draft approval workflow.
+Podcast integration.
+Video blogs.
+Reading bookmarks.
+Blog series.
+RSS feed.
+23. Acceptance Criteria
+Customers can browse and search published blog articles.
+Articles support categories, tags, and SEO metadata.
+Related products and related articles are displayed.
+Newsletter subscription is available.
+Blog pages are responsive, fast, and accessible.
+Analytics capture article engagement.
+Admins can manage articles, categories, and publication status.
+Search returns accurate blog results.
+24. Recommended Database Tables
+Blog
+Blogs
+BlogCategories
+BlogTags
+BlogTagMappings
+BlogAuthors
+BlogRelatedProducts
+SEO
+SeoMetadata
+SeoRedirects
+Analytics
+BlogViews
+BlogShares
+BlogSearchHistory
+NewsletterSubscriptions
+Future
+BlogComments
+BlogCommentReplies
+BlogBookmarks
+25. UI/UX Screens
+Blog Home
+Blog Listing
+Blog Details
+Category Listing
+Search Results
+Tag Listing
+Newsletter Subscription
+Related Articles Section
+Related Products Section
+Mobile Blog Page
+No Results Found
+Loading Skeleton
+26. API Integration Points
+Blog API
+Blog Category API
+Blog Search API
+Tag API
+Related Product API
+Newsletter API
+SEO API
+Analytics API
+Social Share API
+Comment API (Future)
+27. Recommended UI Components
+
+Create reusable blog components:
+
+Blog Card
+Featured Article Banner
+Category Card
+Search Bar
+Tag Chips
+Reading Progress Bar
+Author Information Card
+Related Product Carousel
+Related Articles Carousel
+Newsletter Subscription Card
+Social Share Buttons
+Breadcrumb Component
+Loading Skeleton
+Empty State Component
+28. Recommended .NET 8 Architecture
+
+Implement the Blog module as a dedicated Content Management Module within your .NET 8 Modular Monolithic Architecture. Use CQRS with separate command handlers for content management and query handlers for optimized article retrieval. Store blog content, categories, tags, and SEO metadata using Entity Framework Core, while using Dapper for high-performance blog listing and search operations. Cache frequently viewed articles, categories, and homepage blog sections using Redis or IMemoryCache. Design the module with service abstractions (IBlogService, IBlogSearchService, ISeoService) to support future integration with AI content generation, Elasticsearch, multilingual content, and headless CMS capabilities. This architecture provides a scalable, SEO-friendly, and enterprise-grade blogging platform suitable for modern eCommerce applications.

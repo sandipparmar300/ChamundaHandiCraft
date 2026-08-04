@@ -1,0 +1,401 @@
+The Coupon Module is much more than applying a discount code. In a professional eCommerce system, it is a complete Promotion Engine that controls discount rules, customer eligibility, product/category applicability, usage limits, scheduling, and analytics. It integrates with Orders, Customers, Products, Categories, Payments, and Reports.
+
+Module 09 - Coupon Management
+1. Module Overview
+Module Name
+
+Coupon Management
+
+Purpose
+
+The Coupon Management module allows administrators to create, manage, schedule, validate, and monitor promotional coupon codes. It supports multiple discount types, usage restrictions, customer eligibility, product/category applicability, and complete redemption tracking.
+
+Business Goals
+Increase sales and conversions.
+Promote new and seasonal products.
+Reward loyal customers.
+Encourage repeat purchases.
+Improve marketing campaign effectiveness.
+Reduce manual discount handling.
+Track coupon performance and ROI.
+2. Coupon Workflow
+Create Coupon
+       │
+       ▼
+Configure Rules
+       │
+       ▼
+Set Eligibility
+       │
+       ▼
+Set Usage Limits
+       │
+       ▼
+Schedule Active Period
+       │
+       ▼
+Publish Coupon
+       │
+       ▼
+Customer Applies Coupon
+       │
+       ▼
+Validation Engine
+       │
+   ┌───┴──────────────┐
+   ▼                  ▼
+Valid             Invalid
+   │                  │
+   ▼                  ▼
+Discount Applied   Error Message
+   │
+   ▼
+Order Placed
+   │
+   ▼
+Usage Count Updated
+3. Coupon Dashboard
+
+Display KPI Cards
+
+Total Coupons
+Active Coupons
+Expired Coupons
+Scheduled Coupons
+Draft Coupons
+Total Redemptions
+Total Discount Given
+Most Used Coupon
+Highest Revenue Coupon
+Conversion Rate
+Expiring Soon
+4. Coupon List
+Purpose
+
+Display all coupons with advanced filtering and management.
+
+Columns
+Coupon Code
+Coupon Name
+Discount Type
+Discount Value
+Minimum Order
+Maximum Discount
+Usage Count
+Usage Limit
+Start Date
+Expiry Date
+Status
+Created By
+Actions
+Row Actions
+View
+Edit
+Duplicate
+Activate
+Deactivate
+Archive
+Delete
+View Usage
+Export
+5. Create Coupon
+General Information
+
+Fields
+
+Coupon Name
+Coupon Code
+Description
+Internal Notes
+Discount Type
+
+Supported
+
+Flat Discount
+
+Example
+
+₹500 OFF
+
+Percentage Discount
+
+Example
+
+10% OFF
+
+Maximum Discount (Optional)
+
+Free Shipping (Future)
+Buy X Get Y (Future)
+Gift Voucher (Future)
+6. Discount Configuration
+
+Fields
+
+Discount Type
+Discount Value
+Maximum Discount
+Minimum Order Amount
+Maximum Order Amount
+Currency
+7. Coupon Validity
+
+Fields
+
+Start Date
+Start Time
+Expiry Date
+Expiry Time
+Time Zone
+
+Status
+
+Draft
+Scheduled
+Active
+Expired
+Disabled
+Archived
+8. Usage Limits
+
+Configure
+
+Total Usage Limit
+Per Customer Limit
+Per Day Limit
+Per Device Limit (Future)
+Per Email Limit
+Per Mobile Number
+
+Examples
+
+First 100 customers
+One use per customer
+500 total redemptions
+9. Eligibility Rules
+Customer Eligibility
+All Customers
+New Customers
+Existing Customers
+VIP Customers
+Selected Customers
+Product Eligibility
+All Products
+Selected Products
+Selected Categories
+Selected Brands
+Excluded Products
+Order Eligibility
+Minimum Order Value
+Maximum Order Value
+Payment Method
+Shipping Method
+Customer Group
+10. Coupon Validation
+
+Validation Rules
+
+Coupon Exists
+Coupon Active
+Not Expired
+Usage Limit Available
+Customer Eligible
+Order Amount Eligible
+Product Eligible
+Not Already Used
+Payment Method Allowed
+
+Validation Messages
+
+Examples
+
+Coupon Applied Successfully
+Coupon Expired
+Invalid Coupon
+Usage Limit Reached
+Minimum Order Required
+Coupon Not Applicable
+11. Coupon Redemption History
+
+Display
+
+Coupon Code
+Order Number
+Customer
+Discount Amount
+Order Value
+Date
+Payment Status
+12. Search
+
+Search By
+
+Coupon Code
+Coupon Name
+Customer
+Order Number
+13. Filters
+Status
+Discount Type
+Active
+Expired
+Scheduled
+Date Range
+Usage Count
+Created By
+14. Bulk Actions
+Activate
+Deactivate
+Archive
+Delete
+Export
+Duplicate
+15. Import / Export
+
+Import
+
+Excel
+CSV
+
+Export
+
+Excel
+CSV
+PDF
+16. Reports
+
+Generate
+
+Coupon Performance Report
+Redemption Report
+Discount Summary
+Campaign Report
+Customer Usage Report
+Revenue Impact Report
+Expired Coupon Report
+17. Notifications
+
+Notify Admin
+
+Coupon Expiring Soon
+Usage Limit Reached
+Campaign Started
+Campaign Completed
+
+Notify Customer (Optional)
+
+New Coupon Available
+Coupon Expiring Soon
+Coupon Successfully Applied
+
+Channels
+
+Email
+SMS
+WhatsApp
+Push Notification
+18. Activity Log
+
+Track
+
+Coupon Created
+Coupon Updated
+Coupon Activated
+Coupon Deactivated
+Coupon Redeemed
+Coupon Expired
+Coupon Deleted
+19. Business Rules
+Coupon codes must be unique.
+Coupon codes are case-insensitive during validation.
+Coupons cannot be redeemed after their expiry date and time.
+Discount cannot exceed the configured maximum discount amount.
+Coupon usage limits must be enforced atomically to prevent overuse.
+Customers cannot exceed the configured redemption limit.
+Coupons can be restricted to specific products, categories, brands, or customer groups.
+Only one coupon may be applied per order unless coupon stacking is explicitly enabled.
+Cancelled or refunded orders should restore coupon usage based on business configuration.
+All coupon actions and redemptions are recorded in the audit log.
+20. User Permissions
+Permission	Description
+View Coupons	Access coupon records
+Create Coupons	Create new coupons
+Edit Coupons	Modify coupon configuration
+Activate/Deactivate Coupons	Control coupon availability
+Delete Coupons	Archive or remove coupons
+View Redemption History	Access usage records
+Export Coupon Reports	Download reports
+21. Navigation Flow
+Coupon Management
+        │
+        ├── Dashboard
+        │
+        ├── Coupon List
+        │      ├── Search
+        │      ├── Filters
+        │      ├── Bulk Actions
+        │      └── Export
+        │
+        ├── Create Coupon
+        │      ├── General Information
+        │      ├── Discount Configuration
+        │      ├── Eligibility Rules
+        │      ├── Usage Limits
+        │      ├── Schedule
+        │      └── Preview
+        │
+        ├── Edit Coupon
+        ├── Redemption History
+        ├── Reports
+        └── Activity Log
+22. Future Enhancements
+AI Features
+AI-generated coupon campaigns.
+AI personalized coupons based on purchase history.
+AI customer segmentation.
+AI coupon abuse detection.
+AI campaign performance prediction.
+AI discount optimization.
+AI coupon recommendations during checkout.
+Enterprise Features
+Coupon stacking rules.
+Buy One Get One (BOGO) promotions.
+Tiered discounts.
+Loyalty point redemption.
+Gift cards and vouchers.
+Referral coupons.
+Affiliate coupons.
+QR code coupons.
+Dynamic one-time coupons.
+Multi-store and multi-currency support.
+Partner and influencer coupon codes.
+A/B testing for coupon campaigns.
+23. Acceptance Criteria
+Administrators can create, edit, schedule, activate, and archive coupons.
+Coupon validation correctly enforces eligibility, date ranges, and usage limits.
+Flat and percentage discounts are calculated accurately.
+Redemption history is maintained for every successful use.
+Usage limits are enforced without race conditions.
+Reports accurately summarize coupon performance and financial impact.
+Notifications are sent for configured coupon events.
+All coupon changes and redemptions are logged.
+Role-based permissions restrict coupon management operations.
+The architecture supports future promotion types without redesign.
+Recommended Database Tables
+
+For a scalable implementation, consider these tables:
+
+Coupons
+CouponDiscountRules
+CouponEligibilityRules
+CouponApplicableProducts
+CouponApplicableCategories
+CouponApplicableBrands
+CouponCustomerEligibility
+CouponUsageLimits
+CouponRedemptions
+CouponSchedules
+CouponActivityLogs
+CouponNotifications
+
+This design allows you to evolve from simple coupon codes today to a full-featured Promotion Engine capable of supporting complex marketing campaigns as your handicraft business grows.

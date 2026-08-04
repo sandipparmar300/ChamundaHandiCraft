@@ -1,0 +1,493 @@
+Module 3 - Shop
+1. Module Overview
+Module Name
+
+Shop
+
+Purpose
+
+The Shop module provides customers with a comprehensive product browsing experience through product listings, category navigation, advanced filters, sorting, search, and pagination. It enables customers to efficiently discover products that match their interests while maintaining high performance and excellent user experience.
+
+Business Goals
+Improve product discoverability.
+Increase conversion rates.
+Reduce product search time.
+Improve customer experience.
+Increase Average Order Value (AOV).
+Support SEO-friendly product listing pages.
+Improve mobile shopping experience.
+Enable scalable product browsing.
+2. Shop Workflow
+Customer Opens Shop
+        │
+        ▼
+Load Product Listing
+        │
+        ▼
+Apply Search / Filters
+        │
+        ▼
+Sort Products
+        │
+        ▼
+View Product Cards
+        │
+        ▼
+Quick View / Wishlist / Cart
+        │
+        ▼
+Open Product Details
+        │
+        ▼
+Purchase Product
+3. Shop Page Layout
+Header
+Logo
+Navigation Menu
+Search Bar
+Wishlist
+Cart
+Login / My Account
+Breadcrumb
+
+Example
+
+Home
+   >
+Shop
+   >
+Wooden Crafts
+Left Sidebar (Desktop)
+Categories
+Price Filter
+Brand Filter
+Material Filter
+Color Filter
+Rating Filter
+Availability
+Handmade By
+Country of Origin
+Discount Filter
+Tags
+Mobile Filter
+Slide-in Filter Drawer
+Apply Button
+Reset Button
+Main Product Listing
+
+Display
+
+Product Cards
+Product Count
+Sorting
+Grid/List Toggle
+Pagination
+4. Product Listing
+
+Each Product Card should display
+
+Product Image
+Hover Image
+Product Name
+SKU
+Category
+Brand
+Rating
+Review Count
+Original Price
+Discount Price
+Discount Percentage
+Stock Status
+Handmade Badge
+Bestseller Badge
+Trending Badge
+New Arrival Badge
+Wishlist Button
+Quick View
+Add to Cart
+Buy Now
+5. Grid / List View
+Grid View
+
+Support
+
+2 Columns (Mobile)
+3 Columns (Tablet)
+4 Columns (Desktop)
+List View
+
+Display
+
+Large Image
+Product Information
+Description
+Price
+Rating
+Add to Cart
+Wishlist
+
+System should remember customer's last selected view.
+
+6. Filters
+Category Filter
+Parent Category
+Subcategory
+Price Filter
+Slider
+Min Price
+Max Price
+Brand Filter
+
+Checkbox List
+
+Material Filter
+
+Examples
+
+Wood
+Brass
+Clay
+Marble
+Bamboo
+Fabric
+Color Filter
+
+Display
+
+Color Circles
+Rating Filter
+5 Stars
+4★ & Above
+3★ & Above
+Availability
+In Stock
+Out of Stock
+Pre Order (Future)
+Discount
+
+Examples
+
+10%
+20%
+30%
+50%
+Handmade By
+
+Filter by artisan.
+
+Country of Origin
+
+Example
+
+India
+Nepal
+Indonesia
+Tags
+
+Example
+
+Eco Friendly
+Handmade
+Premium
+Limited Edition
+7. Search
+
+Search By
+
+Product Name
+SKU
+Product Code
+Brand
+Category
+Tags
+
+Features
+
+Auto Suggestion
+Recent Searches
+Popular Searches
+Search History (Logged-in users)
+
+Future
+
+Voice Search
+Image Search
+8. Sorting
+
+Options
+
+Featured
+Newest
+Best Selling
+Trending
+Price Low → High
+Price High → Low
+Highest Rated
+Most Reviewed
+Discount
+A–Z
+Z–A
+
+Default
+
+Featured
+9. Pagination
+
+Support
+
+Previous
+Next
+Page Numbers
+Go to Page
+
+Options
+
+20 Products
+40 Products
+60 Products
+100 Products
+
+Future
+
+Infinite Scroll
+10. Quick View
+
+Popup Display
+
+Product Images
+Price
+Discount
+Rating
+Variants
+Stock
+Add to Cart
+Buy Now
+Wishlist
+View Details
+11. Wishlist Integration
+
+Actions
+
+Add
+Remove
+View Wishlist
+
+Real-Time Update
+
+Wishlist Count
+12. Cart Integration
+
+Actions
+
+Add to Cart
+Update Quantity
+Buy Now
+
+Real-Time Update
+
+Cart Count
+Cart Total
+13. SEO Considerations
+SEO-friendly category URLs.
+SEO-friendly product listing URLs.
+Dynamic meta title and description.
+Canonical URLs for filtered pages.
+Breadcrumb schema.
+Product schema.
+Category schema.
+Optimized H1/H2 structure.
+XML sitemap inclusion.
+Image alt text.
+Pagination with proper rel="next"/"prev" (or equivalent strategy).
+14. Analytics
+
+Track
+
+Shop Page Views
+Product Clicks
+Filter Usage
+Search Keywords
+Sorting Usage
+Wishlist Clicks
+Add to Cart
+Buy Now
+Quick View Usage
+Pagination Usage
+15. Performance Considerations
+Server-side pagination.
+Lazy loading images.
+WebP image support.
+Redis/Memory caching for product listings.
+Optimized SQL queries.
+CDN for images.
+Debounced search.
+Asynchronous filter loading.
+Skeleton loading.
+Response compression.
+16. Accessibility (WCAG)
+Keyboard navigation.
+Screen reader support.
+Accessible filter controls.
+High contrast mode.
+Focus indicators.
+Responsive design.
+Proper ARIA labels.
+Accessible pagination.
+17. Business Rules
+Only published products should appear.
+Hidden or unpublished products must not be displayed.
+Out-of-stock products may be shown or hidden based on system settings.
+Product prices must reflect active offers and discounts.
+Filters should dynamically update product counts.
+Multiple filters should be combinable.
+Search results should respect selected filters.
+Sorting must preserve active filters.
+Pagination should preserve filters and sorting.
+Customer-specific pricing (future) should be applied where applicable.
+18. User Permissions
+
+Customer
+
+Browse Products
+Search Products
+Apply Filters
+Sort Products
+View Product Details
+Add to Wishlist
+Add to Cart
+Buy Now
+
+Admin
+
+Manage Product Visibility
+Configure Filter Options
+Configure Default Sorting
+Configure Shop Layout
+19. Navigation Flow
+Shop
+   │
+   ├── Categories
+   ├── Search
+   ├── Filters
+   │      ├── Price
+   │      ├── Brand
+   │      ├── Material
+   │      ├── Color
+   │      ├── Rating
+   │      ├── Availability
+   │      ├── Handmade By
+   │      └── Tags
+   │
+   ├── Sorting
+   ├── Grid/List View
+   ├── Product Listing
+   ├── Quick View
+   ├── Wishlist
+   ├── Cart
+   └── Pagination
+20. Future AI Enhancements
+AI Shopping Experience
+AI personalized product ranking.
+AI recommended products.
+AI smart filters.
+AI search suggestions.
+AI visual search.
+AI voice search.
+AI product comparison.
+AI personalized collections.
+AI cross-sell recommendations.
+AI upsell recommendations.
+Enterprise Features
+Multi-currency pricing.
+Multi-language product listings.
+Product comparison.
+Infinite scrolling.
+Saved filters.
+Recently viewed products.
+Dynamic pricing.
+Customer-specific catalogs.
+B2B pricing.
+Stock availability by warehouse.
+Product availability by location.
+Personalized merchandising.
+21. Acceptance Criteria
+Customers can browse products using grid and list views.
+Multiple filters can be applied simultaneously.
+Product search returns accurate and relevant results.
+Sorting updates product listings correctly.
+Pagination performs efficiently with large product catalogs.
+Wishlist and Cart actions update in real time.
+Quick View allows customers to inspect products without leaving the listing.
+Shop pages are SEO-friendly and fully responsive.
+Analytics capture browsing behavior and customer interactions.
+Product listings load efficiently even with thousands of products.
+22. Recommended Database Tables
+Product Listing
+Products
+ProductCategories
+ProductBrands
+ProductMaterials
+ProductTags
+ProductVariants
+ProductImages
+ProductReviews
+Search & Filters
+SearchHistory
+PopularSearches
+ProductFilterConfigurations
+ProductSortingConfigurations
+Analytics
+ShopPageVisits
+ProductViewLogs
+FilterUsageLogs
+SearchAnalytics
+ProductClickAnalytics
+23. UI/UX Screens
+Shop Landing Page
+Category Listing Page
+Product Listing (Grid View)
+Product Listing (List View)
+Mobile Product Listing
+Filter Drawer (Mobile)
+Search Results Page
+Empty Search Result Page
+Quick View Modal
+Product Comparison (Future)
+Wishlist Popup
+Loading/Skeleton Screen
+Pagination Component
+No Products Found Page
+24. API Integration Points
+Product Listing API
+Category API
+Product Search API
+Filter API
+Sorting API
+Pagination API
+Wishlist API
+Cart API
+Product Review API
+Inventory API
+Analytics API
+25. Recommended UI Components
+
+Create reusable UI components for consistency across the website:
+
+Product Card
+Product Badge (New, Bestseller, Trending, Discount)
+Search Bar
+Filter Panel
+Price Slider
+Rating Filter
+Color Selector
+Breadcrumb
+Grid/List Toggle
+Sort Dropdown
+Pagination Control
+Quick View Modal
+Empty State
+Skeleton Loader
+Product Count Indicator
+Recommended .NET 8 Architecture
+
+Implement the Shop module using a dedicated Catalog Query Service with CQRS for read operations. Use Dapper for high-performance product listing queries and Entity Framework Core for transactional updates. Apply server-side filtering, sorting, and pagination to efficiently handle large catalogs. Cache frequently accessed category and product listing data using Redis or IMemoryCache. Structure the module around reusable query models and view models so the same APIs can support the Admin Panel, Customer Website, Mobile App, and future marketplace integrations. This architecture ensures high performance, scalability, and maintainability for an enterprise-grade eCommerce platform.

@@ -1,0 +1,505 @@
+Excellent. The Home Page is the most important page of your eCommerce website. It is not just a landing page—it is the digital showroom of your handicraft business. It should maximize user engagement, product discovery, and conversions.
+
+This module integrates with Products, Categories, Offers, Banner Management, Reviews, Wishlist, Cart, Search, Blog, CMS, SEO, Analytics, and Notifications.
+
+Module 2 - Home Page
+1. Module Overview
+Module Name
+
+Home Page
+
+Purpose
+
+The Home Page serves as the primary landing page of the eCommerce website, showcasing featured products, categories, promotional banners, offers, collections, customer reviews, and other marketing content to encourage product discovery and drive sales.
+
+Business Goals
+Create a strong first impression.
+Increase product visibility.
+Improve conversion rate.
+Promote offers and festivals.
+Increase average order value.
+Drive customers to product pages.
+Improve customer engagement.
+Enhance brand identity.
+2. Home Page Workflow
+Customer Visits Website
+        │
+        ▼
+Load Homepage
+        │
+        ▼
+Display Hero Banner
+        │
+        ▼
+Show Featured Categories
+        │
+        ▼
+Display Product Sections
+        │
+        ▼
+Show Offers & Collections
+        │
+        ▼
+Display Customer Reviews
+        │
+        ▼
+Customer Clicks Product
+        │
+        ▼
+Product Details Page
+3. Homepage Layout
+Header
+Logo
+Search Bar
+Navigation Menu
+Categories Menu
+Wishlist
+Cart
+Login/Register
+My Account
+Contact
+Language Selector (Future)
+Currency Selector (Future)
+Hero Banner
+
+Purpose
+
+Display promotional banners and featured campaigns.
+
+Features
+
+Auto Slider
+Manual Navigation
+Desktop Banner
+Mobile Banner
+CTA Button
+Multiple Slides
+Animation
+Banner Scheduling
+Click Tracking
+
+Banner Information
+
+Banner Image
+Banner Title
+Banner Subtitle
+CTA Button Text
+CTA URL
+Display Order
+Active Date
+Expiry Date
+Featured Categories
+
+Purpose
+
+Highlight top product categories.
+
+Display
+
+Category Image
+Category Name
+Product Count
+Shop Now Button
+
+Actions
+
+View Category
+Hover Animation
+Featured Products
+
+Purpose
+
+Promote selected products.
+
+Display
+
+Product Image
+Product Name
+Rating
+Price
+Discount
+Stock Status
+Wishlist
+Quick View
+Add to Cart
+Buy Now
+
+Sorting
+
+Manual Ordering
+Admin Selection
+New Arrivals
+
+Display
+
+Latest Products
+Newly Published Products
+New Collection
+
+Information
+
+Image
+Name
+Price
+Rating
+Wishlist
+Add to Cart
+Trending Products
+
+Display
+
+Most Viewed
+Most Purchased
+Trending Score
+
+Future
+
+AI Trending Algorithm
+Best Sellers
+
+Display
+
+Highest Selling Products
+
+Information
+
+Sales Count
+Rating
+Bestseller Badge
+Festival Collection
+
+Examples
+
+Diwali Collection
+Christmas Collection
+Raksha Bandhan Collection
+Navratri Collection
+Wedding Collection
+
+Display
+
+Banner
+Collection Image
+Shop Collection Button
+Customer Reviews
+
+Display
+
+Customer Photo
+Customer Name
+Rating
+Review
+Purchased Product
+
+Carousel
+
+Auto Scroll
+Manual Navigation
+Newsletter Subscription
+
+Fields
+
+Email
+Subscribe Button
+
+Purpose
+
+Collect email subscribers.
+
+Footer
+
+Display
+
+Company Information
+About Us
+Contact
+Privacy Policy
+Return Policy
+Shipping Policy
+Terms & Conditions
+FAQ
+Social Media Links
+Newsletter
+Copyright
+4. Product Card Component
+
+Every product card should display
+
+Product Image
+Hover Image
+Product Name
+Category
+Rating
+Review Count
+Original Price
+Discount Price
+Discount Percentage
+Stock Status
+Bestseller Badge
+Trending Badge
+New Arrival Badge
+Handmade Badge
+Wishlist Icon
+Compare (Future)
+Quick View
+Add to Cart
+Buy Now
+5. Search
+
+Homepage Search
+
+Support
+
+Product Search
+Category Search
+Brand Search
+SKU Search
+
+Features
+
+Auto Suggestion
+Recent Searches
+Trending Searches
+6. Filters
+
+Quick Filters
+
+Handmade
+Wooden
+Metal
+Clay
+New
+Bestseller
+Trending
+7. Personalization (Future)
+
+Based On
+
+Purchase History
+Browsing History
+Wishlist
+Recently Viewed
+Location
+
+Display
+
+Recommended Products
+Personalized Offers
+8. Notifications
+
+Homepage Popup
+
+Welcome Offer
+Coupon
+Festival Sale
+Free Shipping
+App Download (Future)
+9. Analytics
+
+Track
+
+Homepage Visits
+Banner Clicks
+Category Clicks
+Product Clicks
+Wishlist Clicks
+Add to Cart
+Buy Now
+Newsletter Subscription
+Scroll Depth
+Time on Page
+10. SEO Considerations
+SEO-friendly homepage title.
+Meta Description.
+Open Graph tags.
+Canonical URL.
+Schema.org Organization markup.
+Website schema.
+Breadcrumb schema (where applicable).
+Optimized H1 tag.
+Optimized image alt text.
+Lazy loading for images.
+XML sitemap inclusion.
+11. Performance Considerations
+Lazy loading images.
+Image compression.
+WebP support.
+CDN for banners.
+Browser caching.
+Minified CSS & JavaScript.
+Deferred script loading.
+Optimized API calls.
+Skeleton loaders.
+Responsive images.
+12. Accessibility (WCAG)
+Keyboard navigation.
+Screen reader support.
+Proper ARIA labels.
+High contrast.
+Accessible carousel controls.
+Alt text for every image.
+Focus indicators.
+Responsive layout.
+13. Business Rules
+Only published banners should be displayed.
+Expired banners should not appear.
+Only active products should be displayed.
+Out-of-stock products may be hidden or shown based on system settings.
+Featured, Trending, Bestseller, and New Arrival sections are managed from the Admin Panel.
+Festival collections are displayed only within configured date ranges.
+Customer reviews shown on the homepage must be approved by an administrator.
+Homepage content should be configurable without code changes.
+Banner click events should be tracked for analytics.
+All product prices must respect active discounts and tax configuration.
+14. User Permissions
+
+Customer
+
+View Homepage
+Search Products
+View Categories
+View Product Details
+Add to Wishlist
+Add to Cart
+Buy Now
+Subscribe Newsletter
+
+Admin
+
+Manage Homepage Layout
+Manage Featured Products
+Manage Banners
+Manage Collections
+Manage Reviews
+Manage Homepage Content
+15. Navigation Flow
+Home Page
+     │
+     ├── Hero Banner
+     │
+     ├── Featured Categories
+     │
+     ├── Featured Products
+     │
+     ├── New Arrivals
+     │
+     ├── Trending Products
+     │
+     ├── Best Sellers
+     │
+     ├── Festival Collection
+     │
+     ├── Customer Reviews
+     │
+     ├── Newsletter
+     │
+     └── Footer
+16. Future AI Enhancements
+AI Personalization
+AI personalized homepage.
+AI product recommendations.
+AI dynamic banner selection.
+AI recently viewed recommendations.
+AI cross-selling.
+AI upselling.
+AI customer segmentation.
+AI trending prediction.
+AI personalized festival collections.
+AI homepage optimization based on user behavior.
+Enterprise Features
+Multi-language homepage.
+Multi-store support.
+Dynamic CMS widgets.
+Drag-and-drop homepage builder.
+A/B testing for banners.
+Dynamic pricing display.
+Real-time inventory display.
+Live recently purchased notifications.
+Live visitor counter.
+Product comparison.
+Personalized coupons.
+Loyalty program integration.
+Progressive Web App (PWA) support.
+17. Acceptance Criteria
+Homepage loads quickly on desktop and mobile.
+Hero banners are configurable and support scheduling.
+Featured categories and product sections are dynamically managed from the Admin Panel.
+Customers can search, browse, wishlist, add to cart, and purchase directly from homepage product cards.
+Customer reviews displayed are administrator-approved.
+Newsletter subscriptions are captured successfully.
+Homepage is fully responsive and accessible.
+SEO metadata and structured data are implemented correctly.
+Analytics capture customer interactions with homepage elements.
+Homepage content can be updated without code deployment.
+18. Recommended Database Tables
+Homepage Content
+HomepageConfigurations
+HomepageSections
+HomepageWidgets
+HomepageBanners
+HomepageCollections
+Product Display
+FeaturedProducts
+TrendingProducts
+BestSellerProducts
+NewArrivalProducts
+FestivalCollections
+Analytics
+HomepageVisitLogs
+BannerClickLogs
+HomepageSectionAnalytics
+HomepageRecommendations
+19. UI/UX Screens
+Homepage
+Hero Banner Carousel
+Featured Categories Section
+Featured Products Section
+New Arrivals Section
+Trending Products Section
+Best Sellers Section
+Festival Collection Section
+Customer Reviews Carousel
+Newsletter Subscription Section
+Footer
+Mobile Homepage
+Tablet Homepage
+Quick View Modal
+Search Suggestion Dropdown
+20. API Integration Points
+Homepage Configuration API
+Banner API
+Category API
+Featured Products API
+New Arrivals API
+Trending Products API
+Best Sellers API
+Festival Collection API
+Customer Reviews API
+Wishlist API
+Cart API
+Search API
+Newsletter Subscription API
+Analytics Tracking API
+21. Recommended UI/UX Sections (Modern eCommerce)
+
+To create a premium handicraft eCommerce experience similar to leading platforms, consider this homepage structure:
+
+Header Navigation
+Hero Banner Slider
+Shop by Category
+Featured Products
+New Arrivals
+Trending Products
+Best Sellers
+Festival Collection
+Why Choose Us (Handmade, Quality, Fast Delivery, Secure Payment)
+Featured Artisans / Handmade By
+Customer Testimonials
+Instagram / Social Media Gallery
+Blog Highlights
+Newsletter Subscription
+Trust Badges (Secure Payment, Easy Returns, Authentic Handmade)
+Footer
+Recommended .NET 8 Architecture
+
+Build the homepage as a widget-based, configurable module. Each section (Banner, Categories, Featured Products, New Arrivals, etc.) should be implemented as an independent component with its own service and API. Store homepage configuration in the database, cache frequently accessed data (such as banners and featured products) using Redis or IMemoryCache, and expose data through dedicated query services. This approach allows administrators to reorder, enable, disable, or replace homepage sections without code changes and keeps the architecture scalable as your eCommerce platform grows.

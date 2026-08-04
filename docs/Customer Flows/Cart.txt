@@ -1,0 +1,443 @@
+Module 5 - Shopping Cart
+1. Module Overview
+Module Name
+
+Shopping Cart
+
+Purpose
+
+The Shopping Cart module allows customers to manage selected products before checkout. Customers can update quantities, apply coupons, estimate shipping charges, review pricing, remove products, save items for later, and proceed to checkout.
+
+Business Goals
+Reduce cart abandonment.
+Increase checkout conversion.
+Increase Average Order Value (AOV).
+Encourage cross-selling and upselling.
+Validate pricing before checkout.
+Provide transparent shipping and tax information.
+Simplify the purchasing process.
+Improve customer satisfaction.
+2. Shopping Cart Workflow
+Customer Adds Product
+        │
+        ▼
+Shopping Cart
+        │
+        ▼
+View Cart Items
+        │
+ ┌──────┼───────────────┐
+ │      │               │
+ ▼      ▼               ▼
+Update Qty Remove Item Apply Coupon
+ │      │               │
+ └──────┴───────────────┘
+        │
+        ▼
+Calculate Totals
+        │
+        ▼
+Estimate Shipping
+        │
+        ▼
+Proceed to Checkout
+3. Cart Page Layout
+Header
+Logo
+Navigation
+Search
+Wishlist
+Cart Count
+My Account
+Breadcrumb
+
+Example
+
+Home
+>
+Shopping Cart
+Cart Items Section
+
+Each cart item displays:
+
+Product Image
+Product Name
+SKU
+Category
+Variant (Size, Color, Material, Finish)
+Unit Price
+Discount
+Quantity Selector
+Available Stock
+Subtotal
+Estimated Delivery
+Remove Button
+Save for Later (Future)
+Move to Wishlist
+View Product
+Quantity Management
+
+Actions
+
+Increase Quantity
+Decrease Quantity
+Manual Quantity Entry
+
+Validation
+
+Minimum Quantity
+Maximum Purchase Limit
+Available Stock
+Variant Stock Validation
+
+Automatic Updates
+
+Line Total
+Grand Total
+Discount
+Shipping
+Taxes
+Remove Product
+
+Features
+
+Remove Single Product
+Remove Multiple Products (Future)
+Undo Remove (Temporary)
+Confirmation (Optional)
+4. Coupon Management
+
+Purpose
+
+Apply promotional discounts.
+
+Supported Coupon Types
+
+Flat Discount
+Percentage Discount
+Free Shipping
+Buy X Get Y
+Festival Coupons
+Customer-Specific Coupons
+First Order Coupons
+Referral Coupons (Future)
+
+Fields
+
+Coupon Code
+Apply Button
+
+Validation
+
+Coupon Exists
+Coupon Active
+Expiry Date
+Usage Limit
+Minimum Purchase
+Maximum Discount
+Customer Eligibility
+Product Eligibility
+Category Eligibility
+
+Actions
+
+Apply Coupon
+Remove Coupon
+
+Display
+
+Applied Coupon
+Discount Amount
+Coupon Message
+5. Shipping Estimation
+
+Display
+
+Shipping Charges
+Free Shipping Eligibility
+Courier Service
+Estimated Delivery Date
+Estimated Dispatch Date
+
+Future
+
+Enter PIN Code
+Change Delivery Address
+Courier Selection
+6. Order Summary
+
+Display
+
+Total Items
+Total Quantity
+Original Price
+Product Discount
+Coupon Discount
+Shipping Charges
+Tax (GST)
+Total Savings
+Grand Total
+Estimated Delivery Date
+
+Buttons
+
+Continue Shopping
+Proceed to Checkout
+7. Recommended Products
+
+Purpose
+
+Increase cart value.
+
+Display
+
+Frequently Bought Together
+Similar Products
+Recently Viewed
+Trending Products
+
+Actions
+
+Quick Add to Cart
+View Product
+8. Wishlist Integration
+
+Actions
+
+Move to Wishlist
+Move from Wishlist to Cart
+
+Real-Time Update
+
+Wishlist Count
+9. Inventory Validation
+
+Validation occurs:
+
+When cart loads
+On quantity change
+Before checkout
+
+Display
+
+In Stock
+Low Stock
+Out of Stock
+Limited Quantity
+10. Tax Calculation
+
+Support
+
+GST
+Inclusive Tax
+Exclusive Tax
+
+Display
+
+CGST
+SGST
+IGST
+Total Tax
+11. Guest Cart
+
+Support
+
+Guest Users
+Logged-in Users
+
+Features
+
+Session-Based Cart
+Persistent Cart after Login
+Merge Guest Cart with Customer Cart
+12. Cart Persistence
+
+Features
+
+Auto Save
+Cross Device Sync (Future)
+Restore Abandoned Cart
+Persistent Cart for Logged-in Customers
+13. Search
+
+Not Applicable
+
+14. Analytics
+
+Track
+
+Add to Cart
+Remove from Cart
+Quantity Updates
+Coupon Usage
+Cart Value
+Abandoned Cart
+Checkout Initiated
+Shipping Estimate Usage
+Recommended Product Clicks
+15. SEO Considerations
+Cart page should be NoIndex.
+Exclude cart URLs from sitemap.
+Prevent indexing of coupon parameters.
+Use canonical URL.
+Prevent duplicate cart pages.
+16. Performance Considerations
+AJAX quantity updates.
+Real-time total calculation.
+Optimized inventory validation.
+Coupon validation caching.
+Lazy loading recommended products.
+Minimized API calls.
+Optimized SQL queries.
+Redis/MemoryCache for cart sessions.
+Skeleton loaders.
+17. Accessibility (WCAG)
+Keyboard navigation.
+Screen reader support.
+Accessible quantity controls.
+Focus indicators.
+High contrast support.
+Responsive layout.
+Proper ARIA labels.
+18. Business Rules
+Customers cannot exceed available stock.
+Variant selection is mandatory before adding products.
+Quantity changes should immediately recalculate totals.
+Coupons must be validated in real time.
+Expired or invalid coupons cannot be applied.
+Shipping charges should update based on destination and cart value.
+Taxes should be calculated according to configured tax rules.
+Guest carts should merge with customer carts after login.
+Cart prices should refresh automatically if product prices change.
+Checkout is allowed only when all items are valid and in stock.
+19. User Permissions
+
+Customer
+
+View Cart
+Update Quantity
+Remove Products
+Apply Coupon
+Remove Coupon
+Estimate Shipping
+Move to Wishlist
+Continue Shopping
+Proceed to Checkout
+
+Admin
+
+Configure Cart Rules
+Configure Coupon Rules
+Configure Shipping Rules
+Configure Tax Rules
+20. Navigation Flow
+Shopping Cart
+      │
+      ├── Cart Items
+      ├── Quantity Update
+      ├── Remove Product
+      ├── Coupon
+      ├── Shipping Estimate
+      ├── Order Summary
+      ├── Recommended Products
+      ├── Move to Wishlist
+      ├── Continue Shopping
+      └── Proceed to Checkout
+21. Future AI Enhancements
+AI Shopping Experience
+AI coupon recommendations.
+AI cross-sell suggestions.
+AI upsell recommendations.
+AI shipping optimization.
+AI delivery prediction.
+AI abandoned cart recovery.
+AI price drop alerts.
+AI personalized offers.
+AI bundle recommendations.
+AI fraud detection for coupon abuse.
+Enterprise Features
+Save for Later.
+Gift Wrapping.
+Gift Message.
+Multiple Shipping Addresses.
+Cart Sharing.
+Quote Request (B2B).
+Subscription Products.
+Multi-Currency.
+Multi-Warehouse Availability.
+Scheduled Delivery.
+Loyalty Point Redemption.
+Store Pickup (Click & Collect).
+22. Acceptance Criteria
+Customers can update product quantities with real-time price recalculation.
+Products can be removed individually from the cart.
+Coupons are validated and applied according to business rules.
+Shipping charges and estimated delivery are calculated accurately.
+Taxes are displayed correctly.
+Inventory is validated before checkout.
+Guest carts persist and merge after login.
+Recommended products support cross-selling.
+Cart page is fully responsive and accessible.
+Cart actions are tracked for analytics and abandoned cart recovery.
+23. Recommended Database Tables
+Cart
+ShoppingCarts
+ShoppingCartItems
+ShoppingCartCoupons
+ShoppingCartSessions
+Pricing
+CouponUsageHistory
+ShippingEstimations
+CartTaxCalculations
+Customer
+SavedForLaterItems
+GuestCartMappings
+Analytics
+CartActivityLogs
+AbandonedCarts
+CartRecommendations
+24. UI/UX Screens
+Shopping Cart
+Empty Cart
+Cart with Products
+Coupon Panel
+Shipping Estimation Panel
+Order Summary
+Recommended Products Section
+Save for Later (Future)
+Guest Cart
+Mobile Shopping Cart
+Cart Merge Notification
+Abandoned Cart Recovery (Future)
+25. API Integration Points
+Shopping Cart API
+Add to Cart API
+Update Quantity API
+Remove Item API
+Coupon Validation API
+Shipping Estimation API
+Inventory Validation API
+Tax Calculation API
+Wishlist API
+Checkout API
+Recommended Products API
+Analytics API
+26. Recommended UI Components
+
+Create reusable components for a consistent shopping experience:
+
+Cart Item Card
+Quantity Stepper
+Coupon Input
+Applied Coupon Badge
+Order Summary Card
+Shipping Estimator
+Product Recommendation Carousel
+Empty Cart Illustration
+Sticky Checkout Summary (Mobile)
+Price Breakdown Component
+Delivery Information Card
+Cart Success Notification
+Recommended .NET 8 Architecture
+
+Implement the Shopping Cart as a dedicated Cart Module within your .NET 8 Modular Monolithic Architecture. Use CQRS with separate commands for add, update, remove, and apply coupon operations, while exposing optimized query services for cart retrieval. Store guest carts using session or distributed cache, and persist authenticated customer carts in SQL Server. Use Dapper for high-performance cart queries, Entity Framework Core for transactional updates, and Redis for caching cart sessions and pricing calculations. Integrate the Cart module with Inventory, Pricing, Coupon, Shipping, Tax, and Checkout modules through well-defined application services, ensuring a scalable, maintainable, and enterprise-ready eCommerce platform.

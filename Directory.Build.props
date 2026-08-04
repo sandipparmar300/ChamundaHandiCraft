@@ -1,0 +1,20 @@
+<Project>
+
+  <!--
+    Shared MSBuild settings for every project in the ChamundaHandicraft solution.
+    Individual .csproj files should not restate TargetFramework / Nullable / LangVersion.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Company>Chamunda Handicraft</Company>
+    <Product>Chamunda Handicraft E-Commerce Platform</Product>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+</Project>

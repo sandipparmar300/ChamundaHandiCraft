@@ -1,0 +1,531 @@
+1. Module Overview
+Module Name
+
+My Account
+
+Purpose
+
+The My Account module provides customers with a centralized dashboard to manage their personal information, addresses, orders, wishlist, reviews, account security, notifications, and other account-related activities.
+
+Business Goals
+Improve customer self-service.
+Increase customer retention.
+Enhance customer engagement.
+Reduce customer support requests.
+Improve account security.
+Provide complete order visibility.
+Increase repeat purchases.
+Centralize customer account management.
+2. My Account Workflow
+Customer Login
+      │
+      ▼
+My Account Dashboard
+      │
+ ┌────┼──────────────┬──────────────┐
+ ▼    ▼              ▼              ▼
+Profile Orders      Wishlist     Addresses
+ │    │              │              │
+ ▼    ▼              ▼              ▼
+Reviews Notifications Password Security
+      │
+      ▼
+Logout
+3. My Account Layout
+Left Navigation Menu
+Dashboard
+My Profile
+Address Book
+My Orders
+Wishlist
+Reviews & Ratings
+Notifications
+Change Password
+Logout
+
+Desktop
+
+Fixed Sidebar
+
+Mobile
+
+Slide Menu
+Bottom Navigation (Future)
+4. Dashboard
+Purpose
+
+Provide a quick summary of customer activities.
+
+Display
+
+Welcome Message
+
+Customer Information
+
+Name
+Email
+Mobile
+
+Quick Statistics
+
+Total Orders
+Active Orders
+Delivered Orders
+Cancelled Orders
+Wishlist Items
+Saved Addresses
+Reward Points
+Available Coupons (Future)
+
+Recent Orders
+
+Order Number
+Order Date
+Status
+Total
+View Details
+
+Recent Notifications
+
+Recommended Products
+
+Recently Viewed Products
+
+Quick Actions
+
+Continue Shopping
+Track Order
+Edit Profile
+Manage Addresses
+5. Profile Management
+Customer Information
+
+Personal Details
+
+First Name
+Last Name
+Email
+Mobile
+Date of Birth
+Gender
+Profile Picture
+
+Optional
+
+Anniversary
+Preferred Language
+Preferred Currency
+
+Buttons
+
+Edit
+Save
+Cancel
+
+Validation
+
+Email Unique
+Mobile Unique
+Mandatory Fields
+Valid Formats
+6. Address Management
+
+Display
+
+Home Address
+Office Address
+Other Addresses
+
+Fields
+
+Full Name
+Mobile
+Alternate Mobile
+Address Line 1
+Address Line 2
+Landmark
+City
+State
+Country
+PIN Code
+Address Type
+Default Address
+
+Actions
+
+Add Address
+Edit Address
+Delete Address
+Set Default
+
+Validation
+
+Serviceable PIN Code
+Mandatory Fields
+7. My Orders
+
+Display
+
+Order Number
+Order Date
+Status
+Total Amount
+Payment Status
+Delivery Status
+
+Actions
+
+View Order
+Track Order
+Download Invoice
+Cancel Order (If Eligible)
+Return Order (If Eligible)
+Reorder
+
+Filters
+
+All Orders
+Processing
+Packed
+Shipped
+Delivered
+Cancelled
+Returned
+
+Search
+
+Order Number
+Product Name
+
+Sorting
+
+Latest
+Oldest
+Highest Value
+Lowest Value
+8. Wishlist
+
+Display
+
+Product Image
+Product Name
+Price
+Stock Status
+
+Actions
+
+Add to Cart
+Remove
+View Product
+9. Reviews
+
+Display
+
+Product
+Rating
+Review
+Images
+Date
+
+Actions
+
+Write Review
+Edit Review
+Delete Review (Configurable)
+
+Filters
+
+All
+Pending Review
+Submitted
+Approved
+10. Change Password
+
+Fields
+
+Current Password
+New Password
+Confirm Password
+
+Validation
+
+Password Policy
+Password Match
+Current Password Verification
+
+Features
+
+Show/Hide Password
+Password Strength Indicator
+11. Notifications
+
+Display
+
+Order Updates
+Payment Updates
+Shipping Updates
+Promotions
+Offers
+Wishlist Alerts
+Price Drop Alerts (Future)
+
+Actions
+
+Mark as Read
+Delete
+View Details
+
+Filters
+
+All
+Unread
+Promotions
+Orders
+Payments
+12. Account Security
+
+Display
+
+Last Login
+Login Devices (Future)
+Active Sessions (Future)
+
+Actions
+
+Logout Other Devices
+Enable Two-Factor Authentication (Future)
+13. Reward Points (Future)
+
+Display
+
+Available Points
+Earned Points
+Redeemed Points
+Expiry Date
+
+History
+
+Earned
+Redeemed
+Expired
+14. Saved Payment Methods (Future)
+
+Display
+
+Saved Cards
+UPI IDs
+Wallets
+
+Actions
+
+Add
+Remove
+Set Default
+15. Search
+
+Support
+
+Search Within
+
+Orders
+Reviews
+Notifications
+16. Analytics
+
+Track
+
+Dashboard Visits
+Profile Updates
+Address Changes
+Wishlist Activity
+Order Views
+Review Submission
+Password Changes
+Notification Opens
+Reorder Actions
+17. SEO Considerations
+My Account pages should be NoIndex.
+Exclude all account URLs from XML sitemap.
+Force HTTPS.
+Prevent browser caching of sensitive pages.
+Secure session handling.
+18. Performance Considerations
+Lazy loading order history.
+Server-side pagination.
+Cached dashboard summary.
+Optimized order queries.
+Asynchronous notification loading.
+Image optimization.
+Responsive design.
+Skeleton loaders.
+19. Accessibility (WCAG)
+Keyboard navigation.
+Screen reader support.
+Accessible forms.
+Focus indicators.
+High contrast support.
+Proper ARIA labels.
+Responsive layouts.
+20. Business Rules
+Only authenticated customers can access My Account.
+Customers can only access their own profile and data.
+Email and mobile numbers must remain unique.
+Address validation should verify serviceable delivery locations.
+Orders can only be cancelled or returned according to configured policies.
+Reviews can only be submitted for eligible purchased products (configurable).
+Password changes require current password verification.
+Sensitive actions (password changes, profile updates) should be recorded in audit logs.
+Notifications should respect customer communication preferences.
+Dashboard statistics should reflect real-time account activity.
+21. User Permissions
+
+Customer
+
+View Dashboard
+Edit Profile
+Manage Addresses
+View Orders
+Track Orders
+Download Invoices
+Manage Wishlist
+Write Reviews
+Change Password
+View Notifications
+
+Admin
+
+View Customer Profile
+View Customer Orders
+Block Customer
+Reset Customer Password
+Manage Notifications
+22. Navigation Flow
+My Account
+      │
+      ├── Dashboard
+      ├── My Profile
+      ├── Address Book
+      ├── My Orders
+      ├── Wishlist
+      ├── Reviews
+      ├── Notifications
+      ├── Change Password
+      ├── Account Security
+      └── Logout
+23. Future AI Enhancements
+AI Customer Experience
+AI personalized dashboard.
+AI recommended products.
+AI reorder suggestions.
+AI shipping predictions.
+AI support assistant.
+AI review writing assistance.
+AI personalized offers.
+AI reward recommendations.
+AI purchase insights.
+AI notification prioritization.
+Enterprise Features
+Multi-language account.
+Multi-currency preferences.
+Loyalty program.
+Referral program.
+Gift cards.
+Saved payment methods.
+Two-Factor Authentication (2FA).
+Login history.
+Device management.
+Subscription management.
+Business accounts (B2B).
+Download tax invoices.
+GDPR data export.
+Account deletion request.
+24. Acceptance Criteria
+Customers can securely access and manage all account information.
+Profile updates are validated and saved successfully.
+Customers can manage multiple delivery addresses.
+Order history supports search, filtering, and tracking.
+Wishlist integrates seamlessly with the shopping cart.
+Eligible customers can submit and manage product reviews.
+Password changes follow security policies.
+Notifications are categorized and manageable.
+All pages are responsive, accessible, and secure.
+Dashboard reflects accurate real-time customer information.
+25. Recommended Database Tables
+Customer
+Customers
+CustomerProfiles
+CustomerAddresses
+CustomerPreferences
+CustomerSecuritySettings
+Orders
+Orders
+OrderItems
+OrderTracking
+Invoices
+Wishlist & Reviews
+Wishlists
+WishlistItems
+ProductReviews
+ReviewAttachments
+Notifications
+CustomerNotifications
+NotificationPreferences
+NotificationReadStatus
+Analytics
+CustomerDashboardAnalytics
+CustomerActivityLogs
+ProfileUpdateHistory
+PasswordHistory
+26. UI/UX Screens
+My Account Dashboard
+My Profile
+Edit Profile
+Address Book
+Add/Edit Address Modal
+My Orders
+Order Details
+Order Tracking
+Download Invoice
+Wishlist
+Reviews & Ratings
+Write Review Modal
+Notifications
+Change Password
+Account Security
+Reward Points (Future)
+Saved Payment Methods (Future)
+Mobile My Account Dashboard
+27. API Integration Points
+Customer Profile API
+Customer Address API
+Order History API
+Order Tracking API
+Invoice API
+Wishlist API
+Product Review API
+Notification API
+Change Password API
+Customer Preferences API
+Reward Points API (Future)
+Analytics API
+28. Recommended UI Components
+
+Create reusable account components for a consistent experience:
+
+Dashboard Summary Cards
+Profile Information Card
+Address Card
+Address Form
+Order List Card
+Order Status Timeline
+Wishlist Product Card
+Review Card
+Notification Card
+Password Strength Meter
+Empty State Components
+Confirmation Dialogs
+Success/Error Toast Notifications
+Skeleton Loaders
+Recommended .NET 8 Architecture
+
+Implement My Account as a dedicated Customer Module within your .NET 8 Modular Monolithic Architecture. Separate each feature (Profile, Addresses, Orders, Wishlist, Reviews, Notifications, Security) into independent application services. Use CQRS for read-heavy operations like dashboard summaries and order history, Dapper for optimized customer queries, and Entity Framework Core for transactional updates. Cache dashboard statistics and frequently accessed profile data using Redis or IMemoryCache. Ensure strict authorization so every request is scoped to the authenticated customer, providing a secure, scalable, and enterprise-grade account management experience.

@@ -1,0 +1,395 @@
+Module 07 - Payment Management
+1. Module Overview
+Module Name
+
+Payment Management
+
+Purpose
+
+The Payment Management module is responsible for managing all payment transactions, payment methods, payment gateway integrations, refunds, reconciliation, and financial transaction history for customer orders.
+
+Business Goals
+Support multiple payment methods.
+Secure payment processing.
+Track every payment transaction.
+Simplify refund management.
+Reduce payment failures.
+Maintain complete financial audit logs.
+Enable easy payment reconciliation.
+2. Payment Workflow
+Customer Checkout
+        │
+        ▼
+Select Payment Method
+        │
+        ├───────────────┬──────────────┬──────────────┐
+        ▼               ▼              ▼              ▼
+      COD          Razorpay         Stripe          UPI
+        │               │              │              │
+        └───────────────┴──────────────┴──────────────┘
+                        │
+                        ▼
+              Payment Authorization
+                        │
+                ┌───────┴────────┐
+                ▼                ▼
+          Payment Success    Payment Failed
+                │                │
+                ▼                ▼
+        Order Confirmed    Retry Payment
+                │
+                ▼
+         Invoice Generated
+                │
+                ▼
+        Refund (If Required)
+3. Payment Dashboard
+
+Display KPI Cards
+
+Total Payments
+Today's Payments
+Monthly Payments
+Successful Payments
+Failed Payments
+Pending Payments
+COD Orders
+Online Payments
+Total Refunds
+Pending Refunds
+Refunded Amount
+Gateway-wise Collection
+4. Payment Transactions
+Purpose
+
+Displays all payment transactions.
+
+Columns
+Transaction ID
+Order Number
+Customer Name
+Payment Gateway
+Payment Method
+Amount
+Currency
+Payment Status
+Transaction Date
+Gateway Transaction ID
+Refund Status
+Actions
+Row Actions
+View Transaction
+View Order
+Retry Payment
+Initiate Refund
+Download Receipt
+View Gateway Response
+Print
+Export
+5. Payment Methods
+
+Supported Payment Options
+
+Cash on Delivery (COD)
+
+Features
+
+Enable / Disable
+COD Charges
+COD Availability by Location
+Maximum COD Order Value
+COD Verification (Optional)
+Razorpay
+
+Features
+
+API Key Management
+Webhook Integration
+Payment Capture
+Partial Payment (Future)
+Subscription Support (Future)
+
+Supported
+
+Cards
+UPI
+Net Banking
+Wallets
+Stripe
+
+Features
+
+API Keys
+Webhook
+Payment Intent
+Customer Management
+Saved Cards
+International Payments
+UPI
+
+Support
+
+QR Code
+UPI ID
+Intent Payment
+
+Providers
+
+Google Pay
+PhonePe
+Paytm
+BHIM
+Net Banking
+
+Support
+
+Major Banks
+Instant Payment Confirmation
+Bank Redirect Flow
+6. Payment Status
+
+Available Statuses
+
+Pending
+Authorized
+Processing
+Successful
+Failed
+Cancelled
+Expired
+Refunded
+Partially Refunded
+7. Payment Details
+
+Display
+
+Order Information
+Order Number
+Customer
+Amount
+Tax
+Shipping Charges
+Discount
+Transaction Information
+Transaction ID
+Gateway Transaction ID
+Gateway
+Payment Method
+Currency
+Exchange Rate (Future)
+Payment Date
+Status
+Gateway Response
+Response Code
+Response Message
+Raw Response (Admin Only)
+8. Refund Management
+Refund Types
+Full Refund
+Partial Refund
+Refund Methods
+Original Payment Method
+Bank Transfer
+Wallet Credit
+Store Credit
+Refund Workflow
+Refund Request
+        │
+        ▼
+Admin Review
+        │
+        ▼
+Approve / Reject
+        │
+        ▼
+Gateway Refund
+        │
+        ▼
+Refund Success
+        │
+        ▼
+Customer Notification
+Refund Details
+Refund ID
+Order Number
+Transaction ID
+Refund Amount
+Refund Reason
+Refund Method
+Refund Status
+Refund Date
+Approved By
+9. Payment Reconciliation
+
+Purpose
+
+Compare gateway transactions with system records.
+
+Display
+
+Gateway Amount
+System Amount
+Difference
+Matched
+Unmatched
+Reconciliation Date
+
+Actions
+
+Match
+Investigate
+Export
+10. Failed Payments
+
+Reasons
+
+Insufficient Balance
+Payment Declined
+Gateway Timeout
+User Cancelled
+Authentication Failed
+Network Error
+Fraud Detection
+
+Actions
+
+Retry Payment
+Send Payment Link
+Change Payment Method
+11. Search
+
+Search By
+
+Transaction ID
+Order Number
+Customer
+Payment ID
+Gateway Transaction ID
+12. Filters
+Payment Gateway
+Payment Method
+Payment Status
+Refund Status
+Date Range
+Amount Range
+Currency
+13. Bulk Actions
+Export
+Print
+Reconcile
+Send Receipt
+Download Report
+14. Reports
+
+Generate
+
+Payment Report
+Gateway Report
+Refund Report
+Failed Payment Report
+Daily Collection
+Monthly Collection
+Gateway Settlement Report
+15. Notifications
+
+Automatically notify customers for
+
+Payment Success
+Payment Failure
+Payment Pending
+Refund Initiated
+Refund Completed
+
+Channels
+
+Email
+SMS
+WhatsApp
+Push Notification
+16. Activity Log
+
+Track
+
+Payment Initiated
+Payment Authorized
+Payment Captured
+Payment Failed
+Refund Requested
+Refund Approved
+Refund Completed
+Gateway Webhook Received
+17. Business Rules
+Every payment must be linked to a valid order.
+Each payment transaction must have a unique transaction ID.
+Payment status updates must be driven by gateway responses and webhooks.
+COD orders are marked as Pending Payment until collection.
+Refunds cannot exceed the original paid amount.
+Partial refunds must update the remaining refundable balance.
+Successful payments automatically trigger invoice generation and order processing.
+Failed payments do not reserve inventory unless explicitly configured.
+All gateway responses must be stored for audit purposes.
+Sensitive payment information (such as full card numbers or CVV) must never be stored.
+18. User Permissions
+Permission	Description
+View Payments	Access payment records
+Process Refunds	Initiate and approve refunds
+View Gateway Logs	Access gateway responses
+Retry Payments	Generate payment retry links
+Reconcile Payments	Perform payment reconciliation
+Export Payment Reports	Download reports
+Configure Payment Gateways	Manage gateway settings
+19. Navigation Flow
+Payment Management
+        │
+        ├── Payment Dashboard
+        │
+        ├── Payment Transactions
+        │      ├── View Details
+        │      ├── Gateway Response
+        │      ├── Retry Payment
+        │      └── Receipt
+        │
+        ├── Payment Methods
+        │      ├── COD
+        │      ├── Razorpay
+        │      ├── Stripe
+        │      ├── UPI
+        │      └── Net Banking
+        │
+        ├── Refund Management
+        ├── Failed Payments
+        ├── Reconciliation
+        ├── Reports
+        └── Activity Log
+20. Future Enhancements
+AI Features
+AI fraud detection.
+AI payment failure prediction.
+AI preferred payment method recommendation.
+AI refund risk analysis.
+AI payment anomaly detection.
+Enterprise Features
+Multi-currency support.
+Subscription billing.
+EMI and installment payments.
+Buy Now, Pay Later (BNPL).
+Gift cards and store credit.
+Wallet system.
+Offline payment verification.
+Automatic settlement reconciliation.
+PCI DSS compliance tools.
+Tokenized payment methods.
+Payment analytics dashboard.
+21. Acceptance Criteria
+Customers can successfully complete payments using supported methods.
+Payment statuses update correctly based on gateway responses.
+Refunds support both full and partial amounts.
+Gateway webhooks are processed securely and idempotently.
+Payment history, receipts, and audit logs are available.
+Failed payments can be retried without creating duplicate orders.
+Reconciliation reports accurately identify mismatches.
+Role-based permissions control financial operations.
+The module is designed to support additional gateways in the future with minimal changes.
+Architecture Recommendation
+
+For your .NET 8 Modular Monolithic Architecture, don't tightly couple payment gateways with business logic. Instead, design a Payment Provider abstraction (e.g., IPaymentGateway) so gateways like Razorpay, Stripe, PayPal, Cashfree, PhonePe, or future providers can be added without changing the core payment workflow. This approach will make the system much easier to maintain and extend as your business grows.

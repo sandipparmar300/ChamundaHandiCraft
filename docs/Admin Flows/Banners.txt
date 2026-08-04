@@ -1,0 +1,459 @@
+Module 11 - Banner Management
+1. Module Overview
+Module Name
+
+Banner Management
+
+Purpose
+
+The Banner Management module enables administrators to create, schedule, organize, and publish promotional banners across different sections of the website and mobile devices. It supports homepage banners, sliders, promotional popups, mobile banners, and future campaign placements while providing analytics and click tracking.
+
+Business Goals
+Promote products and offers.
+Improve customer engagement.
+Increase sales through marketing campaigns.
+Display seasonal promotions.
+Support responsive website design.
+Schedule promotional campaigns.
+Track banner performance.
+2. Banner Lifecycle
+Create Banner
+      │
+      ▼
+Upload Images
+      │
+      ▼
+Configure Banner
+      │
+      ▼
+Assign Location
+      │
+      ▼
+Configure Schedule
+      │
+      ▼
+Preview Banner
+      │
+      ▼
+Publish Banner
+      │
+      ▼
+Customer Views Banner
+      │
+      ▼
+Click Tracking
+      │
+      ▼
+Analytics Updated
+3. Banner Dashboard
+
+Display KPI Cards
+
+Total Banners
+Active Banners
+Scheduled Banners
+Expired Banners
+Homepage Banners
+Mobile Banners
+Popups
+Sliders
+Total Impressions
+Total Clicks
+CTR (Click Through Rate)
+Best Performing Banner
+4. Banner List
+
+Display all banners.
+
+Columns
+
+Banner Preview
+Banner Name
+Banner Type
+Display Location
+Device
+Start Date
+End Date
+Priority
+Status
+Created By
+Actions
+
+Actions
+
+View
+Edit
+Duplicate
+Preview
+Publish
+Unpublish
+Archive
+Delete
+View Analytics
+5. Create Banner
+General Information
+
+Fields
+
+Banner Name
+Internal Name
+Description
+Banner Type
+Display Location
+Priority
+Status
+6. Banner Types
+A. Homepage Banner
+
+Purpose
+
+Large promotional banners displayed on homepage.
+
+Features
+
+Full Width Banner
+CTA Button
+Offer Badge
+Countdown Timer (Future)
+Multiple Slides
+B. Homepage Slider
+
+Purpose
+
+Carousel displayed on homepage.
+
+Features
+
+Auto Play
+Manual Navigation
+Previous/Next
+Indicators
+Transition Speed
+Infinite Loop
+C. Popup Banner
+
+Purpose
+
+Marketing popup displayed on selected pages.
+
+Types
+
+Offer Popup
+Newsletter Popup
+Festival Popup
+Coupon Popup
+Exit Intent Popup (Future)
+
+Configuration
+
+Delay Time
+Show Once
+Show Every Visit
+Close Button
+Background Overlay
+D. Mobile Banner
+
+Purpose
+
+Responsive promotional banners.
+
+Supports
+
+Mobile Homepage
+Mobile Category Page
+Mobile Product Page
+
+Responsive Images
+
+Mobile Image
+Tablet Image
+Desktop Image
+7. Display Locations
+
+Banner can be displayed on
+
+Homepage
+Category Page
+Product Details Page
+Shop Page
+Cart Page
+Checkout Page
+Blog Page
+About Us
+Contact Us
+Custom Page
+8. Banner Configuration
+
+Fields
+
+Banner Title
+Subtitle
+Description
+CTA Button Text
+CTA URL
+Open In New Tab
+Background Color
+Text Alignment
+Overlay Color
+Animation Type
+9. Media Management
+
+Upload
+
+Desktop Image
+Mobile Image
+Tablet Image
+Retina Image
+
+Supported Formats
+
+JPG
+PNG
+SVG
+WebP
+
+Features
+
+Crop
+Resize
+Compress
+Preview
+Replace
+10. Scheduling
+
+Fields
+
+Start Date
+Start Time
+End Date
+End Time
+Time Zone
+
+Status
+
+Draft
+Scheduled
+Active
+Expired
+Disabled
+Archived
+11. Banner Priority
+
+Used when multiple banners are configured for the same location.
+
+Example
+
+Priority	Banner
+1	Festival Sale
+2	New Arrival
+3	Combo Offer
+
+Lower number = Higher Priority
+
+12. Visibility Rules
+
+Show Banner Based On
+
+All Visitors
+Logged In Users
+Guest Users
+New Customers
+Returning Customers
+Customer Group
+Device Type
+Country (Future)
+Language (Future)
+13. Click Actions
+
+Banner Click Can Open
+
+Product Page
+Category Page
+Offer Page
+External URL
+Blog Article
+Contact Page
+Custom Landing Page
+14. Analytics
+
+Display
+
+Total Views
+Total Clicks
+CTR
+Conversion Rate
+Bounce Rate (Future)
+Revenue Generated
+Best Device
+Best Location
+
+Charts
+
+Daily Views
+Daily Clicks
+CTR Trend
+Banner Performance
+15. Search
+
+Search By
+
+Banner Name
+Banner Type
+Display Location
+CTA URL
+16. Filters
+Banner Type
+Status
+Display Location
+Device
+Active
+Scheduled
+Expired
+Date Range
+17. Bulk Actions
+Publish
+Unpublish
+Archive
+Delete
+Duplicate
+Export
+18. Import / Export
+
+Export
+
+Excel
+CSV
+PDF
+
+Import (Future)
+
+Banner Configuration
+Campaign Settings
+19. Notifications
+
+Notify Admin
+
+Banner Scheduled
+Banner Expired
+Campaign Started
+Campaign Ended
+20. Activity Log
+
+Track
+
+Banner Created
+Banner Updated
+Banner Published
+Banner Unpublished
+Banner Deleted
+Banner Viewed
+Banner Clicked
+Schedule Updated
+21. Business Rules
+Banner names should be unique.
+A banner must have at least one image before publishing.
+Only active banners within the configured schedule are displayed.
+Priority determines which banner appears when multiple banners target the same location.
+CTA URLs must be validated before publishing.
+Images must meet recommended dimensions for each device type.
+Popups should respect frequency rules (e.g., once per session or once per user).
+Banner impressions and clicks should be recorded for analytics.
+Expired banners are automatically hidden.
+All banner modifications are recorded in the audit log.
+22. User Permissions
+Permission	Description
+View Banners	Access banner records
+Create Banners	Create new banners
+Edit Banners	Modify banner configuration
+Publish/Unpublish Banners	Control visibility
+Delete Banners	Archive or remove banners
+View Banner Analytics	Access performance metrics
+Export Reports	Download analytics and reports
+23. Navigation Flow
+Banner Management
+        │
+        ├── Dashboard
+        │
+        ├── Banner List
+        │      ├── Search
+        │      ├── Filters
+        │      ├── Bulk Actions
+        │      └── Export
+        │
+        ├── Create Banner
+        │      ├── General Information
+        │      ├── Banner Type
+        │      ├── Media Upload
+        │      ├── Display Location
+        │      ├── Scheduling
+        │      ├── Visibility Rules
+        │      ├── CTA Configuration
+        │      └── Preview
+        │
+        ├── Analytics
+        ├── Reports
+        └── Activity Log
+24. Future Enhancements
+AI Features
+AI-generated promotional banner text.
+AI image optimization and background removal.
+AI banner performance prediction.
+AI personalized banners based on browsing history.
+AI A/B testing recommendations.
+AI best display time prediction.
+AI automatic image resizing for all devices.
+Enterprise Features
+Multi-language banners.
+Multi-store banner management.
+Video banners.
+HTML5 animated banners.
+Dynamic banners based on user behavior.
+Geo-targeted banners.
+Weather-based promotions.
+Countdown timers.
+Exit-intent popups.
+Scroll-triggered banners.
+Floating promotional bars.
+Cookie consent banner integration.
+Campaign versioning and approval workflow.
+25. Recommended Image Dimensions
+Banner Type	Recommended Size
+Homepage Hero Banner	1920 × 700 px
+Homepage Slider	1920 × 600 px
+Category Banner	1600 × 400 px
+Product Promotion Banner	1200 × 400 px
+Mobile Banner	768 × 1024 px
+Popup Banner	800 × 600 px
+Sidebar Banner	300 × 600 px
+Newsletter Banner	1200 × 300 px
+Tablet Banner	1024 × 500 px
+26. Acceptance Criteria
+Administrators can create, edit, schedule, publish, and archive banners.
+Homepage banners, sliders, popups, and mobile banners display correctly on their configured locations.
+Banner scheduling automatically activates and deactivates campaigns.
+Priority rules resolve conflicts when multiple banners target the same location.
+Responsive images are served for desktop, tablet, and mobile devices.
+Banner impressions and clicks are accurately tracked.
+CTA links navigate users to the correct destination.
+Analytics and reports provide actionable campaign insights.
+All banner lifecycle events are recorded in the audit log.
+Role-based permissions secure banner management.
+Recommended Database Tables
+
+To build a scalable Banner Management system, consider these tables:
+
+Banners
+BannerTypes
+BannerLocations
+BannerImages
+BannerSchedules
+BannerVisibilityRules
+BannerClickActions
+BannerImpressions
+BannerClicks
+BannerAnalytics
+BannerActivityLogs
+BannerDeviceConfigurations
+BannerCampaigns
+
+This architecture provides a strong foundation for simple promotional banners today while supporting advanced marketing campaigns, personalization, and enterprise-grade content management as your handicraft eCommerce platform expands.

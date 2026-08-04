@@ -1,0 +1,449 @@
+Module 8 - Order Tracking
+1. Module Overview
+Module Name
+
+Order Tracking
+
+Purpose
+
+The Order Tracking module enables customers to monitor the real-time progress of their orders from confirmation to final delivery. It provides shipment status, tracking information, courier details, delivery estimates, and complete order history.
+
+Business Goals
+Improve customer satisfaction.
+Reduce "Where is my order?" support requests.
+Increase customer trust.
+Provide shipment transparency.
+Improve post-purchase experience.
+Enable real-time shipment tracking.
+Support return and cancellation workflows.
+2. Order Tracking Workflow
+Order Placed
+      │
+      ▼
+Order Confirmed
+      │
+      ▼
+Processing
+      │
+      ▼
+Packed
+      │
+      ▼
+Shipped
+      │
+      ▼
+Out For Delivery
+      │
+      ▼
+Delivered
+      │
+      ▼
+Completed
+
+Alternative Flow
+
+Order Placed
+      │
+      ▼
+Processing
+      │
+      ▼
+Cancelled
+Delivered
+      │
+      ▼
+Return Requested
+      │
+      ▼
+Pickup Scheduled
+      │
+      ▼
+Returned
+      │
+      ▼
+Refund Completed
+3. Order Tracking Page Layout
+Header
+Logo
+Navigation Menu
+Search Order
+My Account
+Cart
+Breadcrumb
+
+Example
+
+Home
+>
+My Account
+>
+My Orders
+>
+Order Tracking
+4. Order Summary
+
+Display
+
+Order Number
+Order Date
+Order Status
+Payment Status
+Payment Method
+Invoice Number
+Total Amount
+Total Items
+Delivery Address
+
+Actions
+
+Download Invoice
+Contact Support
+Reorder
+Cancel Order (If Eligible)
+5. Tracking Timeline
+
+Display timeline with completed, current, and upcoming stages.
+
+Statuses
+
+Order Confirmed
+
+Display
+
+Date
+Time
+Confirmation Message
+Processing
+
+Display
+
+Order Verification
+Inventory Allocation
+Estimated Processing Time
+Packed
+
+Display
+
+Packaging Completed
+Packed Date & Time
+Warehouse Name (Optional)
+Shipped
+
+Display
+
+Courier Partner
+Tracking Number
+Shipping Date
+Expected Delivery Date
+
+Action
+
+Track Shipment
+Out for Delivery
+
+Display
+
+Delivery Agent (Optional)
+Delivery Time Window
+Live Tracking (Future)
+Delivered
+
+Display
+
+Delivery Date
+Delivery Time
+Received By
+Delivery Proof (Optional)
+6. Courier Information
+
+Display
+
+Courier Company
+Tracking Number
+Shipment Status
+Courier Contact
+Courier Website (Optional)
+
+Actions
+
+Copy Tracking Number
+Track on Courier Website
+7. Shipping Information
+
+Display
+
+Shipping Address
+Delivery Method
+Shipping Charges
+Estimated Delivery
+Actual Delivery
+8. Order Items
+
+Each item displays
+
+Product Image
+Product Name
+SKU
+Selected Variant
+Quantity
+Unit Price
+Discount
+Total Price
+
+Actions
+
+View Product
+Write Review (After Delivery)
+Buy Again
+9. Payment Information
+
+Display
+
+Payment Method
+Transaction ID
+Payment Status
+
+Statuses
+
+Pending
+Paid
+Failed
+Refunded
+Partially Refunded
+10. Cancellation
+
+Eligibility
+
+Before Shipping (Configurable)
+
+Actions
+
+Cancel Order
+Select Cancellation Reason
+
+Reasons
+
+Ordered by Mistake
+Found Better Price
+Changed Mind
+Delivery Delay
+Other
+11. Returns
+
+Eligibility
+
+Configurable Return Window
+
+Actions
+
+Request Return
+Select Return Reason
+Upload Images
+Select Refund Method
+
+Statuses
+
+Return Requested
+Approved
+Pickup Scheduled
+Picked Up
+Returned
+Refund Completed
+12. Notifications
+
+Notify Customer On
+
+Order Confirmed
+Processing
+Packed
+Shipped
+Out for Delivery
+Delivered
+Cancelled
+Returned
+Refunded
+
+Channels
+
+Email
+SMS
+WhatsApp
+Push Notification
+13. Analytics
+
+Track
+
+Order Tracking Views
+Tracking Link Clicks
+Courier Tracking Clicks
+Order Cancellation
+Return Requests
+Reorder Actions
+Review Submission
+Support Requests
+14. SEO Considerations
+Order Tracking pages should be NoIndex.
+Exclude tracking URLs from XML sitemap.
+Force HTTPS.
+Prevent browser caching of sensitive pages.
+Protect URLs with authentication.
+15. Performance Considerations
+Cache tracking information.
+Refresh shipment status asynchronously.
+Poll courier APIs only when required.
+Optimize timeline rendering.
+Lazy load order item images.
+Skeleton loaders for shipment updates.
+16. Accessibility (WCAG)
+Keyboard navigation.
+Screen reader support.
+Accessible timeline.
+Focus indicators.
+High contrast mode.
+Responsive layout.
+ARIA labels for status indicators.
+17. Business Rules
+Customers can only view their own orders.
+Shipment status should synchronize with courier APIs.
+Delivered orders become eligible for reviews based on business rules.
+Cancellation is allowed only before configurable fulfillment stages.
+Returns are allowed only within the configured return period.
+Refund status should update automatically after payment processing.
+Tracking information should remain available even after delivery.
+Every status change should be recorded in an audit log.
+Customers should receive notifications for every major status update.
+18. User Permissions
+
+Customer
+
+View Order Tracking
+Download Invoice
+Track Shipment
+Cancel Order (If Eligible)
+Request Return
+Write Review
+Reorder
+Contact Support
+
+Admin
+
+Update Order Status
+Assign Courier
+Update Tracking Number
+Process Returns
+Process Refunds
+View Tracking History
+19. Navigation Flow
+My Orders
+      │
+      ▼
+Order Details
+      │
+      ├── Order Summary
+      ├── Tracking Timeline
+      ├── Courier Details
+      ├── Shipping Information
+      ├── Order Items
+      ├── Payment Information
+      ├── Invoice
+      ├── Cancel Order
+      ├── Return Request
+      └── Contact Support
+20. Future AI Enhancements
+AI Delivery Experience
+AI delivery delay prediction.
+AI estimated delivery recalculation.
+AI proactive delay notifications.
+AI return reason analysis.
+AI support chatbot for order tracking.
+AI fraud detection for delivery disputes.
+AI courier performance analytics.
+AI delivery route optimization.
+AI smart reorder suggestions.
+AI customer satisfaction prediction.
+Enterprise Features
+Live GPS delivery tracking.
+Delivery OTP verification.
+Digital signature on delivery.
+Delivery photo confirmation.
+Partial shipment tracking.
+Split order tracking.
+Multi-warehouse shipment tracking.
+International shipment support.
+Carbon-neutral delivery tracking.
+Click & Collect tracking.
+21. Acceptance Criteria
+Customers can view complete order progress through an interactive timeline.
+Tracking information updates automatically as order status changes.
+Courier details and tracking numbers are displayed accurately.
+Customers can download invoices and contact support from the tracking page.
+Eligible orders allow cancellation, returns, and reviews.
+Notifications are sent for every significant order status update.
+Tracking page is responsive, secure, and accessible.
+All tracking events are recorded for auditing and analytics.
+22. Recommended Database Tables
+Order Tracking
+OrderTracking
+OrderTrackingHistory
+ShipmentDetails
+CourierPartners
+CourierTrackingLogs
+Returns
+ReturnRequests
+ReturnItems
+RefundTransactions
+Notifications
+OrderNotifications
+NotificationLogs
+Analytics
+OrderTrackingAnalytics
+CustomerOrderActivity
+23. UI/UX Screens
+Order Tracking Dashboard
+Order Details
+Interactive Tracking Timeline
+Shipment Information
+Courier Details
+Order Items List
+Payment Information
+Download Invoice Screen
+Cancel Order Dialog
+Return Request Form
+Refund Status Page
+Contact Support Modal
+Mobile Order Tracking
+Empty/Error Tracking Page
+24. API Integration Points
+Order Details API
+Order Tracking API
+Shipment API
+Courier Integration API
+Tracking Number API
+Payment Status API
+Invoice API
+Return Request API
+Refund API
+Notification API
+Customer Support API
+Analytics API
+25. Recommended UI Components
+
+Build reusable tracking components:
+
+Order Status Timeline
+Status Badge
+Shipment Progress Bar
+Courier Information Card
+Order Summary Card
+Order Item Card
+Delivery Information Card
+Tracking Number Component
+Invoice Download Button
+Return Request Dialog
+Support Contact Card
+Notification Timeline
+Skeleton Loader
+Empty State Component
+26. Recommended .NET 8 Architecture
+
+Implement Order Tracking as part of the Order Management Module using CQRS with separate read models for tracking information and command handlers for status updates. Integrate courier providers through an abstraction layer (e.g., ICourierProvider) to support multiple logistics partners without changing business logic. Store every status transition in an OrderTrackingHistory table for complete auditability. Use Dapper for optimized tracking queries, Entity Framework Core for transactional updates, and Redis for caching frequently accessed tracking data. Update shipment statuses through scheduled background jobs or courier webhooks, and publish domain events to trigger customer notifications via Email, SMS, WhatsApp, and Push Notifications. This design provides a scalable, maintainable, and enterprise-grade order tracking solution.

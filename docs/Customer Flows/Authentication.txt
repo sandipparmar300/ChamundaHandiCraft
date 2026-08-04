@@ -1,0 +1,514 @@
+Module 1 - Authentication
+1. Module Overview
+Module Name
+
+Authentication
+
+Purpose
+
+The Authentication module enables customers to securely register, log in, recover passwords, verify identities, and manage account access. It supports multiple authentication methods including Email/Password, Mobile OTP, Google Sign-In, and future social login providers while ensuring security and a seamless user experience.
+
+Business Goals
+Secure customer authentication.
+Simplify customer registration.
+Reduce login friction.
+Support passwordless authentication.
+Improve customer retention.
+Protect customer accounts.
+Enable future social login providers.
+Maintain secure session management.
+2. Authentication Workflow
+Customer Visits Website
+        │
+        ▼
+Authentication Page
+        │
+ ┌──────┼──────────┐
+ │      │          │
+ ▼      ▼          ▼
+Register Login   Google Login
+ │        │          │
+ ▼        ▼          ▼
+Verify OTP  Authenticate
+ │        │          │
+ ▼        ▼          ▼
+Create Session
+        │
+        ▼
+Customer Dashboard / Previous Page
+3. Authentication Dashboard (Customer)
+
+After successful login
+
+Display
+
+Welcome Message
+Customer Name
+Reward Points
+Recent Orders
+Wishlist Count
+Cart Summary
+Account Completion Status
+Notifications
+4. Customer Registration
+Purpose
+
+Allow new customers to create an account.
+
+Registration Fields
+
+Personal Information
+
+First Name
+Last Name
+Email Address
+Mobile Number
+Password
+Confirm Password
+Country
+State
+City (Optional)
+
+Agreement
+
+Accept Terms & Conditions
+Accept Privacy Policy
+Subscribe to Newsletter (Optional)
+
+Buttons
+
+Register
+Register with Google
+Login
+Validation Rules
+
+First Name
+
+Required
+2–50 Characters
+
+Last Name
+
+Required
+
+Email
+
+Required
+Unique
+Valid Email Format
+
+Mobile
+
+Required
+Unique
+Country Code Supported
+
+Password
+
+Minimum 8 Characters
+Maximum 128 Characters
+At least:
+1 Uppercase
+1 Lowercase
+1 Number
+1 Special Character
+
+Confirm Password
+
+Must Match Password
+
+Terms
+
+Mandatory
+Registration Flow
+Register
+    │
+    ▼
+Validate Information
+    │
+    ▼
+Check Duplicate Email/Mobile
+    │
+    ▼
+Generate OTP (Optional)
+    │
+    ▼
+Verify OTP
+    │
+    ▼
+Create Customer
+    │
+    ▼
+Send Welcome Email
+    │
+    ▼
+Login Automatically
+5. Login
+
+Supported Methods
+
+Email + Password
+Mobile + Password
+Remember Me
+Login Fields
+Email or Mobile
+Password
+Remember Me
+Login Button
+Google Login
+Forgot Password
+Register
+Validation
+Required Fields
+Invalid Credentials
+Account Blocked
+Account Inactive
+Email Not Verified (If Enabled)
+Login Flow
+Enter Credentials
+       │
+       ▼
+Validate User
+       │
+       ▼
+Verify Password
+       │
+       ▼
+Create Session
+       │
+       ▼
+Redirect
+
+Redirect Rules
+
+Previous Page
+Checkout
+Customer Dashboard
+6. OTP Login
+
+Purpose
+
+Passwordless login.
+
+Supported
+
+Mobile OTP
+Email OTP (Future)
+
+Flow
+
+Enter Mobile
+      │
+      ▼
+Generate OTP
+      │
+      ▼
+Send SMS
+      │
+      ▼
+Verify OTP
+      │
+      ▼
+Login Success
+
+OTP Rules
+
+6 Digits
+Expire in 5 Minutes
+Maximum 5 Attempts
+Resend after 30 Seconds
+7. Google Login
+
+Purpose
+
+Quick authentication using Google OAuth.
+
+Flow
+
+Click Google Login
+        │
+        ▼
+Google Authentication
+        │
+        ▼
+Permission Granted
+        │
+        ▼
+Create Account (If New)
+        │
+        ▼
+Login Success
+
+Future
+
+Facebook Login
+Apple Login
+Microsoft Login
+8. Forgot Password
+
+Purpose
+
+Allow users to securely reset passwords.
+
+Flow
+
+Enter Email/Mobile
+        │
+        ▼
+Verify User
+        │
+        ▼
+Send OTP / Reset Link
+        │
+        ▼
+Verify
+        │
+        ▼
+New Password
+        │
+        ▼
+Login
+
+Fields
+
+Email / Mobile
+OTP
+New Password
+Confirm Password
+9. Session Management
+
+Features
+
+Remember Me
+Auto Login
+Logout
+Session Timeout
+Multiple Device Support (Future)
+Active Sessions (Future)
+10. Account Verification
+
+Methods
+
+Email Verification
+Mobile OTP Verification
+
+Status
+
+Pending
+Verified
+Failed
+11. Account Status
+
+Possible Status
+
+Active
+Pending Verification
+Blocked
+Suspended
+Deleted
+
+Blocked users cannot log in.
+
+12. Security Features
+Password Hashing (ASP.NET Core Identity)
+Secure Cookies
+HTTPS Only
+CSRF Protection
+XSS Protection
+SQL Injection Protection
+Brute Force Protection
+Rate Limiting
+Account Lockout
+CAPTCHA after multiple failed attempts
+Secure Token Generation
+Refresh Token Support (Future)
+13. Search
+
+Not Applicable
+
+14. Filters
+
+Not Applicable
+
+15. Notifications
+
+Registration
+
+Welcome Email
+Welcome SMS (Optional)
+
+Login
+
+New Device Login Alert (Future)
+
+Forgot Password
+
+OTP
+Password Changed Confirmation
+
+Security
+
+Suspicious Login Alert
+Account Locked
+16. Activity Log
+
+Track
+
+Registration
+Login
+Logout
+OTP Sent
+OTP Verified
+Password Changed
+Password Reset
+Failed Login
+Google Login
+Account Blocked
+17. Business Rules
+Email and Mobile Number must be unique.
+Passwords must be securely hashed and never stored in plain text.
+OTPs must expire after the configured duration.
+Multiple failed login attempts should temporarily lock the account.
+Google accounts should be linked to existing accounts when the email matches.
+Password reset links/tokens must be single-use and time-limited.
+Customers cannot log in if their account is blocked or suspended.
+Sessions should expire after a configurable period of inactivity.
+Sensitive authentication events should generate audit logs.
+All authentication APIs should enforce rate limiting.
+18. User Permissions
+
+Customer
+
+Register
+Login
+Logout
+Update Password
+Reset Password
+Verify OTP
+Manage Sessions (Future)
+
+Admin
+
+Block Customer
+Unblock Customer
+Reset Password
+View Login History
+19. Navigation Flow
+Authentication
+      │
+      ├── Register
+      │
+      ├── Login
+      │
+      ├── OTP Login
+      │
+      ├── Google Login
+      │
+      ├── Forgot Password
+      │
+      ├── Reset Password
+      │
+      ├── Verify OTP
+      │
+      └── Logout
+20. SEO Considerations
+Login and Registration pages should be NoIndex.
+Forgot Password and Reset Password pages should be NoIndex.
+Authentication pages should not appear in the sitemap.
+Use canonical URLs for login-related pages.
+Prevent indexing of OTP verification pages.
+21. Performance Considerations
+Cache Google OAuth configuration.
+Optimize OTP generation and verification.
+Use asynchronous email and SMS sending.
+Store sessions using distributed cache (Redis) if scaling horizontally.
+Minimize database lookups during login.
+22. Accessibility (WCAG)
+Keyboard navigation support.
+Visible focus indicators.
+Screen-reader-friendly labels.
+Proper error announcements.
+Password visibility toggle.
+High-contrast support.
+Mobile-friendly forms.
+23. Future AI Enhancements
+AI Security
+AI fraud detection.
+AI suspicious login detection.
+AI risk-based authentication.
+AI bot detection.
+AI account takeover prevention.
+AI adaptive MFA recommendations.
+AI User Experience
+AI autofill suggestions.
+AI smart error messages.
+AI language detection.
+AI personalized onboarding.
+AI login assistance chatbot.
+24. Enterprise Features
+Multi-Factor Authentication (MFA)
+Apple Login
+Microsoft Login
+Facebook Login
+LinkedIn Login
+Magic Link Login
+Passkeys (FIDO2/WebAuthn)
+Device Management
+Trusted Devices
+Active Session Management
+Login History
+OAuth2/OpenID Connect
+SSO Integration
+Enterprise Identity Providers
+25. Acceptance Criteria
+Customers can register using Email/Password.
+Customers can log in using Email/Password, Mobile/Password, OTP, or Google.
+Password recovery works securely using OTP or reset links.
+Passwords are securely hashed and never stored in plain text.
+Duplicate email addresses and mobile numbers are prevented.
+Failed login attempts trigger configurable account lockout.
+Authentication events are logged for auditing.
+Authentication integrates with Cart, Wishlist, Checkout, Orders, and My Account.
+Authentication pages are mobile-responsive and accessible.
+The architecture supports future MFA, SSO, and additional social login providers.
+26. Recommended Database Tables
+Authentication
+Customers
+CustomerCredentials
+CustomerSessions
+CustomerLoginHistory
+CustomerOtpRequests
+CustomerPasswordResetTokens
+CustomerEmailVerifications
+CustomerSocialLogins
+CustomerDevices
+CustomerSecurityEvents
+27. UI/UX Screens
+Login
+Register
+OTP Login
+OTP Verification
+Forgot Password
+Reset Password
+Google Authentication Callback
+Email Verification
+Account Verification Success
+Account Verification Failed
+Session Expired
+Account Locked
+Access Denied
+28. API Integration Points
+Customer Registration API
+Customer Login API
+OTP Generation API
+OTP Verification API
+Google OAuth API
+Password Reset API
+Logout API
+Refresh Token API (Future)
+Email Service API
+SMS Service API
+Notification Service API
+Recommended .NET 8 Architecture
+
+Implement authentication using ASP.NET Core Identity with JWT + Refresh Tokens for APIs and secure authentication cookies for the web application. Separate authentication into its own module within your Modular Monolith. Use provider abstractions for OTP, email, and social logins so external services (Google, Twilio, SendGrid, etc.) can be replaced without affecting business logic. This approach provides enterprise-grade security while remaining scalable and maintainable as your eCommerce platform grows.

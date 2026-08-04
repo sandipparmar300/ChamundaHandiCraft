@@ -1,0 +1,453 @@
+Module 12 - Content Management System (CMS)
+1. Module Overview
+Module Name
+
+Content Management System (CMS)
+
+Purpose
+
+The CMS module enables administrators to manage all website pages, legal documents, informational content, FAQs, contact information, company details, and other static or dynamic content through an intuitive admin interface.
+
+Business Goals
+Allow non-technical users to manage website content.
+Improve SEO through optimized content.
+Maintain legal compliance.
+Centralize website information.
+Reduce developer dependency.
+Improve customer trust.
+Support future multilingual websites.
+2. CMS Workflow
+Create Page
+      │
+      ▼
+Write Content
+      │
+      ▼
+Upload Images
+      │
+      ▼
+Configure SEO
+      │
+      ▼
+Preview Page
+      │
+      ▼
+Publish
+      │
+      ▼
+Visible on Website
+      │
+      ▼
+Edit / Archive
+3. CMS Dashboard
+
+Display KPI Cards
+
+Total Pages
+Published Pages
+Draft Pages
+Scheduled Pages
+Archived Pages
+Total FAQs
+Contact Messages
+Last Updated Pages
+Most Viewed Pages
+SEO Health Score (Future)
+4. CMS Pages
+Default Pages
+About Us
+Contact Us
+Privacy Policy
+Terms & Conditions
+Shipping Policy
+Return & Refund Policy
+FAQ
+
+Future Pages
+
+Careers
+Testimonials
+Store Locator
+Sustainability
+Handmade Process
+Our Artisans
+Size Guide
+Payment Policy
+Cookie Policy
+5. CMS Page List
+
+Columns
+
+Page Name
+URL
+Status
+Last Updated
+Updated By
+Publish Date
+SEO Score (Future)
+Actions
+
+Actions
+
+View
+Edit
+Preview
+Publish
+Unpublish
+Duplicate
+Archive
+Delete
+6. About Us
+
+Purpose
+
+Display company information.
+
+Sections
+
+Company Introduction
+Our Story
+Mission
+Vision
+Core Values
+Our Journey Timeline
+Founder Message
+Our Team
+Why Choose Us
+Awards & Certifications
+Factory / Workshop Images
+Handmade Process
+Customer Trust Section
+
+Media
+
+Images
+Videos
+PDF Brochure
+7. Contact Us
+
+Sections
+
+Company Name
+Office Address
+Factory Address
+Google Map
+Phone Number
+Email Address
+Business Hours
+WhatsApp Number
+Social Media Links
+Contact Form
+
+Fields
+
+Name
+Email
+Mobile
+Subject
+Message
+
+Actions
+
+Submit
+Reset
+
+Admin Features
+
+View Enquiries
+Reply
+Assign Staff
+Mark Resolved
+Export Enquiries
+8. Privacy Policy
+
+Editable Sections
+
+Data Collection
+Data Usage
+Cookies
+Payment Information
+User Rights
+Third Party Services
+Security
+Contact Information
+
+Version History Supported
+
+9. Terms & Conditions
+
+Editable Sections
+
+Website Usage
+Orders
+Pricing
+Payments
+Shipping
+Returns
+Intellectual Property
+Limitation of Liability
+
+Version Control
+
+10. Shipping Policy
+
+Editable
+
+Shipping Charges
+Delivery Areas
+Processing Time
+Delivery Timeline
+Courier Partners
+International Shipping
+Tracking Information
+11. Return & Refund Policy
+
+Editable
+
+Return Window
+Return Eligibility
+Refund Timeline
+Refund Method
+Non-returnable Items
+Damaged Products
+Exchange Policy
+12. FAQ Management
+
+Purpose
+
+Manage Frequently Asked Questions.
+
+FAQ Categories
+
+Orders
+Payments
+Shipping
+Returns
+Products
+Account
+Offers
+Warranty
+
+FAQ Fields
+
+Question
+Answer
+Category
+Display Order
+Active Status
+
+Features
+
+Search
+Expand / Collapse
+Rich Text Editor
+Drag & Drop Ordering
+13. Rich Text Editor
+
+Support
+
+Bold
+Italic
+Underline
+Lists
+Tables
+Images
+Videos
+Hyperlinks
+Buttons
+Code Block
+PDF Links
+14. Media Library
+
+Manage
+
+Images
+Videos
+Documents
+PDF Files
+Icons
+
+Features
+
+Upload
+Replace
+Crop
+Compress
+Delete
+Preview
+15. SEO Management
+
+Every CMS page supports
+
+SEO Title
+Meta Description
+Meta Keywords
+Canonical URL
+SEO URL
+Open Graph Image
+Twitter Card
+Schema Markup (Future)
+16. Page Scheduling
+
+Fields
+
+Publish Date
+Publish Time
+Expiry Date
+Expiry Time
+
+Status
+
+Draft
+Scheduled
+Published
+Hidden
+Archived
+17. Search
+
+Search By
+
+Page Name
+URL
+Keywords
+FAQ Question
+Content
+18. Filters
+Published
+Draft
+Archived
+Scheduled
+Page Type
+Updated By
+Date Range
+19. Version History
+
+Every page stores
+
+Previous Versions
+Published Versions
+Draft Versions
+
+Actions
+
+Compare Versions
+Restore Version
+View Changes
+20. Activity Log
+
+Track
+
+Page Created
+Page Updated
+Page Published
+Page Deleted
+FAQ Added
+FAQ Updated
+Contact Response
+SEO Updated
+21. Business Rules
+Every page must have a unique URL (slug).
+Published pages require SEO Title and Meta Description.
+Deleted pages are soft deleted.
+FAQ display order must be configurable.
+Contact enquiries are stored securely and can be marked as resolved.
+Version history must be retained for all content updates.
+Rich text content should be sanitized to prevent malicious scripts.
+Scheduled pages are published automatically at the configured date and time.
+Media files must support validation for size and format.
+Every content modification is recorded in the audit log.
+22. User Permissions
+Permission	Description
+View CMS	Access CMS pages
+Create Pages	Add new content pages
+Edit Pages	Modify content
+Publish Pages	Publish or unpublish pages
+Delete Pages	Archive or remove pages
+Manage FAQs	Create and manage FAQs
+View Contact Messages	Access customer enquiries
+Reply to Contact Messages	Respond to enquiries
+Manage Media	Upload and organize media
+Manage SEO	Edit SEO metadata
+23. Navigation Flow
+CMS
+   │
+   ├── Dashboard
+   │
+   ├── Pages
+   │      ├── About Us
+   │      ├── Contact Us
+   │      ├── Privacy Policy
+   │      ├── Terms & Conditions
+   │      ├── Shipping Policy
+   │      ├── Return Policy
+   │      ├── Custom Pages
+   │      └── Preview
+   │
+   ├── FAQ Management
+   │      ├── Categories
+   │      ├── Questions
+   │      └── Ordering
+   │
+   ├── Contact Enquiries
+   │
+   ├── Media Library
+   │
+   ├── SEO
+   │
+   ├── Version History
+   │
+   └── Activity Log
+24. Future Enhancements
+AI Features
+AI-generated page content.
+AI SEO optimization.
+AI FAQ generation from customer queries.
+AI grammar and readability improvements.
+AI content translation.
+AI image optimization.
+AI accessibility recommendations.
+AI duplicate content detection.
+Enterprise Features
+Multi-language CMS.
+Multi-store content management.
+Dynamic page builder.
+Drag-and-drop page editor.
+Landing page builder.
+Approval workflow for content publishing.
+Scheduled campaigns.
+Content personalization.
+Content version comparison.
+Role-based content approval.
+Content analytics dashboard.
+Headless CMS API support.
+25. Acceptance Criteria
+Administrators can create, edit, preview, publish, schedule, archive, and restore CMS pages.
+About Us, Contact Us, Privacy Policy, Terms & Conditions, Shipping Policy, Return Policy, and FAQ pages are fully manageable without code changes.
+Rich text editor supports formatted content, media, and links.
+Contact enquiries are stored, searchable, and manageable.
+Every page supports SEO configuration and unique URLs.
+Version history enables rollback to previous content.
+Scheduled publishing and expiry work automatically.
+All content changes are logged in the audit trail.
+Role-based permissions secure content management.
+The module is extensible to support multilingual websites, dynamic page builders, and headless CMS in the future.
+Recommended Database Tables
+
+For an enterprise-grade CMS, consider these tables:
+
+CmsPages
+CmsPageVersions
+CmsPageSeo
+CmsMediaLibrary
+CmsMediaFolders
+CmsFaqCategories
+CmsFaqs
+ContactEnquiries
+ContactReplies
+CmsNavigationMenus (for future dynamic menus)
+CmsPageSchedules
+CmsActivityLogs
+CmsPageViews (analytics)
+CmsSettings
+
+This design transforms the CMS from a simple static page editor into a scalable content platform capable of supporting marketing pages, legal documentation, customer support content, and future multilingual or headless website requirements.

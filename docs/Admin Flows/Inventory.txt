@@ -1,0 +1,526 @@
+Module 05 - Inventory Management
+1. Module Overview
+Module Name
+
+Inventory Management
+
+Purpose
+
+The Inventory Management module is responsible for tracking, controlling, and managing product stock across warehouses. It records every inventory movement, including purchases, sales, adjustments, damages, returns, and transfers while maintaining accurate stock availability.
+
+Business Goals
+Maintain accurate stock levels.
+Prevent overselling.
+Track complete inventory movement history.
+Improve warehouse efficiency.
+Reduce stock shortages.
+Monitor damaged and returned products.
+Enable barcode-based inventory operations.
+Generate inventory reports and alerts.
+2. Inventory Workflow
+Supplier Purchase
+        │
+        ▼
+Purchase Entry
+        │
+        ▼
+Warehouse Stock
+        │
+        ├──────────────┐
+        ▼              ▼
+Sales Order      Stock Adjustment
+        │              │
+        ▼              ▼
+Stock Reduced     Stock Increased/Reduced
+        │
+        ▼
+Customer Return
+        │
+        ▼
+Quality Check
+        │
+   ┌────┴────┐
+   ▼         ▼
+Restock    Damage
+   │         │
+   ▼         ▼
+Available   Damaged Stock
+
+3. Dashboard Summary
+
+Display Inventory KPIs
+
+Total Products
+Total Stock Quantity
+Inventory Value
+Low Stock Products
+Out of Stock Products
+Reserved Stock
+Damaged Stock
+Returned Stock
+Today's Purchase
+Today's Stock Adjustment
+Pending Purchase Entries
+Warehouse Count
+4. Stock Management
+Purpose
+
+Manage current stock availability for every product and variant.
+
+Display Columns
+Product Image
+Product Name
+SKU
+Barcode
+Category
+Warehouse
+Current Stock
+Reserved Stock
+Available Stock
+Low Stock Level
+Reorder Level
+Stock Status
+Last Updated
+Actions
+Stock Status
+In Stock
+Low Stock
+Out Of Stock
+Reserved
+Damaged
+Returned
+Archived
+Stock Actions
+View Stock
+Update Stock
+Transfer Stock
+Stock History
+Print Barcode
+Export
+5. Warehouse Management
+Purpose
+
+Manage one or multiple warehouses.
+
+Features
+Warehouse List
+Create Warehouse
+Edit Warehouse
+Delete Warehouse
+Activate / Deactivate
+Warehouse Manager
+Warehouse Capacity
+Warehouse Address
+Warehouse Fields
+Warehouse Code
+Warehouse Name
+Contact Person
+Phone
+Email
+Address
+City
+State
+Country
+Postal Code
+Status
+Warehouse Dashboard
+
+Display
+
+Total Products
+Stock Value
+Low Stock
+Pending Purchase
+Reserved Stock
+6. Purchase Entry
+Purpose
+
+Add stock received from suppliers.
+
+Purchase Information
+Purchase Number
+Purchase Date
+Supplier
+Warehouse
+Invoice Number
+Payment Status
+Product Details
+Product
+Variant
+Quantity
+Purchase Price
+Discount
+GST
+Total Amount
+Actions
+Save Draft
+Save
+Approve
+Cancel
+Purchase Workflow
+Create Purchase
+      │
+      ▼
+Draft
+      │
+      ▼
+Receive Stock
+      │
+      ▼
+Approve
+      │
+      ▼
+Stock Updated
+7. Stock Adjustment
+Purpose
+
+Correct inventory differences.
+
+Reasons
+
+Manual Correction
+Physical Verification
+Counting Error
+Lost Stock
+Extra Stock
+System Correction
+Fields
+Adjustment Number
+Date
+Product
+Warehouse
+Previous Quantity
+New Quantity
+Difference
+Reason
+Remarks
+8. Stock Transfer (Recommended)
+
+Move stock between warehouses.
+
+Fields
+
+Source Warehouse
+Destination Warehouse
+Product
+Quantity
+Transfer Date
+Status
+
+Workflow
+
+Pending
+
+Approved
+
+Completed
+
+Cancelled
+
+9. Damage Management
+
+Purpose
+
+Record damaged inventory.
+
+Reasons
+
+Broken
+Water Damage
+Manufacturing Defect
+Customer Damage
+Transportation Damage
+
+Fields
+
+Product
+Warehouse
+Quantity
+Damage Reason
+Images
+Remarks
+
+Actions
+
+Dispose
+Repair
+Return to Supplier
+10. Return Management
+
+Support
+
+Customer Returns
+
+Supplier Returns
+
+Customer Return
+Order Number
+Product
+Quantity
+Return Reason
+Return Status
+Inspection Result
+Supplier Return
+Purchase Number
+Supplier
+Product
+Quantity
+Reason
+Return Workflow
+Return Request
+      │
+      ▼
+Received
+      │
+      ▼
+Inspection
+      │
+      ▼
+Approved / Rejected
+      │
+      ▼
+Restock / Damage
+11. Low Stock Alert
+
+Automatically monitor stock.
+
+Conditions
+
+Current Stock ≤ Minimum Stock
+
+Notifications
+
+Dashboard
+Email
+SMS (Future)
+Push Notification
+WhatsApp (Future)
+
+Actions
+
+Reorder
+Purchase Entry
+Ignore
+12. Barcode Management
+
+Purpose
+
+Generate and manage product barcodes.
+
+Features
+
+Barcode Generation
+Barcode Upload
+Barcode Printing
+Barcode Scanner Support
+Barcode Validation
+
+Barcode Types
+
+Code128
+EAN-13
+UPC
+QR Code (Future)
+13. Inventory Ledger
+
+Maintain complete stock movement history.
+
+Columns
+
+Date
+Product
+Warehouse
+Transaction Type
+Opening Stock
+Quantity In
+Quantity Out
+Closing Stock
+Reference Number
+User
+
+Transaction Types
+
+Purchase
+Sale
+Return
+Damage
+Adjustment
+Transfer
+14. Inventory Valuation
+
+Methods
+
+FIFO
+LIFO (Optional)
+Weighted Average
+
+Display
+
+Total Inventory Value
+Product Cost
+Warehouse Value
+15. Search
+
+Search By
+
+Product Name
+SKU
+Barcode
+Warehouse
+Purchase Number
+Supplier
+16. Filters
+Warehouse
+Product
+Category
+Brand
+Stock Status
+Low Stock
+Out Of Stock
+Date Range
+Supplier
+Transaction Type
+17. Bulk Actions
+Export
+Print Barcode
+Update Stock
+Archive
+Assign Warehouse
+18. Import / Export
+
+Import
+
+Excel
+CSV
+
+Export
+
+Excel
+CSV
+PDF
+
+Supports
+
+Stock
+Purchases
+Inventory Ledger
+Barcode List
+19. Reports
+
+Generate
+
+Stock Report
+Inventory Valuation
+Purchase Report
+Low Stock Report
+Out of Stock Report
+Warehouse Report
+Stock Movement Report
+Damage Report
+Return Report
+Barcode Report
+20. Activity Log
+
+Track
+
+Purchase Created
+Stock Updated
+Adjustment Done
+Transfer Completed
+Damage Recorded
+Return Approved
+Barcode Generated
+21. Business Rules
+Stock cannot become negative unless negative inventory is explicitly enabled.
+Every stock movement must create an inventory ledger entry.
+Purchase approval increases stock.
+Sales orders reserve or reduce stock based on order status.
+Customer returns require inspection before restocking.
+Damaged products are excluded from available stock.
+Warehouse transfers reduce stock from the source and increase stock at the destination.
+Low stock alerts are triggered based on configurable thresholds.
+Barcode values must be unique.
+All inventory changes are recorded in the audit log.
+22. User Permissions
+Permission	Description
+View Inventory	Access inventory information
+Manage Stock	Update stock quantities
+Manage Warehouses	Create and edit warehouses
+Create Purchase Entry	Record incoming stock
+Approve Purchases	Finalize purchase entries
+Perform Stock Adjustment	Correct inventory levels
+Record Damage	Manage damaged stock
+Process Returns	Handle customer and supplier returns
+Generate Barcodes	Create and print barcodes
+Export Reports	Export inventory data
+23. Navigation Flow
+Inventory Management
+        │
+        ├── Inventory Dashboard
+        │
+        ├── Stock
+        │      ├── Current Stock
+        │      ├── Stock History
+        │      ├── Stock Adjustment
+        │      └── Stock Transfer
+        │
+        ├── Warehouses
+        │      ├── Warehouse List
+        │      └── Warehouse Details
+        │
+        ├── Purchase Entry
+        │      ├── Draft
+        │      ├── Approval
+        │      └── Received Stock
+        │
+        ├── Damage
+        ├── Returns
+        ├── Barcode
+        ├── Inventory Ledger
+        ├── Reports
+        └── Activity Log
+24. Future Enhancements
+AI Features
+AI demand forecasting.
+AI reorder recommendations.
+AI dead stock detection.
+AI stock anomaly detection.
+AI warehouse optimization.
+AI purchase quantity suggestions.
+AI seasonal inventory planning.
+Enterprise Features
+Multi-warehouse inventory.
+Multi-location stock transfers.
+Batch and lot tracking.
+Serial number tracking.
+Expiry date management.
+Manufacturing inventory integration.
+Supplier portal.
+Mobile barcode scanning.
+RFID support.
+Cycle count management.
+Bin and shelf location management.
+Automatic purchase order generation.
+25. Acceptance Criteria
+Stock levels accurately reflect all inventory transactions.
+Warehouse-specific inventory is maintained.
+Purchase approvals update stock correctly.
+Stock adjustments require reasons and are audited.
+Damage and return workflows preserve inventory accuracy.
+Barcode generation and printing function correctly.
+Low stock alerts trigger based on configured thresholds.
+Inventory reports and valuation are accurate.
+Every stock movement is recorded in the inventory ledger.
+Role-based permissions control inventory operations.
+Recommendations for a Professional E-Commerce Platform
+
+For a scalable, enterprise-ready inventory system, I recommend adding these capabilities from the beginning:
+
+Stock Reservation – Reserve inventory when an order is placed and release it automatically if the order is cancelled or expires.
+Stock Movement Ledger – Maintain an immutable history of every stock transaction for auditing and reconciliation.
+Warehouse Bin Locations – Store products by aisle, rack, shelf, and bin to improve picking efficiency.
+Batch/Lot & Serial Number Tracking – Useful for premium or limited-edition handcrafted products and future product categories.
+Cycle Count & Physical Stock Verification – Schedule inventory counts and reconcile differences without disrupting operations.
+Reorder Rules – Configure minimum stock, reorder quantity, lead time, and preferred supplier to support automated purchasing in the future.
+
+These additions will make your inventory module suitable not only for your father's handicraft business today but also for a larger multi-warehouse e-commerce operation as it grows.
