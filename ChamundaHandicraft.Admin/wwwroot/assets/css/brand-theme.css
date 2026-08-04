@@ -1,0 +1,535 @@
+/* ============================================================================
+   brand-theme.css — Chamunda Handicraft brand palette (single source of truth)
+   ----------------------------------------------------------------------------
+   WHY THIS FILE EXISTS
+   The admin shell is assembled from three imported themes that each hard-code a
+   different accent: Style.css ships navy (#1a2a5e / #184C8C / #4c6ef5),
+   style-dev.css ships NHS blue (#005EB8, almost always with !important), and
+   scss/style.css ships an orange gradient on .primary_button. The result was a
+   maroon sidebar wearing blue buttons, with menu text at rgba(255,255,255,.65)
+   on a mid-dark maroon — roughly 3:1 contrast, which is why the menu labels
+   never read as "on".
+
+   This file is linked LAST in _Layout.cshtml / _OuterLayout.cshtml so it wins
+   the cascade over all three, and it re-points every one of those accents at a
+   single palette. Change --brand-primary here and the sidebar, every button,
+   tabs, paging, focus rings, checkboxes and select2 all follow.
+
+   PALETTE
+     --brand-primary  #8E1F2F  bright maroon   8.8:1 against white text
+     --brand-gold     #F3C969  bright gold     5.6:1 against the sidebar
+   Active sidebar rows invert to gold-on-maroon (6.6:1) so the current page is
+   unmistakable rather than a 10%-opacity wash.
+   ============================================================================ */
+
+:root {
+    /* ── Brand ─────────────────────────────────────────────────────────────── */
+    --brand-primary: #8E1F2F; /* bright maroon — shell + all primary actions */
+    --brand-primary-hover: #7A1928; /* button hover                                */
+    --brand-primary-active: #6B2C2C; /* pressed / text on gold                      */
+    --brand-deep: #5C1520; /* deepest maroon                              */
+    --brand-soft: #FCEEF0; /* maroon tint for chips / soft badges         */
+    --brand-glow: rgba(142, 31, 47, .18); /* focus ring                     */
+
+    --brand-gold: #F3C969; /* bright gold — sidebar accents               */
+    --brand-gold-deep: #B8860B; /* gold that stays legible on white            */
+
+    /* ── Sidebar ───────────────────────────────────────────────────────────── */
+    --sidebar-bg: #8E1F2F;
+    --sidebar-hover: rgba(255, 255, 255, .14);
+    --sidebar-active: var(--brand-gold);
+    --sidebar-text: #ffffff;
+    --sidebar-text-sub: rgba(255, 255, 255, .85);
+
+    /* ── Remap the imported themes' own accent variables ───────────────────── */
+    --accent: var(--brand-primary);
+    --accent-light: #B8324A;
+    --accent-glow: var(--brand-glow);
+    --accent-rgb: 142, 31, 47;
+    --blue-soft: var(--brand-soft);
+}
+
+/* ============================================================================
+   1. SIDEBAR
+
+   TWO STATES, TWO TREATMENTS. The JS in _Sidebar.cshtml adds .active to the
+   matched link AND walks up adding .active to every parent group header, so a
+   sub-page lights up two links at once. Giving both the same filled highlight
+   produced one tall slab spanning the parent and the child.
+
+   So they are deliberately different:
+     • current page  (.nav-item.active, not a group header) → filled gold pill
+     • its group     (.toggle-submenu.active)               → gold text + rail,
+                                                              NO fill
+   Only ever one filled pill on screen, and the open group reads as a heading
+   above it rather than competing with it.
+   ============================================================================ */
+
+.sidebar {
+    background: var(--brand-primary);
+}
+
+/* Section headings ("CATALOG", "SALES") were rgba(255,255,255,.3) — invisible. */
+.sidebar .nav-section-label {
+    color: var(--brand-gold);
+    opacity: .95;
+    font-weight: 700;
+}
+
+/* Shared row geometry. style-dev.css makes rows full-bleed (padding: 8px 20px);
+   insetting them lets hover and active render as pills instead of edge-to-edge
+   bars, which is what made the highlight look like a block. */
+.sidebar .sidebar-nav .nav-item {
+    margin: 2px 12px;
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+/* Resting menu label: full white instead of 65% white. */
+.sidebar .nav-item,
+.sidebar .nav-item .nav-link-name {
+    color: var(--sidebar-text);
+}
+
+.sidebar .nav-item .nav-icon {
+    background: rgba(255, 255, 255, .10);
+    color: var(--brand-gold);
+}
+
+.sidebar .nav-item .chevron,
+.sidebar .nav-item > i.fa-chevron-down {
+    opacity: .75;
+}
+
+/* ── Hover: a quiet wash, same pill shape as the active state ──────────────── */
+.sidebar .nav-item:hover,
+.sidebar .nav-item:hover .nav-link-name {
+    background: var(--sidebar-hover);
+    color: #fff;
+}
+
+.sidebar .nav-item:hover .nav-icon {
+    background: rgba(243, 201, 105, .28);
+    color: var(--brand-gold);
+}
+
+/* ── A. Current page — the only filled pill on screen ──────────────────────── */
+.sidebar .sidebar-nav .nav-item.active:not(.toggle-submenu),
+.sidebar .sidebar-nav .nav-item.active:not(.toggle-submenu) .nav-link-name {
+    background: var(--brand-gold);
+    color: var(--brand-primary-active);
+    font-weight: 700;
+}
+
+.sidebar .sidebar-nav .nav-item.active:not(.toggle-submenu) .nav-icon {
+    background: rgba(107, 44, 44, .16);
+    color: var(--brand-primary-active);
+}
+
+.sidebar .sidebar-nav .nav-item.active:not(.toggle-submenu) {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+}
+
+/* Style.css draws a 3px bar at left:0 for .active. On a rounded, inset pill it
+   just clips the corner — the fill already carries the state. */
+.sidebar .sidebar-nav .nav-item.active:not(.toggle-submenu)::before {
+    display: none;
+}
+
+/* ── B. Group header of the current page — accent only, no fill ────────────── */
+.sidebar .sidebar-nav .nav-item.toggle-submenu.active,
+.sidebar .sidebar-nav .nav-item.toggle-submenu.active .nav-link-name {
+    background: transparent;
+    color: var(--brand-gold);
+    font-weight: 600;
+}
+
+.sidebar .sidebar-nav .nav-item.toggle-submenu.active .nav-icon {
+    background: rgba(243, 201, 105, .18);
+    color: var(--brand-gold);
+}
+
+.sidebar .sidebar-nav .nav-item.toggle-submenu.active::before {
+    background: var(--brand-gold);
+    left: -6px;
+}
+
+/* Hovering the open group header still gives feedback. */
+.sidebar .sidebar-nav .nav-item.toggle-submenu.active:hover {
+    background: var(--sidebar-hover);
+}
+
+/* ── Submenu: a nested block with a gold rail, so the pill inside reads as
+      "inside this group" rather than floating loose over the sidebar. ──────── */
+.sidebar .sidebar-submenu {
+    margin: 2px 12px 8px 30px;
+    padding-left: 0;
+    border-left: 2px solid rgba(243, 201, 105, .28);
+}
+
+.sidebar .sidebar-nav .sidebar-submenu .nav-item.sub-item {
+    color: var(--sidebar-text-sub);
+    margin: 2px 0 2px 8px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.sidebar .sidebar-nav .sidebar-submenu .nav-item.sub-item:hover {
+    background: var(--sidebar-hover);
+    color: #fff;
+}
+
+/* The .sub-item selector above is as specific as the filled-pill rule in (A) and
+   sits later in the file, so it would otherwise win the colour and leave the
+   active sub-item at 85% white on gold. Restate it here. */
+.sidebar .sidebar-nav .sidebar-submenu .nav-item.sub-item.active,
+.sidebar .sidebar-nav .sidebar-submenu .nav-item.sub-item.active:hover {
+    background: var(--brand-gold);
+    color: var(--brand-primary-active);
+    font-weight: 700;
+}
+
+.sidebar .sidebar-nav .sidebar-submenu .nav-item.sub-item.active i {
+    color: var(--brand-primary-active);
+}
+
+/* Collapsed rail: rows are icon-only and centred, so drop the inset. */
+.sidebar-hide .sidebar .sidebar-nav .nav-item {
+    margin: 2px 8px !important;
+    width: auto !important;
+}
+
+/* Collapsed-rail tooltip (Style.css hard-codes navy #1a2a5e). */
+.sidebar-hide .sidebar .nav-item::after {
+    background: var(--brand-primary-active);
+    color: #fff;
+}
+
+/* Logo chip gradient (Style.css hard-codes a blue gradient). */
+.sidebar-logo .logo-icon {
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-deep));
+    box-shadow: 0 4px 12px rgba(142, 31, 47, .35);
+}
+
+.sidebar-user .logout-btn:hover {
+    color: var(--brand-gold);
+}
+
+/* ============================================================================
+   2. TOPBAR
+   ============================================================================ */
+
+.topbar-user {
+    background: var(--brand-primary);
+}
+
+.topbar-user, .topbar-user * {
+    color: #fff;
+}
+
+.topbar-user:hover {
+    background: var(--brand-primary-hover);
+}
+
+.topbar-icon-btn:hover {
+    background: var(--brand-soft);
+    color: var(--brand-primary);
+}
+
+.topbar-search input:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px var(--brand-glow);
+}
+
+/* ============================================================================
+   3. BUTTONS
+   Every button style in the app funnels through one of the selectors below.
+   scss/style.css paints .primary_button with an orange gradient and
+   style-dev.css overrides it to #005EB8 !important — both are replaced here.
+   ============================================================================ */
+
+/* ── .custom_button.primary_button (the main app button: Print, Save, Logout) ─ */
+.custom_button.primary_button {
+    color: #fff !important;
+}
+
+.custom_button.primary_button::after {
+    background: linear-gradient(87.69deg, var(--brand-primary) 2.06%, var(--brand-deep) 86.71%) !important;
+}
+
+/* The hover overlay was near-black; tint it to the deep brand shade instead. */
+.custom_button.primary_button::before {
+    background: linear-gradient(87.69deg, var(--brand-primary-hover) 2.06%, var(--brand-deep) 86.71%) !important;
+}
+
+/* ── .custom_button.secondary_button (Export, Cancel) — brand outline ───────── */
+.custom_button.secondary_button {
+    color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    background-color: transparent;
+}
+
+.custom_button.secondary_button:hover,
+.custom_button.secondary_button:focus {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+/* ── Bootstrap / helper buttons ────────────────────────────────────────────── */
+.btn-primary,
+.btn-save,
+.view-all-btn {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active,
+    .btn-primary.active,
+    .btn-save:hover,
+    .btn-save:focus,
+    .view-all-btn:hover,
+    .view-all-btn:focus {
+        background-color: var(--brand-primary-hover) !important;
+        border-color: var(--brand-primary-hover) !important;
+        color: #fff !important;
+    }
+
+.btn-primary:focus-visible,
+.btn-save:focus-visible,
+.custom_button:focus-visible {
+    box-shadow: 0 0 0 3px var(--brand-glow) !important;
+}
+
+.btn-outline-primary {
+    color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+    .btn-outline-primary:hover,
+    .btn-outline-primary:focus,
+    .btn-outline-primary:active {
+        background-color: var(--brand-primary) !important;
+        border-color: var(--brand-primary) !important;
+        color: #fff !important;
+    }
+
+/* Bootstrap's own check/radio/link accents, which default to #0d6efd. */
+.btn-check:checked + .btn-outline-primary,
+.btn-check:active + .btn-outline-primary {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+.btn-link {
+    color: var(--brand-primary) !important;
+}
+
+    .btn-link:hover {
+        color: var(--brand-primary-hover) !important;
+    }
+
+/* ============================================================================
+   4. LINKS, TABS, BREADCRUMBS
+   ============================================================================ */
+
+.page-head .page-breadcrumb li a,
+.page-header .breadcrumb span,
+.view-all-link {
+    color: var(--brand-primary) !important;
+}
+
+.view-all-link:hover {
+    color: var(--brand-primary-hover) !important;
+}
+
+/* Detail-screen tabs — the base theme underlines the active tab in cyan. */
+.nav-tabs .nav-item .nav-link.active,
+.nav-tabs .nav-link.active {
+    border-bottom: 2px solid var(--brand-primary) !important;
+    color: var(--brand-primary) !important;
+}
+
+/* Dashboard sales-tab pill. */
+.dashboard-section .sales-line-chart .sales-chart .sales-tab nav .nav-tabs .nav-link.active {
+    background: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+/* Settings section nav. */
+.settings-nav .list-group-item.active {
+    background: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+/* ============================================================================
+   5. TABLES / DATATABLES PAGING
+   ============================================================================ */
+
+.listing-section .table-main .dt-layout-row .dt-layout-cell .dt-paging nav button.dt-paging-button,
+.listing-section .dt-paging nav .dt-paging-button {
+    color: var(--brand-primary) !important;
+}
+
+.listing-section .table-main .dt-layout-row .dt-layout-cell .dt-paging nav button.dt-paging-button.current,
+.listing-section .table-main .dt-layout-row .dt-layout-cell .dt-paging nav button.dt-paging-button:hover,
+.main-wrapper .listing-section .dt-paging nav .dt-paging-button.current {
+    background: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+/* Disabled paging buttons keep their grey — do not let the rule above claim them. */
+.listing-section .dt-paging nav .dt-paging-button.disabled {
+    background: #d6d6d6 !important;
+    border-color: #d6d6d6 !important;
+    color: #fff !important;
+}
+
+/* Row action dropdowns. */
+.listing-section .table-main .custom-datatable tbody .dropdown .dropdown-item:hover,
+.listing-section .table-main .custom-datatable tbody .dropdown .dropdown-item:active {
+    color: var(--brand-primary) !important;
+}
+
+/* ============================================================================
+   6. FORMS — focus rings, checkboxes, radios, selects
+   ============================================================================ */
+
+.form-control:focus,
+.form-control-custom:focus,
+.form-select:focus,
+.common_form .form-group .form-control:focus,
+.common_form .form-group .form-control.filled {
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 3px var(--brand-glow) !important;
+}
+
+/* The open dropdown panel takes the brand border but no glow — style-dev.css
+   deliberately keeps box-shadow:none here so the panel does not double-halo. */
+.custom-select .dropdown-menu,
+.custom-select .dropdown-toggle.show {
+    border-color: var(--brand-primary) !important;
+}
+
+.form-check-input:checked,
+.common_form .custom-checkbox .form-group input:checked + label::before {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+.form-check-input:focus {
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 3px var(--brand-glow) !important;
+}
+
+input[type="checkbox"],
+input[type="radio"],
+.permission-matrix input[type="checkbox"] {
+    accent-color: var(--brand-primary);
+}
+
+/* Custom dropdowns + the shared icon chip in style-dev.css. */
+.custom-select .dropdown-menu li .dropdown-item:hover,
+.custom-select .dropdown-menu li .dropdown-item.active,
+.globally-ics {
+    background: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+.icon-input-wrap .input-icon {
+    background: var(--brand-primary);
+}
+
+/* select2 (Style.css hard-codes #184C8C). */
+.select2-results__option--highlighted {
+    background-color: var(--brand-soft) !important;
+    color: var(--brand-primary) !important;
+}
+
+.select2-results__option--selected,
+.select2-selection__choice,
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover,
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:focus {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--focus .select2-selection--multiple,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: var(--brand-primary) !important;
+}
+
+/* ============================================================================
+   7. MISC ACCENTS
+   ============================================================================ */
+
+.upload-dropzone i {
+    color: var(--brand-primary);
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.is-dragging {
+    border-color: var(--brand-primary);
+    background: var(--brand-soft);
+}
+
+.category-tree .tree-node:hover {
+    background: var(--brand-soft);
+}
+
+.category-tree .tree-node.selected {
+    background: rgba(142, 31, 47, .12);
+    color: var(--brand-primary);
+}
+
+.order-timeline .timeline-step.done .timeline-dot,
+.order-timeline .timeline-step.current .timeline-dot {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+
+.stat-card.blue::after {
+    background: var(--brand-primary);
+}
+
+.stat-card.blue .card-icon,
+.notif-icon.blue,
+.badge-status.review {
+    background: var(--brand-soft);
+    color: var(--brand-primary);
+}
+
+.links:hover::before {
+    background: var(--brand-primary) !important;
+}
+
+.dashboard-wrap .main-content .main-header .navbar-wrap .navbar-right .notification-button .noti-no {
+    background-color: var(--brand-primary) !important;
+}
+
+/* Login / forgot-password shell. */
+.lrf-section .primary_button {
+    background: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+/* ── Print: the sidebar is not part of a printed report ────────────────────── */
+@media print {
+    .sidebar, .topbar {
+        display: none !important;
+    }
+
+    .main-wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+}

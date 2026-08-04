@@ -1,0 +1,374 @@
+/* ------------------------------------------------------------------
+   Chamunda Handicraft admin additions.
+
+   Component classes the base theme does not define (KPI cards, status
+   tiles, dropzones, timelines, …).
+
+   COLOURS DO NOT LIVE HERE. The brand palette and every accent
+   override moved to assets/css/brand-theme.css, which is linked last
+   so it can beat the !important accents in style-dev.css. Rules below
+   consume --brand-primary etc. from that file.
+   ------------------------------------------------------------------ */
+
+/* ── KPI cards (Dashboard, Reports) ─────────────────────────────── */
+.kpi-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 12px;
+    background: var(--card-bg, #fff);
+    height: 100%;
+    transition: box-shadow .18s ease, transform .18s ease;
+}
+
+.kpi-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .07);
+    transform: translateY(-2px);
+}
+
+.kpi-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+}
+
+.kpi-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.kpi-label {
+    font-size: .78rem;
+    color: var(--text-muted, #6b7280);
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text, #111827);
+}
+
+.kpi-sub,
+.kpi-trend {
+    font-size: .72rem;
+    color: var(--text-muted, #6b7280);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kpi-trend.up { color: #22c55e; }
+.kpi-trend.down { color: #ef4444; }
+
+/* ── Status tiles (order summary, analytics) ────────────────────── */
+.status-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 16px 10px;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 12px;
+    background: var(--card-bg, #fff);
+    height: 100%;
+    text-align: center;
+    transition: box-shadow .18s ease, transform .18s ease;
+}
+
+.status-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .07);
+    transform: translateY(-2px);
+}
+
+.status-card i { font-size: 1.15rem; }
+
+.status-count {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text, #111827);
+}
+
+.status-label {
+    font-size: .74rem;
+    color: var(--text-muted, #6b7280);
+    font-weight: 600;
+}
+
+.status-trend {
+    font-size: .68rem;
+    color: var(--text-muted, #9ca3af);
+}
+
+/* ── Section headings inside listing boxes ──────────────────────── */
+.section-heading {
+    font-size: .95rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text, #111827);
+}
+
+/* ── Quick action button row ────────────────────────────────────── */
+.quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ── Plain lists used by analytics panels ───────────────────────── */
+.simple-list {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+}
+
+.simple-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--border, #e5e7eb);
+    font-size: .82rem;
+}
+
+.simple-list li:last-child { border-bottom: 0; }
+
+/* ── Read-only field value on Details screens ───────────────────── */
+.detail-value {
+    margin: 0;
+    padding: 9px 0 0;
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--text, #111827);
+    word-break: break-word;
+}
+
+/* ── Login form groups (outer layout) ───────────────────────────── */
+.form-group { margin-bottom: 14px; }
+
+.password-box { position: relative; }
+
+.password-box .form-control-custom { padding-right: 40px; }
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-muted, #6b7280);
+    font-size: .85rem;
+}
+
+/* ── Permission matrix ──────────────────────────────────────────── */
+.permission-matrix th,
+.permission-matrix td { vertical-align: middle; }
+
+.permission-matrix thead th { font-size: .74rem; }
+
+.permission-matrix input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    accent-color: var(--brand-primary, #6B2C2C);
+}
+
+/* ── Tabs on Details screens (active state handled in the palette section) ── */
+.nav-tabs .nav-link {
+    color: var(--text-muted, #6b7280);
+    font-size: .85rem;
+    font-weight: 600;
+    border: 0;
+    border-bottom: 2px solid transparent;
+}
+
+/* ── Media dropzone + thumbnails (Product) ──────────────────────── */
+.upload-dropzone {
+    border: 2px dashed var(--border, #d1d5db);
+    border-radius: 12px;
+    padding: 26px 18px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--card-bg, #fafafa);
+    transition: border-color .18s ease, background .18s ease;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.is-dragging {
+    border-color: var(--brand-primary, #6B2C2C);
+    background: rgba(107, 44, 44, .04);
+}
+
+.upload-dropzone i {
+    font-size: 1.6rem;
+    color: var(--brand-primary, #6B2C2C);
+}
+
+.upload-dropzone p {
+    margin: 8px 0 2px;
+    font-size: .86rem;
+    font-weight: 600;
+}
+
+.media-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.media-thumb {
+    position: relative;
+    width: 92px;
+    height: 92px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border, #e5e7eb);
+}
+
+.media-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumb-remove {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 20px;
+    height: 20px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, .6);
+    color: #fff;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* ── Category tree (L-09) ───────────────────────────────────────── */
+.category-tree,
+.category-tree ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 16px;
+}
+
+.category-tree > li { padding-left: 0; }
+
+.category-tree li {
+    padding: 5px 0;
+    font-size: .85rem;
+}
+
+.category-tree li.tree-empty {
+    padding-left: 0;
+    font-size: .82rem;
+}
+
+.category-tree .tree-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.category-tree .tree-node:hover { background: rgba(107, 44, 44, .06); }
+
+.category-tree .tree-node.selected {
+    background: rgba(107, 44, 44, .12);
+    font-weight: 600;
+}
+
+/* ── Order lifecycle timeline ───────────────────────────────────── */
+.order-timeline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: flex-start;
+}
+
+.order-timeline .timeline-step {
+    position: relative;
+    flex: 1 1 90px;
+    min-width: 90px;
+    text-align: center;
+    padding-top: 18px;
+}
+
+.order-timeline .timeline-step::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border, #e5e7eb);
+}
+
+.order-timeline .timeline-step:first-child::before { left: 50%; }
+.order-timeline .timeline-step:last-child::before { right: 50%; }
+
+.order-timeline .timeline-dot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--border, #cbd5e1);
+}
+
+.order-timeline .timeline-step.done .timeline-dot,
+.order-timeline .timeline-step.current .timeline-dot {
+    background: var(--brand-primary, #6B2C2C);
+    border-color: var(--brand-primary, #6B2C2C);
+}
+
+.order-timeline .timeline-label {
+    display: block;
+    font-size: .72rem;
+    color: var(--text-muted, #6b7280);
+    font-weight: 600;
+}
+
+/* ── Keep a form-section usable as an equal-height grid cell ────── */
+.form-section.h-100,
+.listing-section.h-100 {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-section.h-100 .form-section-body,
+.listing-section.h-100 .table-main {
+    flex: 1 1 auto;
+}
+
+/* ── Settings section nav (L-03) ────────────────────────────────── */
+.settings-nav .list-group-item {
+    border: 0;
+    border-radius: 8px;
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--text-muted, #6b7280);
+    padding: 10px 12px;
+}
+
+.settings-nav .list-group-item.active {
+    background: var(--brand-primary, #6B2C2C);
+    color: #fff;
+}

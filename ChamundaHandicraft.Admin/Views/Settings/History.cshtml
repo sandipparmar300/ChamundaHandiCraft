@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Settings History";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Settings" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">Settings History</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Settings" asp-action="Index" class="links">Platform Settings</a></li>
+            <li>Change History</li>
+        </ul>
+    </div>
+}
+
+<section class="listing-section common-box">
+    <div class="table-main">
+        <table id="settings-history-grid" class="custom-datatable listing-order-table">
+            <thead>
+                <tr>
+                    <th style="min-width:150px;">Date</th>
+                    <th style="min-width:170px;">Section</th>
+                    <th style="min-width:200px;">Setting</th>
+                    <th style="min-width:200px;">Old Value</th>
+                    <th style="min-width:200px;">New Value</th>
+                    <th style="min-width:170px;">Changed By</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Settings"); }
+
+            $('#settings-history-grid').DataTable({
+                paging: true, ordering: true, filter: false,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                language: { emptyTable: "No settings changes recorded yet" }
+            });
+        });
+    </script>
+}

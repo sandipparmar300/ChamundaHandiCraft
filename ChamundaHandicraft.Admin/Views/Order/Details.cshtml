@@ -1,0 +1,323 @@
+@*
+    Module 06 - Order detail. Spec: docs/Admin Flows/Orders.txt §2 lifecycle,
+    §5-10 stage screens, §4 row actions.
+*@
+@{
+    ViewData["Title"] = "Order Details";
+
+    var lifecycle = new[] { "New", "Payment Verified", "Processing", "Packed", "Shipped", "In Transit", "Delivered", "Completed" };
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Order" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">Order Details</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Order" asp-action="Index" class="links">Order Listing</a></li>
+            <li>Details</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <!-- ================= HEADER + ACTIONS ================= -->
+    <section class="form-section">
+        <div class="form-section-body">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Order <span id="ordNumber">&mdash;</span></h3>
+                    <p class="text-muted mb-0" style="font-size:.85rem;">
+                        Placed <span id="ordDate">&mdash;</span> &middot;
+                        <span id="ordCustomer">&mdash;</span> &middot;
+                        <span id="ordItems">0</span> items &middot;
+                        <span id="ordTotal">&#8377;0</span>
+                    </p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="custom_button secondary_button"><i class="fas fa-file-invoice"></i> Invoice</button>
+                    <button type="button" class="custom_button secondary_button"><i class="fas fa-tag"></i> Shipping Label</button>
+                    <button type="button" class="custom_button secondary_button"><i class="fas fa-truck"></i> Assign Courier</button>
+                    <button type="button" class="custom_button secondary_button" data-bs-toggle="modal" data-bs-target="#order-cancel-modal"><i class="fas fa-ban"></i> Cancel</button>
+                    <button type="button" class="custom_button primary_button" data-bs-toggle="modal" data-bs-target="#order-status-modal"><i class="fas fa-arrow-right"></i> Update Status</button>
+                </div>
+            </div>
+
+            <!-- Lifecycle -->
+            <div class="order-timeline mt-4">
+                @foreach (var step in lifecycle)
+                {
+                    <div class="timeline-step">
+                        <span class="timeline-dot"></span>
+                        <span class="timeline-label">@step</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3">
+        <!-- ================= ITEMS ================= -->
+        <div class="col-xl-8">
+            <section class="listing-section common-box h-100">
+                <div class="latest-orders">
+                    <div class="div-search-box-panel flex-ending-cls-here">
+                        <h3 class="section-heading">Order Items</h3>
+                    </div>
+                </div>
+                <div class="table-main">
+                    <table class="custom-datatable listing-order-table" id="order-items-grid">
+                        <thead>
+                            <tr>
+                                <th style="min-width:60px;">Image</th>
+                                <th style="min-width:220px;">Product</th>
+                                <th style="min-width:120px;">SKU</th>
+                                <th style="min-width:140px;">Variant</th>
+                                <th style="min-width:90px;">Qty</th>
+                                <th style="min-width:110px;">Price</th>
+                                <th style="min-width:110px;">Discount</th>
+                                <th style="min-width:100px;">Tax</th>
+                                <th style="min-width:120px;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================= SUMMARY ================= -->
+        <div class="col-xl-4">
+            <section class="form-section h-100">
+                <div class="form-section-header">
+                    <h2><i class="fas fa-receipt" style="color:var(--accent);margin-right:8px;"></i>Order Summary</h2>
+                </div>
+                <div class="form-section-body">
+                    <ul class="simple-list">
+                        @foreach (var line in new[] { "Sub Total", "Discount", "Coupon", "Shipping Charges", "COD Charges", "Tax (GST)", "Grand Total" })
+                        {
+                            <li><span>@line</span><strong>&#8377;0</strong></li>
+                        }
+                    </ul>
+
+                    <h4 class="section-heading mt-3">Payment</h4>
+                    <ul class="simple-list">
+                        @foreach (var line in new[] { "Payment Method", "Payment Status", "Transaction ID", "Paid On" })
+                        {
+                            <li><span>@line</span><strong>&mdash;</strong></li>
+                        }
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ================= TABS ================= -->
+    <section class="form-section">
+        <div class="form-section-body">
+
+            <ul class="nav nav-tabs" id="orderDetailTabs" role="tablist">
+                <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#o-addresses" type="button" role="tab">Addresses</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#o-fulfilment" type="button" role="tab">Fulfilment</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#o-shipment" type="button" role="tab">Shipment</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#o-returns" type="button" role="tab">Returns &amp; Refunds</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#o-activity" type="button" role="tab">Activity Log</button></li>
+            </ul>
+
+            <div class="tab-content pt-3">
+
+                <div class="tab-pane fade show active" id="o-addresses" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4 class="section-heading">Billing Address</h4>
+                            <p class="detail-value">&mdash;</p>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4 class="section-heading">Shipping Address</h4>
+                            <p class="detail-value">&mdash;</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="o-fulfilment" role="tabpanel">
+                    <div class="row g-3">
+                        @foreach (var f in new[] { "Warehouse", "Picking List", "Packed By", "Packing Date", "Number of Packages", "Package Weight", "Package Dimensions", "Packing Notes" })
+                        {
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">@f</label>
+                                <p class="detail-value">&mdash;</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="o-shipment" role="tabpanel">
+                    <div class="row g-3">
+                        @foreach (var f in new[] { "Courier", "AWB Number", "Tracking Number", "Dispatch Date", "Estimated Delivery", "Delivered On", "Receiver Name", "Shipping Charges" })
+                        {
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">@f</label>
+                                <p class="detail-value">&mdash;</p>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="table-main mt-3">
+                        <table class="custom-datatable listing-order-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:150px;">Date</th>
+                                    <th style="min-width:180px;">Status</th>
+                                    <th style="min-width:200px;">Location</th>
+                                    <th style="min-width:280px;">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="o-returns" role="tabpanel">
+                    <div class="table-main">
+                        <table class="custom-datatable listing-order-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:150px;">Reference</th>
+                                    <th style="min-width:120px;">Type</th>
+                                    <th style="min-width:210px;">Product</th>
+                                    <th style="min-width:100px;">Qty</th>
+                                    <th style="min-width:170px;">Reason</th>
+                                    <th style="min-width:130px;">Amount</th>
+                                    <th style="min-width:130px;">Status</th>
+                                    <th style="min-width:140px;">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="o-activity" role="tabpanel">
+                    <div class="table-main">
+                        <table class="custom-datatable listing-order-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:150px;">Date</th>
+                                    <th style="min-width:180px;">Action</th>
+                                    <th style="min-width:160px;">By</th>
+                                    <th style="min-width:300px;">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- Update status -->
+<div class="modal delete-common-modal common-modal" id="order-status-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close-modal" data-bs-dismiss="modal" aria-label="Close">
+                    <picture><img src="~/assets/images/close-icon.svg" alt="close" width="24" height="24"></picture>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>Update Order Status</h3>
+                <div class="text-start mt-2">
+                    <label class="form-label-custom">New Status</label>
+                    <select class="form-control-custom">
+                        @foreach (var s in lifecycle)
+                        {
+                            <option>@s</option>
+                        }
+                    </select>
+
+                    <label class="form-label-custom mt-2">Notes</label>
+                    <textarea class="form-control-custom" rows="3" placeholder="Optional note recorded in the activity log"></textarea>
+
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="NotifyOnStatus" checked />
+                        <label class="form-check-label" for="NotifyOnStatus">Notify the customer</label>
+                    </div>
+                </div>
+                <div class="delete-edit-btn">
+                    <button type="button" class="custom_button secondary_button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="custom_button primary_button" data-bs-dismiss="modal">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel order -->
+<div class="modal delete-common-modal common-modal" id="order-cancel-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close-modal" data-bs-dismiss="modal" aria-label="Close">
+                    <picture><img src="~/assets/images/close-icon.svg" alt="close" width="24" height="24"></picture>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>Cancel Order</h3>
+                <p>Cancelling releases reserved stock and, if payment was captured, starts a refund.</p>
+                <div class="text-start mt-2">
+                    <label class="form-label-custom">Cancellation Reason <span class="req">*</span></label>
+                    <select class="form-control-custom">
+                        <option>Customer Request</option>
+                        <option>Out of Stock</option>
+                        <option>Payment Failed</option>
+                        <option>Address Not Serviceable</option>
+                        <option>Fraud Suspected</option>
+                        <option>Duplicate Order</option>
+                    </select>
+                    <label class="form-label-custom mt-2">Remarks</label>
+                    <textarea class="form-control-custom" rows="3"></textarea>
+                </div>
+                <div class="delete-edit-btn">
+                    <button type="button" class="custom_button secondary_button" data-bs-dismiss="modal">Keep Order</button>
+                    <button type="button" class="custom_button primary_button" data-bs-dismiss="modal">Cancel Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Order"); }
+
+            $('#order-items-grid').DataTable({
+                paging: false, ordering: false, filter: false, info: false,
+                scrollX: true, autoWidth: false,
+                language: { emptyTable: "No items on this order" }
+            });
+
+            $('#orderDetailTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
+                $($(this).data('bs-target')).find('table.custom-datatable').each(function () {
+                    if (!$.fn.DataTable.isDataTable(this)) {
+                        $(this).DataTable({
+                            paging: true, ordering: true, filter: false,
+                            bLengthChange: false, pageLength: 10,
+                            scrollX: true, autoWidth: false,
+                            language: { emptyTable: "No records to show yet" }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

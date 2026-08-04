@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Chamunda Handicraft Admin</title>
+
+    <!-- Main design CSS -->
+    <link rel="stylesheet" href="~/css/Style.css" />
+    <link rel="icon" type="image/svg+xml" href="~/assets/images/chamunda-favicon.svg" />
+    <link rel="alternate icon" href="~/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="~/assets/images/chamunda-favicon.svg" />
+
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/bootstrap-select.min.css")" asp-append-version="true">
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/scss/style.css")" asp-append-version="true">
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/toastr.min.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/style-dev.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/admin-custom.css")" asp-append-version="true" />
+
+    <!-- Plugins -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-2.1.2/datatables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    @* Brand palette. Must stay LAST: the imported themes (Style.css, style-dev.css,
+       scss/style.css) hard-code navy/blue accents, several with !important, so this
+       file only wins the cascade from the bottom of <head>. *@
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/brand-theme.css")" asp-append-version="true" />
+
+    <script>
+        // Global sidebar toggle - runs before jQuery loads.
+        function fnSidebarToggle(btn) {
+            var layout = document.getElementById('mainLayout');
+            var isHiding = !layout.classList.contains('sidebar-hide');
+
+            layout.classList.toggle('sidebar-hide');
+
+            if (btn) btn.classList.toggle('active');
+
+            try {
+                localStorage.setItem('sidebar', isHiding ? 'hide' : 'show');
+            } catch (e) { }
+        }
+
+        // Restore sidebar state on load (FOUC prevention).
+        (function () {
+            try {
+                var state = localStorage.getItem("sidebar");
+                if (state === "hide") {
+                    document.documentElement.classList.add("preload-no-transition");
+                }
+            } catch (e) { }
+        })();
+    </script>
+</head>
+
+<body>
+
+    <div class="app-layout" id="mainLayout">
+        <script>
+            (function () {
+                try {
+                    var state = localStorage.getItem("sidebar");
+                    var mainLayout = document.getElementById("mainLayout");
+                    if (state === "hide") {
+                        mainLayout.classList.add("sidebar-hide");
+                        document.documentElement.setAttribute('data-sidebar-prehide', 'true');
+                    } else {
+                        mainLayout.classList.remove("sidebar-hide");
+                        document.documentElement.setAttribute('data-sidebar-prehide', 'false');
+                    }
+                } catch (e) { }
+            })();
+        </script>
+
+        @await Html.PartialAsync("_Sidebar")
+
+        <div class="main-wrapper">
+
+            @await Html.PartialAsync("_Header")
+
+            <div class="container-fulid">
+                @await RenderSectionAsync("Header", required: false)
+
+                @RenderBody()
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Logout confirmation -->
+    <div class="modal delete-common-modal common-modal" id="logout-confirm-modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close-modal" data-bs-dismiss="modal">
+                        <img src="~/assets/images/close-icon.svg" width="24" height="24" alt="close">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <h3>Logout Confirmation</h3>
+                    <p>Are you sure you want to logout?</p>
+
+                    <div class="delete-edit-btn">
+                        <button class="custom_button secondary_button" data-bs-dismiss="modal">Cancel</button>
+                        <a id="btn-logout-yes"
+                           asp-controller="Auth" asp-action="Logout"
+                           class="custom_button primary_button"
+                           onclick="localStorage.setItem('sidebar','show'); localStorage.setItem('logout-event', Date.now());">
+                            Logout
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/assets/js/jquery.validate.min.js"></script>
+    <script src="~/assets/js/jquery.validate.unobtrusive.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/assets/js/toastr.min.js"></script>
+    <script src="~/assets/js/common.js"></script>
+    <script src="@Url.Content("~/assets/js/moment.js")"></script>
+    <script src="@Url.Content("~/assets/js/dropdown-helper.js")"></script>
+    <script src="https://cdn.datatables.net/v/dt/dt-2.1.2/datatables.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        $(document).ready(function () {
+
+            (function () {
+                try {
+                    var state = localStorage.getItem('sidebar');
+                    var btn = document.getElementById('toggleBtn');
+                    if (state === 'hide' && btn) btn.classList.add('active');
+                } catch (e) { }
+            })();
+
+            $('.select2-single').select2({ allowClear: true, width: '100%' });
+
+            $('.select2-multiple').select2({
+                allowClear: true,
+                width: '100%',
+                closeOnSelect: false,
+                minimumResultsForSearch: 0
+            });
+
+            var success = '@ViewData["SuccessMessage"]';
+            var error = '@ViewData["ErrorMessage"]';
+
+            if (success && success.trim() !== "" && typeof showSuccessMessage === 'function') {
+                showSuccessMessage(success);
+            }
+
+            if (error && error.trim() !== "" && typeof showErrorMessage === 'function') {
+                showErrorMessage(error);
+            }
+
+            if (typeof gblRemoveSpace === 'function') { gblRemoveSpace(); }
+
+            $("#mainLayout").css("visibility", "visible");
+
+            requestAnimationFrame(function () {
+                document.documentElement.classList.remove("preload-no-transition");
+            });
+        });
+
+        // Is-Active pill toggle live update.
+        $(document).on('change', '#IsActiveToggle, #IsActiveCheckbox', function () {
+            var isChecked = $(this).prop('checked');
+            $('#isActiveStatus').text(isChecked ? 'Active' : 'Inactive');
+            $('#isToggleItem').toggleClass('inactive', !isChecked);
+        });
+
+        $(document).ready(function () {
+            var $toggle = $('#IsActiveToggle, #IsActiveCheckbox').first();
+            if ($toggle.length && !$toggle.prop('checked')) {
+                $('#isToggleItem').addClass('inactive');
+            }
+        });
+
+        // Dropdown menus inside scrolling grids are re-parented to body so the
+        // grid's overflow does not clip them.
+        $(document).on('show.bs.dropdown', '.latest-orders-dropdown', function () {
+            var $dropdown = $(this);
+            var $menu = $dropdown.find('.dropdown-menu');
+
+            $('body').append($menu.detach());
+
+            var offset = $dropdown.offset();
+            var height = $dropdown.outerHeight();
+
+            $menu.css({
+                position: 'absolute',
+                top: offset.top + height,
+                left: offset.left,
+                display: 'block',
+                zIndex: 1055
+            });
+
+            $dropdown.data('dropdown-menu', $menu);
+        });
+
+        $(document).on('hide.bs.dropdown', '.latest-orders-dropdown', function () {
+            var $dropdown = $(this);
+            var $menu = $dropdown.data('dropdown-menu');
+
+            if ($menu) {
+                $dropdown.append($menu.detach());
+                $menu.hide();
+            }
+        });
+
+        // Navigating away can skip hide.bs.dropdown, which would leave the menu
+        // parented to body and break the cached page.
+        window.addEventListener('pagehide', function () {
+            $('.latest-orders-dropdown').each(function () {
+                var $dropdown = $(this);
+                var $menu = $dropdown.data('dropdown-menu');
+                if ($menu && $menu.length) {
+                    try {
+                        $dropdown.append($menu.detach());
+                        $menu.hide();
+                    } catch (ex) { }
+                }
+            });
+        });
+
+        // Multi-tab logout sync.
+        window.addEventListener("storage", function (event) {
+            if (event.key === "logout-event") {
+                window.location.href = '@Url.Action("Logout", "Auth")';
+            }
+        });
+    </script>
+
+    @await RenderSectionAsync("BodyAppend", required: false)
+</body>
+</html>

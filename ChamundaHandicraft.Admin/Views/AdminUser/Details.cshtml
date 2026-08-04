@@ -1,0 +1,207 @@
+@*
+    Module 02 - Admin User detail (L-02 tabbed detail).
+    Spec: docs/Admin Flows/Users.txt - View Admin User, Login History, Activity Log.
+*@
+@{
+    ViewData["Title"] = "Admin User Details";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="AdminUser" asp-action="Index">
+                <picture>
+                    <img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" />
+                </picture>
+            </a>
+            <h2 class="page-title">Admin User Details</h2>
+        </div>
+
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="AdminUser" asp-action="Index" class="links">Admin User Listing</a></li>
+            <li>Details</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <!-- ================= SUMMARY ================= -->
+    <section class="form-section">
+        <div class="form-section-body">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <img src="~/assets/images/default-profile.png" class="pic-preview" alt="profile" style="width:74px;height:74px;border-radius:50%;object-fit:cover;" />
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1" id="dtlFullName">&mdash;</h3>
+                    <p class="text-muted mb-0" style="font-size:.85rem;">
+                        <span id="dtlRole">&mdash;</span> &middot;
+                        <span id="dtlDepartment">&mdash;</span> &middot;
+                        Last login <span id="dtlLastLogin">&mdash;</span>
+                    </p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="AdminUser" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+                    <button type="button" class="custom_button secondary_button"><i class="fas fa-key"></i> Change Password</button>
+                    <button type="button" class="custom_button secondary_button"><i class="fas fa-lock"></i> Lock Account</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= TABS ================= -->
+    <section class="form-section">
+        <div class="form-section-body">
+
+            <ul class="nav nav-tabs" id="adminUserTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab">Profile</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-permissions" type="button" role="tab">Role &amp; Permissions</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-logins" type="button" role="tab">Login History</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-activity" type="button" role="tab">Activity Log</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-security" type="button" role="tab">Security</button>
+                </li>
+            </ul>
+
+            <div class="tab-content pt-3">
+
+                <div class="tab-pane fade show active" id="tab-profile" role="tabpanel">
+                    <div class="row g-3">
+                        @{
+                            var profileFields = new[]
+                            {
+                                "Full Name", "Employee ID", "Username", "Email",
+                                "Mobile Number", "Department", "Designation", "Role",
+                                "Time Zone", "Language", "Status", "Created By"
+                            };
+                        }
+                        @foreach (var f in profileFields)
+                        {
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">@f</label>
+                                <p class="detail-value">&mdash;</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-permissions" role="tabpanel">
+                    <div class="table-main">
+                        <table class="custom-datatable listing-order-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:200px;">Module</th>
+                                    <th>View</th>
+                                    <th>Create</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                    <th>Export</th>
+                                    <th>Approve</th>
+                                    <th>Publish</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-logins" role="tabpanel">
+                    <div class="table-main">
+                        <table class="custom-datatable listing-order-table" id="login-history-grid">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:150px;">Login Date</th>
+                                    <th style="min-width:150px;">Logout Date</th>
+                                    <th style="min-width:130px;">IP Address</th>
+                                    <th style="min-width:130px;">Device</th>
+                                    <th style="min-width:130px;">Browser</th>
+                                    <th style="min-width:130px;">OS</th>
+                                    <th style="min-width:150px;">Location</th>
+                                    <th style="min-width:110px;">Status</th>
+                                    <th style="min-width:160px;">Failure Reason</th>
+                                    <th style="min-width:130px;">Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-activity" role="tabpanel">
+                    <div class="table-main">
+                        <table class="custom-datatable listing-order-table" id="activity-grid">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:150px;">Date</th>
+                                    <th style="min-width:160px;">Action</th>
+                                    <th style="min-width:150px;">Module</th>
+                                    <th style="min-width:260px;">Description</th>
+                                    <th style="min-width:130px;">IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-security" role="tabpanel">
+                    <div class="row g-3">
+                        @{
+                            var securityFields = new[]
+                            {
+                                "Password Last Changed", "Password Expires On", "Failed Login Attempts",
+                                "Account Locked", "Session Timeout", "Concurrent Sessions",
+                                "Two Factor Authentication", "IP Restriction"
+                            };
+                        }
+                        @foreach (var f in securityFields)
+                        {
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">@f</label>
+                                <p class="detail-value">&mdash;</p>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3 flex-wrap">
+                        <button type="button" class="custom_button secondary_button">Force Password Reset</button>
+                        <button type="button" class="custom_button secondary_button">Terminate Sessions</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-AdminUser"); }
+
+            // Tabs render their grid on first show so DataTables measures a visible table.
+            $('#adminUserTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
+                $($(this).data('bs-target')).find('table.custom-datatable').each(function () {
+                    if (!$.fn.DataTable.isDataTable(this)) {
+                        $(this).DataTable({
+                            paging: true, ordering: true, filter: false,
+                            bLengthChange: false, pageLength: 10,
+                            scrollX: true, autoWidth: false,
+                            language: { emptyTable: "No records to show yet" }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

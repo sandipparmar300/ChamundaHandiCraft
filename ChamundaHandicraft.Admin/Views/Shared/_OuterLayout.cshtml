@@ -1,0 +1,76 @@
+@*
+    Unauthenticated shell (L-10 in the spec): login, forgot password, reset, 2FA.
+    Single tenant, so the brand is fixed rather than resolved per request.
+*@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/svg+xml" href="~/assets/images/chamunda-favicon.svg" />
+    <link rel="alternate icon" href="~/favicon.ico" sizes="any" />
+
+    <title>Chamunda Handicraft - @ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/bootstrap-select.min.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/scss/style.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/toastr.min.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/style-dev.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    @* Brand palette — shared with the authenticated shell. Must stay after the
+       imported themes so it wins the cascade. *@
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/brand-theme.css")" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <div id="siteLoader" style="display:none"></div>
+
+    <div class="screen-center">
+        <section class="lrf-section">
+            <div class="container">
+                <div class="lrf-inner">
+
+                    <div class="form-side">
+                        <div class="welc-head newwelcome-cls-adding">
+                            <a class="for-logocommoncls">
+                                <picture>
+                                    <img src="~/assets/images/chamunda-logo-dark.svg" class="dropdown-menu-dark Logo" alt="Chamunda Handicraft" width="200">
+                                </picture>
+                            </a>
+                            <h1 class="welcome-title"><strong>Welcome To Chamunda Handicraft</strong></h1>
+                            <p>Please enter your details</p>
+                        </div>
+
+                        <div class="common_form">
+                            @RenderBody()
+                        </div>
+                    </div>
+
+                    <div class="lrf-image-side">
+                        <picture>
+                            <img src="~/assets/images/lrf-image.png" alt="Chamunda Handicraft">
+                        </picture>
+                        <div class="img-text">
+                            <p>Welcome To Chamunda Handicraft</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="@Url.Content("~/assets/js/jQuery.min.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/assets/js/bootstrap.min.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/assets/js/bootstrap-select.min.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/assets/js/popper.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/assets/js/toastr.min.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/assets/js/script.js")" asp-append-version="true"></script>
+    <script src="~/assets/js/jquery.validate.min.js"></script>
+    <script src="~/assets/js/jquery.validate.unobtrusive.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

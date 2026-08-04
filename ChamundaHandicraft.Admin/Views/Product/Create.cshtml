@@ -1,0 +1,519 @@
+@*
+    Module 03 - Create / Edit Product.  Spec: docs/Admin Flows/Product.txt §4-9
+    Tabbed form (L-02): General, Classification, Pricing, Inventory, Media,
+    Variants, SEO, Related. Serves both Add and Edit.
+*@
+@{
+    ViewData["Title"] = "Product";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Product" : "Add Product";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Product" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Product" asp-action="Index" class="links">Product Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="productForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-body">
+
+                <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-general" type="button" role="tab">General</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-classification" type="button" role="tab">Classification</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pricing" type="button" role="tab">Pricing</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-inventory" type="button" role="tab">Inventory</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab">Images &amp; Videos</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-variants" type="button" role="tab">Variants</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-seo" type="button" role="tab">SEO</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-related" type="button" role="tab">Related</button></li>
+                </ul>
+
+                <div class="tab-content pt-3">
+
+                    <!-- ============ GENERAL ============ -->
+                    <div class="tab-pane fade show active" id="tab-general" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Product Name <span class="req">*</span></label>
+                                <input id="Name" name="Name" class="form-control-custom" placeholder="Enter product name" onkeyup="buildSlug()" />
+                                <span class="error-msg" data-valmsg-for="Name"></span>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Product Code <span class="req">*</span></label>
+                                <input id="ProductCode" name="ProductCode" class="form-control-custom" placeholder="Unique product code" />
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">SKU <span class="req">*</span></label>
+                                <input id="Sku" name="Sku" class="form-control-custom" placeholder="Unique SKU" />
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Barcode</label>
+                                <input id="Barcode" name="Barcode" class="form-control-custom" placeholder="EAN / UPC" />
+                            </div>
+
+                            <div class="col-lg-8 col-md-6">
+                                <label class="form-label-custom">Slug (SEO URL)</label>
+                                <input id="Slug" name="Slug" class="form-control-custom" placeholder="auto-generated-from-name" />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label-custom">Short Description</label>
+                                <textarea id="ShortDescription" name="ShortDescription" class="form-control-custom" rows="2" placeholder="One or two lines shown on listing cards"></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label-custom">Full Description</label>
+                                <textarea id="Description" name="Description" class="form-control-custom" rows="5" placeholder="Full product description"></textarea>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Product Story (Handmade Story)</label>
+                                <textarea id="ProductStory" name="ProductStory" class="form-control-custom" rows="4" placeholder="The story behind this piece"></textarea>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <label class="form-label-custom">Care Instructions</label>
+                                <textarea id="CareInstructions" name="CareInstructions" class="form-control-custom" rows="4"></textarea>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <label class="form-label-custom">Warranty Information</label>
+                                <textarea id="Warranty" name="Warranty" class="form-control-custom" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ CLASSIFICATION ============ -->
+                    <div class="tab-pane fade" id="tab-classification" role="tabpanel">
+                        <div class="row g-3">
+                            @{
+                                var classification = new[]
+                                {
+                                    "Category", "Subcategory", "Collection", "Brand", "Material", "Style",
+                                    "Color", "Handmade By (Artisan)", "Country of Origin", "Occasion",
+                                    "Festival Collection", "Season"
+                                };
+                            }
+                            @foreach (var c in classification)
+                            {
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="form-label-custom">@c</label>
+                                    <select class="form-control-custom select2-single"><option value="">Select @c.ToLowerInvariant()</option></select>
+                                </div>
+                            }
+                        </div>
+
+                        <h4 class="section-heading mt-4">Physical Attributes</h4>
+                        <div class="row g-3 mt-1">
+                            @foreach (var p in new[] { "Weight (g)", "Length (cm)", "Width (cm)", "Height (cm)", "Package Weight (g)", "Package Dimensions" })
+                            {
+                                <div class="col-lg-2 col-md-4 col-6">
+                                    <label class="form-label-custom">@p</label>
+                                    <input class="form-control-custom" placeholder="0" />
+                                </div>
+                            }
+                        </div>
+
+                        <h4 class="section-heading mt-4">Tags</h4>
+                        <div class="row g-3 mt-1">
+                            <div class="col-lg-8">
+                                <select id="Tags" name="Tags" class="form-control-custom select2-multiple" multiple>
+                                    @foreach (var t in new[] { "Handmade", "Wooden", "Traditional", "Festival", "Eco-Friendly", "Gift", "Premium" })
+                                    {
+                                        <option>@t</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ PRICING ============ -->
+                    <div class="tab-pane fade" id="tab-pricing" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Cost Price</label>
+                                <input id="CostPrice" name="CostPrice" class="form-control-custom" placeholder="0.00" onkeyup="calcMargin()" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Selling Price <span class="req">*</span></label>
+                                <input id="SellingPrice" name="SellingPrice" class="form-control-custom" placeholder="0.00" onkeyup="calcMargin()" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">MRP</label>
+                                <input id="Mrp" name="Mrp" class="form-control-custom" placeholder="0.00" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Profit Margin</label>
+                                <input id="ProfitMargin" class="form-control-custom" readonly placeholder="Calculated" />
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Discount Type</label>
+                                <select id="DiscountType" name="DiscountType" class="form-control-custom">
+                                    <option value="">None</option>
+                                    <option value="percent">Percentage</option>
+                                    <option value="fixed">Fixed Amount</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Discount Value</label>
+                                <input id="DiscountValue" name="DiscountValue" class="form-control-custom" placeholder="0" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Tax Category</label>
+                                <select id="TaxCategory" name="TaxCategory" class="form-control-custom"><option value="">Select tax class</option></select>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">GST Rate (%)</label>
+                                <input id="GstRate" name="GstRate" class="form-control-custom" placeholder="0" />
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Display Price</label>
+                                <input id="DisplayPrice" name="DisplayPrice" class="form-control-custom" placeholder="0.00" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Strike Price</label>
+                                <input id="StrikePrice" name="StrikePrice" class="form-control-custom" placeholder="0.00" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ INVENTORY ============ -->
+                    <div class="tab-pane fade" id="tab-inventory" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Stock Quantity</label>
+                                <input id="StockQuantity" name="StockQuantity" class="form-control-custom" placeholder="0" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Reserved Stock</label>
+                                <input id="ReservedStock" class="form-control-custom" readonly placeholder="0" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Available Stock</label>
+                                <input id="AvailableStock" class="form-control-custom" readonly placeholder="0" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Low Stock Threshold</label>
+                                <input id="LowStockThreshold" name="LowStockThreshold" class="form-control-custom" placeholder="0" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Reorder Quantity</label>
+                                <input id="ReorderQuantity" name="ReorderQuantity" class="form-control-custom" placeholder="0" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Warehouse</label>
+                                <select id="WarehouseId" name="WarehouseId" class="form-control-custom select2-single"><option value="">Select warehouse</option></select>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Stock Status</label>
+                                <select id="StockStatus" name="StockStatus" class="form-control-custom">
+                                    <option>In Stock</option>
+                                    <option>Low Stock</option>
+                                    <option>Out of Stock</option>
+                                    <option>Back Order</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ MEDIA ============ -->
+                    <div class="tab-pane fade" id="tab-media" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-lg-8">
+                                <label class="form-label-custom">Product Images</label>
+                                <div class="upload-dropzone" id="imageDropzone">
+                                    <i class="fas fa-cloud-arrow-up"></i>
+                                    <p>Drag and drop images here, or click to browse</p>
+                                    <span class="upload-note">JPG, PNG, WEBP &middot; max 5MB each &middot; first image becomes the primary</span>
+                                    <input type="file" id="ProductImages" name="ProductImages" accept="image/*" multiple class="d-none" />
+                                </div>
+                                <div class="media-thumbs mt-3" id="imageThumbs"></div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <label class="form-label-custom">360&deg; Image Sequence</label>
+                                <div class="upload-dropzone" id="spinDropzone">
+                                    <i class="fas fa-arrows-rotate"></i>
+                                    <p>Upload the rotation sequence</p>
+                                    <input type="file" id="SpinImages" accept="image/*" multiple class="d-none" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Video Source</label>
+                                <select id="VideoSource" name="VideoSource" class="form-control-custom">
+                                    <option value="">None</option>
+                                    <option value="upload">Upload</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="vimeo">Vimeo</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-8 col-md-6">
+                                <label class="form-label-custom">Video URL</label>
+                                <input id="VideoUrl" name="VideoUrl" class="form-control-custom" placeholder="https://" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ VARIANTS ============ -->
+                    <div class="tab-pane fade" id="tab-variants" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Variant Types</label>
+                                <select id="VariantTypes" class="form-control-custom select2-multiple" multiple>
+                                    @foreach (var v in new[] { "Size", "Color", "Material", "Finish", "Design", "Pattern", "Weight" })
+                                    {
+                                        <option>@v</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-lg-6 d-flex align-items-end">
+                                <button type="button" class="custom_button secondary_button" onclick="addVariantRow()">
+                                    <i class="fas fa-plus"></i> Add Variant
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-main mt-3">
+                            <table class="custom-datatable listing-order-table" id="variant-table">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:180px;">Variant</th>
+                                        <th style="min-width:130px;">SKU</th>
+                                        <th style="min-width:130px;">Barcode</th>
+                                        <th style="min-width:130px;">Price Difference</th>
+                                        <th style="min-width:100px;">Stock</th>
+                                        <th style="min-width:110px;">Weight</th>
+                                        <th style="min-width:110px;">Image</th>
+                                        <th style="min-width:80px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ============ SEO ============ -->
+                    <div class="tab-pane fade" id="tab-seo" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">SEO Title</label>
+                                <input id="SeoTitle" name="SeoTitle" class="form-control-custom" maxlength="60" />
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Canonical URL</label>
+                                <input id="CanonicalUrl" name="CanonicalUrl" class="form-control-custom" placeholder="https://" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label-custom">Meta Description</label>
+                                <textarea id="MetaDescription" name="MetaDescription" class="form-control-custom" rows="2" maxlength="160"></textarea>
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Meta Keywords</label>
+                                <input id="MetaKeywords" name="MetaKeywords" class="form-control-custom" placeholder="Comma separated" />
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">SEO URL</label>
+                                <input id="SeoUrl" name="SeoUrl" class="form-control-custom" />
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Open Graph Title</label>
+                                <input id="OgTitle" name="OgTitle" class="form-control-custom" />
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Open Graph Image</label>
+                                <input type="file" id="OgImage" name="OgImage" class="form-control-custom" accept="image/*" />
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Twitter Card</label>
+                                <select id="TwitterCard" name="TwitterCard" class="form-control-custom">
+                                    <option>summary</option>
+                                    <option>summary_large_image</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Image Alt Text</label>
+                                <input id="ImageAltText" name="ImageAltText" class="form-control-custom" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ RELATED ============ -->
+                    <div class="tab-pane fade" id="tab-related" role="tabpanel">
+                        <div class="row g-3">
+                            @foreach (var rel in new[] { "Similar Products", "Frequently Bought Together", "Recommended Products", "Cross Sell", "Upsell" })
+                            {
+                                <div class="col-lg-6">
+                                    <label class="form-label-custom">@rel</label>
+                                    <select class="form-control-custom select2-multiple" multiple></select>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ VISIBILITY ============ -->
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-eye" style="color:var(--accent);margin-right:8px;"></i>Visibility &amp; Placement</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Status</label>
+                        <select id="Status" name="Status" class="form-control-custom">
+                            <option>Draft</option>
+                            <option>Published</option>
+                            <option>Scheduled</option>
+                            <option>Hidden</option>
+                            <option>Archived</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Publish On</label>
+                        <input type="datetime-local" id="PublishOn" name="PublishOn" class="form-control-custom" />
+                    </div>
+
+                    <div class="col-lg-6">
+                        <label class="form-label-custom">Homepage Flags</label>
+                        <div class="d-flex gap-3 flex-wrap pt-2">
+                            @foreach (var flag in new[] { "Featured", "New Arrival", "Bestseller", "Trending", "Recommended", "Flash Sale", "Festival Collection" })
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="flag-@flag.Replace(" ", "")" />
+                                    <label class="form-check-label" for="flag-@flag.Replace(" ", "")">@flag</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Product" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save"><i class="fas fa-eye"></i> Preview</button>
+                <button type="button" class="btn-save"><i class="fas fa-save"></i> Save as Draft</button>
+                <button type="button" class="btn-save"><i class="fas fa-upload"></i> @(isEdit ? "Update &amp; Publish" : "Save &amp; Publish")</button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Product"); }
+
+            $('#imageDropzone').on('click', function () { $('#ProductImages').click(); });
+            $('#spinDropzone').on('click', function () { $('#SpinImages').click(); });
+
+            $('#ProductImages').on('change', function () { renderThumbs(this.files); });
+
+            ['dragenter', 'dragover'].forEach(function (evt) {
+                document.getElementById('imageDropzone').addEventListener(evt, function (e) {
+                    e.preventDefault(); e.stopPropagation();
+                    this.classList.add('is-dragging');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(function (evt) {
+                document.getElementById('imageDropzone').addEventListener(evt, function (e) {
+                    e.preventDefault(); e.stopPropagation();
+                    this.classList.remove('is-dragging');
+                });
+            });
+
+            document.getElementById('imageDropzone').addEventListener('drop', function (e) {
+                renderThumbs(e.dataTransfer.files);
+            });
+        });
+
+        function renderThumbs(files) {
+            if (!files) return;
+            var $wrap = $('#imageThumbs');
+            Array.prototype.forEach.call(files, function (f) {
+                if (!/^image\//.test(f.type)) return;
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $wrap.append('<div class="media-thumb"><img src="' + e.target.result + '" alt="' + f.name + '" />' +
+                                 '<button type="button" class="thumb-remove" onclick="$(this).parent().remove()">&times;</button></div>');
+                };
+                reader.readAsDataURL(f);
+            });
+        }
+
+        function buildSlug() {
+            var name = $('#Name').val() || '';
+            if (!$('#Slug').data('touched')) {
+                $('#Slug').val(name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+            }
+        }
+
+        $('#Slug').on('input', function () { $(this).data('touched', true); });
+
+        function calcMargin() {
+            var cost = parseFloat($('#CostPrice').val()) || 0;
+            var sell = parseFloat($('#SellingPrice').val()) || 0;
+            if (sell > 0) {
+                $('#ProfitMargin').val((((sell - cost) / sell) * 100).toFixed(2) + ' %');
+            } else {
+                $('#ProfitMargin').val('');
+            }
+        }
+
+        function addVariantRow() {
+            var row = '<tr>' +
+                '<td><input class="form-control-custom" placeholder="e.g. Small - Brown" /></td>' +
+                '<td><input class="form-control-custom" placeholder="SKU" /></td>' +
+                '<td><input class="form-control-custom" placeholder="Barcode" /></td>' +
+                '<td><input class="form-control-custom" placeholder="0.00" /></td>' +
+                '<td><input class="form-control-custom" placeholder="0" /></td>' +
+                '<td><input class="form-control-custom" placeholder="0" /></td>' +
+                '<td><input type="file" class="form-control-custom" accept="image/*" /></td>' +
+                '<td class="text-center"><button type="button" class="custom_button secondary_button" onclick="$(this).closest(\'tr\').remove()">Remove</button></td>' +
+                '</tr>';
+            $('#variant-table tbody').append(row);
+        }
+    </script>
+}

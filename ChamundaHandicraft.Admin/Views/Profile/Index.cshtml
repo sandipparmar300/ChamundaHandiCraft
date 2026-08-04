@@ -1,0 +1,121 @@
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">My Profile</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Account</li>
+            <li>Profile</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="profileForm" enctype="multipart/form-data">
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-user" style="color:var(--accent);margin-right:8px;"></i>Profile Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+
+                    <div class="col-lg-3 col-md-12">
+                        <label class="form-label-custom">Profile Photo</label>
+                        <div class="profile-pic-box" id="uploadBox">
+                            <img id="ProfilePhotoPreview" src="~/assets/images/default-profile.png" class="pic-preview clickable-img" alt="profile" />
+                            <label class="upload-btn-custom" for="Photo"><i class="fas fa-camera"></i> Upload</label>
+                            <input type="file" id="Photo" name="Photo" accept="image/*" class="d-none" />
+                            <p class="upload-note">JPG, PNG (Max 5MB)</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">First Name <span class="req">*</span></label>
+                        <input id="FirstName" name="FirstName" class="form-control-custom" placeholder="Enter first name" />
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Last Name <span class="req">*</span></label>
+                        <input id="LastName" name="LastName" class="form-control-custom" placeholder="Enter last name" />
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Email</label>
+                        <input id="Email" name="Email" class="form-control-custom" readonly />
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Mobile Number</label>
+                        <input id="Mobile" name="Mobile" class="form-control-custom" placeholder="Enter mobile number" />
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Time Zone</label>
+                        <select id="TimeZone" name="TimeZone" class="form-control-custom select2-single">
+                            <option value="India Standard Time" selected>India Standard Time</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Language</label>
+                        <select id="Language" name="Language" class="form-control-custom select2-single">
+                            <option value="en-IN" selected>English (India)</option>
+                            <option value="hi-IN">Hindi</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-key" style="color:var(--accent);margin-right:8px;"></i>Change Password</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Current Password</label>
+                        <input type="password" id="CurrentPassword" name="CurrentPassword" class="form-control-custom" autocomplete="current-password" />
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">New Password</label>
+                        <input type="password" id="NewPassword" name="NewPassword" class="form-control-custom" autocomplete="new-password" />
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Confirm New Password</label>
+                        <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="form-control-custom" autocomplete="new-password" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div></div>
+            <div>
+                <a asp-controller="Dashboard" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+    </script>
+}

@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Stock Details";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Inventory" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">Stock Details</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Inventory" asp-action="Index" class="links">Inventory</a></li>
+            <li>Stock Details</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <section class="form-section">
+        <div class="form-section-header">
+            <h2><i class="fas fa-cube" style="color:var(--accent);margin-right:8px;"></i>Stock Information</h2>
+        </div>
+        <div class="form-section-body">
+            <div class="row g-3">
+                @foreach (var f in new[] { "Product", "SKU", "Barcode", "Category", "Warehouse", "Current Stock", "Reserved Stock", "Available Stock", "Low Stock Level", "Reorder Level", "Stock Status", "Last Updated" })
+                {
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">@f</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="listing-section common-box">
+        <div class="latest-orders">
+            <div class="div-search-box-panel flex-ending-cls-here">
+                <h3 class="section-heading">Stock Movement History</h3>
+                <button type="button" class="custom_button secondary_button"><i class="fas fa-barcode"></i> Print Barcode</button>
+            </div>
+        </div>
+        <div class="table-main">
+            <table id="stock-history-grid" class="custom-datatable listing-order-table">
+                <thead>
+                    <tr>
+                        <th style="min-width:140px;">Date</th>
+                        <th style="min-width:150px;">Transaction Type</th>
+                        <th style="min-width:130px;">Opening</th>
+                        <th style="min-width:120px;">Qty In</th>
+                        <th style="min-width:120px;">Qty Out</th>
+                        <th style="min-width:130px;">Closing</th>
+                        <th style="min-width:160px;">Reference</th>
+                        <th style="min-width:150px;">User</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
+
+            $('#stock-history-grid').DataTable({
+                paging: true, ordering: true, filter: false,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                language: { emptyTable: "No stock movements recorded yet" }
+            });
+        });
+    </script>
+}

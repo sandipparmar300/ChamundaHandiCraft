@@ -1,0 +1,201 @@
+﻿@{
+    ViewData["Title"] = "Coupon";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Coupon" : "Add Coupon";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Coupon" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Coupon" asp-action="Index" class="links">Coupons Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="couponForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-ticket" style="color:var(--accent);margin-right:8px;"></i>Coupon Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Coupon Code <span class="req">*</span></label>
+                        <input id="CouponCode" name="CouponCode" class="form-control-custom" placeholder="Enter coupon code" />
+                        <span class="error-msg" data-valmsg-for="CouponCode"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Coupon Name <span class="req">*</span></label>
+                        <input id="CouponName" name="CouponName" class="form-control-custom" placeholder="Enter coupon name" />
+                        <span class="error-msg" data-valmsg-for="CouponName"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Discount Type <span class="req">*</span></label>
+                        <select id="DiscountType" name="DiscountType" class="form-control-custom select2-single">
+                            <option value="">Select discount type</option>
+                            <option>Percentage</option>
+                            <option>Fixed Amount</option>
+                            <option>Free Shipping</option>
+                            <option>Buy X Get Y</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="DiscountType"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Discount Value <span class="req">*</span></label>
+                        <input id="DiscountValue" name="DiscountValue" class="form-control-custom" placeholder="0.00" />
+                        <span class="error-msg" data-valmsg-for="DiscountValue"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Maximum Discount</label>
+                        <input id="MaximumDiscount" name="MaximumDiscount" class="form-control-custom" placeholder="0.00" />
+                        <span class="error-msg" data-valmsg-for="MaximumDiscount"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Minimum Order Value</label>
+                        <input id="MinimumOrderValue" name="MinimumOrderValue" class="form-control-custom" placeholder="0.00" />
+                        <span class="error-msg" data-valmsg-for="MinimumOrderValue"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Description</label>
+                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description"></textarea>
+                        <span class="error-msg" data-valmsg-for="Description"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-calendar-days" style="color:var(--accent);margin-right:8px;"></i>Validity and Limits</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Valid From <span class="req">*</span></label>
+                        <input type="datetime-local" id="ValidFrom" name="ValidFrom" class="form-control-custom" />
+                        <span class="error-msg" data-valmsg-for="ValidFrom"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Valid To <span class="req">*</span></label>
+                        <input type="datetime-local" id="ValidTo" name="ValidTo" class="form-control-custom" />
+                        <span class="error-msg" data-valmsg-for="ValidTo"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Usage Limit Total</label>
+                        <input type="number" id="UsageLimitTotal" name="UsageLimitTotal" class="form-control-custom" placeholder="0" />
+                        <span class="error-msg" data-valmsg-for="UsageLimitTotal"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Usage Limit Per Customer</label>
+                        <input type="number" id="UsageLimitPerCustomer" name="UsageLimitPerCustomer" class="form-control-custom" placeholder="0" />
+                        <span class="error-msg" data-valmsg-for="UsageLimitPerCustomer"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Applies To</label>
+                        <select id="AppliesTo" name="AppliesTo" class="form-control-custom select2-single">
+                            <option value="">Select applies to</option>
+                            <option>Entire Store</option>
+                            <option>Specific Products</option>
+                            <option>Specific Categories</option>
+                            <option>Specific Brands</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="AppliesTo"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Customer Eligibility</label>
+                        <select id="CustomerEligibility" name="CustomerEligibility" class="form-control-custom select2-single">
+                            <option value="">Select customer eligibility</option>
+                            <option>All Customers</option>
+                            <option>New Customers</option>
+                            <option>Returning Customers</option>
+                            <option>Specific Segment</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="CustomerEligibility"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">First Order Only</label>
+                        <select id="FirstOrderOnly" name="FirstOrderOnly" class="form-control-custom select2-single">
+                            <option value="">Select first order only</option>
+                            <option>No</option>
+                            <option>Yes</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="FirstOrderOnly"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Stackable</label>
+                        <select id="Stackable" name="Stackable" class="form-control-custom select2-single">
+                            <option value="">Select stackable</option>
+                            <option>No</option>
+                            <option>Yes</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Stackable"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Coupon" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Promotions"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

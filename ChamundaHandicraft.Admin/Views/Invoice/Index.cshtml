@@ -1,0 +1,96 @@
+﻿@*
+    Sales - Invoices listing.  Spec: docs/Admin Flows/
+*@
+@{
+    ViewData["Title"] = "Invoices";
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Invoices</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Sales</li>
+            <li>Invoices Listing</li>
+        </ul>
+    </div>
+}
+
+<section class="listing-section common-box">
+    <div class="latest-orders">
+        <div class="div-search-box-panel flex-ending-cls-here">
+            <div class="listing-search">
+                <div class="search-box">
+                    <span class="search-icon">
+                        <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
+                    </span>
+                    <input placeholder="Search invoice or order number" id="txtSearch" onkeyup="fnSearch(this);">
+                    <span class="clear-icon" id="clearSearch" onclick="clearSearch()" style="display:none; cursor:pointer;">&#10006;</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="custom_button secondary_button" onclick="toolbarAction('Export')"><i class="fas fa-file-export"></i> Export</button>
+                <button type="button" class="custom_button secondary_button" onclick="toolbarAction('Print')"><i class="fas fa-print"></i> Print</button>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="table-main">
+        <table id="invoice-grid" class="custom-datatable listing-order-table">
+            <thead>
+                <tr>
+                    <th style="min-width:150px;">Invoice Number</th>
+                    <th style="min-width:140px;">Invoice Date</th>
+                    <th style="min-width:150px;">Order Number</th>
+                    <th style="min-width:200px;">Customer</th>
+                    <th style="min-width:130px;">Sub Total</th>
+                    <th style="min-width:120px;">Tax</th>
+                    <th style="min-width:140px;">Total Amount</th>
+                    <th style="min-width:140px;">Payment Status</th>
+                    <th style="min-width:80px;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        let datatable;
+
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Order"); }
+
+            datatable = $('#invoice-grid').DataTable({
+                paging: true, ordering: true, filter: false, destroy: true,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                language: { emptyTable: "No records to show yet" },
+                initComplete: function () {
+                    const $w = $("#invoice-grid").closest(".dataTables_wrapper");
+                    if (!$w.parent().hasClass("tb-responsive")) { $w.wrap("<div class='tb-responsive'></div>"); }
+                }
+            });
+        });
+
+        function fnSearch(ctrl) {
+            $("#clearSearch").toggle(($(ctrl).val() || '').length > 0);
+            if (datatable) datatable.draw();
+        }
+
+        function clearSearch() {
+            $("#txtSearch").val('');
+            $("#clearSearch").hide();
+            if (datatable) datatable.draw();
+        }
+
+        function toolbarAction(name) {
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(name + ' will be wired with the Invoice API.');
+            }
+        }
+    </script>
+}

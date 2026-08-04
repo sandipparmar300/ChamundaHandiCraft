@@ -1,0 +1,140 @@
+﻿@{
+    ViewData["Title"] = "Testimonial";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Testimonial" : "Add Testimonial";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Testimonial" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Testimonial" asp-action="Index" class="links">Testimonials Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="testimonialForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-quote-left" style="color:var(--accent);margin-right:8px;"></i>Testimonial Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-12">
+                        <label class="form-label-custom">Photo</label>
+                        <div class="profile-pic-box" id="uploadBox">
+                            <img id="ImagePreview" src="~/assets/images/default-profile.png" class="pic-preview clickable-img" alt="image" />
+                            <label class="upload-btn-custom" for="Photo"><i class="fas fa-camera"></i> Upload</label>
+                            <input type="file" id="Photo" name="Photo" accept="image/*" class="d-none" onchange="previewUpload(this)" />
+                            <p class="upload-note">JPG, PNG (Max 5MB)</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Author Name <span class="req">*</span></label>
+                        <input id="AuthorName" name="AuthorName" class="form-control-custom" placeholder="Enter author name" />
+                        <span class="error-msg" data-valmsg-for="AuthorName"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Designation</label>
+                        <input id="Designation" name="Designation" class="form-control-custom" placeholder="Enter designation" />
+                        <span class="error-msg" data-valmsg-for="Designation"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Location</label>
+                        <input id="Location" name="Location" class="form-control-custom" placeholder="Enter location" />
+                        <span class="error-msg" data-valmsg-for="Location"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Rating</label>
+                        <select id="Rating" name="Rating" class="form-control-custom select2-single">
+                            <option value="">Select rating</option>
+                            <option>5</option>
+                            <option>4</option>
+                            <option>3</option>
+                            <option>2</option>
+                            <option>1</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Rating"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Placement</label>
+                        <select id="Placement" name="Placement" class="form-control-custom select2-single">
+                            <option value="">Select placement</option>
+                            <option>Home</option>
+                            <option>About</option>
+                            <option>Product Page</option>
+                            <option>All</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Placement"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Sort Order</label>
+                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" />
+                        <span class="error-msg" data-valmsg-for="SortOrder"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Testimonial <span class="req">*</span></label>
+                        <textarea id="Testimonial" name="Testimonial" class="form-control-custom" rows="3" placeholder="Enter testimonial"></textarea>
+                        <span class="error-msg" data-valmsg-for="Testimonial"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Testimonial" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Testimonial"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

@@ -1,0 +1,138 @@
+﻿@{
+    ViewData["Title"] = "Template";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Template" : "Add Template";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="NotificationTemplate" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="NotificationTemplate" asp-action="Index" class="links">Notification Templates Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="notificationtemplateForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-file-code" style="color:var(--accent);margin-right:8px;"></i>Template Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Template Name <span class="req">*</span></label>
+                        <input id="TemplateName" name="TemplateName" class="form-control-custom" placeholder="Enter template name" />
+                        <span class="error-msg" data-valmsg-for="TemplateName"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Event <span class="req">*</span></label>
+                        <select id="Event" name="Event" class="form-control-custom select2-single">
+                            <option value="">Select event</option>
+                            <option>Order Placed</option>
+                            <option>Payment Received</option>
+                            <option>Payment Failed</option>
+                            <option>Order Shipped</option>
+                            <option>Order Delivered</option>
+                            <option>Order Cancelled</option>
+                            <option>Refund Processed</option>
+                            <option>Low Stock</option>
+                            <option>New Customer</option>
+                            <option>Review Request</option>
+                            <option>Password Reset</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Event"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Channel <span class="req">*</span></label>
+                        <select id="Channel" name="Channel" class="form-control-custom select2-single">
+                            <option value="">Select channel</option>
+                            <option>Email</option>
+                            <option>SMS</option>
+                            <option>WhatsApp</option>
+                            <option>Push</option>
+                            <option>In App</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Channel"></span>
+                    </div>
+
+                    <div class="col-lg-8 col-md-6">
+                        <label class="form-label-custom">Subject</label>
+                        <input id="Subject" name="Subject" class="form-control-custom" placeholder="Enter subject" />
+                        <span class="error-msg" data-valmsg-for="Subject"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Sender</label>
+                        <input id="Sender" name="Sender" class="form-control-custom" placeholder="Enter sender" />
+                        <span class="error-msg" data-valmsg-for="Sender"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Body <span class="req">*</span></label>
+                        <textarea id="Body" name="Body" class="form-control-custom" rows="3" placeholder="Enter body"></textarea>
+                        <span class="error-msg" data-valmsg-for="Body"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Available Placeholders</label>
+                        <textarea id="AvailablePlaceholders" name="AvailablePlaceholders" class="form-control-custom" rows="3" placeholder="Enter available placeholders"></textarea>
+                        <span class="error-msg" data-valmsg-for="AvailablePlaceholders"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="NotificationTemplate" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Notification"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

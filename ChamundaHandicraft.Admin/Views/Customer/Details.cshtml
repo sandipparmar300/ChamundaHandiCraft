@@ -1,0 +1,256 @@
+@*
+    Module 02 - Customer 360 (L-02 tabbed detail).
+    Spec: docs/Admin Flows/Users.txt - Customer Profile, Orders, Wishlist,
+    Addresses, Reward Points, Communication, Notes.
+*@
+@{
+    ViewData["Title"] = "Customer Details";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Customer" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">Customer Details</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Customer" asp-action="Index" class="links">Customer Listing</a></li>
+            <li>Details</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <!-- ================= SUMMARY ================= -->
+    <section class="form-section">
+        <div class="form-section-body">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <img src="~/assets/images/default-profile.png" alt="customer" style="width:74px;height:74px;border-radius:50%;object-fit:cover;" />
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1" id="custName">&mdash;</h3>
+                    <p class="text-muted mb-0" style="font-size:.85rem;">
+                        <span id="custEmail">&mdash;</span> &middot;
+                        <span id="custMobile">&mdash;</span> &middot;
+                        Registered <span id="custRegistered">&mdash;</span>
+                    </p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="custom_button secondary_button"><i class="fas fa-paper-plane"></i> Contact</button>
+                    <button type="button" class="custom_button secondary_button" data-bs-toggle="modal" data-bs-target="#customer-block-modal"><i class="fas fa-ban"></i> Block</button>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-2">
+                @foreach (var kpi in new[] { "Total Orders", "Total Purchase", "Average Order Value", "Reward Points", "Wishlist Items", "Reviews Submitted", "Support Tickets" })
+                {
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="status-card">
+                            <span class="status-count">0</span>
+                            <span class="status-label">@kpi</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= TABS ================= -->
+    <section class="form-section">
+        <div class="form-section-body">
+
+            <ul class="nav nav-tabs" id="customerTabs" role="tablist">
+                <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-cust-profile" type="button" role="tab">Profile</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cust-orders" type="button" role="tab">Orders</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cust-wishlist" type="button" role="tab">Wishlist</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cust-addresses" type="button" role="tab">Addresses</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cust-rewards" type="button" role="tab">Reward Points</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cust-notes" type="button" role="tab">Internal Notes</button></li>
+            </ul>
+
+            <div class="tab-content pt-3">
+
+                <div class="tab-pane fade show active" id="tab-cust-profile" role="tabpanel">
+                    <div class="row g-3">
+                        @foreach (var f in new[] { "Full Name", "Gender", "Date of Birth", "Email", "Mobile", "Registration Date", "Last Login", "Status" })
+                        {
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">@f</label>
+                                <p class="detail-value">&mdash;</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-cust-orders" role="tabpanel">
+                    <div class="table-main">
+                        <table class="custom-datatable listing-order-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:140px;">Order Number</th>
+                                    <th style="min-width:130px;">Date</th>
+                                    <th style="min-width:120px;">Amount</th>
+                                    <th style="min-width:130px;">Payment</th>
+                                    <th style="min-width:130px;">Delivery</th>
+                                    <th style="min-width:130px;">Order Status</th>
+                                    <th style="min-width:110px;">Invoice</th>
+                                    <th style="min-width:90px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-cust-wishlist" role="tabpanel">
+                    <div class="table-main">
+                        <table class="custom-datatable listing-order-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:60px;">Image</th>
+                                    <th style="min-width:220px;">Product</th>
+                                    <th style="min-width:130px;">Added On</th>
+                                    <th style="min-width:120px;">Current Price</th>
+                                    <th style="min-width:130px;">Availability</th>
+                                    <th style="min-width:120px;">Stock</th>
+                                    <th style="min-width:90px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-cust-addresses" role="tabpanel">
+                    <div class="table-main">
+                        <table class="custom-datatable listing-order-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:110px;">Type</th>
+                                    <th style="min-width:280px;">Address</th>
+                                    <th style="min-width:130px;">City</th>
+                                    <th style="min-width:130px;">State</th>
+                                    <th style="min-width:130px;">Country</th>
+                                    <th style="min-width:110px;">Postal Code</th>
+                                    <th style="min-width:100px;">Default</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-cust-rewards" role="tabpanel">
+                    <div class="row g-3 mb-3">
+                        @foreach (var r in new[] { "Available Points", "Earned Points", "Redeemed Points", "Expired Points" })
+                        {
+                            <div class="col-lg-3 col-md-6">
+                                <div class="status-card">
+                                    <span class="status-count">0</span>
+                                    <span class="status-label">@r</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex gap-2 mb-3 flex-wrap">
+                        <button type="button" class="custom_button secondary_button">Add Points</button>
+                        <button type="button" class="custom_button secondary_button">Deduct Points</button>
+                        <button type="button" class="custom_button secondary_button">Adjust Balance</button>
+                    </div>
+
+                    <div class="table-main">
+                        <table class="custom-datatable listing-order-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:130px;">Date</th>
+                                    <th style="min-width:150px;">Order</th>
+                                    <th style="min-width:110px;">Earned</th>
+                                    <th style="min-width:110px;">Redeemed</th>
+                                    <th style="min-width:110px;">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-cust-notes" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-lg-8">
+                            <label class="form-label-custom">Add an internal note</label>
+                            <textarea id="CustomerNote" class="form-control-custom" rows="3" placeholder="Visible to administrators only"></textarea>
+                        </div>
+                        <div class="col-lg-4 d-flex align-items-end">
+                            <button type="button" class="custom_button primary_button">Add Note</button>
+                        </div>
+                    </div>
+
+                    <div class="table-main mt-3">
+                        <table class="custom-datatable listing-order-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:130px;">Date</th>
+                                    <th style="min-width:160px;">Added By</th>
+                                    <th style="min-width:320px;">Note</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div class="modal delete-common-modal common-modal" id="customer-block-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close-modal" data-bs-dismiss="modal" aria-label="Close">
+                    <picture><img src="~/assets/images/close-icon.svg" alt="close" width="24" height="24"></picture>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>Block Customer</h3>
+                <p>Blocking prevents login and new orders. Order history and reward points are preserved.</p>
+                <div class="text-start mt-2">
+                    <label class="form-label-custom">Reason <span class="req">*</span></label>
+                    <textarea class="form-control-custom" rows="3" placeholder="Record the reason for blocking"></textarea>
+                </div>
+                <div class="delete-edit-btn">
+                    <button type="button" class="custom_button secondary_button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="custom_button primary_button" data-bs-dismiss="modal">Block</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Customer"); }
+
+            $('#customerTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
+                $($(this).data('bs-target')).find('table.custom-datatable').each(function () {
+                    if (!$.fn.DataTable.isDataTable(this)) {
+                        $(this).DataTable({
+                            paging: true, ordering: true, filter: false,
+                            bLengthChange: false, pageLength: 10,
+                            scrollX: true, autoWidth: false,
+                            language: { emptyTable: "No records to show yet" }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

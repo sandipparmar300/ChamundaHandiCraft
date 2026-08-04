@@ -1,0 +1,228 @@
+@mixin border-radius($radius) {
+  border-radius: $radius;
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  -o-border-radius: $radius;
+}
+
+@mixin border-radius-all($radiusTop, $radiusRight, $radiusBottom, $radiusLeft) {
+  -webkit-border-radius: $radiusTop $radiusRight $radiusBottom $radiusLeft;
+  -moz-border-radius: $radiusTop $radiusRight $radiusBottom $radiusLeft;
+  -ms-border-radius: $radiusTop $radiusRight $radiusBottom $radiusLeft;
+  border-radius: $radiusTop $radiusRight $radiusBottom $radiusLeft;
+  -o-border-radius: $radiusTop $radiusRight $radiusBottom $radiusLeft;
+}
+
+@mixin flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@mixin flex-all-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@mixin flex-v-center {
+  display: flex;
+  align-items: center;
+} 
+
+@mixin flex-h-center {
+  display: flex;
+  justify-content: center;
+}
+
+@mixin flex-center-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+@mixin flex-left { 
+  display: flex;
+  justify-content: flex-start;
+}
+
+@mixin flex-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@mixin transition($time, $style) {
+  transition: all $time $style;
+  -webkit-transition: all $time $style;
+  -moz-transition: all $time $style;
+  -ms-transition: all $time $style;
+  -o-transition: all $time $style;
+}
+
+@mixin transition-three {
+  transition: all 0.3s linear;
+  -webkit-transition: all 0.3s linear;
+  -moz-transition: all 0.3s linear;
+  -ms-transition: all 0.3s linear;
+  -o-transition: all 0.3s linear;
+}
+
+@mixin transition-five {
+  transition: all 0.5s linear;
+  -webkit-transition: all 0.5s linear;
+  -moz-transition: all 0.5s linear;
+  -ms-transition: all 0.5s linear;
+  -o-transition: all 0.5s linear;
+}
+
+@mixin rotate-x($deg) {
+  transform: rotateX($deg);
+  -webkit-transform: rotateX($deg);
+  -moz-transform: rotateX($deg);
+  -ms-transform: rotateX($deg);
+  -o-transform: rotateX($deg);
+}
+@mixin rotate-y($deg) {
+  transform: rotateY($deg);
+  -webkit-transform: rotateY($deg);
+  -moz-transform: rotateY($deg);
+  -ms-transform: rotateY($deg);
+  -o-transform: rotateY($deg);
+}
+
+@mixin rotate($deg) {
+  transform: rotate($deg);
+  -webkit-transform: rotate($deg);
+  -moz-transform: rotate($deg);
+  -ms-transform: rotate($deg);
+  -o-transform: rotate($deg);
+}
+
+@mixin scale($scale) {
+  transform: scale($scale);
+  -webkit-transform: scale($scale);
+  -moz-transform: scale($scale);
+  -ms-transform: scale($scale);
+  -o-transform: scale($scale);
+}
+
+@mixin scale-x($scalex) {
+  transform: scaleX($scalex);
+  -webkit-transform: scaleX($scalex);
+  -moz-transform: scaleX($scalex);
+  -ms-transform: scaleX($scalex);
+  -o-transform: scaleX($scalex);
+}
+
+@mixin scale-y($scaley) {
+  transform: scaleY($scaley);
+  -webkit-transform: scaleY($scaley);
+  -moz-transform: scaleY($scaley);
+  -ms-transform: scaleY($scaley);
+  -o-transform: scaleY($scaley);
+}
+
+@mixin skew-x($skewx) {
+  transform: skewX($skewx);
+  -webkit-transform: skewX($skewx);
+  -moz-transform: skewX($skewx);
+  -ms-transform: skewX($skewx);
+  -o-transform: skewX($skewx);
+}
+
+@mixin origin-lc {
+  transform-origin: left center;
+}
+@mixin origin-tc {
+  transform-origin: top center;
+}
+
+@mixin transform($angle1, $angle2) {
+  transform: translate($angle1, $angle2);
+  -webkit-transform: translate($angle1, $angle2);
+  -moz-transform: translate($angle1, $angle2);
+  -ms-transform: translate($angle1, $angle2);
+  -o-transform: translate($angle1, $angle2);
+}
+
+@mixin transform-x($angle-x) {
+  transform: translateX($angle-x);
+  -webkit-transform: translateX($angle-x);
+  -moz-transform: translateX($angle-x);
+  -ms-transform: translateX($angle-x);
+  -o-transform: translateX($angle-x);
+}
+
+@mixin transform-y($angle-y) {
+  transform: translateY($angle-y);
+  -webkit-transform: translateY($angle-y);
+  -moz-transform: translateY($angle-y);
+  -ms-transform: translateY($angle-y);
+  -o-transform: translateY($angle-y);
+}
+
+@mixin before-after {
+  position: absolute;
+  content: " ";
+}
+
+@mixin textEllipsis {
+  display: inherit;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@mixin tableLayout {
+  display: table-cell;
+  float: none;
+}
+
+@mixin background-opacity($color, $opacity) {
+  background-color: rgba($color, $opacity);
+}
+
+@mixin color-opacity($color, $opacity) {
+  color: rgba($color, $opacity);
+}
+
+@mixin border-outline-shadow-none{
+    border: none;
+    outline: none;
+    box-shadow: inherit;
+
+    &:focus{
+        border: none;
+        outline: none;
+        box-shadow: inherit;
+    }
+}
+
+@mixin outline-shadow-none{
+    outline: none;
+    box-shadow: inherit;
+
+    &:focus{
+        outline: none;
+        box-shadow: inherit;
+    }
+}
+
+@mixin absolute-tblr{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@mixin text-ellipsis{
+  overflow: hidden;
+  text-overflow: ellipsis; 
+}
+

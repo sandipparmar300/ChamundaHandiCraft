@@ -1,0 +1,98 @@
+﻿@*
+    Sales - Settlements listing.  Spec: docs/Admin Flows/
+*@
+@{
+    ViewData["Title"] = "Settlements";
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Settlements</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Sales</li>
+            <li>Settlements Listing</li>
+        </ul>
+    </div>
+}
+
+<section class="listing-section common-box">
+    <div class="latest-orders">
+        <div class="div-search-box-panel flex-ending-cls-here">
+            <div class="listing-search">
+                <div class="search-box">
+                    <span class="search-icon">
+                        <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
+                    </span>
+                    <input placeholder="Search settlement or UTR number" id="txtSearch" onkeyup="fnSearch(this);">
+                    <span class="clear-icon" id="clearSearch" onclick="clearSearch()" style="display:none; cursor:pointer;">&#10006;</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="custom_button secondary_button" onclick="toolbarAction('Export')"><i class="fas fa-file-export"></i> Export</button>
+                <button type="button" class="custom_button secondary_button" onclick="toolbarAction('Reconcile')"><i class="fas fa-scale-balanced"></i> Reconcile</button>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="table-main">
+        <table id="settlement-grid" class="custom-datatable listing-order-table">
+            <thead>
+                <tr>
+                    <th style="min-width:160px;">Settlement ID</th>
+                    <th style="min-width:140px;">Settlement Date</th>
+                    <th style="min-width:140px;">Gateway</th>
+                    <th style="min-width:130px;">Transactions</th>
+                    <th style="min-width:140px;">Gross Amount</th>
+                    <th style="min-width:120px;">Fees</th>
+                    <th style="min-width:130px;">Tax</th>
+                    <th style="min-width:140px;">Net Amount</th>
+                    <th style="min-width:160px;">UTR Number</th>
+                    <th style="min-width:130px;">Status</th>
+                    <th style="min-width:80px;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        let datatable;
+
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Payment"); }
+
+            datatable = $('#settlement-grid').DataTable({
+                paging: true, ordering: true, filter: false, destroy: true,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                language: { emptyTable: "No records to show yet" },
+                initComplete: function () {
+                    const $w = $("#settlement-grid").closest(".dataTables_wrapper");
+                    if (!$w.parent().hasClass("tb-responsive")) { $w.wrap("<div class='tb-responsive'></div>"); }
+                }
+            });
+        });
+
+        function fnSearch(ctrl) {
+            $("#clearSearch").toggle(($(ctrl).val() || '').length > 0);
+            if (datatable) datatable.draw();
+        }
+
+        function clearSearch() {
+            $("#txtSearch").val('');
+            $("#clearSearch").hide();
+            if (datatable) datatable.draw();
+        }
+
+        function toolbarAction(name) {
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(name + ' will be wired with the Settlement API.');
+            }
+        }
+    </script>
+}

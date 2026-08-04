@@ -1,0 +1,208 @@
+@*
+    Module 05 - Inventory hub: KPI summary, current stock, and the ledger.
+    Spec: docs/Admin Flows/Inventory.txt §3, §4, §13
+*@
+@{
+    ViewData["Title"] = "Inventory";
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Inventory</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Inventory</li>
+            <li>Stock Overview</li>
+        </ul>
+    </div>
+}
+
+<!-- ================= KPI SUMMARY ================= -->
+<section class="form-section">
+    <div class="form-section-header">
+        <h2><i class="fas fa-boxes-stacked" style="color:var(--accent);margin-right:8px;"></i>Inventory Summary</h2>
+    </div>
+    <div class="form-section-body">
+        <div class="row g-3">
+            @{
+                var invKpis = new[]
+                {
+                    "Total Products", "Total Stock Quantity", "Inventory Value", "Low Stock Products",
+                    "Out of Stock Products", "Reserved Stock", "Damaged Stock", "Returned Stock",
+                    "Today's Purchase", "Today's Adjustment", "Pending Purchase Entries", "Warehouses"
+                };
+            }
+            @foreach (var k in invKpis)
+            {
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                    <div class="status-card">
+                        <span class="status-count">0</span>
+                        <span class="status-label">@k</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ================= STOCK / LEDGER ================= -->
+<section class="listing-section common-box">
+    <div class="latest-orders">
+        <div class="div-search-box-panel flex-ending-cls-here">
+
+            <div class="listing-search">
+                <div class="search-box">
+                    <span class="search-icon">
+                        <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
+                    </span>
+                    <input placeholder="Search product, SKU or barcode" id="txtSearch" onkeyup="fnSearch(this);">
+                    <span class="clear-icon" id="clearSearch" onclick="clearSearch()" style="display:none; cursor:pointer;">&#10006;</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <select id="filterWarehouse" class="form-control-custom" style="min-width:160px;">
+                    <option value="">All Warehouses</option>
+                </select>
+                <select id="filterStockStatus" class="form-control-custom" style="min-width:150px;">
+                    <option value="">All Stock Status</option>
+                    <option>In Stock</option>
+                    <option>Low Stock</option>
+                    <option>Out Of Stock</option>
+                    <option>Reserved</option>
+                    <option>Damaged</option>
+                    <option>Returned</option>
+                    <option>Archived</option>
+                </select>
+                <button type="button" class="custom_button secondary_button" onclick="printBarcodes()"><i class="fas fa-barcode"></i> Print Barcode</button>
+                <button type="button" class="custom_button secondary_button" onclick="notWired('Export')"><i class="fas fa-file-export"></i> Export</button>
+                <a asp-controller="Purchase" asp-action="Add" class="custom_button primary_button">New Purchase Entry</a>
+            </div>
+
+        </div>
+
+        <ul class="nav nav-tabs mt-2" id="inventoryTabs" role="tablist">
+            <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-stock" type="button" role="tab">Current Stock</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-ledger" type="button" role="tab">Inventory Ledger</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-lowstock" type="button" role="tab">Low Stock Alerts</button></li>
+        </ul>
+    </div>
+
+    <div class="tab-content">
+
+        <div class="tab-pane fade show active" id="tab-stock" role="tabpanel">
+            <div class="table-main">
+                <table id="stock-grid" class="custom-datatable listing-order-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width:40px;"><input type="checkbox" id="checkAllRows" /></th>
+                            <th style="min-width:60px;">Image</th>
+                            <th style="min-width:220px;">Product</th>
+                            <th style="min-width:120px;">SKU</th>
+                            <th style="min-width:130px;">Barcode</th>
+                            <th style="min-width:150px;">Category</th>
+                            <th style="min-width:160px;">Warehouse</th>
+                            <th style="min-width:120px;">Current</th>
+                            <th style="min-width:120px;">Reserved</th>
+                            <th style="min-width:120px;">Available</th>
+                            <th style="min-width:120px;">Low Stock</th>
+                            <th style="min-width:120px;">Reorder</th>
+                            <th style="min-width:130px;">Stock Status</th>
+                            <th style="min-width:150px;">Last Updated</th>
+                            <th style="min-width:80px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-ledger" role="tabpanel">
+            <div class="table-main">
+                <table id="ledger-grid" class="custom-datatable listing-order-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width:140px;">Date</th>
+                            <th style="min-width:220px;">Product</th>
+                            <th style="min-width:160px;">Warehouse</th>
+                            <th style="min-width:150px;">Transaction Type</th>
+                            <th style="min-width:130px;">Opening</th>
+                            <th style="min-width:120px;">Qty In</th>
+                            <th style="min-width:120px;">Qty Out</th>
+                            <th style="min-width:130px;">Closing</th>
+                            <th style="min-width:160px;">Reference</th>
+                            <th style="min-width:150px;">User</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-lowstock" role="tabpanel">
+            <div class="table-main">
+                <table id="lowstock-grid" class="custom-datatable listing-order-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width:60px;">Image</th>
+                            <th style="min-width:220px;">Product</th>
+                            <th style="min-width:120px;">SKU</th>
+                            <th style="min-width:160px;">Warehouse</th>
+                            <th style="min-width:120px;">Current</th>
+                            <th style="min-width:130px;">Minimum</th>
+                            <th style="min-width:130px;">Reorder Qty</th>
+                            <th style="min-width:170px;">Preferred Supplier</th>
+                            <th style="min-width:120px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
+
+            buildGrid('#stock-grid', [{ targets: 0, orderable: false }]);
+
+            // Hidden tabs measure at zero width, so their grids build on first show.
+            $('#inventoryTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
+                $($(this).data('bs-target')).find('table.custom-datatable').each(function () {
+                    if (!$.fn.DataTable.isDataTable(this)) { buildGrid(this, []); }
+                });
+            });
+        });
+
+        function buildGrid(sel, columnDefs) {
+            $(sel).DataTable({
+                paging: true, ordering: true, filter: false, destroy: true,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                columnDefs: columnDefs,
+                language: { emptyTable: "No records to show yet" }
+            });
+        }
+
+        function fnSearch(ctrl) {
+            $("#clearSearch").toggle(($(ctrl).val() || '').length > 0);
+        }
+
+        function clearSearch() {
+            $("#txtSearch").val('');
+            $("#clearSearch").hide();
+        }
+
+        function printBarcodes() { notWired('Barcode printing'); }
+
+        function notWired(what) {
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(what + ' will be wired with the Inventory API.');
+            }
+        }
+    </script>
+}

@@ -1,0 +1,114 @@
+@*
+    Module 04 - Category tree + detail split (L-09 in the spec).
+    Spec: docs/Admin Flows/Category.txt
+*@
+@{
+    ViewData["Title"] = "Categories";
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Categories</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Catalog</li>
+            <li>Category Tree</li>
+        </ul>
+    </div>
+}
+
+<div class="row g-3">
+
+    <!-- ============ TREE ============ -->
+    <div class="col-xl-4">
+        <section class="listing-section common-box h-100">
+            <div class="latest-orders">
+                <div class="div-search-box-panel flex-ending-cls-here">
+                    <div class="listing-search">
+                        <div class="search-box">
+                            <span class="search-icon">
+                                <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
+                            </span>
+                            <input placeholder="Search category" id="txtTreeSearch" onkeyup="filterTree(this)">
+                        </div>
+                    </div>
+                    <a asp-controller="Category" asp-action="Add" class="custom_button primary_button">Add</a>
+                </div>
+            </div>
+
+            <div class="p-3">
+                <p class="text-muted" style="font-size:.78rem;">
+                    Drag a node to re-parent or reorder. Depth is capped at three levels.
+                </p>
+
+                <ul class="category-tree" id="categoryTree">
+                    <li class="tree-empty text-muted">No categories yet. Add the first one to start the tree.</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============ DETAIL ============ -->
+    <div class="col-xl-8">
+        <section class="listing-section common-box h-100">
+            <div class="latest-orders">
+                <div class="div-search-box-panel flex-ending-cls-here">
+                    <h3 class="section-heading">Products in selected category</h3>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="custom_button secondary_button" onclick="reorderMode()">
+                            <i class="fas fa-arrows-up-down-left-right"></i> Reorder
+                        </button>
+                        <a asp-controller="Product" asp-action="Index" class="custom_button secondary_button">All Products</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-main">
+                <table id="category-products-grid" class="custom-datatable listing-order-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width:60px;">Image</th>
+                            <th style="min-width:220px;">Product</th>
+                            <th style="min-width:120px;">SKU</th>
+                            <th style="min-width:110px;">Price</th>
+                            <th style="min-width:90px;">Stock</th>
+                            <th style="min-width:110px;">Status</th>
+                            <th style="min-width:110px;">Sort Order</th>
+                            <th style="min-width:80px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Category"); }
+
+            $('#category-products-grid').DataTable({
+                paging: true, ordering: true, filter: false,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                language: { emptyTable: "Select a category to see its products" }
+            });
+        });
+
+        function filterTree(ctrl) {
+            var term = ($(ctrl).val() || '').toLowerCase();
+            $('#categoryTree li[data-name]').each(function () {
+                $(this).toggle(($(this).data('name') + '').toLowerCase().indexOf(term) > -1);
+            });
+        }
+
+        function reorderMode() {
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage('Drag-and-drop reordering will be wired with the Category API.');
+            }
+        }
+    </script>
+}

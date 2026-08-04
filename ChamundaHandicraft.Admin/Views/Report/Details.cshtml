@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "Report";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Report" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">Report</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Report" asp-action="Index" class="links">Report Catalogue</a></li>
+            <li>Result</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <section class="listing-section common-box">
+        <div class="latest-orders">
+            <div class="div-search-box-panel flex-ending-cls-here">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <input type="date" class="form-control-custom" style="max-width:160px;" />
+                    <input type="date" class="form-control-custom" style="max-width:160px;" />
+                    <select class="form-control-custom" style="min-width:150px;"><option value="">Group By</option><option>Day</option><option>Week</option><option>Month</option></select>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="custom_button secondary_button"><i class="fas fa-floppy-disk"></i> Save Report</button>
+                    <button type="button" class="custom_button secondary_button"><i class="fas fa-clock"></i> Schedule</button>
+                    <button type="button" class="custom_button secondary_button"><i class="fas fa-file-export"></i> Export</button>
+                    <button type="button" class="custom_button primary_button" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3">
+            <canvas id="reportChart" height="90"></canvas>
+        </div>
+
+        <div class="table-main">
+            <table id="report-grid" class="custom-datatable listing-order-table">
+                <thead>
+                    <tr>
+                        <th style="min-width:160px;">Period</th>
+                        <th style="min-width:140px;">Orders</th>
+                        <th style="min-width:150px;">Units</th>
+                        <th style="min-width:150px;">Gross</th>
+                        <th style="min-width:150px;">Discount</th>
+                        <th style="min-width:140px;">Tax</th>
+                        <th style="min-width:150px;">Net</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Report"); }
+
+            $('#report-grid').DataTable({
+                paging: true, ordering: true, filter: false,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                language: { emptyTable: "Run the report to see results" }
+            });
+
+            var el = document.getElementById('reportChart');
+            if (el && window.Chart) {
+                new Chart(el, {
+                    type: 'bar',
+                    data: { labels: [], datasets: [{ label: 'Net', data: [], backgroundColor: '#6B2C2C' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                });
+            }
+        });
+    </script>
+}

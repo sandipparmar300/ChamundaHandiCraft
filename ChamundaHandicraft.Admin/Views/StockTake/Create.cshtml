@@ -1,0 +1,126 @@
+﻿@{
+    ViewData["Title"] = "Stock Take";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Stock Take" : "Add Stock Take";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="StockTake" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="StockTake" asp-action="Index" class="links">Stock Takes Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="stocktakeForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-clipboard-check" style="color:var(--accent);margin-right:8px;"></i>Stock Take Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Stock Take Number <span class="req">*</span></label>
+                        <input id="StockTakeNumber" name="StockTakeNumber" class="form-control-custom" placeholder="Enter stock take number" />
+                        <span class="error-msg" data-valmsg-for="StockTakeNumber"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Scheduled Date <span class="req">*</span></label>
+                        <input type="date" id="ScheduledDate" name="ScheduledDate" class="form-control-custom" />
+                        <span class="error-msg" data-valmsg-for="ScheduledDate"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Warehouse <span class="req">*</span></label>
+                        <select id="Warehouse" name="Warehouse" class="form-control-custom select2-single">
+                            <option value="">Select warehouse</option>
+                            <option>Select from master</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Warehouse"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Count Type</label>
+                        <select id="CountType" name="CountType" class="form-control-custom select2-single">
+                            <option value="">Select count type</option>
+                            <option>Full Count</option>
+                            <option>Cycle Count</option>
+                            <option>Spot Check</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="CountType"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Status</label>
+                        <select id="Status" name="Status" class="form-control-custom select2-single">
+                            <option value="">Select status</option>
+                            <option>Scheduled</option>
+                            <option>In Progress</option>
+                            <option>Completed</option>
+                            <option>Cancelled</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Status"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Remarks</label>
+                        <textarea id="Remarks" name="Remarks" class="form-control-custom" rows="3" placeholder="Enter remarks"></textarea>
+                        <span class="error-msg" data-valmsg-for="Remarks"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="StockTake" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

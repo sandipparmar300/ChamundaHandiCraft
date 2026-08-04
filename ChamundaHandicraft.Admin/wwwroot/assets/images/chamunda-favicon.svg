@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Chamunda Handicraft">
+  <title>Chamunda Handicraft</title>
+
+  <!-- Solid tile so the mark stays legible at 16px -->
+  <rect width="64" height="64" rx="14" fill="#6B2C2C"/>
+
+  <!-- Centre petal -->
+  <path d="M32 13c7.2 7 10.8 13.6 10.8 20 0 6.3-3.6 11.1-10.8 14.4-7.2-3.3-10.8-8.1-10.8-14.4 0-6.4 3.6-13 10.8-20z"
+        fill="#F2DDA3"/>
+
+  <!-- Side petals -->
+  <path d="M14 33c4.4 1.4 7.7 3.9 10 7.6 2.3 3.7 3.4 8 3.1 12.7-4.8-.8-8.5-3-11.1-6.4-2.6-3.6-3.7-8.2-2-13.9z"
+        fill="#F2DDA3" opacity=".7"/>
+  <path d="M50 33c-4.4 1.4-7.7 3.9-10 7.6-2.3 3.7-3.4 8-3.1 12.7 4.8-.8 8.5-3 11.1-6.4 2.6-3.6 3.7-8.2 2-13.9z"
+        fill="#F2DDA3" opacity=".7"/>
+
+  <!-- Base -->
+  <rect x="20" y="52" width="24" height="3.4" rx="1.7" fill="#F2DDA3"/>
+</svg>

@@ -1,0 +1,184 @@
+@*
+    Module 06 - Order list with the lifecycle summary.
+    Spec: docs/Admin Flows/Orders.txt §3 dashboard, §4 list, §11 filters
+*@
+@{
+    ViewData["Title"] = "Orders";
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Orders</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Sales</li>
+            <li>Order Listing</li>
+        </ul>
+    </div>
+}
+
+<!-- ================= SUMMARY ================= -->
+<section class="form-section">
+    <div class="form-section-header">
+        <h2><i class="fas fa-clipboard-list" style="color:var(--accent);margin-right:8px;"></i>Order Summary</h2>
+    </div>
+    <div class="form-section-body">
+        <div class="row g-3">
+            @{
+                var orderKpis = new[]
+                {
+                    "Total Orders", "Today's Orders", "Pending", "Processing", "Packed",
+                    "Shipped", "Delivered", "Cancelled", "Returned", "Refund Pending",
+                    "Refund Completed", "Average Order Value"
+                };
+            }
+            @foreach (var k in orderKpis)
+            {
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                    <div class="status-card">
+                        <span class="status-count">0</span>
+                        <span class="status-label">@k</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="listing-section common-box">
+    <div class="latest-orders">
+        <div class="div-search-box-panel flex-ending-cls-here">
+
+            <div class="listing-search">
+                <div class="search-box">
+                    <span class="search-icon">
+                        <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
+                    </span>
+                    <input placeholder="Search order number, customer, tracking or invoice" id="txtSearch" onkeyup="fnSearch(this);">
+                    <span class="clear-icon" id="clearSearch" onclick="clearSearch()" style="display:none; cursor:pointer;">&#10006;</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="custom_button secondary_button" data-bs-toggle="collapse" data-bs-target="#orderFilters">
+                    <i class="fas fa-filter"></i> Filters
+                </button>
+                <button type="button" class="custom_button secondary_button" onclick="notWired('Invoice printing')"><i class="fas fa-print"></i> Print Invoices</button>
+                <button type="button" class="custom_button secondary_button" onclick="notWired('Export')"><i class="fas fa-file-export"></i> Export</button>
+            </div>
+        </div>
+
+        <div class="collapse" id="orderFilters">
+            <div class="row g-3 mt-1">
+                @foreach (var f in new[] { "Order Status", "Payment Status", "Shipping Status", "Payment Method", "Courier", "Warehouse" })
+                {
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <label class="form-label-custom">@f</label>
+                        <select class="form-control-custom"><option value="">All</option></select>
+                    </div>
+                }
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                    <label class="form-label-custom">From Date</label>
+                    <input type="date" class="form-control-custom" />
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                    <label class="form-label-custom">To Date</label>
+                    <input type="date" class="form-control-custom" />
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs mt-2" id="orderTabs" role="tablist">
+            @{
+                var tabs = new[] { "All", "New", "Processing", "Packed", "Shipped", "Delivered", "Cancelled", "Returned" };
+                var first = true;
+            }
+            @foreach (var t in tabs)
+            {
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @(first ? "active" : "")" data-bs-toggle="tab" data-bs-target="#tab-order-@t.ToLowerInvariant()" type="button" role="tab">@t</button>
+                </li>
+                first = false;
+            }
+        </ul>
+    </div>
+
+    <div class="tab-content">
+        @{
+            var firstPane = true;
+        }
+        @foreach (var t in tabs)
+        {
+            <div class="tab-pane fade @(firstPane ? "show active" : "")" id="tab-order-@t.ToLowerInvariant()" role="tabpanel">
+                <div class="table-main">
+                    <table class="custom-datatable listing-order-table" id="order-grid-@t.ToLowerInvariant()">
+                        <thead>
+                            <tr>
+                                <th style="min-width:40px;"><input type="checkbox" class="check-all-rows" /></th>
+                                <th style="min-width:150px;">Order Number</th>
+                                <th style="min-width:140px;">Order Date</th>
+                                <th style="min-width:190px;">Customer</th>
+                                <th style="min-width:120px;">Customer ID</th>
+                                <th style="min-width:90px;">Items</th>
+                                <th style="min-width:130px;">Total Amount</th>
+                                <th style="min-width:150px;">Payment Method</th>
+                                <th style="min-width:140px;">Payment Status</th>
+                                <th style="min-width:140px;">Order Status</th>
+                                <th style="min-width:140px;">Shipping Status</th>
+                                <th style="min-width:150px;">Courier</th>
+                                <th style="min-width:160px;">Tracking Number</th>
+                                <th style="min-width:150px;">Delivery Date</th>
+                                <th style="min-width:80px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            firstPane = false;
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Order"); }
+
+            buildOrderGrid('#order-grid-all');
+
+            // Each status tab owns its own grid; build on first show so DataTables
+            // measures a visible table.
+            $('#orderTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
+                $($(this).data('bs-target')).find('table.custom-datatable').each(function () {
+                    if (!$.fn.DataTable.isDataTable(this)) { buildOrderGrid(this); }
+                });
+            });
+        });
+
+        function buildOrderGrid(sel) {
+            $(sel).DataTable({
+                paging: true, ordering: true, filter: false, destroy: true,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                columnDefs: [{ targets: 0, orderable: false }],
+                language: { emptyTable: "No orders to show yet" }
+            });
+        }
+
+        function fnSearch(ctrl) {
+            $("#clearSearch").toggle(($(ctrl).val() || '').length > 0);
+        }
+
+        function clearSearch() {
+            $("#txtSearch").val('');
+            $("#clearSearch").hide();
+        }
+
+        function notWired(what) {
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(what + ' will be wired with the Order API.');
+            }
+        }
+    </script>
+}

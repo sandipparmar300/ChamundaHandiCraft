@@ -1,0 +1,174 @@
+﻿@{
+    ViewData["Title"] = "Warehouse";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Warehouse" : "Add Warehouse";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Warehouse" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Warehouse" asp-action="Index" class="links">Warehouses Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="warehouseForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-building" style="color:var(--accent);margin-right:8px;"></i>Warehouse Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Warehouse Code <span class="req">*</span></label>
+                        <input id="WarehouseCode" name="WarehouseCode" class="form-control-custom" placeholder="Enter warehouse code" />
+                        <span class="error-msg" data-valmsg-for="WarehouseCode"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Warehouse Name <span class="req">*</span></label>
+                        <input id="WarehouseName" name="WarehouseName" class="form-control-custom" placeholder="Enter warehouse name" />
+                        <span class="error-msg" data-valmsg-for="WarehouseName"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Capacity</label>
+                        <input type="number" id="Capacity" name="Capacity" class="form-control-custom" placeholder="0" />
+                        <span class="error-msg" data-valmsg-for="Capacity"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-address-book" style="color:var(--accent);margin-right:8px;"></i>Contact</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Contact Person</label>
+                        <input id="ContactPerson" name="ContactPerson" class="form-control-custom" placeholder="Enter contact person" />
+                        <span class="error-msg" data-valmsg-for="ContactPerson"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Phone</label>
+                        <input id="Phone" name="Phone" class="form-control-custom" placeholder="Enter phone" />
+                        <span class="error-msg" data-valmsg-for="Phone"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Email</label>
+                        <input id="Email" name="Email" class="form-control-custom" placeholder="Enter email" />
+                        <span class="error-msg" data-valmsg-for="Email"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-location-dot" style="color:var(--accent);margin-right:8px;"></i>Address</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Address</label>
+                        <textarea id="Address" name="Address" class="form-control-custom" rows="3" placeholder="Enter address"></textarea>
+                        <span class="error-msg" data-valmsg-for="Address"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">City</label>
+                        <select id="City" name="City" class="form-control-custom select2-single">
+                            <option value="">Select city</option>
+                            <option>Ahmedabad</option>
+                            <option>Surat</option>
+                            <option>Rajkot</option>
+                            <option>Jaipur</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="City"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">State</label>
+                        <select id="State" name="State" class="form-control-custom select2-single">
+                            <option value="">Select state</option>
+                            <option>Gujarat</option>
+                            <option>Rajasthan</option>
+                            <option>Maharashtra</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="State"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Country</label>
+                        <select id="Country" name="Country" class="form-control-custom select2-single">
+                            <option value="">Select country</option>
+                            <option>India</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Country"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Postal Code</label>
+                        <input id="PostalCode" name="PostalCode" class="form-control-custom" placeholder="Enter postal code" />
+                        <span class="error-msg" data-valmsg-for="PostalCode"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Warehouse" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

@@ -1,0 +1,120 @@
+@*
+    Module 20 - Platform settings hub (L-03 settings panel).
+    Spec: docs/Admin Flows/Settings.txt
+*@
+@{
+    ViewData["Title"] = "Settings";
+
+    var sections = new (string Key, string Title, string Icon, string[] Fields)[]
+    {
+        ("store",    "Store",           "fa-store",             new[] { "Store Name", "Legal Entity Name", "Support Email", "Support Phone", "WhatsApp Number", "Registered Address", "GSTIN", "PAN", "Store Logo", "Favicon" }),
+        ("locale",   "Locale & Currency","fa-globe",            new[] { "Default Currency", "Currency Symbol", "Default Language", "Supported Languages", "Timezone", "Date Format", "Time Format", "Weight Unit", "Dimension Unit" }),
+        ("orders",   "Orders",          "fa-receipt",           new[] { "Order Number Prefix", "Order Number Start", "Auto Accept Orders", "Order Cancellation Window (hours)", "Return Window (days)", "Minimum Order Value", "Guest Checkout", "Invoice Prefix" }),
+        ("payments", "Payments",        "fa-credit-card",       new[] { "Default Gateway", "COD Enabled", "COD Maximum Order Value", "COD Charges", "Partial Payment", "Auto Capture", "Refund Mode" }),
+        ("shipping", "Shipping",        "fa-truck",             new[] { "Default Courier", "Free Shipping Above", "Default Handling Fee", "Default Package Weight", "Pickup Address", "Dispatch Cut-off Time" }),
+        ("tax",      "Tax",             "fa-percent",           new[] { "Tax Calculation", "Prices Include Tax", "Default Tax Class", "Display Tax In Cart", "Place of Supply" }),
+        ("inventory","Inventory",       "fa-boxes-stacked",     new[] { "Allow Negative Stock", "Default Low Stock Threshold", "Reserve Stock On Order", "Release Reservation After (minutes)", "Default Warehouse", "Valuation Method" }),
+        ("customer", "Customers",       "fa-users",             new[] { "Email Verification Required", "Mobile OTP Required", "Reward Points Per 100", "Reward Point Value", "Reward Expiry (days)", "Wishlist Enabled", "Compare Enabled" }),
+        ("security", "Security",        "fa-shield-halved",     new[] { "Maximum Failed Login Attempts", "Lockout Duration (minutes)", "Password Expiry (days)", "Session Timeout (minutes)", "Concurrent Sessions", "Two Factor For Roles" }),
+        ("seo",      "SEO",             "fa-magnifying-glass",  new[] { "Robots Indexable", "Default Title Suffix", "Sitemap Path", "Google Analytics ID", "Google Tag Manager ID", "Facebook Pixel ID", "Search Console Verification" }),
+        ("email",    "Email & SMS",     "fa-envelope",          new[] { "Email Provider", "SMTP Host", "SMTP Port", "From Address", "From Name", "SMS Provider", "SMS Sender ID", "WhatsApp Provider" }),
+        ("maint",    "Maintenance",     "fa-screwdriver-wrench",new[] { "Maintenance Mode", "Maintenance Message", "Allowed IP Addresses", "Scheduled From", "Scheduled To" })
+    };
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Settings</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Administration</li>
+            <li>Platform Settings</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="settingsForm" enctype="multipart/form-data">
+
+        <div class="row g-3">
+
+            <!-- Section nav -->
+            <div class="col-xl-3">
+                <section class="form-section h-100">
+                    <div class="form-section-body">
+                        <div class="list-group settings-nav" id="settingsNav" role="tablist">
+                            @{
+                                var firstNav = true;
+                            }
+                            @foreach (var s in sections)
+                            {
+                                <a class="list-group-item list-group-item-action @(firstNav ? "active" : "")"
+                                   data-bs-toggle="list" href="#set-@s.Key" role="tab">
+                                    <i class="fas @s.Icon me-2"></i>@s.Title
+                                </a>
+                                firstNav = false;
+                            }
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Section panels -->
+            <div class="col-xl-9">
+                <div class="tab-content">
+                    @{
+                        var firstPane = true;
+                    }
+                    @foreach (var s in sections)
+                    {
+                        <div class="tab-pane fade @(firstPane ? "show active" : "")" id="set-@s.Key" role="tabpanel">
+                            <section class="form-section">
+                                <div class="form-section-header">
+                                    <h2><i class="fas @s.Icon" style="color:var(--accent);margin-right:8px;"></i>@s.Title</h2>
+                                </div>
+                                <div class="form-section-body">
+                                    <div class="row g-3">
+                                        @foreach (var f in s.Fields)
+                                        {
+                                            var fid = s.Key + System.Text.RegularExpressions.Regex.Replace(f, "[^A-Za-z0-9]", "");
+                                            <div class="col-lg-4 col-md-6">
+                                                <label class="form-label-custom">@f</label>
+                                                <input id="@fid" name="@fid" class="form-control-custom" placeholder="Enter @f.ToLowerInvariant()" />
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        firstPane = false;
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-action-bar">
+            <div>
+                <a asp-controller="Settings" asp-action="History" class="links" style="font-size:.82rem;">
+                    <i class="fas fa-clock-rotate-left"></i> View change history
+                </a>
+            </div>
+            <div>
+                <a asp-controller="Dashboard" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Settings"); }
+        });
+    </script>
+}

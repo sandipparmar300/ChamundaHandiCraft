@@ -1,0 +1,205 @@
+@*
+    Module 03 - Product list.  Spec: docs/Admin Flows/Product.txt
+*@
+@{
+    ViewData["Title"] = "Products";
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Products</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Catalog</li>
+            <li>Product Listing</li>
+        </ul>
+    </div>
+}
+
+<section class="listing-section common-box">
+    <div class="latest-orders">
+        <div class="div-search-box-panel flex-ending-cls-here">
+
+            <div class="listing-search">
+                <div class="search-box">
+                    <span class="search-icon">
+                        <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
+                    </span>
+                    <input placeholder="Search by name, SKU, barcode or product code" id="txtSearch" onkeyup="fnSearch(this);">
+                    <span class="clear-icon" id="clearSearch" onclick="clearSearch()" style="display:none; cursor:pointer;">&#10006;</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="custom_button secondary_button" data-bs-toggle="collapse" data-bs-target="#advancedFilters">
+                    <i class="fas fa-filter"></i> Filters
+                </button>
+                <button type="button" class="custom_button secondary_button" onclick="importProducts()"><i class="fas fa-file-import"></i> Import</button>
+                <button type="button" class="custom_button secondary_button" onclick="exportGrid()"><i class="fas fa-file-export"></i> Export</button>
+                <a asp-controller="Product" asp-action="Add" class="custom_button primary_button">Add Product</a>
+            </div>
+
+        </div>
+
+        <!-- Advanced filters -->
+        <div class="collapse" id="advancedFilters">
+            <div class="row g-3 mt-1">
+                @{
+                    var filterSelects = new[]
+                    {
+                        "Category", "Subcategory", "Brand", "Material", "Color", "Size",
+                        "Style", "Artisan", "Country", "Stock Status", "Published Status"
+                    };
+                }
+                @foreach (var f in filterSelects)
+                {
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <label class="form-label-custom">@f</label>
+                        <select class="form-control-custom"><option value="">All</option></select>
+                    </div>
+                }
+
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                    <label class="form-label-custom">Price From</label>
+                    <input class="form-control-custom" placeholder="0" />
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                    <label class="form-label-custom">Price To</label>
+                    <input class="form-control-custom" placeholder="0" />
+                </div>
+
+                <div class="col-12 d-flex gap-2 flex-wrap">
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="fFeatured"><label class="form-check-label" for="fFeatured">Featured</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="fBestseller"><label class="form-check-label" for="fBestseller">Bestseller</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="fTrending"><label class="form-check-label" for="fTrending">Trending</label></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk action bar -->
+    <div class="d-flex align-items-center gap-2 flex-wrap px-3 pb-2" id="bulkBar" style="display:none !important;">
+        <span class="text-muted" style="font-size:.82rem;"><span id="bulkCount">0</span> selected</span>
+        <select id="bulkAction" class="form-control-custom" style="max-width:220px;">
+            <option value="">Bulk action</option>
+            <option>Publish</option>
+            <option>Unpublish</option>
+            <option>Archive</option>
+            <option>Delete</option>
+            <option>Update Category</option>
+            <option>Update Brand</option>
+            <option>Update Price</option>
+            <option>Update Discount</option>
+            <option>Export</option>
+        </select>
+        <button type="button" class="custom_button primary_button" onclick="applyBulk()">Apply</button>
+    </div>
+
+    <div class="table-main">
+        <table id="product-grid" class="custom-datatable listing-order-table">
+            <thead>
+                <tr>
+                    <th style="min-width:40px;"><input type="checkbox" id="checkAllRows" /></th>
+                    <th style="min-width:60px;">Image</th>
+                    <th style="min-width:220px;">Product Name</th>
+                    <th style="min-width:120px;">SKU</th>
+                    <th style="min-width:120px;">Product Code</th>
+                    <th style="min-width:130px;">Barcode</th>
+                    <th style="min-width:150px;">Category</th>
+                    <th style="min-width:140px;">Brand</th>
+                    <th style="min-width:110px;">Price</th>
+                    <th style="min-width:110px;">Discount</th>
+                    <th style="min-width:90px;">Stock</th>
+                    <th style="min-width:120px;">Status</th>
+                    <th style="min-width:110px;">Visibility</th>
+                    <th style="min-width:100px;">Featured</th>
+                    <th style="min-width:130px;">Created</th>
+                    <th style="min-width:80px;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
+
+<div class="modal delete-common-modal common-modal" id="product-delete-confirm-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close-modal" data-bs-dismiss="modal" aria-label="Close">
+                    <picture><img src="~/assets/images/close-icon.svg" alt="close" width="24" height="24"></picture>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>Delete Confirmation</h3>
+                <p>Are you sure you want to delete this product?</p>
+                <p class="text-muted" style="font-size:.8rem;">Products are soft deleted and stay available for reporting.</p>
+                <div class="delete-edit-btn">
+                    <button type="button" class="custom_button secondary_button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btn-delete-yes" class="custom_button primary_button" data-bs-dismiss="modal">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let datatable;
+
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Product"); }
+
+            datatable = $('#product-grid').DataTable({
+                paging: true, ordering: true, filter: false, destroy: true,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                columnDefs: [{ targets: 0, orderable: false }],
+                language: { emptyTable: "No products to show yet" },
+                initComplete: function () {
+                    const $w = $("#product-grid").closest(".dataTables_wrapper");
+                    if (!$w.parent().hasClass("tb-responsive")) { $w.wrap("<div class='tb-responsive'></div>"); }
+                }
+            });
+
+            $('#checkAllRows').on('change', function () {
+                $('#product-grid tbody .row-check').prop('checked', $(this).prop('checked'));
+                syncBulkBar();
+            });
+
+            $(document).on('change', '.row-check', syncBulkBar);
+        });
+
+        function syncBulkBar() {
+            var n = $('#product-grid tbody .row-check:checked').length;
+            $('#bulkCount').text(n);
+            $('#bulkBar').css('display', n > 0 ? 'flex' : 'none');
+        }
+
+        function fnSearch(ctrl) {
+            $("#clearSearch").toggle(($(ctrl).val() || '').length > 0);
+            if (datatable) datatable.draw();
+        }
+
+        function clearSearch() {
+            $("#txtSearch").val('');
+            $("#clearSearch").hide();
+            if (datatable) datatable.draw();
+        }
+
+        function exportGrid() {
+            if (typeof showSuccessMessage === 'function') { showSuccessMessage('Export will be wired with the Product API.'); }
+        }
+
+        function importProducts() {
+            if (typeof showSuccessMessage === 'function') { showSuccessMessage('Import will be wired with the Product API.'); }
+        }
+
+        function applyBulk() {
+            var action = $('#bulkAction').val();
+            if (!action) {
+                if (typeof showErrorMessage === 'function') { showErrorMessage('Select a bulk action first.'); }
+            }
+        }
+    </script>
+}

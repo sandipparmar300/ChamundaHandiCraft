@@ -1,0 +1,98 @@
+﻿@*
+    Customers - Reviews listing.  Spec: docs/Admin Flows/
+*@
+@{
+    ViewData["Title"] = "Reviews";
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Reviews</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Customers</li>
+            <li>Reviews Listing</li>
+        </ul>
+    </div>
+}
+
+<section class="listing-section common-box">
+    <div class="latest-orders">
+        <div class="div-search-box-panel flex-ending-cls-here">
+            <div class="listing-search">
+                <div class="search-box">
+                    <span class="search-icon">
+                        <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
+                    </span>
+                    <input placeholder="Search product, customer or review text" id="txtSearch" onkeyup="fnSearch(this);">
+                    <span class="clear-icon" id="clearSearch" onclick="clearSearch()" style="display:none; cursor:pointer;">&#10006;</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="custom_button secondary_button" onclick="toolbarAction('Approve Selected')"><i class="fas fa-check"></i> Approve Selected</button>
+                <button type="button" class="custom_button secondary_button" onclick="toolbarAction('Reject Selected')"><i class="fas fa-xmark"></i> Reject Selected</button>
+                <button type="button" class="custom_button secondary_button" onclick="toolbarAction('Export')"><i class="fas fa-file-export"></i> Export</button>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="table-main">
+        <table id="review-grid" class="custom-datatable listing-order-table">
+            <thead>
+                <tr>
+                    <th style="min-width:70px;">Image</th>
+                    <th style="min-width:220px;">Product</th>
+                    <th style="min-width:180px;">Customer</th>
+                    <th style="min-width:110px;">Rating</th>
+                    <th style="min-width:300px;">Review</th>
+                    <th style="min-width:120px;">Media</th>
+                    <th style="min-width:140px;">Verified</th>
+                    <th style="min-width:150px;">Submitted On</th>
+                    <th style="min-width:130px;">Status</th>
+                    <th style="min-width:80px;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        let datatable;
+
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Review"); }
+
+            datatable = $('#review-grid').DataTable({
+                paging: true, ordering: true, filter: false, destroy: true,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                language: { emptyTable: "No records to show yet" },
+                initComplete: function () {
+                    const $w = $("#review-grid").closest(".dataTables_wrapper");
+                    if (!$w.parent().hasClass("tb-responsive")) { $w.wrap("<div class='tb-responsive'></div>"); }
+                }
+            });
+        });
+
+        function fnSearch(ctrl) {
+            $("#clearSearch").toggle(($(ctrl).val() || '').length > 0);
+            if (datatable) datatable.draw();
+        }
+
+        function clearSearch() {
+            $("#txtSearch").val('');
+            $("#clearSearch").hide();
+            if (datatable) datatable.draw();
+        }
+
+        function toolbarAction(name) {
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(name + ' will be wired with the Review API.');
+            }
+        }
+    </script>
+}

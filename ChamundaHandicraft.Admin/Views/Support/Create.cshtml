@@ -1,0 +1,158 @@
+﻿@{
+    ViewData["Title"] = "Ticket";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Ticket" : "Add Ticket";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Support" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Support" asp-action="Index" class="links">Support Tickets Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="supportForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-headset" style="color:var(--accent);margin-right:8px;"></i>Ticket Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Ticket Number <span class="req">*</span></label>
+                        <input id="TicketNumber" name="TicketNumber" class="form-control-custom" placeholder="Enter ticket number" />
+                        <span class="error-msg" data-valmsg-for="TicketNumber"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Customer <span class="req">*</span></label>
+                        <select id="Customer" name="Customer" class="form-control-custom select2-single">
+                            <option value="">Select customer</option>
+                            <option>Select customer</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Customer"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Category <span class="req">*</span></label>
+                        <select id="Category" name="Category" class="form-control-custom select2-single">
+                            <option value="">Select category</option>
+                            <option>Order Issue</option>
+                            <option>Payment Issue</option>
+                            <option>Shipping Issue</option>
+                            <option>Product Query</option>
+                            <option>Return Request</option>
+                            <option>Account</option>
+                            <option>Other</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Category"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Priority <span class="req">*</span></label>
+                        <select id="Priority" name="Priority" class="form-control-custom select2-single">
+                            <option value="">Select priority</option>
+                            <option>Low</option>
+                            <option>Medium</option>
+                            <option>High</option>
+                            <option>Urgent</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Priority"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Assigned To</label>
+                        <select id="AssignedTo" name="AssignedTo" class="form-control-custom select2-single">
+                            <option value="">Select assigned to</option>
+                            <option>Select agent</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="AssignedTo"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Related Order</label>
+                        <input id="RelatedOrder" name="RelatedOrder" class="form-control-custom" placeholder="Enter related order" />
+                        <span class="error-msg" data-valmsg-for="RelatedOrder"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Status</label>
+                        <select id="Status" name="Status" class="form-control-custom select2-single">
+                            <option value="">Select status</option>
+                            <option>Open</option>
+                            <option>In Progress</option>
+                            <option>Waiting on Customer</option>
+                            <option>Resolved</option>
+                            <option>Closed</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Status"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Subject <span class="req">*</span></label>
+                        <input id="Subject" name="Subject" class="form-control-custom" placeholder="Enter subject" />
+                        <span class="error-msg" data-valmsg-for="Subject"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Description <span class="req">*</span></label>
+                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description"></textarea>
+                        <span class="error-msg" data-valmsg-for="Description"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Support" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Support"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

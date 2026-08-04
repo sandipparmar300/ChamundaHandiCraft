@@ -1,0 +1,154 @@
+/* ============================================================================
+   tenant-theme.css  —  Dynamic per-tenant primary colour overrides
+   ----------------------------------------------------------------------------
+   The tenant's PrimaryColor (chosen at tenant creation / Branding) is emitted
+   by _Layout.cshtml as the CSS variable `--brand-primary`. Historically the
+   primary button and every sidebar hover/active state were hard-coded to
+   #005EB8 in style-dev.css, so changing a tenant's colour had no effect on
+   them. This file re-points all of those accents at `var(--brand-primary)` so
+   the whole application follows the selected brand colour automatically.
+
+   Load order: this file is linked LAST in <head> (after style-dev.css) so it
+   wins the cascade. No markup or DB changes are required — only the existing
+   --brand-primary variable is consumed.
+   ============================================================================ */
+
+/* Default brand colour. _Layout.cshtml overrides --brand-primary at :root when
+   the logged-in tenant has a PrimaryColor; this keeps the old blue for the
+   login screen / no-tenant case and as a fallback if the variable is unset.
+   --brand-primary-dark is the hover shade (computed where color-mix is
+   supported; otherwise the listed fallback is used). */
+:root {
+    --brand-primary: #005EB8;
+    /* Darker shades of the brand colour for hover / active / pressed states.
+       Defaults match the old blue; overridden below from --brand-primary when
+       the browser supports color-mix, so they always track the tenant colour. */
+    --brand-primary-dark: #004a93;   /* generic hover (buttons etc.) */
+    --brand-primary-hover: #00509e;  /* sidebar hover  */
+    --brand-primary-active: #004080; /* sidebar active */
+}
+
+@supports (background: color-mix(in srgb, red, blue)) {
+    :root {
+        --brand-primary-dark: color-mix(in srgb, var(--brand-primary) 86%, #000);
+        --brand-primary-hover: color-mix(in srgb, var(--brand-primary) 82%, #000);
+        --brand-primary-active: color-mix(in srgb, var(--brand-primary) 68%, #000);
+    }
+}
+
+/* ── Primary button (custom_button primary_button) ────────────────────────── */
+.custom_button.primary_button {
+    color: #fff;
+}
+
+.custom_button.primary_button::after {
+    background: var(--brand-primary) !important;
+}
+
+/* Keep the existing dark overlay on hover, but tint it toward the brand colour
+   so hover stays on-theme instead of a flat grey/blue. */
+.custom_button.primary_button::before {
+    background: linear-gradient(87.69deg,
+            color-mix(in srgb, var(--brand-primary) 55%, #000) 2.06%,
+            color-mix(in srgb, var(--brand-primary) 35%, #000) 86.71%) !important;
+}
+
+/* ── Secondary button hover ───────────────────────────────────────────────── */
+.custom_button.secondary_button:hover {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+/* ── Sidebar: hover & active (top-level items AND submenu items) ───────────────
+   The real markup (_Sidebar.cshtml) styles every menu link as `a.nav-item`,
+   and Style.css drives hover/active entirely through two CSS variables:
+       .nav-item:hover  { background: var(--sidebar-hover);  }
+       .nav-item.active { background: var(--sidebar-active); }
+   The active class is applied to BOTH the selected link and its parent
+   (see the JS at the bottom of _Sidebar.cshtml), and sub-items are also
+   `a.nav-item`, so redefining these two variables recolours hover, the
+   selected tab, and the open parent — all in one place.
+
+   The sidebar background IS --brand-primary (set in _Layout.cshtml), so we use
+   DARKER SHADES of the same brand colour: same hue as the tenant colour, just
+   dark enough to stand out against the sidebar. */
+:root {
+    --sidebar-hover: var(--brand-primary-hover) !important;
+    --sidebar-active: var(--brand-primary-active) !important;
+}
+
+/* Ensure text stays white on hover/active regardless of brand colour. */
+.sidebar-nav .nav-item:hover,
+.sidebar-nav .nav-item:hover .nav-link-name,
+.sidebar-nav .nav-item.active,
+.sidebar-nav .nav-item.active .nav-link-name {
+    color: #fff !important;
+}
+
+/* The icon chip + active indicator bar default to a fixed indigo (--accent-light)
+   which clashes on a brand-coloured sidebar — make them a translucent white so
+   they read cleanly on ANY tenant colour. */
+.sidebar-nav .nav-item:hover .nav-icon,
+.sidebar-nav .nav-item.active .nav-icon {
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #fff !important;
+}
+
+.sidebar-nav .nav-item.active::before {
+    background: #fff !important;
+}
+
+/* ── Other primary-colour accents so the whole app stays on-theme ─────────── */
+/* Breadcrumb links */
+.page-head .page-breadcrumb li a {
+    color: var(--brand-primary) !important;
+}
+
+/* DataTables paging */
+.listing-section .table-main .dt-layout-row .dt-layout-cell .dt-paging nav button.dt-paging-button {
+    color: var(--brand-primary) !important;
+}
+
+.listing-section .table-main .dt-layout-row .dt-layout-cell .dt-paging nav button.dt-paging-button.current {
+    background: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+/* Dashboard sales-tab active pill */
+.dashboard-section .sales-line-chart .sales-chart .sales-tab nav .nav-tabs .nav-link.active {
+    background: var(--brand-primary) !important;
+}
+
+/* Generic .btn-primary helper + "View All" link */
+.btn-primary {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--brand-primary-dark) !important;
+    border-color: var(--brand-primary-dark) !important;
+}
+
+.view-all-btn {
+    background-color: var(--brand-primary) !important;
+}
+
+.view-all-btn:hover {
+    background-color: var(--brand-primary-dark) !important;
+}
+
+/* Save button (defined in Style.css with var(--accent)) */
+.btn-save {
+    background: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #fff !important;
+}
+
+.btn-save:hover {
+    background: var(--brand-primary-dark) !important;
+    border-color: var(--brand-primary-dark) !important;
+    color: #fff !important;
+}

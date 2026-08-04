@@ -1,0 +1,160 @@
+﻿@{
+    ViewData["Title"] = "SEO Entry";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit SEO Entry" : "Add SEO Entry";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Seo" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Seo" asp-action="Index" class="links">SEO Meta Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="seoForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-magnifying-glass-chart" style="color:var(--accent);margin-right:8px;"></i>SEO Entry</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Page URL <span class="req">*</span></label>
+                        <input id="PageURL" name="PageURL" class="form-control-custom" placeholder="Enter page url" />
+                        <span class="error-msg" data-valmsg-for="PageURL"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Entity Type <span class="req">*</span></label>
+                        <select id="EntityType" name="EntityType" class="form-control-custom select2-single">
+                            <option value="">Select entity type</option>
+                            <option>Home</option>
+                            <option>Product</option>
+                            <option>Category</option>
+                            <option>Blog Post</option>
+                            <option>CMS Page</option>
+                            <option>Collection</option>
+                            <option>Custom</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="EntityType"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Indexable</label>
+                        <select id="Indexable" name="Indexable" class="form-control-custom select2-single">
+                            <option value="">Select indexable</option>
+                            <option>Yes</option>
+                            <option>No</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Indexable"></span>
+                    </div>
+
+                    <div class="col-lg-8 col-md-6">
+                        <label class="form-label-custom">SEO Title</label>
+                        <input id="SEOTitle" name="SEOTitle" class="form-control-custom" placeholder="Enter seo title" />
+                        <span class="error-msg" data-valmsg-for="SEOTitle"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Canonical URL</label>
+                        <input type="url" id="CanonicalURL" name="CanonicalURL" class="form-control-custom" placeholder="https://" />
+                        <span class="error-msg" data-valmsg-for="CanonicalURL"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Meta Description</label>
+                        <textarea id="MetaDescription" name="MetaDescription" class="form-control-custom" rows="3" placeholder="Enter meta description"></textarea>
+                        <span class="error-msg" data-valmsg-for="MetaDescription"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label class="form-label-custom">Meta Keywords</label>
+                        <input id="MetaKeywords" name="MetaKeywords" class="form-control-custom" placeholder="Enter meta keywords" />
+                        <span class="error-msg" data-valmsg-for="MetaKeywords"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label class="form-label-custom">Open Graph Title</label>
+                        <input id="OpenGraphTitle" name="OpenGraphTitle" class="form-control-custom" placeholder="Enter open graph title" />
+                        <span class="error-msg" data-valmsg-for="OpenGraphTitle"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label class="form-label-custom">Twitter Card</label>
+                        <select id="TwitterCard" name="TwitterCard" class="form-control-custom select2-single">
+                            <option value="">Select twitter card</option>
+                            <option>summary</option>
+                            <option>summary_large_image</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="TwitterCard"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label class="form-label-custom">Structured Data Type</label>
+                        <select id="StructuredDataType" name="StructuredDataType" class="form-control-custom select2-single">
+                            <option value="">Select structured data type</option>
+                            <option>Product</option>
+                            <option>Article</option>
+                            <option>FAQPage</option>
+                            <option>BreadcrumbList</option>
+                            <option>Organization</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="StructuredDataType"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Seo" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Seo"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

@@ -1,0 +1,159 @@
+﻿@{
+    ViewData["Title"] = "Page";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Page" : "Add Page";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="CmsPage" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="CmsPage" asp-action="Index" class="links">CMS Pages Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="cmspageForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-file-lines" style="color:var(--accent);margin-right:8px;"></i>Page Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Page Title <span class="req">*</span></label>
+                        <input id="PageTitle" name="PageTitle" class="form-control-custom" placeholder="Enter page title" />
+                        <span class="error-msg" data-valmsg-for="PageTitle"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Slug <span class="req">*</span></label>
+                        <input id="Slug" name="Slug" class="form-control-custom" placeholder="Enter slug" />
+                        <span class="error-msg" data-valmsg-for="Slug"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Template</label>
+                        <select id="Template" name="Template" class="form-control-custom select2-single">
+                            <option value="">Select template</option>
+                            <option>Default</option>
+                            <option>Full Width</option>
+                            <option>Sidebar</option>
+                            <option>Landing</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Template"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Show In Header</label>
+                        <select id="ShowInHeader" name="ShowInHeader" class="form-control-custom select2-single">
+                            <option value="">Select show in header</option>
+                            <option>No</option>
+                            <option>Yes</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="ShowInHeader"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Show In Footer</label>
+                        <select id="ShowInFooter" name="ShowInFooter" class="form-control-custom select2-single">
+                            <option value="">Select show in footer</option>
+                            <option>No</option>
+                            <option>Yes</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="ShowInFooter"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Sort Order</label>
+                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" />
+                        <span class="error-msg" data-valmsg-for="SortOrder"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Content <span class="req">*</span></label>
+                        <textarea id="Content" name="Content" class="form-control-custom" rows="3" placeholder="Enter content"></textarea>
+                        <span class="error-msg" data-valmsg-for="Content"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-magnifying-glass" style="color:var(--accent);margin-right:8px;"></i>SEO</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-6 col-md-6">
+                        <label class="form-label-custom">SEO Title</label>
+                        <input id="SEOTitle" name="SEOTitle" class="form-control-custom" placeholder="Enter seo title" />
+                        <span class="error-msg" data-valmsg-for="SEOTitle"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label class="form-label-custom">Meta Keywords</label>
+                        <input id="MetaKeywords" name="MetaKeywords" class="form-control-custom" placeholder="Enter meta keywords" />
+                        <span class="error-msg" data-valmsg-for="MetaKeywords"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Meta Description</label>
+                        <textarea id="MetaDescription" name="MetaDescription" class="form-control-custom" rows="3" placeholder="Enter meta description"></textarea>
+                        <span class="error-msg" data-valmsg-for="MetaDescription"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="CmsPage" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-CmsPage"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

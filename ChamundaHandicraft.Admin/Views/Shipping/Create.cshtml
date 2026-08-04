@@ -1,0 +1,158 @@
+﻿@{
+    ViewData["Title"] = "Shipping Zone";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Shipping Zone" : "Add Shipping Zone";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Shipping" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Shipping" asp-action="Index" class="links">Shipping Zones Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="shippingForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-map-location-dot" style="color:var(--accent);margin-right:8px;"></i>Zone Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Zone Name <span class="req">*</span></label>
+                        <input id="ZoneName" name="ZoneName" class="form-control-custom" placeholder="Enter zone name" />
+                        <span class="error-msg" data-valmsg-for="ZoneName"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Coverage Type <span class="req">*</span></label>
+                        <select id="CoverageType" name="CoverageType" class="form-control-custom select2-single">
+                            <option value="">Select coverage type</option>
+                            <option>Pincode</option>
+                            <option>City</option>
+                            <option>State</option>
+                            <option>Country</option>
+                            <option>Rest of World</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="CoverageType"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Delivery Days</label>
+                        <input id="DeliveryDays" name="DeliveryDays" class="form-control-custom" placeholder="Enter delivery days" />
+                        <span class="error-msg" data-valmsg-for="DeliveryDays"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Coverage Values</label>
+                        <textarea id="CoverageValues" name="CoverageValues" class="form-control-custom" rows="3" placeholder="Enter coverage values"></textarea>
+                        <span class="error-msg" data-valmsg-for="CoverageValues"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-indian-rupee-sign" style="color:var(--accent);margin-right:8px;"></i>Rates</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Rate Type <span class="req">*</span></label>
+                        <select id="RateType" name="RateType" class="form-control-custom select2-single">
+                            <option value="">Select rate type</option>
+                            <option>Flat</option>
+                            <option>Weight Based</option>
+                            <option>Price Based</option>
+                            <option>Free</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="RateType"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Base Rate</label>
+                        <input id="BaseRate" name="BaseRate" class="form-control-custom" placeholder="0.00" />
+                        <span class="error-msg" data-valmsg-for="BaseRate"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Per Kg Rate</label>
+                        <input id="PerKgRate" name="PerKgRate" class="form-control-custom" placeholder="0.00" />
+                        <span class="error-msg" data-valmsg-for="PerKgRate"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Free Above</label>
+                        <input id="FreeAbove" name="FreeAbove" class="form-control-custom" placeholder="0.00" />
+                        <span class="error-msg" data-valmsg-for="FreeAbove"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">COD Charges</label>
+                        <input id="CODCharges" name="CODCharges" class="form-control-custom" placeholder="0.00" />
+                        <span class="error-msg" data-valmsg-for="CODCharges"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Handling Fee</label>
+                        <input id="HandlingFee" name="HandlingFee" class="form-control-custom" placeholder="0.00" />
+                        <span class="error-msg" data-valmsg-for="HandlingFee"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Shipping" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Shipping"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

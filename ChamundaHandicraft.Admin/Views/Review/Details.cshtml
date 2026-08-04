@@ -1,0 +1,94 @@
+﻿@{
+    ViewData["Title"] = "Review Details";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Review" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">Review Details</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Review" asp-action="Index" class="links">Reviews Listing</a></li>
+            <li>Details</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <section class="form-section">
+        <div class="form-section-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Review Information</h2>
+
+        </div>
+
+        <div class="form-section-body">
+            <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Product</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Customer</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Rating</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Title</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Review</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Media</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Verified Purchase</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Submitted On</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Helpful Votes</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Reported Count</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Moderated By</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Status</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label-custom">Admin Reply</label>
+                        <p class="detail-value">&mdash;</p>
+                    </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Review"); }
+        });
+    </script>
+}

@@ -1,0 +1,160 @@
+@*
+    Module 18 - Reports hub. Spec: docs/Admin Flows/Reports.txt
+*@
+@{
+    ViewData["Title"] = "Reports";
+
+    var reportGroups = new (string Group, string Icon, string[] Reports)[]
+    {
+        ("Sales",     "fa-indian-rupee-sign", new[] { "Sales Summary", "Sales by Product", "Sales by Category", "Sales by Brand", "Sales by Artisan", "Discount Usage" }),
+        ("Orders",    "fa-receipt",           new[] { "Order Summary", "Order Status", "Cancellation", "Return", "Fulfilment Time" }),
+        ("Finance",   "fa-chart-pie",         new[] { "Profit and Loss", "Tax / GST", "Payment Settlement", "Refund", "Outstanding" }),
+        ("Inventory", "fa-boxes-stacked",     new[] { "Stock Report", "Inventory Valuation", "Low Stock", "Out of Stock", "Stock Movement", "Damage" }),
+        ("Customers", "fa-users",             new[] { "Customer Acquisition", "Repeat Purchase", "Lifetime Value", "Segment Performance", "Reward Points" }),
+        ("Marketing", "fa-bullhorn",          new[] { "Coupon Performance", "Offer Performance", "Campaign Performance", "Traffic Source", "Conversion Funnel" })
+    };
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Reports</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>Insights</li>
+            <li>Report Catalogue</li>
+        </ul>
+    </div>
+}
+
+<section class="listing-section common-box">
+    <div class="latest-orders">
+        <div class="div-search-box-panel flex-ending-cls-here">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <select id="reportRange" class="form-control-custom" style="min-width:170px;">
+                    <option value="today">Today</option>
+                    <option value="last7" selected>Last 7 Days</option>
+                    <option value="last30">Last 30 Days</option>
+                    <option value="thismonth">This Month</option>
+                    <option value="lastmonth">Last Month</option>
+                    <option value="thisyear">This Year</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+                <input type="date" id="reportFrom" class="form-control-custom" style="max-width:160px;display:none;" />
+                <input type="date" id="reportTo" class="form-control-custom" style="max-width:160px;display:none;" />
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="custom_button secondary_button" onclick="notWired('Export')"><i class="fas fa-file-export"></i> Export</button>
+                <button type="button" class="custom_button primary_button" onclick="notWired('Report builder')"><i class="fas fa-wand-magic-sparkles"></i> Report Builder</button>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs mt-2" id="reportTabs" role="tablist">
+            <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-catalogue" type="button" role="tab">Catalogue</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-saved" type="button" role="tab">Saved Reports</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-schedules" type="button" role="tab">Schedules</button></li>
+        </ul>
+    </div>
+
+    <div class="tab-content p-3">
+
+        <div class="tab-pane fade show active" id="tab-catalogue" role="tabpanel">
+            @foreach (var g in reportGroups)
+            {
+                <h4 class="section-heading mt-3">
+                    <i class="fas @g.Icon" style="color:var(--accent);margin-right:6px;"></i>@g.Group
+                </h4>
+                <div class="row g-3 mt-1">
+                    @foreach (var r in g.Reports)
+                    {
+                        <div class="col-xl-3 col-lg-4 col-md-6">
+                            <a asp-controller="Report" asp-action="Details" asp-route-id="0" class="text-decoration-none">
+                                <div class="kpi-card">
+                                    <div class="kpi-icon" style="background:rgba(107,44,44,.10);color:var(--brand-primary,#6B2C2C);">
+                                        <i class="fas fa-file-lines"></i>
+                                    </div>
+                                    <div class="kpi-body">
+                                        <span class="kpi-label">@g.Group</span>
+                                        <span style="font-weight:700;font-size:.95rem;">@r</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="tab-saved" role="tabpanel">
+            <div class="table-main">
+                <table class="custom-datatable listing-order-table" id="saved-reports-grid">
+                    <thead>
+                        <tr>
+                            <th style="min-width:220px;">Report Name</th>
+                            <th style="min-width:160px;">Base Report</th>
+                            <th style="min-width:220px;">Filters</th>
+                            <th style="min-width:160px;">Owner</th>
+                            <th style="min-width:150px;">Created On</th>
+                            <th style="min-width:150px;">Last Run</th>
+                            <th style="min-width:80px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-schedules" role="tabpanel">
+            <div class="table-main">
+                <table class="custom-datatable listing-order-table" id="report-schedules-grid">
+                    <thead>
+                        <tr>
+                            <th style="min-width:220px;">Schedule Name</th>
+                            <th style="min-width:180px;">Report</th>
+                            <th style="min-width:150px;">Frequency</th>
+                            <th style="min-width:140px;">Format</th>
+                            <th style="min-width:220px;">Recipients</th>
+                            <th style="min-width:150px;">Next Run</th>
+                            <th style="min-width:130px;">Status</th>
+                            <th style="min-width:80px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Report"); }
+
+            $('#reportRange').on('change', function () {
+                var custom = $(this).val() === 'custom';
+                $('#reportFrom, #reportTo').toggle(custom);
+            });
+
+            $('#reportTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
+                $($(this).data('bs-target')).find('table.custom-datatable').each(function () {
+                    if (!$.fn.DataTable.isDataTable(this)) {
+                        $(this).DataTable({
+                            paging: true, ordering: true, filter: false,
+                            bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                            language: { emptyTable: "No records to show yet" }
+                        });
+                    }
+                });
+            });
+        });
+
+        function notWired(what) {
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(what + ' will be wired with the Reports API.');
+            }
+        }
+    </script>
+}

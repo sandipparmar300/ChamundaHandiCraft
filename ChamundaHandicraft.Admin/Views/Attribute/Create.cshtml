@@ -1,0 +1,165 @@
+@{
+    ViewData["Title"] = "Attribute";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Attribute" : "Add Attribute";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Attribute" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Attribute" asp-action="Index" class="links">Attribute Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="attributeForm">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-sliders" style="color:var(--accent);margin-right:8px;"></i>Attribute Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Attribute Name <span class="req">*</span></label>
+                        <input id="Name" name="Name" class="form-control-custom" placeholder="e.g. Size, Colour, Material" />
+                        <span class="error-msg" data-valmsg-for="Name"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Input Type <span class="req">*</span></label>
+                        <select id="InputType" name="InputType" class="form-control-custom" onchange="toggleValueRows()">
+                            <option value="select">Dropdown</option>
+                            <option value="multiselect">Multi Select</option>
+                            <option value="swatch">Colour Swatch</option>
+                            <option value="text">Free Text</option>
+                            <option value="number">Number</option>
+                            <option value="boolean">Yes / No</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Attribute Set</label>
+                        <select id="AttributeSetId" name="AttributeSetId" class="form-control-custom select2-single">
+                            <option value="">Select attribute set</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="d-flex gap-3 flex-wrap pt-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="IsFilterable" name="IsFilterable" />
+                                <label class="form-check-label" for="IsFilterable">Use as a storefront filter</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="IsRequired" name="IsRequired" />
+                                <label class="form-check-label" for="IsRequired">Required on every product</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="IsVariantOption" name="IsVariantOption" />
+                                <label class="form-check-label" for="IsVariantOption">Can define variants</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section" id="valuesSection">
+            <div class="form-section-header d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-list" style="color:var(--accent);margin-right:8px;"></i>Attribute Values</h2>
+                <button type="button" class="custom_button secondary_button" onclick="addValueRow()">
+                    <i class="fas fa-plus"></i> Add Value
+                </button>
+            </div>
+
+            <div class="form-section-body">
+                <div class="table-main">
+                    <table class="custom-datatable listing-order-table" id="value-table">
+                        <thead>
+                            <tr>
+                                <th style="min-width:220px;">Value</th>
+                                <th style="min-width:180px;">Display Label</th>
+                                <th style="min-width:140px;">Swatch</th>
+                                <th style="min-width:110px;">Sort Order</th>
+                                <th style="min-width:90px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input class="form-control-custom" placeholder="Enter value" /></td>
+                                <td><input class="form-control-custom" placeholder="Shown to customers" /></td>
+                                <td><input type="color" class="form-control-custom" value="#6B2C2C" /></td>
+                                <td><input type="number" class="form-control-custom" placeholder="0" /></td>
+                                <td class="text-center">
+                                    <button type="button" class="custom_button secondary_button" onclick="removeValueRow(this)">Remove</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Attribute" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Product"); }
+            toggleValueRows();
+        });
+
+        // Free text, number and boolean attributes carry no value list.
+        function toggleValueRows() {
+            var t = $('#InputType').val();
+            $('#valuesSection').toggle(t === 'select' || t === 'multiselect' || t === 'swatch');
+        }
+
+        function addValueRow() {
+            var $row = $('#value-table tbody tr').first().clone();
+            $row.find('input').not('[type=color]').val('');
+            $('#value-table tbody').append($row);
+        }
+
+        function removeValueRow(btn) {
+            if ($('#value-table tbody tr').length > 1) {
+                $(btn).closest('tr').remove();
+            }
+        }
+    </script>
+}

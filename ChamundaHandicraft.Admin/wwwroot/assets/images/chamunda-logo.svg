@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 74" width="260" height="74" role="img" aria-label="Chamunda Handicraft">
+  <title>Chamunda Handicraft</title>
+
+  <!-- Mark: a stylised handcrafted lotus/urn motif in brass -->
+  <g transform="translate(6 8)">
+    <circle cx="29" cy="29" r="28" fill="none" stroke="#F2DDA3" stroke-width="2"/>
+    <path d="M29 12c5.6 5.4 8.4 10.6 8.4 15.6 0 4.9-2.8 8.6-8.4 11.2-5.6-2.6-8.4-6.3-8.4-11.2 0-5 2.8-10.2 8.4-15.6z"
+          fill="#F2DDA3"/>
+    <path d="M15 30c3.4 1.1 6 3 7.8 5.9 1.8 2.9 2.6 6.2 2.4 9.9-3.7-.6-6.6-2.3-8.6-5-2-2.8-2.9-6.4-1.6-10.8z"
+          fill="#F2DDA3" opacity=".72"/>
+    <path d="M43 30c-3.4 1.1-6 3-7.8 5.9-1.8 2.9-2.6 6.2-2.4 9.9 3.7-.6 6.6-2.3 8.6-5 2-2.8 2.9-6.4 1.6-10.8z"
+          fill="#F2DDA3" opacity=".72"/>
+    <path d="M20 48h18" stroke="#F2DDA3" stroke-width="2.4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="74" y="34"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="23" font-weight="700" letter-spacing=".4" fill="#FFFFFF">Chamunda</text>
+  <text x="75" y="55"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="14" letter-spacing="3.6" fill="#F2DDA3">HANDICRAFT</text>
+</svg>

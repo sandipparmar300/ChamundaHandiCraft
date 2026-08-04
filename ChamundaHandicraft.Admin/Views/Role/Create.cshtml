@@ -1,0 +1,190 @@
+@*
+    Module 02 - Create / Edit Role, including the permission matrix.
+    Spec: docs/Admin Flows/Users.txt - Role Assignment + Permission Management.
+*@
+@{
+    ViewData["Title"] = "Role";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit Role" : "Add Role";
+
+    var modules = new[]
+    {
+        "Dashboard", "Products", "Categories", "Inventory", "Orders", "Payments",
+        "Shipping", "Customers", "Coupons", "Offers", "Banners", "CMS", "Blog",
+        "Reviews", "Testimonials", "Newsletter", "Notifications", "Reports",
+        "SEO", "Settings", "Users", "Media", "Support", "Audit"
+    };
+
+    var actions = new[] { "View", "Create", "Edit", "Delete", "Export", "Import", "Print", "Approve", "Publish", "Unpublish", "Restore" };
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Role" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Role" asp-action="Index" class="links">Role Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="roleForm">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-user-shield" style="color:var(--accent);margin-right:8px;"></i>Role Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Role Name <span class="req">*</span></label>
+                        <input id="Name" name="Name" class="form-control-custom" placeholder="Enter role name" />
+                        <span class="error-msg" data-valmsg-for="Name"></span>
+                    </div>
+
+                    <div class="col-lg-8 col-md-6">
+                        <label class="form-label-custom">Description</label>
+                        <input id="Description" name="Description" class="form-control-custom" placeholder="Enter description" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="form-section-header d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-shield-halved" style="color:var(--accent);margin-right:8px;"></i>Permission Matrix</h2>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="checkAll" />
+                    <label class="form-check-label" for="checkAll">Select all</label>
+                </div>
+            </div>
+
+            <div class="form-section-body">
+                <div class="table-main">
+                    <table class="custom-datatable listing-order-table permission-matrix">
+                        <thead>
+                            <tr>
+                                <th style="min-width:180px;">Module</th>
+                                @foreach (var a in actions)
+                                {
+                                    <th style="min-width:90px;" class="text-center">
+                                        @a
+                                        <br />
+                                        <input type="checkbox" class="check-column" data-action="@a" title="Select whole column" />
+                                    </th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in modules)
+                            {
+                                <tr>
+                                    <td>
+                                        <label class="d-flex align-items-center gap-2 mb-0">
+                                            <input type="checkbox" class="check-row" data-module="@m" />
+                                            <strong>@m</strong>
+                                        </label>
+                                    </td>
+                                    @foreach (var a in actions)
+                                    {
+                                        <td class="text-center">
+                                            <input type="checkbox"
+                                                   class="perm-check"
+                                                   data-module="@m"
+                                                   data-action="@a"
+                                                   name="Permissions"
+                                                   value="@(m.ToLowerInvariant()).@(a.ToLowerInvariant())" />
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Role" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save" onclick="saveRole(event)">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-AdminUser"); }
+
+            $('#checkAll').on('change', function () {
+                var on = $(this).prop('checked');
+                $('.perm-check, .check-row, .check-column').prop('checked', on);
+            });
+
+            $('.check-row').on('change', function () {
+                var m = $(this).data('module');
+                $('.perm-check[data-module="' + m + '"]').prop('checked', $(this).prop('checked'));
+                syncHeaderBoxes();
+            });
+
+            $('.check-column').on('change', function () {
+                var a = $(this).data('action');
+                $('.perm-check[data-action="' + a + '"]').prop('checked', $(this).prop('checked'));
+                syncRowBoxes();
+            });
+
+            $('.perm-check').on('change', function () {
+                syncRowBoxes();
+                syncHeaderBoxes();
+            });
+        });
+
+        function syncRowBoxes() {
+            $('.check-row').each(function () {
+                var m = $(this).data('module');
+                var all = $('.perm-check[data-module="' + m + '"]');
+                $(this).prop('checked', all.length === all.filter(':checked').length);
+            });
+        }
+
+        function syncHeaderBoxes() {
+            $('.check-column').each(function () {
+                var a = $(this).data('action');
+                var all = $('.perm-check[data-action="' + a + '"]');
+                $(this).prop('checked', all.length === all.filter(':checked').length);
+            });
+        }
+
+        function saveRole(event) {
+            event.preventDefault();
+            // POSTs to Role/Save once the API is wired.
+        }
+    </script>
+}

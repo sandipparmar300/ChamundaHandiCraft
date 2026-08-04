@@ -1,0 +1,109 @@
+﻿@{
+    ViewData["Title"] = "FAQ";
+    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var heading = isEdit ? "Edit FAQ" : "Add FAQ";
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Faq" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Faq" asp-action="Index" class="links">FAQs Listing</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" id="faqForm" enctype="multipart/form-data">
+
+        <input type="hidden" id="Id" name="Id" value="0" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-circle-question" style="color:var(--accent);margin-right:8px;"></i>FAQ Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-8 col-md-6">
+                        <label class="form-label-custom">Question <span class="req">*</span></label>
+                        <input id="Question" name="Question" class="form-control-custom" placeholder="Enter question" />
+                        <span class="error-msg" data-valmsg-for="Question"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Category <span class="req">*</span></label>
+                        <select id="Category" name="Category" class="form-control-custom select2-single">
+                            <option value="">Select category</option>
+                            <option>Orders</option>
+                            <option>Shipping</option>
+                            <option>Returns</option>
+                            <option>Payments</option>
+                            <option>Products</option>
+                            <option>Account</option>
+                            <option>General</option>
+                        </select>
+                        <span class="error-msg" data-valmsg-for="Category"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Sort Order</label>
+                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" />
+                        <span class="error-msg" data-valmsg-for="SortOrder"></span>
+                    </div>
+
+                    <div class="col-lg-12 col-md-6">
+                        <label class="form-label-custom">Answer <span class="req">*</span></label>
+                        <textarea id="Answer" name="Answer" class="form-control-custom" rows="3" placeholder="Enter answer"></textarea>
+                        <span class="error-msg" data-valmsg-for="Answer"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div class="is-active-row" id="isActiveRow">
+                <div class="is-toggle-item" id="isToggleItem">
+                    <span class="ia-label">Is Active</span>
+                    <label class="ia-switch">
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <span class="ia-slider"></span>
+                    </label>
+                    <span class="ia-status" id="isActiveStatus">Active</span>
+                </div>
+            </div>
+
+            <div>
+                <a asp-controller="Faq" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="button" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-CmsPage"); }
+            $('#uploadBox').click(function () { $('#Photo').click(); });
+        });
+
+        function previewUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    </script>
+}

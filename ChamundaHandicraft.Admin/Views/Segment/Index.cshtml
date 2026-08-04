@@ -1,0 +1,77 @@
+@{
+    ViewData["Title"] = "Customer Segments";
+}
+
+@section Header {
+    <div class="page-head">
+        <div class="page-head-left">
+            <h2 class="page-title">Customer Segments</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li>User Management</li>
+            <li>Segment Listing</li>
+        </ul>
+    </div>
+}
+
+<section class="listing-section common-box">
+    <div class="latest-orders">
+        <div class="div-search-box-panel flex-ending-cls-here">
+            <div class="listing-search">
+                <div class="search-box">
+                    <span class="search-icon">
+                        <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
+                    </span>
+                    <input placeholder="Search segment" id="txtSearch" onkeyup="fnSearch(this);">
+                    <span class="clear-icon" id="clearSearch" onclick="clearSearch()" style="display:none; cursor:pointer;">&#10006;</span>
+                </div>
+            </div>
+
+            <a asp-controller="Segment" asp-action="Add" class="custom_button primary_button">Add Segment</a>
+        </div>
+    </div>
+
+    <div class="table-main">
+        <table id="segment-grid" class="custom-datatable listing-order-table">
+            <thead>
+                <tr>
+                    <th style="min-width:200px;">Segment</th>
+                    <th style="min-width:300px;">Rule Summary</th>
+                    <th style="min-width:120px;">Customers</th>
+                    <th style="min-width:120px;">Type</th>
+                    <th style="min-width:130px;">Created At</th>
+                    <th style="min-width:110px;">Status</th>
+                    <th style="min-width:80px;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        let datatable;
+
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Customer"); }
+
+            datatable = $('#segment-grid').DataTable({
+                paging: true, ordering: true, filter: false, destroy: true,
+                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
+                language: { emptyTable: "No segments to show yet" }
+            });
+        });
+
+        function fnSearch(ctrl) {
+            $("#clearSearch").toggle(($(ctrl).val() || '').length > 0);
+            if (datatable) datatable.draw();
+        }
+
+        function clearSearch() {
+            $("#txtSearch").val('');
+            $("#clearSearch").hide();
+            if (datatable) datatable.draw();
+        }
+    </script>
+}
