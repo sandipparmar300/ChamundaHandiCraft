@@ -2,7 +2,7 @@
 
 The single backend. It owns the database connection, JWT issuance, permission
 enforcement, background jobs and every business operation. Neither the Admin panel nor
-the Storefront has database access — both reach the data only through this project,
+the Customer site has database access — both reach the data only through this project,
 via the gateway.
 
 ---
@@ -13,7 +13,7 @@ via the gateway.
 ChamundaHandicraft.API/
 ├─ Controllers/
 │  ├─ Admin/         Authenticated back-office endpoints  -> /api/admin/*
-│  ├─ Storefront/    Customer endpoints (JWT or guest token) -> /api/storefront/*
+│  ├─ Customer/      Customer endpoints (JWT or guest token) -> /api/customer/*
 │  ├─ Public/        Anonymous endpoints -> /api/public/*
 │  └─ Webhooks/      Inbound gateway/courier/email callbacks -> /api/webhooks/*
 ├─ Attributes/       HasApiPermissionAttribute + HasApiPermissionFilter
@@ -66,7 +66,7 @@ JWT `claim` object and the request language) and carries
 | `AuditLogController`, `ApprovalController` | Audit |
 | `DashboardController` | Reports + cross-module |
 
-## Controllers/Storefront
+## Controllers/Customer
 
 | Controller | Serves |
 |------------|--------|
@@ -119,7 +119,6 @@ One file registering everything.
 
 ```
 #region Connection Configuration
-   AddDbContext<ChamundaHandicraftDbContext>(...)   // EF for reporting / migrations
    AddScoped<SqlConnection>(...)                    // Dapper for all SP calls
 #endregion
 

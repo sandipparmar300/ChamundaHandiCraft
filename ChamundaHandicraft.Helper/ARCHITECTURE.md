@@ -1,7 +1,7 @@
 # ChamundaHandicraft.Helper
 
 The only project referenced by **everything**. It holds the shared contract between the
-API, the Admin panel and the Storefront: view models, constants, enums and the HTTP
+API, the Admin panel and the Customer site: view models, constants, enums and the HTTP
 client both web tiers use to reach the gateway.
 
 It contains **no business logic** and **no data access**.
@@ -13,7 +13,7 @@ It contains **no business logic** and **no data access**.
 ```
 ChamundaHandicraft.Helper/
 ├─ APICommonMethod/     ApiResponse<T>, ApiCommonLogic — uniform API envelope
-├─ ApiService/          ApiService — static HTTP client used by Admin + Storefront
+├─ ApiService/          ApiService — static HTTP client used by Admin + Customer
 ├─ Attributes/          Permission attributes + their action filters
 ├─ CommonMethod/        CommonLogic, EnumHelper, SessionExtension, PermissionHelper,
 │                       StorageHelper, SlugHelper, PriceHelper, LocalizationHelper
@@ -26,19 +26,19 @@ ChamundaHandicraft.Helper/
    ├─ Common/           Pagination, DataTableRequest, GridListResponse, ResponseViewModel,
    │                    IdNamePair, ImageUpload, UpdateStatusRequest, AuditableViewModel
    ├─ Admin/            One folder-level file set per admin module
-   └─ Storefront/       One folder-level file set per storefront module
+   └─ Customer/         One folder-level file set per customer-facing module
 ```
 
 ---
 
 ## Constants/ApiEndPoint.cs
 
-The single source of truth for every route the Admin panel and Storefront call.
+The single source of truth for every route the Admin panel and Customer site call.
 Organised in `#region` blocks per module, mirroring the gateway prefixes:
 
 ```csharp
 public const string Admin = "Admin/";       // -> API /api/admin/*
-public const string Shop  = "Shop/";        // -> API /api/storefront/*
+public const string Shop  = "Shop/";        // -> API /api/customer/*
 public const string Public = "Public/";     // -> API /api/public/*
 ```
 
@@ -62,7 +62,7 @@ Per-module regions to define:
 | Report | `SalesReport`, `ProductReport`, `InventoryReport`, `TaxReport`, `SavedReportList`, `ReportExport` |
 | Seo | `SeoMetaGridList`, `RedirectSave`, `NotFoundLog`, `SitemapRegenerate` |
 | Settings | `SettingsGetSection`, `SettingsSaveSection`, `SettingsHistory`, `IntegrationList` |
-| Storefront | `ShopProductList`, `ShopProductDetail`, `ShopSearch`, `CartGet`, `CartAddItem`, `CheckoutInit`, `PlaceOrder`, `TrackOrder`, `WishlistToggle`, `SubmitReview` |
+| Customer | `ShopProductList`, `ShopProductDetail`, `ShopSearch`, `CartGet`, `CartAddItem`, `CheckoutInit`, `PlaceOrder`, `TrackOrder`, `WishlistToggle`, `SubmitReview` |
 
 ---
 

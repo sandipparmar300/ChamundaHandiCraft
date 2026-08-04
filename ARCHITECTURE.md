@@ -32,10 +32,9 @@ Solution/
 ├─ ChamundaHandicraft.APIGateway/   Ocelot. The only host the web tiers may call
 ├─ ChamundaHandicraft.API/          The single backend. Owns DB, JWT, jobs, business ops
 ├─ ChamundaHandicraft.Admin/        Back-office MVC panel  (docs/ui-ux)
-├─ ChamundaHandicraft.Storefront/   Customer website MVC   (docs/ui-ux-storefront)
+├─ ChamundaHandicraft.Customer/     Customer website MVC   (docs/ui-ux-storefront)
 ├─ ChamundaHandicraft.Helper/       Shared view models, constants, ApiService, attributes
 ├─ ChamundaHandicraft.Tests/        xUnit — unit + integration
-├─ Persistence/                     Aggregate EF DbContext, configurations, seed
 │
 ├─ Modules/  (solution folder — 25 class libraries)
 │  ├─ Identity/        Catalog/       Orders/       Promotions/    Reports/
@@ -54,26 +53,25 @@ Solution/
 ## 3. Runtime topology
 
 ```
-                     ┌──────────────────────────┐
-   Browser (admin) ──▶│ ChamundaHandicraft.Admin │──┐
-                     └──────────────────────────┘  │  HTTPS + Bearer (JWT from session)
-                                                    │
-                ┌───────────────────────────────┐   │   ┌──────────────────────────────┐
-   Browser (shop)▶│ ChamundaHandicraft.Storefront│───┼──▶│ ChamundaHandicraft.APIGateway │
-                └───────────────────────────────┘   │   └──────────────┬───────────────┘
-                                                    │                  │ Ocelot
-   Gateways / couriers / email provider ────────────┘                  ▼
-                    (webhooks)                            ┌────────────────────────────┐
-                                                          │  ChamundaHandicraft.API    │
-                                                          │  Controllers → Module      │
-                                                          │  Services → Repositories   │
-                                                          └─────────────┬──────────────┘
-                                                                        │ Dapper (SPs)
-                                                                        │ EF (schema, reports)
-                                                                        ▼
-                                                                    ┌────────┐
-                                                                    │ MSSQL  │
-                                                                    └────────┘
+                      ┌──────────────────────────┐
+   Browser (admin) ──▶│ ChamundaHandicraft.Admin │──────┐
+                      └──────────────────────────┘      │  HTTPS + Bearer
+                                                        │  (JWT from session)
+                      ┌─────────────────────────────┐   │  ┌───────────────────────────────┐
+   Browser (shop) ───▶│ ChamundaHandicraft.Customer │───┼─▶│ ChamundaHandicraft.APIGateway │
+                      └─────────────────────────────┘   │  └───────────────┬───────────────┘
+                                                        │                  │ Ocelot
+   Gateways / couriers / email provider ────────────────┘                  ▼
+                    (webhooks)                               ┌────────────────────────────┐
+                                                             │  ChamundaHandicraft.API    │
+                                                             │  Controllers → Module      │
+                                                             │  Services → Repositories   │
+                                                             └─────────────┬──────────────┘
+                                                                           │ Dapper (stored procs)
+                                                                           ▼
+                                                                       ┌────────┐
+                                                                       │ MSSQL  │
+                                                                       └────────┘
 ```
 
 **The rule that keeps this clean:** neither MVC project references a module project or
@@ -85,7 +83,7 @@ a connection string. If the Admin panel needs data, it calls a constant from
 | Gateway | 7138 | none (pass-through) |
 | API | 7139 | JWT bearer |
 | Admin | 7140 | Cookie + JWT held in session |
-| Storefront | 7141 | Cookie (customer) or guest token |
+| Customer | 7141 | Cookie (customer) or guest token |
 
 ---
 
@@ -176,8 +174,10 @@ services.CatalogAutoMapper();    // profiles in that assembly
 
 ## 6. Data access
 
-**Dapper + stored procedures is the default.** EF Core is used only for schema
-migrations, seeding and the ad-hoc report builder.
+**Dapper + stored procedures is the only data access path.** There is no ORM and no
+change tracking. The schema, seed data and reporting views are authored as SQL under
+`DatabaseScripts/` and applied in numbered order, which makes that folder the single
+source of truth for the database.
 
 Every repository follows this shape:
 
@@ -214,7 +214,7 @@ Procedure naming and the schema run order are documented in
 
 | Concern | Where it lives |
 |---------|----------------|
-| Authentication | API issues JWT + refresh token; Admin/Storefront hold it in session behind a cookie |
+| Authentication | API issues JWT + refresh token; Admin/Customer hold it in session behind a cookie |
 | Authorisation | Key-based RBAC. `[HasApiPermission("catalog.product.create")]` on the API, `[PagePermission(...)]` on the Admin panel. Key set cached server-side, loaded into session at login |
 | Validation | Data annotations on view models, plus business rules in Application services. Exact user-facing messages come from the module chapter §22 in the design spec |
 | Errors | `RepositoryException` → `ExceptionMiddleware` → `ResponseViewModel` envelope. No raw exception ever reaches a browser |
@@ -258,7 +258,7 @@ module projects:
 
 | Phase | Goal | Modules to build |
 |-------|------|------------------|
-| **P0 Foundations** | Nothing ships without these | `Helper`, `Persistence`, `Identity`, `Settings`, `Locations`, `Masters`, `Media`, `Audit` + both app shells |
+| **P0 Foundations** | Nothing ships without these | `Helper`, `Identity`, `Settings`, `Locations`, `Masters`, `Media`, `Audit` + `DatabaseScripts/01-Schema` + both app shells |
 | **P1 Sell** | Take and fulfil an order | `Catalog`, `Categories`, `Inventory`, `Cart`, `Orders`, `Payments`, `Shipping` |
 | **P2 Operate** | Visibility and delegation | `Customers`, `Reports` (sales/order/inventory), Dashboard |
 | **P3 Grow** | Demand generation | `Promotions`, `Banners`, `Newsletter`, `Seo` |

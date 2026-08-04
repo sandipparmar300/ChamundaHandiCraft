@@ -20,8 +20,8 @@
       }
     },
     {
-      "//": "Storefront traffic. ChamundaHandicraft.Storefront calls /Shop/<Controller>/<Action>.",
-      "DownstreamPathTemplate": "/api/storefront/{everything}",
+      "//": "Customer site traffic. ChamundaHandicraft.Customer calls /Shop/<Controller>/<Action>.",
+      "DownstreamPathTemplate": "/api/customer/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {

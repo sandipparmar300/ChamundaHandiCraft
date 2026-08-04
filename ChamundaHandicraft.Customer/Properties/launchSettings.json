@@ -1,12 +1,12 @@
 {
   "profiles": {
-    "ChamundaHandicraft.Storefront": {
+    "ChamundaHandicraft.Customer": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:51965;http://localhost:51966"
+      "applicationUrl": "https://localhost:7141;http://localhost:5141"
     }
   }
 }

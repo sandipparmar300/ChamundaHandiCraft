@@ -1,6 +1,6 @@
 # ChamundaHandicraft.APIGateway
 
-Ocelot reverse proxy. The only host the Admin panel and Storefront are allowed to talk
+Ocelot reverse proxy. The only host the Admin panel and Customer site are allowed to talk
 to. It gives us one public surface, one place for rate limiting and CORS, and the
 freedom to split `ChamundaHandicraft.API` later without touching either web tier.
 
@@ -11,7 +11,7 @@ freedom to split `ChamundaHandicraft.API` later without touching either web tier
 | Upstream (what the web tiers call) | Downstream (API) | Caller |
 |------------------------------------|------------------|--------|
 | `/Admin/{everything}` | `/api/admin/{everything}` | ChamundaHandicraft.Admin |
-| `/Shop/{everything}` | `/api/storefront/{everything}` | ChamundaHandicraft.Storefront |
+| `/Shop/{everything}` | `/api/customer/{everything}` | ChamundaHandicraft.Customer |
 | `/Public/{everything}` | `/api/public/{everything}` | Anonymous (sitemap, robots, tracking) |
 | `/Webhooks/{everything}` | `/api/webhooks/{everything}` | Payment gateways, couriers, email provider |
 
@@ -24,7 +24,7 @@ one-line edit in two files.
 ## Program.cs responsibilities
 
 - `AddOcelot()` + `UseOcelot()`
-- CORS policy — Admin origin and Storefront origin only
+- CORS policy — Admin origin and Customer origin only
 - Rate limiting — tighter on `/Public/*` and `/Webhooks/*` than on `/Admin/*`
 - Request/correlation ID propagation to the API for traceable logs
 
@@ -40,7 +40,7 @@ API so a single implementation governs both tiers.
 | Gateway | 7138 |
 | API | 7139 |
 | Admin | 7140 |
-| Storefront | 7141 |
+| Customer | 7141 |
 
 Update the downstream ports in `ocelot.json` and `APIGatewayBaseUrl` in both web tiers'
 `appsettings.json` together.

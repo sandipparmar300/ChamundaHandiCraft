@@ -19,8 +19,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 
 // TODO: builder.Services.AddServiceModule(builder.Configuration);
-//       ServiceExtension wires the DbContext, the Dapper SqlConnection, all 25 module
-//       registrations and their AutoMapper profiles. See ARCHITECTURE.md.
+//       ServiceExtension wires the Dapper SqlConnection, all 25 module registrations
+//       and their AutoMapper profiles. See ARCHITECTURE.md.
 
 #endregion
 

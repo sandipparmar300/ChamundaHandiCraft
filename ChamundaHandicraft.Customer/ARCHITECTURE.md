@@ -1,4 +1,4 @@
-# ChamundaHandicraft.Storefront
+# ChamundaHandicraft.Customer
 
 The customer website. ASP.NET Core MVC + Razor + Bootstrap 5 + jQuery, cookie
 authentication for signed-in shoppers and a guest token for anonymous carts. Like the
@@ -13,7 +13,7 @@ Mobile is the primary design target (390px first, then expanded).
 ## Folder layout
 
 ```
-ChamundaHandicraft.Storefront/
+ChamundaHandicraft.Customer/
 ├─ Controllers/
 ├─ Models/
 ├─ ViewComponents/       ProductCard, ProductRail, MiniCart, MegaMenu, FacetPanel,
@@ -24,7 +24,7 @@ ChamundaHandicraft.Storefront/
 │  │                     _Breadcrumb, _Toast, _EmptyState, _SkeletonCard, Error
 │  └─ <Module>/
 ├─ wwwroot/
-│  ├─ assets/css/scss/   Storefront semantic layer over the shared primitives
+│  ├─ assets/css/scss/   Customer semantic layer over the shared primitives
 │  ├─ assets/js/         cart.js, plp.js, pdp.js, checkout.js, search.js
 │  ├─ assets/images/
 │  ├─ assets/fonts/

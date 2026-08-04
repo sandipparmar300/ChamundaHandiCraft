@@ -3,10 +3,11 @@
     "ChamundaHandicraft.API": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:51959;http://localhost:51962"
+      "applicationUrl": "https://localhost:7139;http://localhost:5139"
     }
   }
 }

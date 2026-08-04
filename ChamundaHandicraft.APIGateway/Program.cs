@@ -29,7 +29,7 @@ var app = builder.Build();
 if (allowedOrigins.Length == 0)
 {
     app.Logger.LogWarning(
-        "Cors:AllowedOrigins is empty. The Admin and Storefront origins must be listed before either tier can call the gateway from a browser.");
+        "Cors:AllowedOrigins is empty. The Admin and Customer origins must be listed before either tier can call the gateway from a browser.");
 }
 
 app.UseCors(WebTiersCorsPolicy);

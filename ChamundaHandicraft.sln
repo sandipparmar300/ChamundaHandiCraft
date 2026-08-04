@@ -5,15 +5,13 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChamundaHandicraft.Helper", "ChamundaHandicraft.Helper\ChamundaHandicraft.Helper.csproj", "{14CD8E10-D4D1-41A6-93F2-E9DA174923AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChamundaHandicraft.API", "ChamundaHandicraft.API\ChamundaHandicraft.API.csproj", "{0663BBB5-2E5D-48E5-913E-085A7ECE7DE4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChamundaHandicraft.APIGateway", "ChamundaHandicraft.APIGateway\ChamundaHandicraft.APIGateway.csproj", "{BC7E1F38-E4D7-4B5C-9A43-9C360C3A80AA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChamundaHandicraft.Admin", "ChamundaHandicraft.Admin\ChamundaHandicraft.Admin.csproj", "{C29EA7DE-75EF-4081-8C64-8EF33442C7B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChamundaHandicraft.Storefront", "ChamundaHandicraft.Storefront\ChamundaHandicraft.Storefront.csproj", "{168D0DF0-55EF-45EB-AFB0-85BD8CB01C67}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChamundaHandicraft.Customer", "ChamundaHandicraft.Customer\ChamundaHandicraft.Customer.csproj", "{168D0DF0-55EF-45EB-AFB0-85BD8CB01C67}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChamundaHandicraft.Tests", "ChamundaHandicraft.Tests\ChamundaHandicraft.Tests.csproj", "{81202892-2EEB-4E04-8BC1-D7A4B874AA06}"
 EndProject
@@ -91,18 +89,6 @@ Global
 		{14CD8E10-D4D1-41A6-93F2-E9DA174923AF}.Release|x64.Build.0 = Release|Any CPU
 		{14CD8E10-D4D1-41A6-93F2-E9DA174923AF}.Release|x86.ActiveCfg = Release|Any CPU
 		{14CD8E10-D4D1-41A6-93F2-E9DA174923AF}.Release|x86.Build.0 = Release|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Debug|x64.Build.0 = Debug|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Debug|x86.Build.0 = Debug|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Release|x64.ActiveCfg = Release|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Release|x64.Build.0 = Release|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Release|x86.ActiveCfg = Release|Any CPU
-		{19FCF20B-1600-45AD-A5B0-7BCEFBD0DA2E}.Release|x86.Build.0 = Release|Any CPU
 		{0663BBB5-2E5D-48E5-913E-085A7ECE7DE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0663BBB5-2E5D-48E5-913E-085A7ECE7DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0663BBB5-2E5D-48E5-913E-085A7ECE7DE4}.Debug|x64.ActiveCfg = Debug|Any CPU
