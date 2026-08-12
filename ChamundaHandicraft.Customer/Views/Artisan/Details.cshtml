@@ -1,0 +1,257 @@
+@model ArtisanSummary
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+</div>
+
+@* ---- Cover ---- *@
+<section class="container" style="padding-top:var(--space-md)">
+    <div class="img-box img-3-1" style="border-radius:var(--radius-xl);min-height:200px">
+        <img src="~/assets/images/placeholders/artisan-cover.svg"
+             alt="@Model.Name's workshop courtyard in @Model.Cluster" fetchpriority="high" width="1200" height="400" />
+    </div>
+</section>
+
+@* ---- Identity ---- *@
+<section class="container" style="margin-top:calc(var(--space-2xl) * -1);position:relative;z-index:2">
+    <div class="card">
+        <div class="row-flex wrap gap-lg">
+            <img class="shrink-0" src="@Model.PhotoUrl" alt="@Model.Name" width="120" height="120"
+                 style="width:120px;height:120px;border-radius:var(--radius-lg);object-fit:cover;border:4px solid var(--color-bg-surface)" />
+
+            <div class="grow">
+                <span class="t-overline eyebrow-craft">Meet the maker</span>
+                <h1 class="t-display-lg mt-2xs">@Model.Name</h1>
+                <p class="t-body-lg text-craft-c">@Model.Craft</p>
+                <p class="t-body-sm text-secondary-c mt-2xs row-flex gap-2xs">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-map-pin"></use></svg>
+                    @Model.Cluster
+                </p>
+
+                <div class="row-flex wrap gap-lg mt-md">
+                    <span class="row-flex gap-2xs t-body-sm">
+                        <svg class="ico ico-sm text-brand-c" aria-hidden="true"><use href="#i-star"></use></svg>
+                        <strong class="tabular">4.8</strong> from 412 reviews
+                    </span>
+                    <span class="row-flex gap-2xs t-body-sm">
+                        <svg class="ico ico-sm text-brand-c" aria-hidden="true"><use href="#i-package"></use></svg>
+                        <strong class="tabular">212</strong> pieces
+                    </span>
+                    <span class="row-flex gap-2xs t-body-sm">
+                        <svg class="ico ico-sm text-brand-c" aria-hidden="true"><use href="#i-clock"></use></svg>
+                        <strong class="tabular">18</strong> years at the craft
+                    </span>
+                    <span class="row-flex gap-2xs t-body-sm">
+                        <svg class="ico ico-sm text-brand-c" aria-hidden="true"><use href="#i-users"></use></svg>
+                        <strong class="tabular">6</strong> apprentices trained
+                    </span>
+                </div>
+            </div>
+
+            <div class="row-flex gap-xs shrink-0" style="align-self:center">
+                <a class="btn btn-primary" href="#products">Shop His Work</a>
+                <button class="btn btn-outline" type="button" data-open="shareSheet">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-share"></use></svg>
+                    Share
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ---- Story ---- *@
+<section class="band">
+    <div class="container">
+        <div class="layout-editorial" style="align-items:start">
+            <div class="prose">
+                <h2>His story</h2>
+                <p class="t-body-xl">
+                    @Model.Name learned the craft from his father at eleven, in the same courtyard he works
+                    in today. He has run his own workshop for eighteen years and trained six apprentices,
+                    two of whom now have workshops of their own.
+                </p>
+                <p>
+                    The technique has not changed much. The dough is still quartz, glass and fuller's earth,
+                    kneaded by hand and rested overnight. The motif is still drawn freehand in cobalt oxide
+                    with a squirrel-hair brush. The kiln is still wood-fired, and roughly one piece in six
+                    still does not survive it.
+                </p>
+
+                <blockquote>“Every piece carries the hands that made it.”</blockquote>
+
+                <p>
+                    What has changed is who buys it. For most of his career, @Model.Name.Split(' ')[0] sold
+                    through traders who set the price and paid on consignment — sometimes months later,
+                    sometimes not at all. Since 2024 he has sold to us directly, at prices he sets, paid
+                    on collection.
+                </p>
+
+                <h2>How the pieces are made</h2>
+                <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+                    @foreach (var (num, img, title) in new[]
+                    {
+                        (1, "wood", "Preparing the dough"),
+                        (2, "pottery", "Shaping in the mould"),
+                        (3, "art", "Painting the motif"),
+                        (4, "lamp", "Firing at 800°C")
+                    })
+                    {
+                        <figure>
+                            <div class="img-box img-1-1">
+                                <img src="~/assets/images/placeholders/@(img).svg" alt="@title" loading="lazy" />
+                                <span class="badge badge-handmade" style="position:absolute;top:8px;left:8px">Step @num</span>
+                            </div>
+                            <figcaption class="t-body-sm mt-xs">@title</figcaption>
+                        </figure>
+                    }
+                </div>
+
+                <h2>About @Model.Cluster</h2>
+                <p>
+                    Blue pottery arrived in Jaipur in the 14th century by way of Persia and Central Asia.
+                    At its height, several hundred families in Sanganer and Neota worked in it. Today
+                    the number of working workshops is closer to forty.
+                </p>
+            </div>
+
+            <aside>
+                <div class="card card-craft">
+                    <p class="t-heading-xs text-craft-c mb-sm">The workshop</p>
+                    <div class="img-box img-4-3 mb-md">
+                        <img src="~/assets/images/placeholders/lifestyle.svg"
+                             alt="@Model.Name's workshop in @Model.Cluster" loading="lazy" />
+                    </div>
+                    <div class="spec-list">
+                        <div class="spec-list__row"><span class="spec-list__key">Craft</span><span class="spec-list__val">@Model.Craft</span></div>
+                        <div class="spec-list__row"><span class="spec-list__key">Cluster</span><span class="spec-list__val">@Model.Cluster</span></div>
+                        <div class="spec-list__row"><span class="spec-list__key">Working since</span><span class="spec-list__val">2008</span></div>
+                        <div class="spec-list__row"><span class="spec-list__key">With us since</span><span class="spec-list__val">2024</span></div>
+                        <div class="spec-list__row" style="border-bottom:0"><span class="spec-list__key">GI tagged</span><span class="spec-list__val">Yes</span></div>
+                    </div>
+                </div>
+
+                <div class="card mt-md">
+                    <p class="t-heading-xs mb-sm">Watch him work</p>
+                    <div class="img-box img-16-9" style="position:relative">
+                        <img src="~/assets/images/placeholders/blog.svg" alt="Craft process film" loading="lazy" />
+                        <button class="icon-btn icon-btn-onimage icon-btn-xl" type="button"
+                                style="position:absolute;inset:0;margin:auto"
+                                aria-label="Play the craft process film, 2 minutes 40 seconds">
+                            <svg class="ico ico-xl" aria-hidden="true"><use href="#i-play-circle"></use></svg>
+                        </button>
+                    </div>
+                    <p class="t-body-xs text-tertiary-c mt-xs">2:40 · Captions and transcript available</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+@* ---- Products ---- *@
+<section class="band band-surface" id="products">
+    <div class="container">
+        <div class="band-head">
+            <div class="band-head__text">
+                <h2 class="t-display-lg">Pieces by @Model.Name.Split(' ')[0]</h2>
+                <p class="band-head__sub">212 pieces currently in stock, all made in this workshop.</p>
+            </div>
+            <a class="link-standalone" href="/shop?artisan=@Model.Slug">
+                View all 212
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+        </div>
+
+        <div class="pgrid">
+            @foreach (var product in DemoContent.Products(8))
+            {
+                @await Html.PartialAsync("_ProductCard", product)
+            }
+        </div>
+    </div>
+</section>
+
+@* ---- Reviews mentioning him ---- *@
+<section class="band-sm">
+    <div class="container">
+        <h2 class="t-heading-lg mb-md">What shoppers say about his work</h2>
+        <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+            @foreach (var review in DemoContent.Reviews())
+            {
+                <div class="testimonial">
+                    <span class="rating__stars" role="img" aria-label="Rated @review.Rating out of 5">
+                        @for (var i = 0; i < 5; i++)
+                        {
+                            <svg class="ico ico-sm @(i < review.Rating ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
+                        }
+                    </span>
+                    <p class="t-heading-xs">@review.Title</p>
+                    <p class="testimonial__quote clamp-4">@review.Body</p>
+                    <div class="row-flex gap-xs mt-auto" style="padding-top:var(--space-sm)">
+                        <span class="avatar avatar-sm">@review.Author[..1]</span>
+                        <span>
+                            <span class="t-body-sm" style="font-weight:600;display:block">@review.Author</span>
+                            <span class="review-card__verified">
+                                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-badge-check"></use></svg>
+                                Verified purchase
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="band band-craft">
+    <div class="container">
+        <div class="band-head">
+            <div class="band-head__text">
+                <h2 class="t-display-lg">Other makers in @Model.Cluster.Split(',')[1].Trim()</h2>
+            </div>
+            <a class="link-standalone" href="/artisans">
+                All artisans
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+        </div>
+
+        <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+            @foreach (var artisan in DemoContent.Artisans().Where(a => a.Slug != Model.Slug))
+            {
+                <a class="card card-flush" href="/artisans/@artisan.Slug" style="text-align:center">
+                    <div class="img-box img-1-1" style="border-radius:0">
+                        <img src="@artisan.PhotoUrl" alt="@artisan.Name" loading="lazy" width="240" height="240" />
+                    </div>
+                    <div style="padding:var(--space-md)">
+                        <p class="t-heading-xs">@artisan.Name</p>
+                        <p class="t-body-sm text-craft-c">@artisan.Craft</p>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<div class="sheet" id="shareSheet" role="dialog" aria-modal="true" aria-label="Share this artisan" aria-hidden="true" data-scrim="globalScrim">
+    <div class="sheet__handle"></div>
+    <div class="sheet__head">
+        <h2 class="t-heading-md">Share</h2>
+        <button class="icon-btn" data-close aria-label="Close"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg></button>
+    </div>
+    <div class="sheet__body">
+        <button class="dropdown__item" type="button" data-copy="https://chamundahandicraft.com/artisans/@Model.Slug">
+            <svg class="ico" aria-hidden="true"><use href="#i-copy"></use></svg> Copy link
+        </button>
+        <a class="dropdown__item" href="https://wa.me/?text=https://chamundahandicraft.com/artisans/@Model.Slug" rel="noopener">
+            <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg> WhatsApp
+        </a>
+        <a class="dropdown__item" href="mailto:?body=https://chamundahandicraft.com/artisans/@Model.Slug">
+            <svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg> Email
+        </a>
+    </div>
+</div>

@@ -1,4 +1,5 @@
-﻿@{
+@model WarehouseGridItem
+@{
     ViewData["Title"] = "Warehouse";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Warehouse" : "Add Warehouse";
@@ -23,7 +24,7 @@
 
     <form method="post" id="warehouseForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -40,7 +41,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Warehouse Name <span class="req">*</span></label>
-                        <input id="WarehouseName" name="WarehouseName" class="form-control-custom" placeholder="Enter warehouse name" />
+                        <input id="WarehouseName" name="WarehouseName" class="form-control-custom" placeholder="Enter warehouse name" / value="@Model.WarehouseName" >
                         <span class="error-msg" data-valmsg-for="WarehouseName"></span>
                     </div>
 
@@ -61,13 +62,13 @@
                 <div class="row g-3">
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Contact Person</label>
-                        <input id="ContactPerson" name="ContactPerson" class="form-control-custom" placeholder="Enter contact person" />
+                        <input id="ContactPerson" name="ContactPerson" class="form-control-custom" placeholder="Enter contact person" / value="@Model.ContactPerson" >
                         <span class="error-msg" data-valmsg-for="ContactPerson"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Phone</label>
-                        <input id="Phone" name="Phone" class="form-control-custom" placeholder="Enter phone" />
+                        <input id="Phone" name="Phone" class="form-control-custom" placeholder="Enter phone" / value="@Model.Phone" >
                         <span class="error-msg" data-valmsg-for="Phone"></span>
                     </div>
 

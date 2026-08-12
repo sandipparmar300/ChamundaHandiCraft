@@ -1,0 +1,25 @@
+@model string
+@{
+    // Shared with the Admin panel — the same three SVGs, byte for byte, so the
+    // brand mark is identical across the whole product.
+    //
+    //   chamunda-logo.svg       light ink + brass mark, for dark surfaces
+    //   chamunda-logo-dark.svg  maroon ink + maroon mark, for light surfaces
+    //
+    // Model:
+    //   "inverse" — always the light-ink variant (permanently dark surfaces)
+    //   anything else — swaps automatically with the storefront theme
+    var inverse = string.Equals(Model, "inverse", StringComparison.OrdinalIgnoreCase);
+}
+
+@if (inverse)
+{
+    <img src="~/assets/images/chamunda-logo.svg" alt="Chamunda Handicraft" width="260" height="74" />
+}
+else
+{
+    <img class="logo-img logo-img--light" src="~/assets/images/chamunda-logo-dark.svg"
+         alt="Chamunda Handicraft" width="260" height="74" />
+    <img class="logo-img logo-img--dark" src="~/assets/images/chamunda-logo.svg"
+         alt="Chamunda Handicraft" width="260" height="74" aria-hidden="true" />
+}

@@ -1,0 +1,25 @@
+@model OrderStatus
+@*
+    Order status. The wording matches the storefront's own status chip exactly, so a
+    support agent reading this grid and a shopper reading their order page are looking
+    at the same words — see docs/INTEGRATION-MAP.md §4.
+*@
+@{
+    var (css, label) = Model switch
+    {
+        OrderStatus.Placed => ("bg-info", "Order placed"),
+        OrderStatus.PaymentPending => ("bg-warning text-dark", "Payment pending"),
+        OrderStatus.Processing => ("bg-info", "Processing"),
+        OrderStatus.Packed => ("bg-info", "Packed"),
+        OrderStatus.Shipped or OrderStatus.InTransit => ("bg-primary", "In transit"),
+        OrderStatus.OutForDelivery => ("bg-primary", "Out for delivery"),
+        OrderStatus.Delivered or OrderStatus.Completed => ("bg-success", "Delivered"),
+        OrderStatus.Cancelled => ("bg-secondary", "Cancelled"),
+        OrderStatus.ReturnRequested or OrderStatus.ReturnApproved or OrderStatus.ReturnPickedUp
+            => ("bg-warning text-dark", "Return in progress"),
+        OrderStatus.Refunded => ("bg-secondary", "Refunded"),
+        OrderStatus.PaymentFailed => ("bg-danger", "Payment failed"),
+        _ => ("bg-secondary", Model.ToString())
+    };
+}
+<span class="badge @css">@label</span>

@@ -1,3 +1,4 @@
+@model CategorySaveRequest
 @{
     ViewData["Title"] = "Category";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
@@ -23,7 +24,7 @@
 
     <form method="post" id="categoryForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -45,13 +46,13 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Category Name <span class="req">*</span></label>
-                        <input id="Name" name="Name" class="form-control-custom" placeholder="Enter category name" onkeyup="buildSlug()" />
+                        <input id="Name" name="Name" class="form-control-custom" placeholder="Enter category name" onkeyup="buildSlug()" / value="@Model.Name" >
                         <span class="error-msg" data-valmsg-for="Name"></span>
                     </div>
 
                     <div class="col-lg-5 col-md-6">
                         <label class="form-label-custom">Slug <span class="req">*</span></label>
-                        <input id="Slug" name="Slug" class="form-control-custom" placeholder="auto-generated-from-name" />
+                        <input id="Slug" name="Slug" class="form-control-custom" placeholder="auto-generated-from-name" / value="@Model.Slug" >
                     </div>
 
                     <div class="col-lg-4 col-md-6">
@@ -63,7 +64,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Sort Order</label>
-                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" />
+                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" / value="@Model.SortOrder" >
                     </div>
 
                     <div class="col-lg-4 col-md-6">
@@ -76,7 +77,7 @@
 
                     <div class="col-12">
                         <label class="form-label-custom">Description</label>
-                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description"></textarea>
+                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description">@Model.Description</textarea>
                     </div>
 
                 </div>

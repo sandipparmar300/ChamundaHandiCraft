@@ -1,0 +1,142 @@
+@{
+    Layout = "_AccountLayout";
+    const int points = 1840;
+    const int nextTierAt = 2000;
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">Rewards &amp; points</h1>
+    <p class="page-head__sub">1 point per ₹100 spent. 100 points is ₹100 off. Points don't expire.</p>
+</div>
+
+<div class="layout-halves mb-md" style="align-items:stretch;gap:var(--space-md)">
+    <div class="points-card">
+        <span class="t-overline" style="color:rgba(255,255,255,.7)">Your balance</span>
+        <p class="points-card__value mt-xs">@points.ToString("N0")</p>
+        <p class="points-card__label">points · worth @Money.Inr(points)</p>
+
+        <div class="mt-lg">
+            <div class="row-flex between mb-xs">
+                <span class="t-body-xs" style="color:rgba(255,255,255,.78)">Bronze</span>
+                <span class="t-body-xs" style="color:rgba(255,255,255,.78)">Silver at @nextTierAt.ToString("N0")</span>
+            </div>
+            <div class="progress" style="background:rgba(255,255,255,.22)">
+                <span class="progress__fill" style="width:@(points * 100 / nextTierAt)%;background:var(--brass-300)"></span>
+            </div>
+            <p class="t-body-xs mt-xs" style="color:rgba(255,255,255,.78)">
+                @((nextTierAt - points).ToString("N0")) more points until Silver — free express delivery on every order.
+            </p>
+        </div>
+
+        <a class="btn btn-inverse btn-sm mt-lg" href="/cart">Use Points at Checkout</a>
+    </div>
+
+    <div class="card">
+        <h2 class="t-heading-md mb-md">How to earn</h2>
+        <div class="stack stack-sm">
+            @foreach (var (icon, action, reward) in new[]
+            {
+                ("i-cart", "Every order", "1 point per ₹100 spent"),
+                ("i-star", "Write a review", "50 points, or 75 with a photo"),
+                ("i-users", "Refer a friend", "200 points when their order ships"),
+                ("i-calendar", "Your birthday", "100 points, once a year"),
+                ("i-camera", "Share a photo of your piece", "25 points")
+            })
+            {
+                <div class="row-flex gap-sm" style="padding-bottom:var(--space-sm);border-bottom:1px solid var(--color-border-subtle)">
+                    <svg class="ico text-brand-c shrink-0" aria-hidden="true"><use href="#@icon"></use></svg>
+                    <span class="grow">
+                        <span class="t-body-md" style="display:block">@action</span>
+                        <span class="t-body-sm text-secondary-c">@reward</span>
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* ---- Tiers ---- *@
+<section class="card mb-md">
+    <h2 class="t-heading-md mb-md">Tiers</h2>
+    <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+        @foreach (var (tier, threshold, perks, current) in new[]
+        {
+            ("Bronze", "0 points", new[] { "1 point per ₹100", "Birthday coupon" }, true),
+            ("Silver", "2,000 points", new[] { "1.25 points per ₹100", "Free express delivery", "Early access to drops" }, false),
+            ("Gold", "6,000 points", new[] { "1.5 points per ₹100", "Free express delivery", "Priority support", "Artisan studio visits" }, false)
+        })
+        {
+            <div class="card @(current ? "card-premium" : "")" style="@(current ? "" : "opacity:.8")">
+                <div class="row-flex between gap-sm mb-xs">
+                    <span class="t-heading-xs">@tier</span>
+                    @if (current)
+                    {
+                        <span class="tag tag-brass">Your tier</span>
+                    }
+                </div>
+                <p class="t-body-sm text-secondary-c mb-sm">@threshold</p>
+                <ul class="stack stack-2xs">
+                    @foreach (var perk in perks)
+                    {
+                        <li class="row-flex gap-xs t-body-sm">
+                            <svg class="ico ico-xs text-success-c shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                            @perk
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</section>
+
+@* ---- History ---- *@
+<section class="card">
+    <div class="card__head">
+        <h2 class="t-heading-md">Points history</h2>
+        <select class="select" style="width:auto;height:36px" aria-label="Filter history">
+            <option>All activity</option>
+            <option>Earned</option>
+            <option>Spent</option>
+        </select>
+    </div>
+
+    <div class="data-table table-scroll">
+        <table>
+            <caption class="sr-only">Your reward points history</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Activity</th>
+                    <th scope="col">Points</th>
+                    <th scope="col">Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var (date, activity, delta, balance) in new[]
+                {
+                    (DateTime.Today.AddDays(-3), "Order HC-2026-000482", 52, 1840),
+                    (DateTime.Today.AddDays(-9), "Referral — R••••l M. ordered", 200, 1788),
+                    (DateTime.Today.AddDays(-18), "Referral — P••••a S. ordered", 200, 1588),
+                    (DateTime.Today.AddDays(-24), "Order HC-2026-000391", 34, 1388),
+                    (DateTime.Today.AddDays(-30), "Used at checkout", -500, 1354),
+                    (DateTime.Today.AddDays(-45), "Review with photo", 75, 1854)
+                })
+                {
+                    <tr>
+                        <td>@Money.LongDate(date)</td>
+                        <td>@activity</td>
+                        <td class="tabular @(delta > 0 ? "text-success-c" : "text-danger-c")">
+                            @(delta > 0 ? "+" : "")@delta
+                        </td>
+                        <td class="tabular">@balance.ToString("N0")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <p class="t-body-xs text-tertiary-c mt-sm">
+        Points from an order arrive once it's delivered, and are reversed if the item is returned.
+        They never expire. <a class="link" href="/pages/terms">Full terms</a>.
+    </p>
+</section>

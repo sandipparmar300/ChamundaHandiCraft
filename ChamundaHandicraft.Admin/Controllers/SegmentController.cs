@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ViewModel.Admin;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Admin.Controllers;
 
 /// <summary>
-/// View shell for the Segment screens. Each action renders markup only —
-/// the ApiService calls and view models arrive with the API wiring.
+/// Customer segments — the audiences campaigns and coupons target.
+///
+/// The detail screen carries what the edit form cannot: how many customers matched and
+/// when the rule was last evaluated. Both are results of the rule, not part of it.
 /// </summary>
-public class SegmentController : Controller
+public class SegmentController : AdminCrudController<SegmentGridItem, SegmentGridItem>
 {
-    public IActionResult Index() => View();
+    public SegmentController(IAdminClient client) : base(client) { }
 
-    public IActionResult Add() => View("Create");
-
-    public IActionResult Edit(int id) => View("Create");
+    protected override string Module => "Segment";
 }
-

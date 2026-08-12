@@ -1,0 +1,45 @@
+@{
+    Layout = "_Layout";
+    ViewData["HideChrome"] = true;
+}
+
+@* SL-10 · blank/system layout. No navigation — there is nowhere useful to go. *@
+<div class="container-narrow" style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-block:var(--space-2xl)">
+
+    <a class="header-logo mx-auto mb-2xl" href="/">
+        @await Html.PartialAsync("_Logo", "auto")
+    </a>
+
+    <div class="text-center">
+        <span class="state-block__icon state-block__icon--craft mx-auto">
+            <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-settings"></use></svg>
+        </span>
+
+        <h1 class="t-display-lg mt-md">We're back shortly</h1>
+        <p class="t-body-lg text-secondary-c mt-sm">
+            We're making a quick change to the site. Nothing has been lost — your cart, wishlist and
+            orders are exactly as you left them.
+        </p>
+
+        <div class="card card-craft mt-lg text-center">
+            <p class="t-body-sm text-craft-c">Expected back by</p>
+            <p class="t-heading-lg text-craft-c mt-2xs">@DateTime.Now.AddMinutes(40).ToString("h:mm tt") IST</p>
+        </div>
+
+        <div class="row-flex center wrap gap-sm mt-lg">
+            <button class="btn btn-primary btn-lg" type="button" onclick="location.reload()">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"></use></svg>
+                Try Again
+            </button>
+            <a class="btn btn-outline btn-lg" href="https://wa.me/919876543210" rel="noopener">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+                WhatsApp Us
+            </a>
+        </div>
+
+        <p class="t-body-sm text-tertiary-c mt-xl">
+            Need something urgently? <a class="link" href="tel:+919876543210">+91 98765 43210</a> ·
+            <a class="link" href="mailto:care@chamundahandicraft.com">care@chamundahandicraft.com</a>
+        </p>
+    </div>
+</div>

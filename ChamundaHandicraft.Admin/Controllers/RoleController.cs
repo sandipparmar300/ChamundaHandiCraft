@@ -1,19 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ViewModel.Admin;
+using ChamundaHandicraft.Helper.ViewModel.Common;
+using ChamundaHandicraft.Helper.ViewModel.Customer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Admin.Controllers;
 
-/// <summary>
-/// View shell for the Role screens. Each action renders markup only —
-/// the ApiService calls and view models arrive with the API wiring.
-/// </summary>
-public class RoleController : Controller
+/// <summary>Permission sets granted to team members.</summary>
+public class RoleController : AdminCrudController<RoleGridItem, RoleGridItem>
 {
-    public IActionResult Index() => View();
+    public RoleController(IAdminClient client) : base(client) { }
 
-    public IActionResult Add() => View("Create");
-
-    public IActionResult Edit(int id) => View("Create");
-
-    public IActionResult Details(int id) => View();
+    protected override string Module => "Role";
 }
-

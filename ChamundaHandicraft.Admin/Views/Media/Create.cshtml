@@ -1,4 +1,5 @@
-﻿@{
+@model MediaGridItem
+@{
     ViewData["Title"] = "Media File";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Media File" : "Add Media File";
@@ -23,7 +24,7 @@
 
     <form method="post" id="mediaForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -65,7 +66,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Alt Text</label>
-                        <input id="AltText" name="AltText" class="form-control-custom" placeholder="Enter alt text" />
+                        <input id="AltText" name="AltText" class="form-control-custom" placeholder="Enter alt text" / value="@Model.AltText" >
                         <span class="error-msg" data-valmsg-for="AltText"></span>
                     </div>
 

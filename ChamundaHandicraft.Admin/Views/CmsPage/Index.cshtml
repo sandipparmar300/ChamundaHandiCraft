@@ -1,7 +1,10 @@
-﻿@*
+@model PagedResult<CmsPageGridItem>
+@*
     Content - CMS Pages listing.  Spec: docs/Admin Flows/
 *@
 @{
+    // Preview opens the customer site, which runs on its own host.
+    var storefrontBase = Configuration["StorefrontBaseUrl"] ?? "https://localhost:7141";
     ViewData["Title"] = "CMS Pages";
 }
 
@@ -50,7 +53,32 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-action="Edit" asp-route-id="@row.Id">@row.Title</a></td>
+                        <td class="t-mono">@row.Slug</td>
+                        <td>@row.Template</td>
+                        <td>@await Html.PartialAsync("_YesNo", row.IsSystemPage)</td>
+                        <td>@Money.LongDate(row.ModifiedOn ?? row.CreatedOn)</td>
+                        <td>@(row.ModifiedBy ?? row.CreatedBy ?? "—")</td>
+                        <td><span class="badge @(row.IsActive ? "bg-success" : "bg-secondary")">@row.Status</span></td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                            @if (row.IsActive)
+                            {
+                                <a href="@storefrontBase@row.StorefrontUrl" target="_blank" rel="noopener" title="Preview on the storefront" class="ms-2"><i class="fas fa-external-link-alt"></i></a>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="8" class="text-center py-4">No pages yet. <a asp-action="Add">Create the first one</a>.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

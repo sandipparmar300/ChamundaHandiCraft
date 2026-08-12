@@ -1,0 +1,118 @@
+@{
+    var lines = DemoContent.CartLines();
+    var summary = DemoContent.Summary(lines, coupon: null);
+}
+
+@*
+    CMP-CRT-MiniCart — right-side drawer. Opening it never loses page state.
+    Becomes a bottom sheet on mobile.
+*@
+<div class="drawer drawer-sheet-on-mobile" id="miniCart" role="dialog" aria-modal="true"
+     aria-labelledby="miniCartTitle" aria-hidden="true" data-scrim="globalScrim">
+
+    <div class="drawer__head">
+        <div>
+            <h2 class="t-heading-md" id="miniCartTitle">Your cart</h2>
+            <p class="t-body-sm text-secondary-c">@summary.ItemCount items</p>
+        </div>
+        <button class="icon-btn" data-close aria-label="Close cart">
+            <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+    </div>
+
+    <div class="drawer__body">
+        @if (lines.Count == 0)
+        {
+            <div class="state-block">
+                <span class="state-block__icon state-block__icon--craft">
+                    <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-cart"></use></svg>
+                </span>
+                <h3 class="t-heading-md">Your cart is empty</h3>
+                <p class="state-block__desc">Nothing saved yet. Start with the pieces our shoppers reach for most.</p>
+                <div class="state-block__actions">
+                    <a class="btn btn-primary" href="/shop">Browse the Shop</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            @* Free shipping progress — real threshold, no manufactured urgency. *@
+            <div class="ship-progress mb-md">
+                @if (summary.QualifiesForFreeShipping)
+                {
+                    <span class="ship-progress__label text-success-c">
+                        <svg class="ico ico-sm" aria-hidden="true" style="display:inline;vertical-align:-3px"><use href="#i-truck"></use></svg>
+                        <strong>Free delivery unlocked</strong>
+                    </span>
+                }
+                else
+                {
+                    <span class="ship-progress__label">
+                        Add <strong>@Money.Inr(summary.AmountToFreeShipping)</strong> more for free delivery
+                    </span>
+                }
+                <div class="progress">
+                    <span class="progress__fill @(summary.QualifiesForFreeShipping ? "" : "")"
+                          style="width:@(summary.FreeShippingProgressPercent)%"></span>
+                </div>
+            </div>
+
+            <ul>
+                @foreach (var line in lines)
+                {
+                    <li class="cart-line" style="grid-template-columns:72px minmax(0,1fr)">
+                        <a class="cart-line__media" href="@line.Url">
+                            <img class="img-product" src="@line.ImageUrl" alt="@line.ImageAlt" width="72" height="72" loading="lazy" />
+                        </a>
+                        <div>
+                            <a class="cart-line__title clamp-2" href="@line.Url">@line.Name</a>
+                            <p class="cart-line__meta">@line.VariantSummary</p>
+                            <div class="row-flex between mt-xs gap-sm">
+                                <div class="qty qty-sm">
+                                    <button class="qty__btn" type="button" data-step="-1" aria-label="Decrease quantity">
+                                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-minus"></use></svg>
+                                    </button>
+                                    <input class="qty__input" type="number" value="@line.Quantity" min="1" max="@line.MaxQuantity"
+                                           aria-label="Quantity for @line.Name" />
+                                    <button class="qty__btn" type="button" data-step="1" aria-label="Increase quantity">
+                                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"></use></svg>
+                                    </button>
+                                </div>
+                                <span class="t-body-md tabular" style="font-weight:600">@Money.Inr(line.LineTotal)</span>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+
+            @* Mandatory in compact form on cart lines (CX principle 4). *@
+            <div class="variation-notice variation-notice-compact mt-md">
+                <svg class="ico ico-sm variation-notice__icon" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                <span>Handmade items vary slightly in colour, finish and size.</span>
+            </div>
+        }
+    </div>
+
+    @if (lines.Count > 0)
+    {
+        <div class="drawer__foot">
+            <dl class="summary mb-md">
+                <div class="summary__row">
+                    <dt>Subtotal</dt>
+                    <dd>@Money.Inr(summary.Subtotal)</dd>
+                </div>
+                <div class="summary__row @(summary.QualifiesForFreeShipping ? "summary__row--free" : "")">
+                    <dt>Delivery</dt>
+                    <dd>@(summary.Shipping == 0 ? "Free" : Money.Inr(summary.Shipping))</dd>
+                </div>
+                <div class="summary__total">
+                    <dt>Total</dt>
+                    <dd>@Money.Inr(summary.Total)</dd>
+                </div>
+            </dl>
+            <p class="t-body-xs text-tertiary-c mb-sm">Inclusive of all taxes. Coupons apply at checkout.</p>
+            <a class="btn btn-primary btn-lg btn-block" href="/checkout">Checkout · @Money.Inr(summary.Total)</a>
+            <a class="btn btn-ghost btn-block mt-xs" href="/cart">View full cart</a>
+        </div>
+    }
+</div>

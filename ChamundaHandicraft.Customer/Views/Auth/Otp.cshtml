@@ -1,0 +1,91 @@
+@{
+    Layout = "_AuthLayout";
+    var sentTo = ViewData["SentTo"] as string ?? "+91 98765 43210";
+}
+
+@* PG-01-03 · OTP Verification — auto-advance, paste-fill, auto-submit on the 6th digit. *@
+<a class="btn btn-ghost btn-sm mb-md" href="/login" style="min-width:0;padding-inline:0">
+    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+    Back to sign in
+</a>
+
+<h1 class="t-heading-xl">Enter your code</h1>
+<p class="t-body-md text-secondary-c mt-xs mb-lg">
+    We sent a 6-digit code to <strong class="text-primary-c">@sentTo</strong>.
+    <a class="link" href="/login">Change number</a>
+</p>
+
+<form method="post" action="/signin/otp/verify" id="otpForm">
+    <div class="field">
+        <label class="field__label" for="otp1">6-digit code</label>
+        <div class="otp" id="otpGroup">
+            @for (var i = 1; i <= 6; i++)
+            {
+                <input id="otp@(i)" name="digit@(i)" type="text" inputmode="numeric" maxlength="1"
+                       autocomplete="@(i == 1 ? "one-time-code" : "off")" required
+                       aria-label="Digit @i of 6" />
+            }
+        </div>
+        <p class="field__error" id="otpError" data-static>
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+            <span>That code isn't right. 2 attempts left.</span>
+        </p>
+    </div>
+
+    <button class="btn btn-primary btn-xl btn-block mt-lg" type="submit">
+        <span class="btn__spinner" aria-hidden="true"></span>
+        <span class="btn__label">Verify</span>
+    </button>
+</form>
+
+<div class="row-flex center gap-xs mt-lg t-body-sm text-secondary-c">
+    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>
+    <span>Resend available in <strong class="tabular" id="resendTimer">00:30</strong></span>
+</div>
+
+<button class="btn btn-link btn-block mt-xs" type="button" id="resendBtn" disabled>Send a new code</button>
+
+<div class="card card-craft mt-lg">
+    <div class="row-flex gap-sm">
+        <svg class="ico ico-lg text-craft-c shrink-0" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+        <div class="grow">
+            <p class="t-heading-xs text-craft-c">SMS not arriving?</p>
+            <p class="t-body-sm text-craft-c">We can send the code to WhatsApp instead.</p>
+        </div>
+        <button class="btn btn-outline btn-sm shrink-0" type="button">Get it on WhatsApp</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-submit on the sixth digit; resend unlocks when the timer reaches zero.
+        (function () {
+            var form = document.getElementById('otpForm');
+            var inputs = Array.prototype.slice.call(document.querySelectorAll('#otpGroup input'));
+
+            inputs.forEach(function (input) {
+                input.addEventListener('input', function () {
+                    if (inputs.every(function (i) { return i.value.length === 1; })) {
+                        form.querySelector('button[type=submit]').classList.add('is-loading');
+                        setTimeout(function () { form.submit(); }, 300);
+                    }
+                });
+            });
+
+            var left = 30;
+            var timer = document.getElementById('resendTimer');
+            var button = document.getElementById('resendBtn');
+
+            var tick = setInterval(function () {
+                left--;
+                timer.textContent = '00:' + String(Math.max(0, left)).padStart(2, '0');
+
+                if (left <= 0) {
+                    clearInterval(tick);
+                    button.disabled = false;
+                    timer.closest('div').hidden = true;
+                }
+            }, 1000);
+        })();
+    </script>
+}

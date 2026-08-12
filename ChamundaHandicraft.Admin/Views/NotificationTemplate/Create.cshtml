@@ -1,4 +1,5 @@
-﻿@{
+@model NotificationTemplateGridItem
+@{
     ViewData["Title"] = "Template";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Template" : "Add Template";
@@ -23,7 +24,7 @@
 
     <form method="post" id="notificationtemplateForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -72,7 +73,7 @@
 
                     <div class="col-lg-8 col-md-6">
                         <label class="form-label-custom">Subject</label>
-                        <input id="Subject" name="Subject" class="form-control-custom" placeholder="Enter subject" />
+                        <input id="Subject" name="Subject" class="form-control-custom" placeholder="Enter subject" / value="@Model.Subject" >
                         <span class="error-msg" data-valmsg-for="Subject"></span>
                     </div>
 

@@ -1,0 +1,187 @@
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="page-head">
+        <h1 class="t-display-lg page-head__title">Contact us</h1>
+        <p class="page-head__sub measure">
+            A named person answers every message, Monday to Saturday, 10am to 7pm IST.
+            We reply within one working day — usually much sooner.
+        </p>
+    </div>
+
+    <div class="layout-content-summary" style="padding-bottom:var(--space-2xl)">
+
+        @* ---- Form ---- *@
+        <section class="card">
+            <h2 class="t-heading-md mb-md">Send us a message</h2>
+
+            <form data-validate>
+                <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+                    <div class="field">
+                        <label class="field__label" for="contactName">Your name <span class="field__req">*</span></label>
+                        <input class="input" id="contactName" type="text" required placeholder="Ananya Iyer" autocomplete="name" />
+                        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                    </div>
+
+                    <div class="field" style="margin-top:0">
+                        <label class="field__label" for="contactEmail">Email <span class="field__req">*</span></label>
+                        <input class="input" id="contactEmail" type="email" required placeholder="you@example.com" autocomplete="email" />
+                        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                    </div>
+                </div>
+
+                <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+                    <div class="field">
+                        <label class="field__label" for="contactPhone">
+                            Mobile <span class="field__optional">(optional)</span>
+                        </label>
+                        <div class="phone-input">
+                            <select class="select" aria-label="Country code"><option selected>+91</option></select>
+                            <input class="input" id="contactPhone" type="tel" inputmode="numeric" autocomplete="tel" />
+                        </div>
+                        <p class="field__help">Only if you'd rather we called.</p>
+                    </div>
+
+                    <div class="field" style="margin-top:0">
+                        <label class="field__label" for="contactSubject">Subject <span class="field__req">*</span></label>
+                        <select class="select" id="contactSubject" required>
+                            <option value="">Choose a topic</option>
+                            <option>Question about an order</option>
+                            <option>Delivery or tracking</option>
+                            <option>Return or refund</option>
+                            <option>Product question</option>
+                            <option>Bulk or corporate order</option>
+                            <option>Working with us as an artisan</option>
+                            <option>Press or partnership</option>
+                            <option>Something else</option>
+                        </select>
+                        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="contactOrder">
+                        Order number <span class="field__optional">(optional)</span>
+                    </label>
+                    <input class="input" id="contactOrder" type="text" placeholder="HC-2026-000482"
+                           style="font-family:var(--font-mono);max-width:280px" />
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="contactMessage">Message <span class="field__req">*</span></label>
+                    <textarea class="textarea" id="contactMessage" rows="5" required
+                              placeholder="Tell us what you need. Specifics help us fix things faster."></textarea>
+                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                </div>
+
+                <div class="field">
+                    <span class="field__label">Attachments <span class="field__optional">(optional)</span></span>
+                    <div class="upload" style="padding:var(--space-md)">
+                        <svg class="ico ico-xl text-tertiary-c mx-auto mb-xs" aria-hidden="true"><use href="#i-camera"></use></svg>
+                        <p class="t-body-sm">Add photos if something arrived damaged</p>
+                        <p class="t-body-xs text-tertiary-c mt-2xs">JPG or PNG, up to 5 MB each</p>
+                        <input type="file" accept="image/*" multiple class="sr-only" />
+                    </div>
+                </div>
+
+                @* Unticked — consent is never assumed. *@
+                <label class="check mt-md">
+                    <input type="checkbox" />
+                    <span class="check__label t-body-sm">
+                        Send me craft stories by email too
+                        <span class="check__help">Two a month. Nothing to do with this message.</span>
+                    </span>
+                </label>
+
+                <button class="btn btn-primary btn-xl btn-block mt-lg" type="submit">
+                    <span class="btn__spinner" aria-hidden="true"></span>
+                    <span class="btn__label">Send Message</span>
+                </button>
+
+                <p class="t-body-xs text-tertiary-c mt-sm text-center">
+                    You'll get a reference number by email straight away.
+                    We use what you send only to answer you — see our
+                    <a class="link" href="/pages/privacy-policy">privacy policy</a>.
+                </p>
+            </form>
+        </section>
+
+        @* ---- Direct channels ---- *@
+        <aside class="stack stack-md">
+            <div class="card">
+                <h2 class="t-heading-md mb-md">Reach us directly</h2>
+                <div class="stack stack-sm">
+                    <a class="dropdown__item" href="https://wa.me/919876543210" rel="noopener" style="min-height:56px">
+                        <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+                        <span class="grow">
+                            <span class="t-body-md" style="display:block">WhatsApp</span>
+                            <span class="t-body-xs text-tertiary-c">Usually within the hour</span>
+                        </span>
+                    </a>
+                    <a class="dropdown__item" href="tel:+919876543210" style="min-height:56px">
+                        <svg class="ico" aria-hidden="true"><use href="#i-phone"></use></svg>
+                        <span class="grow">
+                            <span class="t-body-md" style="display:block">+91 98765 43210</span>
+                            <span class="t-body-xs text-tertiary-c">Mon–Sat, 10am–7pm IST</span>
+                        </span>
+                    </a>
+                    <a class="dropdown__item" href="mailto:care@chamundahandicraft.com" style="min-height:56px">
+                        <svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg>
+                        <span class="grow">
+                            <span class="t-body-md" style="display:block">care@chamundahandicraft.com</span>
+                            <span class="t-body-xs text-tertiary-c">Within one working day</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="t-heading-md mb-sm">Studio &amp; registered office</h2>
+                <p class="t-body-sm text-secondary-c">
+                    Chamunda Handicraft Pvt. Ltd.<br />
+                    Plot 42, Sanganer Industrial Area<br />
+                    Jaipur, Rajasthan 302029<br />
+                    India
+                </p>
+                <p class="t-body-xs text-tertiary-c mt-sm">
+                    GSTIN 08AABCK1234M1Z5 · CIN U52609RJ2024PTC091234
+                </p>
+                <div class="map-embed mt-md" role="img" aria-label="Map showing the studio in Sanganer, Jaipur">
+                    <div class="row-flex center" style="height:100%;flex-direction:column;gap:var(--space-xs)">
+                        <svg class="ico ico-2xl text-tertiary-c" aria-hidden="true"><use href="#i-map-pin"></use></svg>
+                        <p class="t-body-sm text-secondary-c">Sanganer, Jaipur</p>
+                    </div>
+                </div>
+                <p class="t-body-xs text-tertiary-c mt-sm">
+                    Visits are by appointment — we'd love to show you the workshop.
+                </p>
+            </div>
+
+            <div class="card card-craft">
+                <p class="t-heading-xs text-craft-c mb-xs">Are you an artisan?</p>
+                <p class="t-body-sm text-craft-c">
+                    We're always looking for workshops to buy from. Tell us what you make and where,
+                    and someone will visit.
+                </p>
+                <a class="btn btn-secondary btn-sm mt-md" href="/pages/careers">Work With Us</a>
+            </div>
+
+            <div class="card">
+                <p class="t-heading-xs mb-sm">Faster answers</p>
+                <div class="stack stack-2xs">
+                    <a class="link-muted t-body-sm" href="/track">Track an order</a>
+                    <a class="link-muted t-body-sm" href="/account/orders">Return an item</a>
+                    <a class="link-muted t-body-sm" href="/help#faq">Frequently asked questions</a>
+                    <a class="link-muted t-body-sm" href="/pages/shipping-policy">Shipping policy</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>

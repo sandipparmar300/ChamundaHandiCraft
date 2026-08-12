@@ -1,0 +1,180 @@
+@model ShellViewModel
+@{
+    var nav = new (string Label, string Url, string Key, string? Menu)[]
+    {
+        ("Shop", "/shop", "shop", "megaShop"),
+        ("New Arrivals", "/c/new-arrivals", "new", null),
+        ("Festive", "/c/festive", "festive", "megaFestive"),
+        ("Gifting", "/c/gifting", "gifting", null),
+        ("Artisans", "/artisans", "artisans", null),
+        ("Stories", "/blog", "blog", null),
+        ("Sale", "/c/sale", "sale", null)
+    };
+}
+
+@* Announcement bar — rotating, dismissible, dismissal persists 7 days. *@
+@if (Model.ShowAnnouncement)
+{
+    <div class="announcement-bar" role="region" aria-label="Announcements">
+        <div class="container announcement-bar__inner">
+            <span class="announcement-bar__msg is-active">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-truck"></use></svg>
+                Free delivery on orders above ₹999
+            </span>
+            <span class="announcement-bar__msg">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                Every piece is made by a named artisan — <a href="/artisans">meet the makers</a>
+            </span>
+            <span class="announcement-bar__msg">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-package"></use></svg>
+                <a href="/track">Track your order</a>
+            </span>
+            <button class="announcement-bar__close" aria-label="Dismiss announcements">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+    </div>
+}
+
+<header class="site-header">
+    <div class="container">
+        <div class="header-main">
+
+            <button class="icon-btn only-tablet-down" data-open="mobileDrawer" aria-label="Open menu" aria-haspopup="dialog">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-menu"></use></svg>
+            </button>
+
+            <a class="header-logo" href="/" aria-label="Chamunda Handicraft — home">
+                @await Html.PartialAsync("_Logo", "auto")
+            </a>
+
+            @* Search — 480px, expands to 640 on focus, opens the suggestions panel. *@
+            <div class="header-search search-bar">
+                <label class="sr-only" for="headerSearch">Search products</label>
+                <svg class="ico search-bar__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+                <input class="search-bar__input" id="headerSearch" type="search" role="combobox"
+                       aria-expanded="false" aria-controls="headerSuggest" autocomplete="off"
+                       placeholder="Search for pottery, diyas, cushions…" />
+                <button class="icon-btn icon-btn-sm search-bar__clear" type="button" aria-label="Clear search">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-x"></use></svg>
+                </button>
+
+                @await Html.PartialAsync("_SearchSuggest")
+            </div>
+
+            <div class="header-actions">
+
+                @if (Model.IsSignedIn)
+                {
+                    <div class="dropdown hide-tablet-down">
+                        <button class="icon-btn icon-btn-lg" data-dropdown aria-expanded="false" aria-haspopup="menu"
+                                aria-label="Account menu">
+                            <span class="avatar avatar-sm">@(Model.FirstName.Length > 0 ? Model.FirstName[..1] : "A")</span>
+                        </button>
+                        <div class="dropdown__menu" role="menu">
+                            <div class="p-sm" style="padding:8px 12px 12px">
+                                <div class="t-heading-xs">Hello, @Model.FirstName</div>
+                                <span class="tag tag-brass mt-2xs">
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-gem"></use></svg>
+                                    @Model.RewardPoints.ToString("N0") points
+                                </span>
+                            </div>
+                            <div class="dropdown__divider"></div>
+                            <a class="dropdown__item" role="menuitem" href="/account/orders"><svg class="ico" aria-hidden="true"><use href="#i-package"></use></svg>My Orders</a>
+                            <a class="dropdown__item" role="menuitem" href="/wishlist"><svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg>Wishlist</a>
+                            <a class="dropdown__item" role="menuitem" href="/account/addresses"><svg class="ico" aria-hidden="true"><use href="#i-map-pin"></use></svg>Addresses</a>
+                            <a class="dropdown__item" role="menuitem" href="/account/rewards"><svg class="ico" aria-hidden="true"><use href="#i-gem"></use></svg>Rewards</a>
+                            <a class="dropdown__item" role="menuitem" href="/account/coupons"><svg class="ico" aria-hidden="true"><use href="#i-ticket-percent"></use></svg>Coupons</a>
+                            <a class="dropdown__item" role="menuitem" href="/account/notifications">
+                                <svg class="ico" aria-hidden="true"><use href="#i-bell"></use></svg>Notifications
+                                @if (Model.NotificationCount > 0)
+                                {
+                                    <span class="counter counter-brand" style="margin-left:auto">@Model.NotificationCount</span>
+                                }
+                            </a>
+                            <a class="dropdown__item" role="menuitem" href="/account/profile"><svg class="ico" aria-hidden="true"><use href="#i-user"></use></svg>Profile</a>
+                            <div class="dropdown__divider"></div>
+                            <a class="dropdown__item" role="menuitem" href="/logout"><svg class="ico" aria-hidden="true"><use href="#i-log-out"></use></svg>Sign Out</a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <a class="btn btn-ghost btn-sm hide-tablet-down" href="/login">
+                        <svg class="ico" aria-hidden="true"><use href="#i-user"></use></svg>
+                        Sign in
+                    </a>
+                }
+
+                <a class="icon-btn icon-btn-lg counter-anchor only-tablet-down" href="/search" aria-label="Search">
+                    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-search"></use></svg>
+                </a>
+
+                <a class="icon-btn icon-btn-lg counter-anchor" href="/wishlist" aria-label="Wishlist, @Model.WishlistCount saved items">
+                    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-heart"></use></svg>
+                    <span class="counter" id="wishlistCount" hidden="@(Model.WishlistCount == 0)">@Model.WishlistCount</span>
+                </a>
+
+                @* Opens the Mini Cart drawer on desktop — never navigates away. *@
+                <button class="icon-btn icon-btn-lg counter-anchor" data-open="miniCart" data-cart-icon
+                        aria-label="Cart, @Model.CartCount items" aria-haspopup="dialog">
+                    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-cart"></use></svg>
+                    <span class="counter" id="cartCount" hidden="@(Model.CartCount == 0)">@Model.CartCount</span>
+                </button>
+            </div>
+        </div>
+
+        @* Mobile search row *@
+        <div class="header-search-row only-tablet-down">
+            <form class="search-bar" action="/search" method="get" role="search">
+                <label class="sr-only" for="mobileSearch">Search products</label>
+                <svg class="ico search-bar__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+                <input class="search-bar__input" id="mobileSearch" name="q" type="search"
+                       placeholder="Search handmade treasures…" autocomplete="off" />
+            </form>
+        </div>
+    </div>
+
+    @* Desktop nav bar *@
+    <nav class="nav-bar" aria-label="Primary">
+        <div class="container" style="position:relative">
+            <ul class="nav-bar__list">
+                @foreach (var item in nav)
+                {
+                    <li>
+                        @if (item.Menu is not null)
+                        {
+                            <button class="nav-bar__link @(Model.ActiveNav == item.Key ? "is-active" : "")"
+                                    data-megamenu="@item.Menu" aria-expanded="false" aria-haspopup="true">
+                                @item.Label
+                                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                            </button>
+                        }
+                        else
+                        {
+                            <a class="nav-bar__link @(item.Key == "sale" ? "nav-bar__link--sale" : "") @(Model.ActiveNav == item.Key ? "is-active" : "")"
+                               href="@item.Url">@item.Label</a>
+                        }
+                    </li>
+                }
+                <li style="margin-left:auto">
+                    <div class="dropdown">
+                        <button class="nav-bar__link" data-dropdown aria-expanded="false" aria-haspopup="menu">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-circle-help"></use></svg>
+                            Help
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                        </button>
+                        <div class="dropdown__menu" role="menu">
+                            <a class="dropdown__item" role="menuitem" href="/help"><svg class="ico" aria-hidden="true"><use href="#i-circle-help"></use></svg>Help Centre</a>
+                            <a class="dropdown__item" role="menuitem" href="/track"><svg class="ico" aria-hidden="true"><use href="#i-package"></use></svg>Track Order</a>
+                            <a class="dropdown__item" role="menuitem" href="/pages/contact"><svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg>Contact Us</a>
+                            <a class="dropdown__item" role="menuitem" href="https://wa.me/919876543210" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>WhatsApp</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            @await Html.PartialAsync("_MegaMenu")
+        </div>
+    </nav>
+</header>

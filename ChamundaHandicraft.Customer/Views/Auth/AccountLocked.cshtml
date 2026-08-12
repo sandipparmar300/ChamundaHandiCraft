@@ -1,0 +1,45 @@
+@{
+    Layout = "_AuthLayout";
+}
+
+@* PG-01-10 · Account Locked — states the cause, the cooldown, and the way out. *@
+<div class="text-center">
+    <span class="state-block__icon state-block__icon--error mx-auto">
+        <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-lock"></use></svg>
+    </span>
+
+    <h1 class="t-heading-xl mt-md">Account temporarily locked</h1>
+    <p class="t-body-md text-secondary-c mt-xs">
+        Five sign-in attempts failed, so we've paused sign-in for 15 minutes to protect the account.
+        Nothing has been changed and your cart is safe.
+    </p>
+</div>
+
+<div class="card mt-lg text-center">
+    <p class="t-body-sm text-secondary-c">Sign-in reopens in</p>
+    <p class="t-display-lg tabular" id="lockTimer">14:59</p>
+</div>
+
+<a class="btn btn-primary btn-xl btn-block mt-lg" href="/forgot-password">Reset My Password</a>
+<a class="btn btn-ghost btn-block mt-xs" href="/help">Contact Support</a>
+
+<p class="t-body-xs text-tertiary-c text-center mt-lg">
+    Didn't try to sign in? <a class="link" href="/pages/contact">Tell us</a> — we'll check the account for you.
+</p>
+
+@section Scripts {
+    <script>
+        (function () {
+            var el = document.getElementById('lockTimer');
+            var left = 899;
+
+            var timer = setInterval(function () {
+                left--;
+                var mins = String(Math.floor(left / 60)).padStart(2, '0');
+                var secs = String(left % 60).padStart(2, '0');
+                el.textContent = mins + ':' + secs;
+                if (left <= 0) { clearInterval(timer); location.href = '/login'; }
+            }, 1000);
+        })();
+    </script>
+}

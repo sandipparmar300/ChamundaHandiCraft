@@ -1,4 +1,5 @@
-﻿@{
+@model SeoMetaGridItem
+@{
     ViewData["Title"] = "SEO Entry";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit SEO Entry" : "Add SEO Entry";
@@ -23,7 +24,7 @@
 
     <form method="post" id="seoForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -77,7 +78,7 @@
 
                     <div class="col-lg-12 col-md-6">
                         <label class="form-label-custom">Meta Description</label>
-                        <textarea id="MetaDescription" name="MetaDescription" class="form-control-custom" rows="3" placeholder="Enter meta description"></textarea>
+                        <textarea id="MetaDescription" name="MetaDescription" class="form-control-custom" rows="3" placeholder="Enter meta description">@Model.MetaDescription</textarea>
                         <span class="error-msg" data-valmsg-for="MetaDescription"></span>
                     </div>
 

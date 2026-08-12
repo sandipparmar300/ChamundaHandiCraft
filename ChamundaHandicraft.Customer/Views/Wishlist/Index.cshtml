@@ -1,0 +1,176 @@
+@model List<ProductCardViewModel>
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="page-head">
+        <div class="row-flex wrap between gap-md">
+            <div>
+                <h1 class="t-display-lg page-head__title">Your wishlist</h1>
+                <p class="page-head__sub">
+                    @Model.Count saved @(Model.Count == 1 ? "piece" : "pieces"). We'll tell you if one drops in price or runs low.
+                </p>
+            </div>
+
+            @if (Model.Count > 0)
+            {
+                <div class="row-flex gap-xs">
+                    <button class="btn btn-outline btn-sm" type="button" data-open="shareWishlist">
+                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-share"></use></svg>
+                        Share
+                    </button>
+                    <button class="btn btn-primary btn-sm" type="button" data-add-to-cart data-open-minicart>
+                        <span class="btn__spinner" aria-hidden="true"></span>
+                        <span class="btn__label">Add All to Cart</span>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        @* Empty (nothing exists): illustration + heading + supporting line + CTA. *@
+        <div class="state-block">
+            <span class="state-block__icon state-block__icon--craft">
+                <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-heart"></use></svg>
+            </span>
+            <h2 class="t-heading-md">Nothing saved yet</h2>
+            <p class="state-block__desc">
+                Tap the heart on any piece to keep it here. Your wishlist stays with you across
+                devices once you're signed in, and we'll alert you on price drops.
+            </p>
+            <div class="state-block__actions">
+                <a class="btn btn-primary btn-lg" href="/shop">Browse the Shop</a>
+                <a class="btn btn-outline btn-lg" href="/c/new-arrivals">See New Arrivals</a>
+            </div>
+        </div>
+
+        <section class="band-sm">
+            @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+            {
+                Heading = "Most saved this month",
+                SubHeading = "What other shoppers are keeping an eye on.",
+                ViewAllUrl = "/shop",
+                Products = DemoContent.Products(6)
+            })
+        </section>
+    }
+    else
+    {
+        @* Signed-out shoppers still get a working wishlist — this nudge is informative, not a gate. *@
+        <div class="alert alert-info mb-lg" role="status">
+            <svg class="ico" aria-hidden="true"><use href="#i-info"></use></svg>
+            <div class="grow">
+                <p class="alert__title">Saved on this device</p>
+                <p>Sign in and your wishlist follows you to your phone and back.</p>
+            </div>
+            <a class="btn btn-outline btn-sm shrink-0" href="/login?returnUrl=/wishlist">Sign in</a>
+        </div>
+
+        <div class="plp-toolbar">
+            <div class="row-flex wrap gap-xs">
+                <button class="chip is-active" type="button">All (@Model.Count)</button>
+                <button class="chip" type="button">In stock (5)</button>
+                <button class="chip" type="button">Price dropped (2)</button>
+                <button class="chip" type="button">Running low (1)</button>
+            </div>
+            <div class="sort-select hide-tablet-down">
+                <label class="t-body-sm text-secondary-c" for="wishSort">Sort by</label>
+                <select class="select" id="wishSort">
+                    <option>Recently added</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Availability</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="pgrid mt-md">
+            @foreach (var product in Model)
+            {
+                <div>
+                    @await Html.PartialAsync("_ProductCard", product)
+
+                    @* Price-drop and low-stock alerts sit under the card, not on it — they
+                       are information, not urgency devices stacked onto the imagery. *@
+                    @if (product.IsOnSale)
+                    {
+                        <p class="inline-msg text-success-c mt-xs">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-percent"></use></svg>
+                            Price dropped @Money.Inr(product.Savings) since you saved it
+                        </p>
+                    }
+                    else if (product.Stock == StockState.LowStock)
+                    {
+                        <p class="inline-msg text-warning-c mt-xs">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+                            Running low since you saved it
+                        </p>
+                    }
+
+                    <div class="row-flex gap-md mt-xs">
+                        <button class="cart-line__link" type="button">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-repeat"></use></svg>
+                            Move to cart
+                        </button>
+                        <button class="cart-line__link cart-line__link--danger" type="button">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-trash"></use></svg>
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <section class="band-sm">
+            @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+            {
+                Heading = "You might also like",
+                SubHeading = "Based on what you've saved.",
+                Products = DemoContent.Products(6, 5)
+            })
+        </section>
+    }
+</div>
+
+<div class="modal-scrim" id="shareWishlist" role="dialog" aria-modal="true" aria-labelledby="shareWishTitle" aria-hidden="true">
+    <div class="modal modal-sm">
+        <div class="modal__head">
+            <div>
+                <h2 class="t-heading-md" id="shareWishTitle">Share your wishlist</h2>
+                <p class="t-body-sm text-secondary-c mt-2xs">Anyone with the link can see these pieces, but not your account.</p>
+            </div>
+            <button class="icon-btn" data-close="shareWishlist" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <div class="field">
+                <label class="field__label" for="wishLink">Shareable link</label>
+                <div class="row-flex gap-xs">
+                    <input class="input" id="wishLink" type="text" readonly value="https://chamundahandicraft.com/w/a7f3c2" />
+                    <button class="btn btn-outline shrink-0" type="button" data-copy="https://chamundahandicraft.com/w/a7f3c2">Copy</button>
+                </div>
+            </div>
+            <div class="row-flex gap-xs mt-md">
+                <a class="btn btn-outline grow" href="https://wa.me/?text=https://chamundahandicraft.com/w/a7f3c2" rel="noopener">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+                    WhatsApp
+                </a>
+                <a class="btn btn-outline grow" href="mailto:?body=https://chamundahandicraft.com/w/a7f3c2">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-mail"></use></svg>
+                    Email
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_QuickView", DemoContent.Products(1)[0])

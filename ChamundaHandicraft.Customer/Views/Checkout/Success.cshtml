@@ -1,0 +1,216 @@
+@model CheckoutViewModel
+@{
+    Layout = "_CheckoutLayout";
+    var orderNumber = ViewData["OrderNumber"] as string ?? "HC-2026-000482";
+    var summary = Model.Summary;
+    var deliveryBy = DateTime.Today.AddDays(6);
+    var address = Model.Addresses.First(a => a.IsDefault);
+}
+
+<div class="container-wide" style="padding-block:var(--space-xl)">
+
+    <div class="confirm-card">
+        <span class="confirm-card__check">
+            <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+        </span>
+
+        <h1 class="t-display-lg">Order confirmed</h1>
+        <p class="t-body-lg text-secondary-c mt-sm">
+            Thank you, Ananya. Your pieces are being packed in Jaipur.
+        </p>
+
+        <div class="row-flex center wrap gap-sm mt-md">
+            <span class="order-number">
+                @orderNumber
+                <button class="icon-btn icon-btn-sm" type="button" data-copy="@orderNumber" aria-label="Copy order number">
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-copy"></use></svg>
+                </button>
+            </span>
+        </div>
+
+        <p class="t-body-sm text-secondary-c mt-md">
+            A confirmation is on its way to <strong>ananya@example.com</strong> and
+            <strong>+91 98765 43210</strong>.
+        </p>
+
+        <div class="row-flex center wrap gap-sm mt-lg">
+            <a class="btn btn-primary btn-lg" href="/track/@orderNumber">Track This Order</a>
+            <a class="btn btn-outline btn-lg" href="/account/orders/@orderNumber">View Order Details</a>
+            <button class="btn btn-ghost btn-lg" type="button" onclick="window.print()">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-printer"></use></svg>
+                Print
+            </button>
+        </div>
+    </div>
+
+    @* Delivery promise, stated as a date. *@
+    <div class="card card-craft mt-lg">
+        <div class="row-flex gap-md">
+            <span class="trust-badge__icon shrink-0"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-truck"></use></svg></span>
+            <div class="grow">
+                <p class="t-heading-sm text-craft-c">Arriving @Money.DeliveryDate(deliveryBy)</p>
+                <p class="t-body-sm text-craft-c">
+                    Delivered by Delhivery to @address.City @address.Pincode.
+                    We'll send you a tracking link the moment it leaves the studio.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    @* Mandatory on the order confirmation (CX principle 4). *@
+    <div class="mt-md">
+        @await Html.PartialAsync("_VariationNotice")
+    </div>
+
+    @* ---- What you ordered ---- *@
+    <section class="card mt-lg">
+        <h2 class="t-heading-md mb-md">What you ordered</h2>
+
+        <ul>
+            @foreach (var line in Model.Lines)
+            {
+                <li class="cart-line" style="grid-template-columns:72px minmax(0,1fr) auto">
+                    <a class="cart-line__media" href="@line.Url">
+                        <img class="img-product" src="@line.ImageUrl" alt="@line.ImageAlt" width="72" height="72" loading="lazy" />
+                    </a>
+                    <div class="grow">
+                        <a class="cart-line__title" href="@line.Url">@line.Name</a>
+                        <p class="cart-line__meta">@line.VariantSummary · Qty @line.Quantity</p>
+                        @if (line.Artisan is not null)
+                        {
+                            <span class="artisan-chip mt-2xs">
+                                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                                Made by @line.Artisan.Name, @line.Artisan.Cluster
+                            </span>
+                        }
+                    </div>
+                    <span class="t-body-md tabular" style="font-weight:600">@Money.Inr(line.LineTotal)</span>
+                </li>
+            }
+        </ul>
+
+        <div class="layout-halves mt-lg" style="align-items:start">
+            <div>
+                <h3 class="t-heading-xs mb-xs">Delivering to</h3>
+                <p class="t-body-sm text-secondary-c">
+                    <strong class="text-primary-c">@address.FullName</strong><br />
+                    @address.OneLine<br />
+                    @address.Phone
+                </p>
+            </div>
+
+            <dl class="summary">
+                <div class="summary__row">
+                    <dt>Subtotal</dt>
+                    <dd>@Money.Inr(summary.MrpTotal)</dd>
+                </div>
+                @if (summary.ProductSavings > 0)
+                {
+                    <div class="summary__row summary__row--discount">
+                        <dt>Product discount</dt>
+                        <dd>−@Money.Inr(summary.ProductSavings)</dd>
+                    </div>
+                }
+                @if (summary.CouponDiscount > 0)
+                {
+                    <div class="summary__row summary__row--discount">
+                        <dt>Coupon (@summary.CouponCode)</dt>
+                        <dd>−@Money.Inr(summary.CouponDiscount)</dd>
+                    </div>
+                }
+                <div class="summary__row summary__row--free">
+                    <dt>Delivery</dt>
+                    <dd>@(summary.Shipping == 0 ? "Free" : Money.Inr(summary.Shipping))</dd>
+                </div>
+                <div class="summary__row">
+                    <dt>Paid by</dt>
+                    <dd class="text-secondary-c" style="font-weight:400">UPI · ananya@okhdfcbank</dd>
+                </div>
+                <div class="summary__total">
+                    <dt>Total paid</dt>
+                    <dd>@Money.Inr(summary.Total)</dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="row-flex wrap gap-sm mt-lg no-print">
+            <a class="btn btn-outline btn-sm" href="/account/orders/@orderNumber">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-file-text"></use></svg>
+                Download Invoice
+            </a>
+            <a class="btn btn-ghost btn-sm" href="/help">Need to change something?</a>
+        </div>
+    </section>
+
+    @* ---- MOD-01-05 · Post-purchase account creation. Offered, never demanded. ---- *@
+    <section class="card card-premium mt-lg no-print">
+        <div class="row-flex wrap gap-md between">
+            <div class="grow" style="min-width:260px">
+                <span class="t-overline">Optional</span>
+                <h2 class="t-heading-md mt-2xs">Save this order to an account?</h2>
+                <p class="t-body-sm text-secondary-c mt-xs">
+                    One tap sets a password on <strong>ananya@example.com</strong>. You'd get order tracking
+                    in one place, a wishlist across devices, and <strong>39 reward points</strong> from this order.
+                </p>
+            </div>
+            <div class="row-flex gap-sm shrink-0">
+                <button class="btn btn-ghost" type="button">Not now</button>
+                <a class="btn btn-primary" href="/register?returnUrl=/account/orders/@orderNumber">Create Account</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="band-sm no-print">
+        <h2 class="t-heading-lg mb-md">While you wait</h2>
+        <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+            @foreach (var article in DemoContent.Articles())
+            {
+                <a class="article-card" href="@article.Url">
+                    <div class="article-card__media">
+                        <img src="@article.CoverUrl" alt="@article.Title" loading="lazy" width="800" height="450" />
+                    </div>
+                    <div class="article-card__body">
+                        <span class="t-overline eyebrow-craft">@article.Category</span>
+                        <h3 class="article-card__title clamp-2">@article.Title</h3>
+                        <p class="article-card__meta">@article.ReadMinutes min read</p>
+                    </div>
+                </a>
+            }
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        // A single confetti burst, once, replaced by a static badge under reduced motion.
+        (function () {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            var colours = ['#4F46E5', '#D4714C', '#C99A28', '#059669'];
+            var host = document.querySelector('.confirm-card');
+            if (!host) return;
+
+            host.style.position = 'relative';
+            host.style.overflow = 'hidden';
+
+            for (var i = 0; i < 40; i++) {
+                var bit = document.createElement('span');
+                bit.style.cssText =
+                    'position:absolute;top:-12px;width:7px;height:12px;pointer-events:none;border-radius:1px;' +
+                    'left:' + (Math.floor(i * 2.5) % 100) + '%;' +
+                    'background:' + colours[i % colours.length] + ';' +
+                    'animation:fall ' + (1000 + (i % 7) * 120) + 'ms ease-in ' + (i % 5) * 60 + 'ms forwards';
+                host.appendChild(bit);
+            }
+
+            var style = document.createElement('style');
+            style.textContent =
+                '@@keyframes fall{to{transform:translateY(320px) rotate(540deg);opacity:0}}';
+            document.head.appendChild(style);
+
+            setTimeout(function () {
+                host.querySelectorAll('span[style*="fall"]').forEach(function (s) { s.remove(); });
+            }, 2400);
+        })();
+    </script>
+}

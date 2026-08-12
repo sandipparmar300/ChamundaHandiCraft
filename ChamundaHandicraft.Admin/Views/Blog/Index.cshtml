@@ -1,7 +1,10 @@
-﻿@*
+@model PagedResult<BlogGridItem>
+@*
     Content - Blog Posts listing.  Spec: docs/Admin Flows/
 *@
 @{
+    // Preview opens the customer site, which runs on its own host.
+    var storefrontBase = Configuration["StorefrontBaseUrl"] ?? "https://localhost:7141";
     ViewData["Title"] = "Blog Posts";
 }
 
@@ -52,7 +55,36 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td><img src="@(row.CoverUrl ?? "/assets/images/default-profile.png")" width="56" height="32" alt="@row.Title" style="object-fit:cover;border-radius:4px" /></td>
+                        <td><a asp-action="Edit" asp-route-id="@row.Id">@row.Title</a></td>
+                        <td class="t-mono">@row.Slug</td>
+                        <td>@row.CategoryName</td>
+                        <td>@row.AuthorName</td>
+                        <td class="text-end">@row.ViewCount</td>
+                        <td class="text-end">@row.CommentCount</td>
+                        <td>@(row.PublishedOn is null ? "—" : Money.LongDate(row.PublishedOn.Value))</td>
+                        <td>
+                            <span class="badge @(row.IsLiveOnStorefront ? "bg-success" : "bg-secondary")">@row.Status</span>
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                            @if (row.IsLiveOnStorefront)
+                            {
+                                <a href="@storefrontBase@row.StorefrontUrl" target="_blank" rel="noopener" title="Preview on the storefront" class="ms-2"><i class="fas fa-external-link-alt"></i></a>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="10" class="text-center py-4">No posts yet. <a asp-action="Add">Write the first one</a>.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

@@ -1,25 +1,49 @@
 @*
     Module 20 - Platform settings hub (L-03 settings panel).
     Spec: docs/Admin Flows/Settings.txt
+
+    Every value on this screen is quoted back to a shopper somewhere: the free-shipping
+    threshold on each cart, the COD fee at checkout, the return window on each order page.
+    One section is loaded at a time so a save writes only what the operator actually saw.
 *@
+@model Dictionary<string, string?>
 @{
     ViewData["Title"] = "Settings";
 
-    var sections = new (string Key, string Title, string Icon, string[] Fields)[]
+    var active = ViewData["Section"] as string ?? SettingsSection.Storefront;
+
+    var sections = new (string Key, string Title, string Icon, string Note)[]
     {
-        ("store",    "Store",           "fa-store",             new[] { "Store Name", "Legal Entity Name", "Support Email", "Support Phone", "WhatsApp Number", "Registered Address", "GSTIN", "PAN", "Store Logo", "Favicon" }),
-        ("locale",   "Locale & Currency","fa-globe",            new[] { "Default Currency", "Currency Symbol", "Default Language", "Supported Languages", "Timezone", "Date Format", "Time Format", "Weight Unit", "Dimension Unit" }),
-        ("orders",   "Orders",          "fa-receipt",           new[] { "Order Number Prefix", "Order Number Start", "Auto Accept Orders", "Order Cancellation Window (hours)", "Return Window (days)", "Minimum Order Value", "Guest Checkout", "Invoice Prefix" }),
-        ("payments", "Payments",        "fa-credit-card",       new[] { "Default Gateway", "COD Enabled", "COD Maximum Order Value", "COD Charges", "Partial Payment", "Auto Capture", "Refund Mode" }),
-        ("shipping", "Shipping",        "fa-truck",             new[] { "Default Courier", "Free Shipping Above", "Default Handling Fee", "Default Package Weight", "Pickup Address", "Dispatch Cut-off Time" }),
-        ("tax",      "Tax",             "fa-percent",           new[] { "Tax Calculation", "Prices Include Tax", "Default Tax Class", "Display Tax In Cart", "Place of Supply" }),
-        ("inventory","Inventory",       "fa-boxes-stacked",     new[] { "Allow Negative Stock", "Default Low Stock Threshold", "Reserve Stock On Order", "Release Reservation After (minutes)", "Default Warehouse", "Valuation Method" }),
-        ("customer", "Customers",       "fa-users",             new[] { "Email Verification Required", "Mobile OTP Required", "Reward Points Per 100", "Reward Point Value", "Reward Expiry (days)", "Wishlist Enabled", "Compare Enabled" }),
-        ("security", "Security",        "fa-shield-halved",     new[] { "Maximum Failed Login Attempts", "Lockout Duration (minutes)", "Password Expiry (days)", "Session Timeout (minutes)", "Concurrent Sessions", "Two Factor For Roles" }),
-        ("seo",      "SEO",             "fa-magnifying-glass",  new[] { "Robots Indexable", "Default Title Suffix", "Sitemap Path", "Google Analytics ID", "Google Tag Manager ID", "Facebook Pixel ID", "Search Console Verification" }),
-        ("email",    "Email & SMS",     "fa-envelope",          new[] { "Email Provider", "SMTP Host", "SMTP Port", "From Address", "From Name", "SMS Provider", "SMS Sender ID", "WhatsApp Provider" }),
-        ("maint",    "Maintenance",     "fa-screwdriver-wrench",new[] { "Maintenance Mode", "Maintenance Message", "Allowed IP Addresses", "Scheduled From", "Scheduled To" })
+        (SettingsSection.Storefront,    "Storefront",     "fa-store",          "Currency, thresholds and the figures every page repeats"),
+        (SettingsSection.Shipping,      "Shipping",       "fa-truck",          "Quoted on the cart, checkout and product page"),
+        (SettingsSection.Payment,       "Payment",        "fa-credit-card",    "Which methods appear at checkout, and their fees"),
+        (SettingsSection.Tax,           "Tax",            "fa-percent",        "How tax is shown in the price breakdown"),
+        (SettingsSection.Rewards,       "Rewards",        "fa-gift",           "Earn rate and tier thresholds in the shopper's account"),
+        (SettingsSection.Seo,           "SEO",            "fa-magnifying-glass","Indexing and analytics tags"),
+        (SettingsSection.Contact,       "Contact",        "fa-headset",        "The number and address on every help page"),
+        (SettingsSection.Notifications, "Notifications",  "fa-bell",           "Which order events send an email or SMS"),
+        (SettingsSection.Legal,         "Legal",          "fa-scale-balanced", "Entity details printed on invoices")
     };
+
+    var current = sections.FirstOrDefault(s => s.Key == active);
+    if (current.Key is null) { current = sections[0]; }
+
+    // "FreeShippingThreshold" -> "Free Shipping Threshold"
+    string Label(string key) =>
+        System.Text.RegularExpressions.Regex.Replace(key, "(?<!^)([A-Z])", " $1");
+
+    // Keys the storefront reads directly, so an operator knows the blast radius.
+    var storefrontFacing = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "FreeShippingThreshold", "StandardShippingCost", "CodFee", "GiftWrapCost",
+        "ExpressSurcharge", "ReturnWindowDays", "RefundWorkingDays", "CurrencyCode",
+        "SupportPhone", "SupportEmail", "SupportWhatsApp", "SupportHours",
+        "PointsPerHundredSpent", "PointValue", "SilverTierAt", "GoldTierAt"
+    };
+
+    bool IsBoolean(string? v) =>
+        string.Equals(v, "true", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(v, "false", StringComparison.OrdinalIgnoreCase);
 }
 
 @section Header {
@@ -30,13 +54,16 @@
         <ul class="page-breadcrumb">
             <li>Administration</li>
             <li>Platform Settings</li>
+            <li>@current.Title</li>
         </ul>
     </div>
 }
 
 <main class="page-content">
 
-    <form method="post" id="settingsForm" enctype="multipart/form-data">
+    <form method="post" asp-controller="Settings" asp-action="Save" id="settingsForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Section" value="@current.Key" />
 
         <div class="row g-3">
 
@@ -44,53 +71,70 @@
             <div class="col-xl-3">
                 <section class="form-section h-100">
                     <div class="form-section-body">
-                        <div class="list-group settings-nav" id="settingsNav" role="tablist">
-                            @{
-                                var firstNav = true;
-                            }
+                        <div class="list-group settings-nav">
                             @foreach (var s in sections)
                             {
-                                <a class="list-group-item list-group-item-action @(firstNav ? "active" : "")"
-                                   data-bs-toggle="list" href="#set-@s.Key" role="tab">
+                                <a class="list-group-item list-group-item-action @(s.Key == current.Key ? "active" : "")"
+                                   asp-controller="Settings" asp-action="Index" asp-route-section="@s.Key">
                                     <i class="fas @s.Icon me-2"></i>@s.Title
                                 </a>
-                                firstNav = false;
                             }
                         </div>
                     </div>
                 </section>
             </div>
 
-            <!-- Section panels -->
+            <!-- Active section -->
             <div class="col-xl-9">
-                <div class="tab-content">
-                    @{
-                        var firstPane = true;
-                    }
-                    @foreach (var s in sections)
-                    {
-                        <div class="tab-pane fade @(firstPane ? "show active" : "")" id="set-@s.Key" role="tabpanel">
-                            <section class="form-section">
-                                <div class="form-section-header">
-                                    <h2><i class="fas @s.Icon" style="color:var(--accent);margin-right:8px;"></i>@s.Title</h2>
-                                </div>
-                                <div class="form-section-body">
-                                    <div class="row g-3">
-                                        @foreach (var f in s.Fields)
+                <section class="form-section">
+                    <div class="form-section-header">
+                        <h2><i class="fas @current.Icon" style="color:var(--accent);margin-right:8px;"></i>@current.Title</h2>
+                        <span class="text-muted" style="font-size:.8rem;">@current.Note</span>
+                    </div>
+                    <div class="form-section-body">
+                        @if (!Model.Any())
+                        {
+                            <p class="text-muted mb-0">No settings are defined for this section yet.</p>
+                        }
+                        else
+                        {
+                            <div class="row g-3">
+                                @foreach (var kv in Model.OrderBy(k => k.Key))
+                                {
+                                    <div class="col-lg-4 col-md-6">
+                                        <label class="form-label-custom" for="set-@kv.Key">
+                                            @Label(kv.Key)
+                                            @if (storefrontFacing.Contains(kv.Key))
+                                            {
+                                                <i class="fas fa-eye ms-1" style="color:var(--accent);font-size:.72rem;"
+                                                   title="Shoppers see this value"></i>
+                                            }
+                                        </label>
+
+                                        @if (IsBoolean(kv.Value))
                                         {
-                                            var fid = s.Key + System.Text.RegularExpressions.Regex.Replace(f, "[^A-Za-z0-9]", "");
-                                            <div class="col-lg-4 col-md-6">
-                                                <label class="form-label-custom">@f</label>
-                                                <input id="@fid" name="@fid" class="form-control-custom" placeholder="Enter @f.ToLowerInvariant()" />
-                                            </div>
+                                            <select id="set-@kv.Key" name="Values[@kv.Key]" class="form-control-custom">
+                                                <option value="true" selected="@(kv.Value!.Equals("true", StringComparison.OrdinalIgnoreCase))">Yes</option>
+                                                <option value="false" selected="@(kv.Value!.Equals("false", StringComparison.OrdinalIgnoreCase))">No</option>
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <input id="set-@kv.Key" name="Values[@kv.Key]" class="form-control-custom"
+                                                   value="@kv.Value" placeholder="@Label(kv.Key)" />
                                         }
                                     </div>
-                                </div>
-                            </section>
-                        </div>
-                        firstPane = false;
-                    }
-                </div>
+                                }
+                            </div>
+
+                            <div class="mt-4">
+                                <label class="form-label-custom" for="changeNote">Why are you changing this?</label>
+                                <input id="changeNote" name="ChangeNote" class="form-control-custom"
+                                       placeholder="Recorded against every value in the change history" />
+                            </div>
+                        }
+                    </div>
+                </section>
             </div>
 
         </div>
@@ -103,7 +147,7 @@
             </div>
             <div>
                 <a asp-controller="Dashboard" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save"><i class="fas fa-save"></i> Save Settings</button>
+                <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save @current.Title</button>
             </div>
         </div>
 

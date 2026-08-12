@@ -1,0 +1,92 @@
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">Saved cards</h1>
+    <p class="page-head__sub">
+        Cards are tokenised by our payment partner as RBI requires — we never store the full number.
+    </p>
+</div>
+
+<div class="stack stack-sm">
+    @foreach (var (network, last4, expiry, bank, isDefault) in new[]
+    {
+        ("VISA", "4242", "08/28", "HDFC Bank", true),
+        ("RuPay", "8871", "02/27", "SBI", false)
+    })
+    {
+        <div class="card">
+            <div class="row-flex wrap between gap-md">
+                <div class="row-flex gap-md">
+                    <span class="payment-mark" style="height:36px;min-width:56px">@network</span>
+                    <div>
+                        <p class="t-body-md">
+                            •••• •••• •••• @last4
+                            @if (isDefault)
+                            {
+                                <span class="tag tag-success" style="margin-left:8px">Default</span>
+                            }
+                        </p>
+                        <p class="t-body-sm text-secondary-c">@bank · Expires @expiry</p>
+                    </div>
+                </div>
+
+                <div class="row-flex gap-md shrink-0">
+                    @if (!isDefault)
+                    {
+                        <button class="cart-line__link" type="button">Set as default</button>
+                    }
+                    <button class="cart-line__link cart-line__link--danger" type="button" data-open="removeCard">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-trash"></use></svg>
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="card card-craft mt-md">
+    <div class="row-flex gap-sm">
+        <svg class="ico ico-lg text-craft-c shrink-0" aria-hidden="true"><use href="#i-shield-check"></use></svg>
+        <div>
+            <p class="t-heading-xs text-craft-c">How this stays safe</p>
+            <p class="t-body-sm text-craft-c">
+                Your card number is replaced by a token held by the bank. Neither we nor our payment
+                partner can read it, and the token only works on Chamunda Handicraft. You still enter the CVV on every payment.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-md">
+    <h2 class="t-heading-md mb-sm">UPI IDs</h2>
+    <div class="row-flex wrap between gap-sm">
+        <div>
+            <p class="t-body-md t-mono">ananya@okhdfcbank</p>
+            <p class="t-body-xs text-tertiary-c">Used on your last 3 orders</p>
+        </div>
+        <button class="cart-line__link cart-line__link--danger" type="button">Remove</button>
+    </div>
+</div>
+
+<div class="modal-scrim" id="removeCard" role="dialog" aria-modal="true" aria-labelledby="removeCardTitle" aria-hidden="true">
+    <div class="modal modal-sm">
+        <div class="modal__head">
+            <h2 class="t-heading-md" id="removeCardTitle">Remove this card?</h2>
+            <button class="icon-btn" data-close="removeCard" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <p class="t-body-md text-secondary-c">
+                You can add it again at your next checkout. Orders already paid for are unaffected.
+            </p>
+        </div>
+        <div class="modal__foot">
+            <button class="btn btn-ghost" data-close="removeCard">Cancel</button>
+            <button class="btn btn-danger" data-close="removeCard">Remove Card</button>
+        </div>
+    </div>
+</div>

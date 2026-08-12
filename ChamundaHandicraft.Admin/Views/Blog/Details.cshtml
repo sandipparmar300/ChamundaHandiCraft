@@ -1,4 +1,5 @@
-﻿@{
+@model BlogGridItem
+@{
     ViewData["Title"] = "Post Details";
 }
 
@@ -22,26 +23,26 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Post Information</h2>
-            <a asp-controller="Blog" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Blog" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Title</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Title</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Slug</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Slug</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Category</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.CategoryName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Author</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.AuthorName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Excerpt</label>
@@ -49,19 +50,19 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Reading Time</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.ReadMinutes min</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Published On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.PublishedOn is null ? "Not published" : Money.LongDate(Model.PublishedOn.Value))</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Views</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.ViewCount</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Comments</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.CommentCount</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">SEO Title</label>
@@ -73,7 +74,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
             </div>
         </div>

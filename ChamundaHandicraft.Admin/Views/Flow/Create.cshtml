@@ -1,4 +1,5 @@
-﻿@{
+@model FlowGridItem
+@{
     ViewData["Title"] = "Flow";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Flow" : "Add Flow";
@@ -23,7 +24,7 @@
 
     <form method="post" id="flowForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">

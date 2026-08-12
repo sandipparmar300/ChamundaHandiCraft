@@ -1,4 +1,5 @@
-﻿@{
+@model CityGridItem
+@{
     ViewData["Title"] = "City";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit City" : "Add City";
@@ -23,7 +24,7 @@
 
     <form method="post" id="cityForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -34,7 +35,7 @@
                 <div class="row g-3">
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">City Name <span class="req">*</span></label>
-                        <input id="CityName" name="CityName" class="form-control-custom" placeholder="Enter city name" />
+                        <input id="CityName" name="CityName" class="form-control-custom" placeholder="Enter city name" / value="@Model.CityName" >
                         <span class="error-msg" data-valmsg-for="CityName"></span>
                     </div>
 

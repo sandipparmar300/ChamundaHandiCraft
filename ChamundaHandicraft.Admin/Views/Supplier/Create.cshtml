@@ -1,4 +1,5 @@
-﻿@{
+@model SupplierGridItem
+@{
     ViewData["Title"] = "Supplier";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Supplier" : "Add Supplier";
@@ -23,7 +24,7 @@
 
     <form method="post" id="supplierForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -40,7 +41,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Supplier Name <span class="req">*</span></label>
-                        <input id="SupplierName" name="SupplierName" class="form-control-custom" placeholder="Enter supplier name" />
+                        <input id="SupplierName" name="SupplierName" class="form-control-custom" placeholder="Enter supplier name" / value="@Model.SupplierName" >
                         <span class="error-msg" data-valmsg-for="SupplierName"></span>
                     </div>
 
@@ -80,19 +81,19 @@
                 <div class="row g-3">
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Contact Person</label>
-                        <input id="ContactPerson" name="ContactPerson" class="form-control-custom" placeholder="Enter contact person" />
+                        <input id="ContactPerson" name="ContactPerson" class="form-control-custom" placeholder="Enter contact person" / value="@Model.ContactPerson" >
                         <span class="error-msg" data-valmsg-for="ContactPerson"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Phone</label>
-                        <input id="Phone" name="Phone" class="form-control-custom" placeholder="Enter phone" />
+                        <input id="Phone" name="Phone" class="form-control-custom" placeholder="Enter phone" / value="@Model.Phone" >
                         <span class="error-msg" data-valmsg-for="Phone"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Email</label>
-                        <input id="Email" name="Email" class="form-control-custom" placeholder="Enter email" />
+                        <input id="Email" name="Email" class="form-control-custom" placeholder="Enter email" / value="@Model.Email" >
                         <span class="error-msg" data-valmsg-for="Email"></span>
                     </div>
 
@@ -104,7 +105,7 @@
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">City</label>
-                        <input id="City" name="City" class="form-control-custom" placeholder="Enter city" />
+                        <input id="City" name="City" class="form-control-custom" placeholder="Enter city" / value="@Model.City" >
                         <span class="error-msg" data-valmsg-for="City"></span>
                     </div>
 

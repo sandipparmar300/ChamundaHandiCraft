@@ -1,3 +1,4 @@
+@model RoleGridItem
 @{
     ViewData["Title"] = "Role Details";
 }
@@ -55,7 +56,16 @@
                         <th style="min-width:110px;">Status</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                    @* Who currently holds this role. Removing the last holder of a system
+                       role is what locks an organisation out, so the count is shown plainly. *@
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            @Model.UserCount user@(Model.UserCount == 1 ? "" : "s") hold this role.
+                            <a asp-controller="AdminUser" asp-action="Index">See the team list</a>.
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </section>

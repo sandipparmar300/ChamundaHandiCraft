@@ -1,0 +1,19 @@
+@model PaymentStatus
+@*
+    Payment status as a word plus a colour, never colour alone — the same rule the
+    storefront follows for order status.
+*@
+@{
+    var (css, label) = Model switch
+    {
+        PaymentStatus.Paid => ("bg-success", "Paid"),
+        PaymentStatus.Authorised => ("bg-info", "Authorised"),
+        PaymentStatus.Pending => ("bg-warning text-dark", "Pending"),
+        PaymentStatus.CodPending => ("bg-warning text-dark", "COD pending"),
+        PaymentStatus.Failed => ("bg-danger", "Failed"),
+        PaymentStatus.Refunded => ("bg-secondary", "Refunded"),
+        PaymentStatus.PartiallyRefunded => ("bg-secondary", "Partly refunded"),
+        _ => ("bg-secondary", Model.ToString())
+    };
+}
+<span class="badge @css">@label</span>

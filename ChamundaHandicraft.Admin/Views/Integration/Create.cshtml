@@ -1,4 +1,5 @@
-﻿@{
+@model IntegrationGridItem
+@{
     ViewData["Title"] = "Integration";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Integration" : "Add Integration";
@@ -23,7 +24,7 @@
 
     <form method="post" id="integrationForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">

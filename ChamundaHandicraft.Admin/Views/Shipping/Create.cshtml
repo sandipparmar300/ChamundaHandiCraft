@@ -1,4 +1,5 @@
-﻿@{
+@model ShippingZoneGridItem
+@{
     ViewData["Title"] = "Shipping Zone";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Shipping Zone" : "Add Shipping Zone";
@@ -23,7 +24,7 @@
 
     <form method="post" id="shippingForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -34,7 +35,7 @@
                 <div class="row g-3">
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Zone Name <span class="req">*</span></label>
-                        <input id="ZoneName" name="ZoneName" class="form-control-custom" placeholder="Enter zone name" />
+                        <input id="ZoneName" name="ZoneName" class="form-control-custom" placeholder="Enter zone name" / value="@Model.ZoneName" >
                         <span class="error-msg" data-valmsg-for="ZoneName"></span>
                     </div>
 
@@ -86,13 +87,13 @@
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Base Rate</label>
-                        <input id="BaseRate" name="BaseRate" class="form-control-custom" placeholder="0.00" />
+                        <input id="BaseRate" name="BaseRate" class="form-control-custom" placeholder="0.00" / value="@Model.BaseRate" >
                         <span class="error-msg" data-valmsg-for="BaseRate"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Per Kg Rate</label>
-                        <input id="PerKgRate" name="PerKgRate" class="form-control-custom" placeholder="0.00" />
+                        <input id="PerKgRate" name="PerKgRate" class="form-control-custom" placeholder="0.00" / value="@Model.PerKgRate" >
                         <span class="error-msg" data-valmsg-for="PerKgRate"></span>
                     </div>
 

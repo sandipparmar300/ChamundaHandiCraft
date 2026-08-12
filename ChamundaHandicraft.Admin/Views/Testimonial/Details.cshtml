@@ -1,4 +1,5 @@
-﻿@{
+@model TestimonialGridItem
+@{
     ViewData["Title"] = "Testimonial Details";
 }
 
@@ -22,14 +23,14 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Testimonial Information</h2>
-            <a asp-controller="Testimonial" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Testimonial" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Author Name</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.CustomerName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Designation</label>
@@ -37,27 +38,27 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Location</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.Location ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Rating</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Rating / 5</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Testimonial</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Quote</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Placement</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.ShowOnHome ? "Home page" : "Not placed")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Sort Order</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.SortOrder</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
             </div>
         </div>

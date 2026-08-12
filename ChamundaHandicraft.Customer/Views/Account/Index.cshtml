@@ -1,0 +1,164 @@
+@{
+    Layout = "_AccountLayout";
+    var orders = DemoContent.Orders();
+    var activeOrder = orders.First();
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-display-lg page-head__title">Hello, Ananya</h1>
+    <p class="page-head__sub">Everything about your orders, saved pieces and points, in one place.</p>
+</div>
+
+@* ---- Stat tiles ---- *@
+<div class="stat-grid mb-lg">
+    <a class="stat-tile" href="/account/orders">
+        <p class="stat-tile__value">@orders.Count</p>
+        <p class="stat-tile__label">Orders placed</p>
+    </a>
+    <a class="stat-tile" href="/account/orders">
+        <p class="stat-tile__value">1</p>
+        <p class="stat-tile__label">In transit</p>
+    </a>
+    <a class="stat-tile" href="/wishlist">
+        <p class="stat-tile__value">6</p>
+        <p class="stat-tile__label">Saved pieces</p>
+    </a>
+    <a class="stat-tile" href="/account/coupons">
+        <p class="stat-tile__value">4</p>
+        <p class="stat-tile__label">Coupons available</p>
+    </a>
+</div>
+
+@* ---- Active order — the most useful thing on this page ---- *@
+<section class="card mb-lg">
+    <div class="card__head">
+        <h2 class="t-heading-md">Arriving soon</h2>
+        <a class="link-standalone" href="/account/orders">
+            All orders
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+        </a>
+    </div>
+
+    <div class="row-flex wrap between gap-md">
+        <div class="row-flex gap-md">
+            <div class="order-thumbs">
+                @foreach (var thumb in activeOrder.Thumbnails.Take(2))
+                {
+                    <img class="img-product" src="@thumb" alt="" width="56" height="56" loading="lazy" />
+                }
+            </div>
+            <div>
+                <span class="status-chip status-chip--@activeOrder.StatusModifier">
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#@activeOrder.StatusIcon"></use></svg>
+                    @activeOrder.StatusLabel
+                </span>
+                <p class="t-body-md mt-2xs">@activeOrder.PrimaryItemName@(activeOrder.ItemCount > 1 ? $" + {activeOrder.ItemCount - 1} more" : "")</p>
+                <p class="t-body-sm text-secondary-c">
+                    <span class="t-mono">@activeOrder.OrderNumber</span> ·
+                    Arriving @Money.DeliveryDate(activeOrder.DeliveryBy!.Value)
+                </p>
+            </div>
+        </div>
+
+        <div class="row-flex gap-xs shrink-0">
+            <a class="btn btn-primary btn-sm" href="/track/@activeOrder.OrderNumber">Track Order</a>
+            <a class="btn btn-outline btn-sm" href="@activeOrder.Url">View Details</a>
+        </div>
+    </div>
+
+    <div class="card__divider"></div>
+
+    <div class="track-strip">
+        @foreach (var step in DemoContent.Timeline())
+        {
+            <div class="track-strip__step @(step.State == "done" ? "is-done" : step.State == "current" ? "is-current" : "")">
+                <span class="timeline__dot" style="@(step.State == "done" ? "background:var(--success-600);border-color:var(--success-600);color:#fff" : step.State == "current" ? "background:var(--color-action-primary-bg);border-color:var(--color-action-primary-bg);color:#fff" : "")">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#@step.Icon"></use></svg>
+                </span>
+                <p class="t-body-sm" style="font-weight:@(step.State == "upcoming" ? "500" : "600")">@step.Title</p>
+                @if (step.At is not null)
+                {
+                    <p class="t-body-xs text-tertiary-c">@Money.DeliveryDate(step.At.Value)</p>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@* ---- Points ---- *@
+<div class="layout-halves mb-lg" style="align-items:stretch;gap:var(--space-md)">
+    <div class="points-card">
+        <span class="t-overline" style="color:rgba(255,255,255,.7)">Chamunda rewards</span>
+        <p class="points-card__value mt-xs">1,840</p>
+        <p class="points-card__label">points · worth @Money.Inr(1840)</p>
+        <div class="row-flex gap-sm mt-md">
+            <a class="btn btn-inverse btn-sm" href="/account/rewards">View Rewards</a>
+            <a class="btn btn-ghost btn-sm" href="/shop" style="color:#fff">Shop &amp; Earn</a>
+        </div>
+        <p class="t-body-xs mt-md" style="color:rgba(255,255,255,.66)">
+            160 more points until Silver tier — free express delivery on every order.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2 class="t-heading-md mb-sm">Default delivery address</h2>
+        @{
+            var address = DemoContent.Addresses().First(a => a.IsDefault);
+        }
+        <p class="t-body-md">
+            <strong>@address.FullName</strong><br />
+            <span class="text-secondary-c">@address.OneLine</span><br />
+            <span class="text-secondary-c">@address.Phone</span>
+        </p>
+        <div class="row-flex gap-sm mt-md">
+            <a class="btn btn-outline btn-sm" href="/account/addresses">Manage Addresses</a>
+        </div>
+    </div>
+</div>
+
+@* ---- Things needing the shopper's attention ---- *@
+<section class="card mb-lg">
+    <h2 class="t-heading-md mb-md">A few things to do</h2>
+    <div class="stack stack-sm">
+        <div class="row-flex wrap between gap-sm" style="padding-bottom:var(--space-sm);border-bottom:1px solid var(--color-border-subtle)">
+            <span class="row-flex gap-sm">
+                <svg class="ico text-brand-c" aria-hidden="true"><use href="#i-star"></use></svg>
+                <span>
+                    <span class="t-body-md" style="display:block">Review the Cuttack jhumkas</span>
+                    <span class="t-body-xs text-tertiary-c">Delivered 18 days ago · earn 50 points</span>
+                </span>
+            </span>
+            <a class="btn btn-outline btn-sm" href="/reviews/write/silver-filigree-jhumka">Write a Review</a>
+        </div>
+
+        <div class="row-flex wrap between gap-sm" style="padding-bottom:var(--space-sm);border-bottom:1px solid var(--color-border-subtle)">
+            <span class="row-flex gap-sm">
+                <svg class="ico text-warning-c" aria-hidden="true"><use href="#i-phone"></use></svg>
+                <span>
+                    <span class="t-body-md" style="display:block">Verify your mobile number</span>
+                    <span class="t-body-xs text-tertiary-c">Needed for cash on delivery</span>
+                </span>
+            </span>
+            <a class="btn btn-outline btn-sm" href="/verify-mobile">Verify Now</a>
+        </div>
+
+        <div class="row-flex wrap between gap-sm">
+            <span class="row-flex gap-sm">
+                <svg class="ico text-success-c" aria-hidden="true"><use href="#i-heart"></use></svg>
+                <span>
+                    <span class="t-body-md" style="display:block">2 saved pieces have dropped in price</span>
+                    <span class="t-body-xs text-tertiary-c">You'd save ₹660 today</span>
+                </span>
+            </span>
+            <a class="btn btn-outline btn-sm" href="/wishlist">View Wishlist</a>
+        </div>
+    </div>
+</section>
+
+@await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+{
+    Heading = "Buy it again",
+    SubHeading = "Pieces you've ordered before.",
+    Products = DemoContent.Products(5),
+    Compact = true
+})

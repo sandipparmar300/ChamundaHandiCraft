@@ -1,4 +1,5 @@
-﻿@{
+@model SubscriberGridItem
+@{
     ViewData["Title"] = "Subscriber";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Subscriber" : "Add Subscriber";
@@ -23,7 +24,7 @@
 
     <form method="post" id="subscriberForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -34,13 +35,13 @@
                 <div class="row g-3">
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Email <span class="req">*</span></label>
-                        <input id="Email" name="Email" class="form-control-custom" placeholder="Enter email" />
+                        <input id="Email" name="Email" class="form-control-custom" placeholder="Enter email" / value="@Model.Email" >
                         <span class="error-msg" data-valmsg-for="Email"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Name</label>
-                        <input id="Name" name="Name" class="form-control-custom" placeholder="Enter name" />
+                        <input id="Name" name="Name" class="form-control-custom" placeholder="Enter name" / value="@Model.Name" >
                         <span class="error-msg" data-valmsg-for="Name"></span>
                     </div>
 

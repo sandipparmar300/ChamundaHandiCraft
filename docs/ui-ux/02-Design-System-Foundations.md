@@ -1,7 +1,7 @@
 # 02 — Design System Foundations
 
 Enterprise Handicraft E-Commerce Platform · UI/UX Design Specification
-**Design System Name:** `Karigar DS` (Karigar = artisan)
+**Design System Name:** `Chamunda DS`
 
 ---
 

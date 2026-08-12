@@ -1,0 +1,266 @@
+@model ArticleCardViewModel
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+
+    var sections = new (string Id, string Heading)[]
+    {
+        ("s-quartz", "There is no clay in blue pottery"),
+        ("s-shaping", "Shaping without a wheel"),
+        ("s-cobalt", "Painting in cobalt oxide"),
+        ("s-firing", "One firing, one chance"),
+        ("s-today", "Forty workshops left")
+    };
+
+    var articleJsonLd =
+        "{\"@context\":\"https://schema.org\",\"@type\":\"Article\"," +
+        "\"headline\":\"" + Model.Title.Replace("\"", "\\\"") + "\"," +
+        "\"image\":\"" + Model.CoverUrl + "\"," +
+        "\"author\":{\"@type\":\"Person\",\"name\":\"" + Model.Author + "\"}," +
+        "\"datePublished\":\"" + Model.PublishedOn.ToString("yyyy-MM-dd") + "\"," +
+        "\"publisher\":{\"@type\":\"Organization\",\"name\":\"Chamunda Handicraft\"}}";
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+</div>
+
+<article>
+    @* ---- Header ---- *@
+    <header class="container-wide" style="padding-block:var(--space-lg) var(--space-xl);text-align:center">
+        <span class="t-overline eyebrow-craft">@Model.Category</span>
+        <h1 class="t-display-xl mt-sm">@Model.Title</h1>
+        <p class="t-body-xl text-secondary-c mt-md mx-auto measure">@Model.Excerpt</p>
+
+        <div class="row-flex center wrap gap-md mt-lg">
+            <span class="row-flex gap-xs">
+                <span class="avatar avatar-sm">@Model.Author[..1]</span>
+                <span class="t-body-sm">@Model.Author</span>
+            </span>
+            <span class="t-body-sm text-tertiary-c">@Money.LongDate(Model.PublishedOn)</span>
+            <span class="t-body-sm text-tertiary-c">@Model.ReadMinutes min read</span>
+            <button class="btn btn-ghost btn-sm" type="button" data-open="shareArticle">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-share"></use></svg>
+                Share
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="img-box img-16-9" style="border-radius:var(--radius-xl)">
+            <img src="@Model.CoverUrl" alt="@Model.Title" fetchpriority="high" width="1600" height="900" />
+        </div>
+        <p class="t-caption text-center mt-xs">
+            Ram Prasad Sharma's workshop in Sanganer, on the edge of Jaipur. Photograph by Nandini Rao.
+        </p>
+    </div>
+
+    @* ---- Body + TOC rail ---- *@
+    <div class="container">
+        <div class="layout-editorial" style="padding-block:var(--space-2xl)">
+            <div class="prose">
+                <p class="t-body-xl">
+                    The first thing Ram Prasad Sharma tells you about blue pottery is what it is not.
+                    “There is no clay,” he says, pushing a fistful of white powder across the table.
+                    “People assume clay. It is quartz.”
+                </p>
+
+                <h2 id="s-quartz">There is no clay in blue pottery</h2>
+                <p>
+                    The body is a dough of quartz powder, powdered glass, fuller's earth, borax and gum,
+                    kneaded like bread and rested overnight. It has no plasticity — you cannot throw it on a
+                    wheel the way you would throw stoneware. Left alone it slumps; worked too hard it cracks.
+                </p>
+                <p>
+                    That is why blue pottery is translucent when it is thin, and why it must be fired far
+                    lower than ordinary ceramics. It is closer to glass than to earthenware, and it behaves
+                    accordingly.
+                </p>
+
+                <blockquote>
+                    “Every piece that survives the kiln has already been through more than most people
+                    think a vase goes through.”
+                </blockquote>
+
+                <h2 id="s-shaping">Shaping without a wheel</h2>
+                <p>
+                    The dough is pressed into a plaster mould in two halves, joined at the seam with more
+                    dough, then smoothed by hand until the join disappears. A skilled maker can hide a seam
+                    so completely that only a raking light reveals it.
+                </p>
+                <figure>
+                    <div class="img-box img-4-3">
+                        <img src="~/assets/images/placeholders/pottery.svg"
+                             alt="Hands smoothing the seam of a moulded blue pottery vase" loading="lazy" />
+                    </div>
+                    <figcaption>The seam is smoothed by thumb, then burnished with a smooth river stone.</figcaption>
+                </figure>
+
+                <h2 id="s-cobalt">Painting in cobalt oxide</h2>
+                <p>
+                    The motif goes on before the glaze, in cobalt oxide ground with gum. It is drawn freehand
+                    with a squirrel-hair brush — no stencils, no transfers. This is why no two pieces repeat,
+                    and why the floral band on your vase will differ slightly from the one photographed.
+                </p>
+                <ul>
+                    <li>Cobalt for the classic blue</li>
+                    <li>Copper oxide for turquoise</li>
+                    <li>Manganese, rarely, for a brown that most workshops have stopped using</li>
+                </ul>
+
+                <h2 id="s-firing">One firing, one chance</h2>
+                <p>
+                    Blue pottery is fired once, at around 800°C, in a wood-fired kiln. There is no bisque
+                    stage to catch mistakes. Roughly one piece in six does not survive — it cracks, the glaze
+                    crawls, or the cobalt burns out.
+                </p>
+                <p>
+                    Ram Prasad shrugs at the number. “Six for five is a good day. Some days it is three for one.”
+                </p>
+
+                <h2 id="s-today">Forty workshops left</h2>
+                <p>
+                    Blue pottery arrived in Jaipur in the 14th century by way of Persia and Central Asia. At
+                    its height, several hundred families in Sanganer and Neota worked in it. Today the number
+                    of working workshops is closer to forty.
+                </p>
+                <p>
+                    The pieces we sell come from six of them. We buy at a price the makers set, and we name
+                    them on every product page — which is, in the end, the only part of this we can control.
+                </p>
+            </div>
+
+            @* ---- TOC rail ---- *@
+            <aside class="hide-tablet-down">
+                <nav class="toc" aria-label="On this page">
+                    <p class="t-overline mb-sm">On this page</p>
+                    @foreach (var part in sections)
+                    {
+                        <a class="toc__link @(part.Id == "s-quartz" ? "is-active" : "")" href="#@part.Id">@part.Heading</a>
+                    }
+                </nav>
+
+                <div class="card card-craft mt-lg">
+                    <p class="t-heading-xs text-craft-c mb-xs">Shop this story</p>
+                    <p class="t-body-sm text-craft-c mb-md">Pieces from Ram Prasad's workshop.</p>
+                    <div class="stack stack-xs">
+                        @foreach (var product in DemoContent.Products(2))
+                        {
+                            <a class="pcard-compact" href="@product.Url">
+                                <img class="pcard-compact__img img-product" src="@product.ImageUrl" alt="" width="48" height="48"
+                                     style="width:48px;height:48px" />
+                                <span class="grow">
+                                    <span class="t-body-sm clamp-2" style="display:block">@product.Name</span>
+                                    <span class="t-body-sm tabular" style="font-weight:600">@Money.Inr(product.Price)</span>
+                                </span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</article>
+
+@* ---- Author ---- *@
+<section class="container">
+    <div class="artisan-card">
+        <span class="avatar avatar-xl shrink-0">@Model.Author[..1]</span>
+        <div class="grow">
+            <span class="t-overline text-craft-c">Written by</span>
+            <h2 class="t-heading-md mt-2xs">@Model.Author</h2>
+            <p class="t-body-md mt-xs measure">
+                Nandini writes about craft, materials and the people who work with them. She has spent
+                three years visiting the workshops Chamunda Handicraft buys from, and has yet to leave one without clay
+                on her shoes.
+            </p>
+            <div class="artisan-card__actions">
+                <a class="btn btn-outline btn-sm" href="/blog?author=@Model.Author">More by @Model.Author.Split(' ')[0]</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ---- Shop the story ---- *@
+<section class="band band-surface">
+    <div class="container">
+        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        {
+            Eyebrow = "From this workshop",
+            Heading = "Shop Jaipur blue pottery",
+            SubHeading = "Every piece here was made in one of the six workshops in this story.",
+            ViewAllUrl = "/c/pottery",
+            Products = DemoContent.Products(6)
+        })
+    </div>
+</section>
+
+@* ---- Related reading ---- *@
+<section class="band-sm">
+    <div class="container">
+        <h2 class="t-heading-lg mb-md">Keep reading</h2>
+        <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+            @foreach (var article in DemoContent.Articles().Where(a => a.Slug != Model.Slug))
+            {
+                <a class="article-card" href="@article.Url">
+                    <div class="article-card__media">
+                        <img src="@article.CoverUrl" alt="@article.Title" loading="lazy" width="800" height="450" />
+                    </div>
+                    <div class="article-card__body">
+                        <span class="t-overline eyebrow-craft">@article.Category</span>
+                        <h3 class="article-card__title clamp-2">@article.Title</h3>
+                        <p class="article-card__meta">@article.ReadMinutes min read</p>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<div class="sheet" id="shareArticle" role="dialog" aria-modal="true" aria-label="Share this story" aria-hidden="true" data-scrim="globalScrim">
+    <div class="sheet__handle"></div>
+    <div class="sheet__head">
+        <h2 class="t-heading-md">Share this story</h2>
+        <button class="icon-btn" data-close aria-label="Close"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg></button>
+    </div>
+    <div class="sheet__body">
+        <button class="dropdown__item" type="button" data-copy="https://chamundahandicraft.com/blog/@Model.Slug">
+            <svg class="ico" aria-hidden="true"><use href="#i-copy"></use></svg> Copy link
+        </button>
+        <a class="dropdown__item" href="https://wa.me/?text=https://chamundahandicraft.com/blog/@Model.Slug" rel="noopener">
+            <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg> WhatsApp
+        </a>
+        <a class="dropdown__item" href="https://facebook.com" rel="noopener">
+            <svg class="ico" aria-hidden="true"><use href="#i-facebook"></use></svg> Facebook
+        </a>
+        <a class="dropdown__item" href="mailto:?body=https://chamundahandicraft.com/blog/@Model.Slug">
+            <svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg> Email
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="application/ld+json">@Html.Raw(articleJsonLd)</script>
+    <script>
+        // Highlight the section currently in view in the table of contents.
+        (function () {
+            var links = document.querySelectorAll('.toc__link');
+            if (!links.length || !('IntersectionObserver' in window)) return;
+
+            var headings = document.querySelectorAll('.prose h2[id]');
+
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    links.forEach(function (link) {
+                        link.classList.toggle('is-active', link.getAttribute('href') === '#' + entry.target.id);
+                    });
+                });
+            }, { rootMargin: '-20% 0px -70% 0px' });
+
+            headings.forEach(function (h) { io.observe(h); });
+        })();
+    </script>
+}

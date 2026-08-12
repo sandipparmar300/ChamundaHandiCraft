@@ -1,0 +1,54 @@
+@model List<BreadcrumbItem>
+@{
+    if (Model is null || Model.Count == 0) { return; }
+
+    var parent = Model.Count >= 2 ? Model[^2] : null;
+
+    // BreadcrumbList structured data (SEO §10) — built here so the markup below
+    // stays readable.
+    var listItems = Model.Select((item, index) =>
+    {
+        var name = item.Label.Replace("\"", "\\\"");
+        var url = item.Url is null ? "" : $",\"item\":\"{item.Url}\"";
+        return $"{{\"@type\":\"ListItem\",\"position\":{index + 1},\"name\":\"{name}\"{url}}}";
+    });
+
+    var jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":["
+                 + string.Join(",", listItems) + "]}";
+}
+
+@* CMP-NAV-Breadcrumb — over 4 levels the middle collapses; mobile shows only "‹ parent". *@
+<nav class="breadcrumb hide-tablet-down" aria-label="Breadcrumb">
+    @for (var i = 0; i < Model.Count; i++)
+    {
+        var item = Model[i];
+
+        if (i > 0)
+        {
+            <span class="breadcrumb__sep" aria-hidden="true">
+                <svg class="ico ico-xs"><use href="#i-chevron-right"></use></svg>
+            </span>
+        }
+
+        if (i == Model.Count - 1 || item.Url is null)
+        {
+            <span class="breadcrumb__current" aria-current="page">@item.Label</span>
+        }
+        else
+        {
+            <a href="@item.Url">@item.Label</a>
+        }
+    }
+</nav>
+
+@if (parent?.Url is not null)
+{
+    <nav class="breadcrumb only-tablet-down" aria-label="Breadcrumb">
+        <a href="@parent.Url">
+            <svg class="ico ico-sm" aria-hidden="true" style="display:inline;vertical-align:-3px"><use href="#i-chevron-left"></use></svg>
+            @parent.Label
+        </a>
+    </nav>
+}
+
+<script type="application/ld+json">@Html.Raw(jsonLd)</script>

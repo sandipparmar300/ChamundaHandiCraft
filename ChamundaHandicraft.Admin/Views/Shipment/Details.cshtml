@@ -1,4 +1,5 @@
-﻿@{
+@model ShipmentGridItem
+@{
     ViewData["Title"] = "Shipment Details";
 }
 
@@ -22,42 +23,42 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Shipment Information</h2>
-            <a asp-controller="Shipment" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Shipment" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">AWB Number</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.AwbNumber</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Order Number</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.OrderNumber</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Customer</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.CustomerName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Courier</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.CourierName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Tracking Number</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.AwbNumber</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Dispatch Date</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.PickedUpOn is null ? "—" : Money.LongDate(Model.PickedUpOn.Value))</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Estimated Delivery</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.PromisedBy is null ? "—" : Money.DeliveryDate(Model.PromisedBy.Value))</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Delivered On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.DeliveredOn is null ? "—" : Money.LongDate(Model.DeliveredOn.Value))</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Packages</label>
@@ -65,15 +66,15 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Package Weight</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.WeightKg kg</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Shipping Charges</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.ShippingCost)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
             </div>
         </div>

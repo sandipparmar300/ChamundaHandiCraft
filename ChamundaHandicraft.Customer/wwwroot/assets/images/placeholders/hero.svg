@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" role="img" aria-label="Editorial craft photography placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#312E81"/><stop offset="1" stop-color="#95482E"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="500" fill="url(#g)"/>
+  <g fill="none" stroke="#FDF3EF" stroke-width="3" stroke-linecap="round" opacity="0.35">
+    <circle cx="300" cy="250" r="100"/>
+    <circle cx="600" cy="250" r="166"/>
+    <circle cx="900" cy="250" r="100"/>
+    <path d="M0 375 Q 300 250 600 375 T 1200 375"/>
+  </g>
+  <g fill="#FDF3EF" opacity="0.18">
+    <circle cx="200" cy="125" r="6"/><circle cx="1000" cy="125" r="6"/>
+    <circle cx="400" cy="400" r="5"/><circle cx="800" cy="400" r="5"/>
+  </g>
+</svg>

@@ -1,0 +1,213 @@
+@model OrderSummaryCardViewModel
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+    var orderNumber = ViewData["OrderNumber"] as string ?? Model.OrderNumber;
+    var timeline = DemoContent.Timeline();
+    var lines = DemoContent.CartLines();
+    var address = DemoContent.Addresses().First(a => a.IsDefault);
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    @* ---- The answer first: where is it and when does it arrive ---- *@
+    <section class="card card-craft mt-md">
+        <div class="row-flex wrap between gap-md">
+            <div>
+                <span class="t-overline text-craft-c">Order <span class="t-mono">@orderNumber</span></span>
+                <h1 class="t-display-lg text-craft-c mt-xs">Out for delivery</h1>
+                <p class="t-body-lg text-craft-c mt-xs">
+                    Arriving today between 10am and 6pm.
+                </p>
+                <p class="t-body-sm text-craft-c mt-sm">
+                    @Model.Courier · <span class="t-mono">@Model.TrackingNumber</span>
+                    <button class="icon-btn icon-btn-sm" type="button" data-copy="@Model.TrackingNumber"
+                            aria-label="Copy tracking number">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-copy"></use></svg>
+                    </button>
+                </p>
+            </div>
+
+            <div class="row-flex gap-xs shrink-0">
+                <button class="btn btn-secondary btn-sm" type="button" data-open="shareTracking">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-share"></use></svg>
+                    Share Tracking
+                </button>
+                <a class="btn btn-outline btn-sm" href="/account/orders/@orderNumber">Order Details</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="layout-content-summary mt-md">
+        <div>
+            @* ---- Horizontal progress on desktop ---- *@
+            <section class="card mb-md hide-tablet-down">
+                <div class="track-strip">
+                    @foreach (var step in timeline)
+                    {
+                        <div class="track-strip__step @(step.State == "done" ? "is-done" : step.State == "current" ? "is-current" : "")">
+                            <span class="timeline__dot"
+                                  style="@(step.State == "done" ? "background:var(--success-600);border-color:var(--success-600);color:#fff" : step.State == "current" ? "background:var(--color-action-primary-bg);border-color:var(--color-action-primary-bg);color:#fff;box-shadow:0 0 0 4px var(--color-focus-halo)" : "")">
+                                <svg class="ico ico-sm" aria-hidden="true"><use href="#@step.Icon"></use></svg>
+                            </span>
+                            <p class="t-body-sm" style="font-weight:@(step.State == "upcoming" ? "500" : "600")">@step.Title</p>
+                            @if (step.At is not null)
+                            {
+                                <p class="t-body-xs text-tertiary-c">@Money.DeliveryDate(step.At.Value)</p>
+                            }
+                        </div>
+                    }
+                </div>
+            </section>
+
+            @* ---- Map placeholder ---- *@
+            <section class="card mb-md">
+                <h2 class="t-heading-md mb-md">Where it is now</h2>
+                <div class="map-embed" role="img"
+                     aria-label="Map showing the parcel in Ahmedabad, approximately 8 kilometres from the delivery address">
+                    <div class="row-flex center" style="height:100%;flex-direction:column;gap:var(--space-sm)">
+                        <svg class="ico ico-3xl text-tertiary-c" aria-hidden="true"><use href="#i-map-pin"></use></svg>
+                        <p class="t-body-sm text-secondary-c">Ahmedabad, Gujarat · about 8 km away</p>
+                    </div>
+                </div>
+                <p class="t-body-xs text-tertiary-c mt-sm">
+                    Location comes from @Model.Courier and updates roughly every 30 minutes.
+                </p>
+            </section>
+
+            @* ---- Detailed history ---- *@
+            <section class="card">
+                <h2 class="t-heading-md mb-md">Full history</h2>
+                <div class="timeline">
+                    @foreach (var step in timeline)
+                    {
+                        <div class="timeline__step is-@step.State">
+                            <div class="timeline__marker">
+                                <span class="timeline__dot"><svg class="ico ico-sm" aria-hidden="true"><use href="#@step.Icon"></use></svg></span>
+                                <span class="timeline__line"></span>
+                            </div>
+                            <div class="timeline__body">
+                                <p class="timeline__title">@step.Title</p>
+                                <p class="timeline__meta">@step.Meta</p>
+                                @if (step.At is not null)
+                                {
+                                    <p class="t-body-xs text-tertiary-c mt-2xs">
+                                        @Money.LongDate(step.At.Value) at @step.At.Value.ToString("h:mm tt")
+                                        @if (step.Location is not null)
+                                        {
+                                            <text> · @step.Location</text>
+                                        }
+                                    </p>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+
+        @* ---- Side panel ---- *@
+        <aside class="sticky-col">
+            <div class="card mb-md">
+                <h2 class="t-heading-md mb-md">In this parcel</h2>
+                <div class="stack stack-sm">
+                    @foreach (var line in lines)
+                    {
+                        <div class="pcard-compact" style="padding:0">
+                            <img class="pcard-compact__img img-product" src="@line.ImageUrl" alt="" width="56" height="56"
+                                 style="width:56px;height:56px" />
+                            <span class="grow">
+                                <span class="t-body-sm clamp-2" style="display:block">@line.Name</span>
+                                <span class="t-body-xs text-tertiary-c">Qty @line.Quantity</span>
+                            </span>
+                        </div>
+                    }
+                </div>
+
+                <div class="card__divider"></div>
+
+                <h3 class="t-heading-xs mb-xs">Delivering to</h3>
+                <p class="t-body-sm text-secondary-c">
+                    <strong class="text-primary-c">@address.FullName</strong><br />
+                    @address.OneLine
+                </p>
+            </div>
+
+            <div class="card">
+                <h2 class="t-heading-xs mb-sm">Something not right?</h2>
+                <div class="stack stack-xs">
+                    <a class="dropdown__item" href="/help">
+                        <svg class="ico" aria-hidden="true"><use href="#i-circle-help"></use></svg> Delivery is late
+                    </a>
+                    <a class="dropdown__item" href="/account/addresses">
+                        <svg class="ico" aria-hidden="true"><use href="#i-map-pin"></use></svg> Change the address
+                    </a>
+                    <a class="dropdown__item" href="/help">
+                        <svg class="ico" aria-hidden="true"><use href="#i-calendar"></use></svg> Reschedule delivery
+                    </a>
+                    <a class="dropdown__item" href="https://wa.me/919876543210" rel="noopener">
+                        <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg> WhatsApp us
+                    </a>
+                </div>
+            </div>
+
+            @* Notification opt-in, unticked by default. *@
+            <div class="card mt-md">
+                <h2 class="t-heading-xs mb-sm">Delivery alerts</h2>
+                <label class="switch" style="justify-content:space-between;width:100%">
+                    <span class="t-body-sm">WhatsApp updates for this order</span>
+                    <input type="checkbox" />
+                </label>
+                <label class="switch mt-sm" style="justify-content:space-between;width:100%">
+                    <span class="t-body-sm">SMS on the delivery day</span>
+                    <input type="checkbox" checked />
+                </label>
+            </div>
+        </aside>
+    </div>
+
+    @* Variation notice appears once more before the parcel is opened. *@
+    <div class="mt-lg">
+        @await Html.PartialAsync("_VariationNotice")
+    </div>
+</div>
+
+<div class="modal-scrim" id="shareTracking" role="dialog" aria-modal="true" aria-labelledby="shareTrackTitle" aria-hidden="true">
+    <div class="modal modal-sm">
+        <div class="modal__head">
+            <div>
+                <h2 class="t-heading-md" id="shareTrackTitle">Share tracking</h2>
+                <p class="t-body-sm text-secondary-c mt-2xs">
+                    The link shows the status and delivery date only — never your address or payment details.
+                </p>
+            </div>
+            <button class="icon-btn" data-close="shareTracking" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <div class="field">
+                <label class="field__label" for="trackShareLink">Shareable link</label>
+                <div class="row-flex gap-xs">
+                    <input class="input" id="trackShareLink" type="text" readonly
+                           value="https://chamundahandicraft.com/track/shared/9f2ac1" />
+                    <button class="btn btn-outline shrink-0" type="button"
+                            data-copy="https://chamundahandicraft.com/track/shared/9f2ac1">Copy</button>
+                </div>
+            </div>
+            <div class="row-flex gap-xs mt-md">
+                <a class="btn btn-outline grow" href="https://wa.me/?text=https://chamundahandicraft.com/track/shared/9f2ac1" rel="noopener">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+                    WhatsApp
+                </a>
+                <a class="btn btn-outline grow" href="mailto:?body=https://chamundahandicraft.com/track/shared/9f2ac1">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-mail"></use></svg>
+                    Email
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

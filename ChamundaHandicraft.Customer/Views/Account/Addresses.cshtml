@@ -1,0 +1,160 @@
+@model List<AddressViewModel>
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <div class="row-flex wrap between gap-md">
+        <div>
+            <h1 class="t-heading-xl page-head__title">Addresses</h1>
+            <p class="page-head__sub">Where we deliver. The default is pre-selected at checkout.</p>
+        </div>
+        <button class="btn btn-primary" type="button" data-open="addAddress">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"></use></svg>
+            Add Address
+        </button>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="state-block">
+        <span class="state-block__icon">
+            <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-map-pin"></use></svg>
+        </span>
+        <h2 class="t-heading-md">No saved addresses</h2>
+        <p class="state-block__desc">Add one now and checkout takes two taps next time.</p>
+        <div class="state-block__actions">
+            <button class="btn btn-primary" type="button" data-open="addAddress">Add Address</button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+        @foreach (var address in Model)
+        {
+            <div class="card address-card">
+                <div class="row-flex wrap gap-xs mb-xs">
+                    <span class="address-card__badge">
+                        <svg class="ico ico-xs" aria-hidden="true">
+                            <use href="#@AddressStyle.Icon(address.Label)"></use>
+                        </svg>
+                        @address.Label
+                    </span>
+                    @if (address.IsDefault)
+                    {
+                        <span class="tag tag-success">Default</span>
+                    }
+                </div>
+
+                <p class="t-body-md"><strong>@address.FullName</strong></p>
+                <p class="t-body-sm text-secondary-c mt-2xs">@address.OneLine</p>
+                <p class="t-body-sm text-secondary-c">@address.Phone</p>
+
+                <div class="row-flex wrap gap-md mt-md">
+                    <button class="cart-line__link" type="button" data-open="addAddress">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-pencil"></use></svg>
+                        Edit
+                    </button>
+                    @if (!address.IsDefault)
+                    {
+                        <button class="cart-line__link" type="button">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                            Set as default
+                        </button>
+                    }
+                    <button class="cart-line__link cart-line__link--danger" type="button" data-open="deleteAddress">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-trash"></use></svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<div class="modal-scrim" id="addAddress" role="dialog" aria-modal="true" aria-labelledby="accAddrTitle" aria-hidden="true">
+    <div class="modal">
+        <div class="modal__head">
+            <h2 class="t-heading-md" id="accAddrTitle">Add delivery address</h2>
+            <button class="icon-btn" data-close="addAddress" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <form data-validate id="accAddressForm">
+                <div class="field">
+                    <label class="field__label" for="accName">Full name <span class="field__req">*</span></label>
+                    <input class="input" id="accName" type="text" required autocomplete="name" />
+                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                </div>
+                <div class="field">
+                    <label class="field__label" for="accPhone">Mobile number <span class="field__req">*</span></label>
+                    <div class="phone-input">
+                        <select class="select" aria-label="Country code"><option selected>+91</option></select>
+                        <input class="input" id="accPhone" type="tel" required inputmode="numeric" autocomplete="tel" />
+                    </div>
+                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                </div>
+                <div class="field">
+                    <label class="field__label" for="accPin">PIN code <span class="field__req">*</span></label>
+                    <input class="input" id="accPin" type="text" required maxlength="6" inputmode="numeric"
+                           autocomplete="postal-code" style="max-width:200px" />
+                    <p class="field__help">City and state fill in automatically.</p>
+                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                </div>
+                <div class="field">
+                    <label class="field__label" for="accLine1">Flat, house no., building <span class="field__req">*</span></label>
+                    <input class="input" id="accLine1" type="text" required autocomplete="address-line1" />
+                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                </div>
+                <div class="field">
+                    <label class="field__label" for="accLine2">Area, street, sector <span class="field__req">*</span></label>
+                    <input class="input" id="accLine2" type="text" required autocomplete="address-line2" />
+                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                </div>
+                <div class="field">
+                    <label class="field__label" for="accLandmark">Landmark <span class="field__optional">(optional)</span></label>
+                    <input class="input" id="accLandmark" type="text" />
+                </div>
+                <div class="field">
+                    <span class="field__label">Address type</span>
+                    <div class="option-list">
+                        <button class="option-pill is-selected" type="button" data-label="Home">Home</button>
+                        <button class="option-pill" type="button" data-label="Work">Work</button>
+                        <button class="option-pill" type="button" data-label="Other">Other</button>
+                    </div>
+                </div>
+                <label class="check mt-md">
+                    <input type="checkbox" />
+                    <span class="check__label t-body-sm">Make this my default address</span>
+                </label>
+            </form>
+        </div>
+        <div class="modal__foot">
+            <button class="btn btn-ghost" data-close="addAddress">Cancel</button>
+            <button class="btn btn-primary" type="submit" form="accAddressForm">Save Address</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-scrim" id="deleteAddress" role="dialog" aria-modal="true" aria-labelledby="delAddrTitle" aria-hidden="true">
+    <div class="modal modal-sm">
+        <div class="modal__head">
+            <h2 class="t-heading-md" id="delAddrTitle">Delete this address?</h2>
+            <button class="icon-btn" data-close="deleteAddress" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <p class="t-body-md text-secondary-c">
+                Orders already on their way to this address are unaffected.
+            </p>
+        </div>
+        <div class="modal__foot">
+            <button class="btn btn-ghost" data-close="deleteAddress">Cancel</button>
+            <button class="btn btn-danger" data-close="deleteAddress">Delete Address</button>
+        </div>
+    </div>
+</div>

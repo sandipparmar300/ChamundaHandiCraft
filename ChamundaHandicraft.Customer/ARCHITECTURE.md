@@ -14,35 +14,69 @@ Mobile is the primary design target (390px first, then expanded).
 
 ```
 ChamundaHandicraft.Customer/
-├─ Controllers/
-├─ Models/
-├─ ViewComponents/       ProductCard, ProductRail, MiniCart, MegaMenu, FacetPanel,
-│                        TrustBand, ReviewSummary, BreadcrumbSchema, RecentlyViewed
-├─ TagHelpers/           PriceTagHelper, ImageCdnTagHelper, SeoMetaTagHelper
+├─ Controllers/          StorefrontController (base) + one per module
+├─ Models/               StorefrontModels.cs — view models, Money/BadgeStyle/StockStyle helpers
+├─ Services/             DemoContent.cs — design-phase catalogue, replaced by gateway calls
+├─ ViewComponents/       (reserved — shared surfaces are Razor partials during the design phase)
+├─ TagHelpers/           (reserved — PriceTagHelper, ImageCdnTagHelper, SeoMetaTagHelper)
 ├─ Views/
-│  ├─ Shared/            _Layout, _Header, _MegaMenu, _Footer, _MiniCart,
-│  │                     _Breadcrumb, _Toast, _EmptyState, _SkeletonCard, Error
+│  ├─ Shared/            _Layout, _AuthLayout, _CheckoutLayout, _AccountLayout,
+│  │                     _Icons, _Header, _MegaMenu, _SearchSuggest, _Footer,
+│  │                     _MiniCart, _MobileDrawer, _BottomTabs, _Breadcrumb,
+│  │                     _TrustBand, _ProductCard, _ProductCardList, _ProductRail,
+│  │                     _VariationNotice, _FilterRail, _QuickView, _SkeletonGrid, Error
 │  └─ <Module>/
 ├─ wwwroot/
-│  ├─ assets/css/scss/   Customer semantic layer over the shared primitives
-│  ├─ assets/js/         cart.js, plp.js, pdp.js, checkout.js, search.js
-│  ├─ assets/images/
+│  ├─ assets/css/        tokens.css, base.css, components.css, storefront.css
+│  ├─ assets/js/         storefront.js
+│  ├─ assets/images/     logo, favicon, placeholders/
 │  ├─ assets/fonts/
 │  └─ lib/
 ├─ Program.cs
 └─ appsettings.json
 ```
 
+### The four CSS layers
+
+Loaded in this order; each depends only on the ones above it.
+
+| File | Contents |
+|------|----------|
+| `tokens.css` | Primitives (indigo, terracotta, brass, paper, status) + semantic tokens for light and dark. Nothing in it styles an element. |
+| `base.css` | Reset, focus, typography scale, layout containers and the `SL-*` templates, utilities, icon sizing, reduced-motion and print rules. |
+| `components.css` | Actions, navigation, search, forms, filters, feedback, overlays, indicators. |
+| `storefront.css` | Product, media, commerce, orders, reviews, account, content and AI components. |
+
+`_Icons.cshtml` renders a Lucide `<symbol>` sprite once per page; every icon is
+`<svg class="ico"><use href="#i-name"></use></svg>`. Stroke width, size and colour come
+from CSS, so one symbol serves every context.
+
+Themes are switched by `data-theme` on `<html>`, applied before first paint by an inline
+script in `_Layout` so the theme never flashes. `Chamunda.theme` in `storefront.js` is the
+public API.
+
+---
+
+## Design-phase content
+
+Every view binds to `Services/DemoContent.cs` — a realistic catalogue of Indian craft
+products, artisans, orders, reviews and articles. It exists so each screen, state and
+breakpoint can be reviewed with true-to-life copy and prices before the gateway is wired.
+Replacing a `DemoContent` call with a gateway call does not change any view model.
+
 ---
 
 ## Routes → Controllers → Views
 
-Routes come verbatim from `docs/ui-ux-storefront/00-Master-Index.md` §0.4.3.
+Routes come verbatim from `docs/ui-ux-storefront/00-Master-Index.md` §0.4.3 and are declared
+with `[Route]` attributes on the action, so the slug shape lives next to what serves it.
+`StorefrontController` is the base: it populates the header/footer state and provides
+`Page()`, `Crumbs()`, `ActiveNav()` and `MinimalChrome()`.
 
 | Route | Controller | Views folder | Spec module |
 |-------|------------|--------------|-------------|
 | `/` | `HomeController` | `Home` | 02 Home |
-| `/login`, `/register`, `/forgot-password` | `AuthController` | `Auth` | 01 Authentication |
+| `/login`, `/register`, `/signin/otp`, `/forgot-password`, `/reset-password`, `/verify-email`, `/verify-mobile`, `/complete-profile`, `/account-locked`, `/welcome` | `AuthController` | `Auth` | 01 Authentication |
 | `/shop` | `ShopController` | `Shop` | 03 Shop / PLP |
 | `/c/{category-slug}`, `/c/{category}/{sub}` | `ShopController` | `Shop` | 03 Shop / PLP |
 | `/p/{product-slug}` | `ProductController` | `Product` | 04 Product Details |
@@ -50,21 +84,33 @@ Routes come verbatim from `docs/ui-ux-storefront/00-Master-Index.md` §0.4.3.
 | `/compare` | `CompareController` | `Compare` | 05 Compare |
 | `/wishlist` | `WishlistController` | `Wishlist` | 06 Wishlist |
 | `/cart` | `CartController` | `Cart` | 07 Cart |
-| `/checkout` | `CheckoutController` | `Checkout` | 08 Checkout |
-| `/checkout/success/{orderNumber}` | `CheckoutController` | `Checkout` | 08 Checkout |
-| payment redirect / callback | `PaymentController` | `Payment` | 09 Payment |
-| `/account` | `AccountController` | `Account` | 10 My Account |
-| `/account/orders/{orderNumber}` | `OrderController` | `Order` | 11 Orders |
-| `/track/{orderNumber}` | `TrackController` | `Track` | 12 Order Tracking |
-| `/help` | `SupportController` | `Support` | 14 Customer Support |
-| review submission / listing | `ReviewController` | `Review` | 15 Reviews |
+| `/checkout`, `/checkout/success/{orderNumber}`, `/checkout/failed` | `CheckoutController` | `Checkout` | 08 Checkout |
+| `/payment/processing` | `PaymentController` | `Payment` | 09 Payment |
+| `/account`, `/account/profile`, `/account/addresses`, `/account/coupons`, `/account/payment-methods`, `/account/security`, `/account/preferences`, `/account/privacy`, `/account/referrals` | `AccountController` | `Account` | 10 My Account |
+| `/account/orders`, `/account/orders/{orderNumber}`, `/account/orders/{n}/return`, `/account/returns` | `OrderController` | `Order` | 11 Orders |
+| `/track`, `/track/{orderNumber}` | `TrackController` | `Track` | 12 Order Tracking |
+| `/help`, `/help/tickets` | `SupportController` | `Support` | 14 Customer Support |
+| `/reviews/write/{slug}`, `/account/reviews` | `ReviewController` | `Review` | 15 Reviews |
 | `/account/rewards` | `RewardsController` | `Rewards` | 16 Rewards |
 | `/account/notifications` | `NotificationController` | `Notification` | 17 Notifications |
 | `/blog`, `/blog/{slug}` | `BlogController` | `Blog` | 18 Blog |
 | `/pages/{slug}` | `PageController` | `Page` | 19 Static Pages |
-| `/artisans/{slug}` | `ArtisanController` | `Artisan` | 03/04 storytelling |
-| AI assistant endpoints | `AiController` | `Ai` | 20 AI Shopping |
-| footer subscribe | `NewsletterController` | `Newsletter` | 16 (admin-side) |
+| `/artisans`, `/artisans/{slug}` | `ArtisanController` | `Artisan` | 03/04 storytelling |
+| `/assistant` | `AiController` | `Ai` | 20 AI Shopping |
+| `/newsletter/subscribe` (POST) | `NewsletterController` | — | 16 (admin-side) |
+| `/error`, `/maintenance`, `/offline`, `/sitemap` | `HomeController`, `SystemController` | `Shared`, `System` | System pages |
+
+`UseStatusCodePagesWithReExecute` sends 404 and 500 to `/error`, so a wrong URL still
+arrives at a page with the full header, footer and a route back into the catalogue.
+
+### Chrome variants
+
+| Layout | Used by | Why |
+|--------|---------|-----|
+| `_Layout` | Everything by default | Announcement bar, full header, mega menu, footer, mini cart, mobile drawer, bottom tabs |
+| `_AuthLayout` | Module 01 | `SL-11` split with craft photography; no site navigation to distract from the form |
+| `_CheckoutLayout` | Modules 08–09 | Logo (guarded), secure badge, help link only — every removed element is a documented source of checkout leakage |
+| `_AccountLayout` | Modules 10, 11, 15–17 | `SL-05` sidebar and content, with the profile and points card at the top of the rail |
 
 ---
 

@@ -1,4 +1,5 @@
-﻿@{
+@model MenuGridItem
+@{
     ViewData["Title"] = "Menu";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Menu" : "Add Menu";
@@ -23,7 +24,7 @@
 
     <form method="post" id="menuForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -52,7 +53,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Sort Order</label>
-                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" />
+                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" / value="@Model.SortOrder" >
                         <span class="error-msg" data-valmsg-for="SortOrder"></span>
                     </div>
 

@@ -1,0 +1,93 @@
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">Returns &amp; refunds</h1>
+    <p class="page-head__sub">Every return you've raised, and exactly where the money is.</p>
+</div>
+
+<section class="card mb-md">
+    <div class="order-card__head" style="margin:calc(var(--space-md) * -1) calc(var(--space-md) * -1) var(--space-md);border-radius:var(--radius-lg) var(--radius-lg) 0 0">
+        <div class="row-flex wrap gap-lg">
+            <div>
+                <p class="t-body-xs text-tertiary-c">Return number</p>
+                <p class="t-body-sm t-mono">RMA-2026-00119</p>
+            </div>
+            <div>
+                <p class="t-body-xs text-tertiary-c">From order</p>
+                <p class="t-body-sm"><a class="link t-mono" href="/account/orders/HC-2026-000287">HC-2026-000287</a></p>
+            </div>
+            <div>
+                <p class="t-body-xs text-tertiary-c">Refund</p>
+                <p class="t-body-sm tabular">@Money.Inr(1650)</p>
+            </div>
+        </div>
+        <span class="status-chip status-chip--refunded">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+            Refunded
+        </span>
+    </div>
+
+    <div class="row-flex gap-md mb-lg">
+        <img class="img-product" src="~/assets/images/placeholders/decor.svg" alt="" width="64" height="64"
+             style="width:64px;height:64px;border-radius:var(--radius-md);object-fit:cover" />
+        <div>
+            <p class="t-body-md">Terracotta Planter — Tall Fluted</p>
+            <p class="t-body-sm text-secondary-c">Reason: arrived with a hairline crack</p>
+        </div>
+    </div>
+
+    <div class="timeline">
+        @foreach (var (title, meta, at, icon, state) in new[]
+        {
+            ("Return requested", "You told us about the crack and sent two photos", DateTime.Today.AddDays(-58), "i-undo", "done"),
+            ("Pickup scheduled", "Delhivery assigned, 10am–6pm slot", DateTime.Today.AddDays(-57), "i-calendar-check", "done"),
+            ("Item collected", "Picked up from your address", DateTime.Today.AddDays(-55), "i-truck", "done"),
+            ("Received and checked", "Confirmed at our Jaipur studio", DateTime.Today.AddDays(-52), "i-package-check", "done"),
+            ("Refund issued", "₹1,650 sent to your original UPI ID", DateTime.Today.AddDays(-51), "i-banknote", "done")
+        })
+        {
+            <div class="timeline__step is-@state">
+                <div class="timeline__marker">
+                    <span class="timeline__dot"><svg class="ico ico-sm" aria-hidden="true"><use href="#@icon"></use></svg></span>
+                    <span class="timeline__line"></span>
+                </div>
+                <div class="timeline__body">
+                    <p class="timeline__title">@title</p>
+                    <p class="timeline__meta">@meta</p>
+                    <p class="t-body-xs text-tertiary-c mt-2xs">@Money.LongDate(at)</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="alert alert-success mt-md">
+        <svg class="ico" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+        <div>
+            <p class="alert__title">Refund complete</p>
+            <p>
+                @Money.Inr(1650) reached your UPI ID on @Money.LongDate(DateTime.Today.AddDays(-51)).
+                If your bank hasn't shown it, quote reference <span class="t-mono">RFD-8842190</span>.
+            </p>
+        </div>
+    </div>
+</section>
+
+<div class="card card-craft">
+    <div class="row-flex gap-sm">
+        <svg class="ico ico-lg text-craft-c shrink-0" aria-hidden="true"><use href="#i-undo"></use></svg>
+        <div>
+            <p class="t-heading-xs text-craft-c">How our returns work</p>
+            <p class="t-body-sm text-craft-c">
+                7 days from delivery, any reason. We book the courier and pay for it. Refunds start
+                the day the item reaches our studio and land within 5 working days.
+                Damaged on arrival? Send a photo and we refund or replace immediately — no return needed.
+            </p>
+            <a class="link-standalone mt-sm" href="/pages/return-policy" style="color:inherit">
+                Read the full policy
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,197 @@
+@model OrderSummaryCardViewModel
+@{
+    Layout = "_AccountLayout";
+    var lines = DemoContent.CartLines();
+    var summary = DemoContent.Summary(lines);
+    var address = DemoContent.Addresses().First(a => a.IsDefault);
+    var timeline = DemoContent.Timeline();
+}
+
+<div class="page-head" style="padding-top:0">
+    <div class="row-flex wrap between gap-md">
+        <div>
+            <a class="btn btn-ghost btn-sm mb-xs" href="/account/orders" style="min-width:0;padding-inline:0">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+                All orders
+            </a>
+            <h1 class="t-heading-xl page-head__title">Order @Model.OrderNumber</h1>
+            <p class="page-head__sub">
+                Placed @Money.LongDate(Model.PlacedOn) · @Model.ItemCount items · @Money.Inr(Model.Total)
+            </p>
+        </div>
+
+        <div class="row-flex gap-xs shrink-0">
+            <a class="btn btn-outline btn-sm" href="/account/orders/@Model.OrderNumber/invoice">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-download"></use></svg>
+                Invoice
+            </a>
+            <a class="btn btn-ghost btn-sm" href="/help">Need help?</a>
+        </div>
+    </div>
+</div>
+
+@* ---- Status band ---- *@
+<section class="card card-craft mb-md">
+    <div class="row-flex wrap between gap-md">
+        <div class="row-flex gap-md">
+            <span class="trust-badge__icon shrink-0"><svg class="ico ico-lg" aria-hidden="true"><use href="#@Model.StatusIcon"></use></svg></span>
+            <div>
+                <p class="t-heading-sm text-craft-c">@Model.StatusLabel</p>
+                @if (Model.DeliveryBy is not null)
+                {
+                    <p class="t-body-sm text-craft-c">
+                        Arriving @Money.DeliveryDate(Model.DeliveryBy.Value) · @Model.Courier ·
+                        <span class="t-mono">@Model.TrackingNumber</span>
+                    </p>
+                }
+            </div>
+        </div>
+        <a class="btn btn-secondary shrink-0" href="/track/@Model.OrderNumber">Track This Order</a>
+    </div>
+</section>
+
+<div class="layout-content-summary">
+    <div>
+        @* ---- Timeline ---- *@
+        <section class="card mb-md">
+            <h2 class="t-heading-md mb-md">Order history</h2>
+            <div class="timeline">
+                @foreach (var step in timeline)
+                {
+                    <div class="timeline__step is-@step.State">
+                        <div class="timeline__marker">
+                            <span class="timeline__dot"><svg class="ico ico-sm" aria-hidden="true"><use href="#@step.Icon"></use></svg></span>
+                            <span class="timeline__line"></span>
+                        </div>
+                        <div class="timeline__body">
+                            <p class="timeline__title">@step.Title</p>
+                            <p class="timeline__meta">@step.Meta</p>
+                            @if (step.At is not null)
+                            {
+                                <p class="t-body-xs text-tertiary-c mt-2xs">
+                                    @Money.LongDate(step.At.Value) at @step.At.Value.ToString("h:mm tt")
+                                    @if (step.Location is not null)
+                                    {
+                                        <text> · @step.Location</text>
+                                    }
+                                </p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        @* ---- Items ---- *@
+        <section class="card mb-md">
+            <h2 class="t-heading-md mb-md">Items in this order</h2>
+
+            <ul>
+                @foreach (var line in lines)
+                {
+                    <li class="cart-line" style="grid-template-columns:88px minmax(0,1fr) auto">
+                        <a class="cart-line__media" href="@line.Url">
+                            <img class="img-product" src="@line.ImageUrl" alt="@line.ImageAlt" width="88" height="88" loading="lazy" />
+                        </a>
+                        <div class="grow">
+                            <a class="cart-line__title" href="@line.Url">@line.Name</a>
+                            <p class="cart-line__meta">@line.VariantSummary · Qty @line.Quantity</p>
+                            <p class="cart-line__meta t-mono">SKU @line.Sku</p>
+                            @if (line.Artisan is not null)
+                            {
+                                <a class="artisan-chip mt-2xs" href="/artisans/@line.Artisan.Slug">
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                                    Made by @line.Artisan.Name, @line.Artisan.Cluster
+                                </a>
+                            }
+
+                            <div class="cart-line__actions">
+                                <a class="cart-line__link" href="/reviews/write/@line.Slug">
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-star"></use></svg>
+                                    Write a review
+                                </a>
+                                <a class="cart-line__link" href="/account/orders/@Model.OrderNumber/return">
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-undo"></use></svg>
+                                    Return or replace
+                                </a>
+                                <a class="cart-line__link" href="@line.Url">
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-repeat"></use></svg>
+                                    Buy again
+                                </a>
+                            </div>
+                        </div>
+                        <span class="t-body-md tabular" style="font-weight:600">@Money.Inr(line.LineTotal)</span>
+                    </li>
+                }
+            </ul>
+
+            @* Mandatory on the order surface for handmade items. *@
+            <div class="variation-notice variation-notice-compact mt-md">
+                <svg class="ico ico-sm variation-notice__icon" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                <span>Handmade — small differences in colour, finish and size are expected and are not defects.</span>
+            </div>
+        </section>
+
+        @* ---- Delivery and payment ---- *@
+        <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+            <section class="card">
+                <h2 class="t-heading-xs mb-sm">Delivery address</h2>
+                <p class="t-body-sm">
+                    <strong>@address.FullName</strong><br />
+                    <span class="text-secondary-c">@address.OneLine</span><br />
+                    <span class="text-secondary-c">@address.Phone</span>
+                </p>
+            </section>
+
+            <section class="card">
+                <h2 class="t-heading-xs mb-sm">Payment</h2>
+                <p class="t-body-sm">
+                    <strong>UPI</strong> · ananya@okhdfcbank<br />
+                    <span class="text-secondary-c">Paid @Money.Inr(summary.Total) on @Money.LongDate(Model.PlacedOn)</span>
+                </p>
+                <span class="tag tag-success mt-xs">
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+                    Payment successful
+                </span>
+            </section>
+        </div>
+    </div>
+
+    @* ---- Summary ---- *@
+    <aside class="sticky-col">
+        <div class="card">
+            <h2 class="t-heading-md mb-md">Payment summary</h2>
+            <dl class="summary">
+                <div class="summary__row"><dt>Subtotal</dt><dd>@Money.Inr(summary.MrpTotal)</dd></div>
+                @if (summary.ProductSavings > 0)
+                {
+                    <div class="summary__row summary__row--discount"><dt>Product discount</dt><dd>−@Money.Inr(summary.ProductSavings)</dd></div>
+                }
+                @if (summary.CouponDiscount > 0)
+                {
+                    <div class="summary__row summary__row--discount"><dt>Coupon (@summary.CouponCode)</dt><dd>−@Money.Inr(summary.CouponDiscount)</dd></div>
+                }
+                <div class="summary__row summary__row--free"><dt>Delivery</dt><dd>Free</dd></div>
+                <div class="summary__row"><dt>Taxes (GST)</dt><dd class="text-secondary-c">Included</dd></div>
+                <div class="summary__total"><dt>Total paid</dt><dd>@Money.Inr(summary.Total)</dd></div>
+            </dl>
+
+            <p class="summary__savings">You saved @Money.Inr(summary.TotalSavings)</p>
+
+            <div class="card__divider"></div>
+
+            <div class="stack stack-xs">
+                <a class="btn btn-outline btn-block" href="/account/orders/@Model.OrderNumber/invoice">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-file-text"></use></svg>
+                    Download Invoice
+                </a>
+                <a class="btn btn-ghost btn-block" href="/account/orders/@Model.OrderNumber/return">Return or Replace</a>
+                <a class="btn btn-ghost btn-block" href="/help">Report a Problem</a>
+            </div>
+
+            <p class="t-body-xs text-tertiary-c mt-md">
+                39 reward points from this order will be added once it is delivered.
+            </p>
+        </div>
+    </aside>
+</div>

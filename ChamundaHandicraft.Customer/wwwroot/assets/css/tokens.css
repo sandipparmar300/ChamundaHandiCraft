@@ -1,0 +1,376 @@
+/* ==========================================================================
+   Chamunda DS — Storefront · Design Tokens
+   Source of truth: docs/ui-ux-storefront/02-Design-System-Foundations.md
+   Layer 1 (primitives, shared with Admin) + Layer 2 (storefront semantics).
+   Nothing in this file styles an element. Only tokens live here.
+   ========================================================================== */
+
+:root {
+    /* ---------- Primitive · Indigo (primary) ---------- */
+    --indigo-25: #F5F7FF;
+    --indigo-50: #EEF2FF;
+    --indigo-100: #E0E7FF;
+    --indigo-200: #C7D2FE;
+    --indigo-300: #A5B4FC;
+    --indigo-400: #818CF8;
+    --indigo-500: #6366F1;
+    --indigo-600: #4F46E5;
+    --indigo-700: #4338CA;
+    --indigo-800: #3730A3;
+    --indigo-900: #312E81;
+    --indigo-950: #1E1B4B;
+
+    /* ---------- Primitive · Terracotta (craft / secondary) ---------- */
+    --terracotta-50: #FDF3EF;
+    --terracotta-100: #FAE3DA;
+    --terracotta-200: #F4C7B5;
+    --terracotta-300: #EDA88C;
+    --terracotta-400: #E28B67;
+    --terracotta-500: #D4714C;
+    --terracotta-600: #B85B3A;
+    --terracotta-700: #95482E;
+    --terracotta-800: #733825;
+    --terracotta-900: #57291B;
+
+    /* ---------- Primitive · Brass (premium / rating) ---------- */
+    --brass-50: #FDF8EC;
+    --brass-100: #F9EFD1;
+    --brass-200: #F2DDA3;
+    --brass-300: #E8C86E;
+    --brass-400: #DDB244;
+    --brass-500: #C99A28;
+    --brass-600: #A87D1D;
+    --brass-700: #845F17;
+
+    /* ---------- Primitive · Warm neutrals (paper) ---------- */
+    --paper-0: #FFFFFF;
+    --paper-25: #FEFDFB;
+    --paper-50: #FAF9F7;
+    --paper-100: #F4F2EE;
+    --paper-200: #E8E5DF;
+    --paper-300: #D6D2CA;
+    --paper-400: #A8A29A;
+    --paper-500: #7A746B;
+    --paper-600: #5C5750;
+    --paper-700: #403C36;
+    --paper-800: #2A2724;
+    --paper-900: #1A1816;
+    --paper-950: #0F0E0D;
+
+    /* ---------- Primitive · Status ---------- */
+    --success-50: #ECFDF5;
+    --success-100: #D1FAE5;
+    --success-400: #34D399;
+    --success-500: #10B981;
+    --success-600: #059669;
+    --success-700: #047857;
+
+    --warning-50: #FFFBEB;
+    --warning-100: #FEF3C7;
+    --warning-400: #FBBF24;
+    --warning-500: #F59E0B;
+    --warning-600: #D97706;
+    --warning-700: #B45309;
+
+    --danger-50: #FEF2F2;
+    --danger-100: #FEE2E2;
+    --danger-400: #F87171;
+    --danger-500: #EF4444;
+    --danger-600: #DC2626;
+    --danger-700: #B91C1C;
+    --danger-800: #991B1B;
+
+    --info-50: #F0F9FF;
+    --info-100: #E0F2FE;
+    --info-400: #38BDF8;
+    --info-500: #0EA5E9;
+    --info-600: #0284C7;
+    --info-700: #0369A1;
+
+    /* ---------- Spacing (4px base) ---------- */
+    --space-3xs: 2px;
+    --space-2xs: 4px;
+    --space-xs: 8px;
+    --space-sm: 12px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 40px;
+    --space-3xl: 56px;
+    --space-4xl: 80px;
+    --space-5xl: 120px;
+
+    /* ---------- Radius ---------- */
+    --radius-none: 0;
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+
+    /* ---------- Typefaces ---------- */
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-ui: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+
+    /* ---------- Type scale (fluid: mobile → desktop) ---------- */
+    --fs-display-2xl: clamp(2.5rem, 1.6rem + 4.5vw, 4rem); /* 40 → 64 */
+    --fs-display-xl: clamp(2rem, 1.4rem + 3vw, 3rem); /* 32 → 48 */
+    --fs-display-lg: clamp(1.75rem, 1.3rem + 2.25vw, 2.5rem); /* 28 → 40 */
+    --fs-heading-xl: clamp(1.5rem, 1.2rem + 1.5vw, 2rem); /* 24 → 32 */
+    --fs-heading-lg: clamp(1.375rem, 1.15rem + 1.1vw, 1.75rem); /* 22 → 28 */
+    --fs-heading-md: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem); /* 20 → 24 */
+    --fs-heading-sm: clamp(1.125rem, 1.08rem + 0.22vw, 1.25rem); /* 18 → 20 */
+    --fs-heading-xs: 1rem; /* 16 */
+    --fs-body-xl: 1.125rem; /* 18 */
+    --fs-body-lg: 1rem; /* 16 */
+    --fs-body-md: 0.9375rem; /* 15 */
+    --fs-body-sm: 0.875rem; /* 14 */
+    --fs-body-xs: 0.8125rem; /* 13 */
+    --fs-label-lg: 0.9375rem;
+    --fs-label-md: 0.875rem;
+    --fs-label-sm: 0.75rem; /* 12 */
+    --fs-caption: 0.75rem;
+    --fs-overline: 0.6875rem; /* 11 */
+    --fs-price-2xl: clamp(1.75rem, 1.5rem + 1vw, 2rem); /* 28 → 32 */
+    --fs-price-xl: clamp(1.375rem, 1.25rem + 0.5vw, 1.5rem); /* 22 → 24 */
+    --fs-price-lg: 1.125rem;
+    --fs-price-md: 1rem;
+    --fs-price-sm: 0.875rem;
+    --fs-nav-lg: 0.9375rem;
+    --fs-button-lg: 1rem;
+    --fs-button-md: 0.9375rem;
+    --fs-button-sm: 0.875rem;
+    --fs-mono-md: 0.875rem;
+
+    /* ---------- Line heights ---------- */
+    --lh-display: 1.1;
+    --lh-heading: 1.25;
+    --lh-body: 1.55;
+    --lh-relaxed: 1.6;
+    --lh-tight: 1.2;
+
+    /* ---------- Motion ---------- */
+    --duration-instant: 80ms;
+    --duration-fast: 150ms;
+    --duration-normal: 250ms;
+    --duration-slow: 350ms;
+    --duration-slower: 500ms;
+    --duration-shimmer: 1400ms;
+
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+    --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+    --ease-craft: cubic-bezier(0.34, 1.2, 0.44, 1);
+
+    /* ---------- Z-index scale ---------- */
+    --z-base: 0;
+    --z-sticky-cta: 100;
+    --z-sticky-filter: 110;
+    --z-sticky-summary: 120;
+    --z-announcement: 900;
+    --z-header: 1000;
+    --z-megamenu: 1010;
+    --z-dropdown: 1050;
+    --z-tooltip: 1070;
+    --z-scrim: 1080;
+    --z-drawer: 1090;
+    --z-modal-scrim: 1100;
+    --z-modal: 1110;
+    --z-search-overlay: 1120;
+    --z-lightbox: 1150;
+    --z-toast: 1200;
+    --z-cookie: 1250;
+    --z-chat: 1300;
+
+    /* ---------- Layout ---------- */
+    --container-max: 1320px;
+    --content-max: 1440px;
+    --article-max: 680px;
+    --page-pad: 16px;
+    --header-h: 80px;
+    --navbar-h: 52px;
+    --announce-h: 40px;
+
+    /* ---------- Sizing ---------- */
+    --icon-xs: 14px;
+    --icon-sm: 16px;
+    --icon-md: 20px;
+    --icon-lg: 24px;
+    --icon-xl: 32px;
+    --icon-2xl: 48px;
+    --icon-3xl: 64px;
+}
+
+/* ==========================================================================
+   Semantic tokens — Light theme (default)
+   ========================================================================== */
+:root,
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    --color-bg-canvas: var(--paper-50);
+    --color-bg-surface: var(--paper-0);
+    --color-bg-surface-raised: var(--paper-0);
+    --color-bg-subtle: var(--paper-100);
+    --color-bg-craft: var(--terracotta-50);
+    --color-bg-premium: var(--brass-50);
+    --color-bg-inverse: var(--paper-900);
+    --color-bg-image-placeholder: var(--paper-100);
+    --color-bg-image-backdrop: transparent;
+    --color-bg-overlay: rgba(26,24,22,0.60);
+    --color-bg-scrim-image: linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+    --color-bg-selected: var(--indigo-50);
+
+    --color-text-primary: var(--paper-800);
+    --color-text-secondary: var(--paper-500);
+    --color-text-tertiary: var(--paper-400);
+    --color-text-placeholder: var(--paper-400);
+    --color-text-disabled: var(--paper-300);
+    --color-text-inverse: var(--paper-0);
+    --color-text-brand: var(--indigo-600);
+    --color-text-link: var(--indigo-600);
+    --color-text-craft: var(--terracotta-700);
+
+    --color-price: var(--paper-900);
+    --color-price-sale: var(--danger-600);
+    --color-price-strike: var(--paper-400);
+
+    --color-border-subtle: var(--paper-100);
+    --color-border-default: var(--paper-200);
+    --color-border-strong: var(--paper-300);
+    --color-border-brand: var(--indigo-600);
+    --color-focus-ring: var(--indigo-600);
+    --color-focus-halo: rgba(79,70,229,0.18);
+
+    --color-action-primary-bg: var(--indigo-600);
+    --color-action-primary-bg-hover: var(--indigo-700);
+    --color-action-primary-bg-active: var(--indigo-800);
+    --color-action-primary-bg-disabled: var(--indigo-200);
+    --color-action-secondary-bg: var(--terracotta-500);
+    --color-action-secondary-bg-hover: var(--terracotta-600);
+    --color-action-secondary-bg-active: var(--terracotta-700);
+    --color-action-buy-now-bg: var(--terracotta-600);
+    --color-action-buy-now-bg-hover: var(--terracotta-700);
+
+    --color-rating-fill: var(--brass-300);
+    --color-rating-empty: var(--paper-200);
+
+    --color-status-success-bg: var(--success-50);
+    --color-status-success-text: var(--success-700);
+    --color-status-warning-bg: var(--warning-50);
+    --color-status-warning-text: var(--warning-700);
+    --color-status-danger-bg: var(--danger-50);
+    --color-status-danger-text: var(--danger-600);
+    --color-status-info-bg: var(--info-50);
+    --color-status-info-text: var(--info-600);
+    --color-status-brass-bg: var(--brass-100);
+    --color-status-brass-text: var(--brass-700);
+    --color-status-craft-bg: var(--terracotta-100);
+    --color-status-craft-text: var(--terracotta-700);
+
+    /* Elevation — warm-tinted black so shadows sit on the paper canvas */
+    --elevation-1: 0 1px 2px rgba(26,24,22,0.04), 0 1px 3px rgba(26,24,22,0.06);
+    --elevation-2: 0 2px 6px rgba(26,24,22,0.06), 0 4px 12px rgba(26,24,22,0.06);
+    --elevation-3: 0 4px 12px rgba(26,24,22,0.08), 0 12px 24px rgba(26,24,22,0.08);
+    --elevation-4: 0 8px 24px rgba(26,24,22,0.10), 0 20px 40px rgba(26,24,22,0.10);
+    --elevation-5: 0 16px 32px rgba(26,24,22,0.12), 0 32px 64px rgba(26,24,22,0.12);
+    --elevation-sticky-up: 0 -2px 12px rgba(26,24,22,0.08);
+}
+
+/* ==========================================================================
+   Semantic tokens — Dark theme
+   Never pure black: #0F0E0D keeps warmth against craft photography.
+   ========================================================================== */
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --color-bg-canvas: #0F0E0D;
+    --color-bg-surface: #1A1816;
+    --color-bg-surface-raised: #242220;
+    --color-bg-subtle: #242220;
+    --color-bg-craft: rgba(212,113,76,0.12);
+    --color-bg-premium: rgba(201,154,40,0.12);
+    --color-bg-inverse: var(--paper-50);
+    --color-bg-image-placeholder: #242220;
+    /* Mandatory: product images sit on a light inner backdrop in dark mode. */
+    --color-bg-image-backdrop: var(--paper-0);
+    --color-bg-overlay: rgba(0,0,0,0.72);
+    --color-bg-selected: rgba(129,140,248,0.14);
+
+    --color-text-primary: #F5F3F0;
+    --color-text-secondary: #C4BEB6;
+    --color-text-tertiary: #8F8880;
+    --color-text-placeholder: #8F8880;
+    --color-text-disabled: #5C5750;
+    --color-text-inverse: #1A1816;
+    --color-text-brand: var(--indigo-400);
+    --color-text-link: var(--indigo-400);
+    --color-text-craft: var(--terracotta-300);
+
+    --color-price: #F5F3F0;
+    --color-price-sale: var(--danger-400);
+    --color-price-strike: #8F8880;
+
+    --color-border-subtle: rgba(196,190,182,0.10);
+    --color-border-default: rgba(196,190,182,0.18);
+    --color-border-strong: rgba(196,190,182,0.32);
+    --color-border-brand: var(--indigo-400);
+    --color-focus-ring: var(--indigo-400);
+    --color-focus-halo: rgba(129,140,248,0.22);
+
+    --color-action-primary-bg: var(--indigo-500);
+    --color-action-primary-bg-hover: var(--indigo-400);
+    --color-action-primary-bg-active: var(--indigo-600);
+    --color-action-primary-bg-disabled: rgba(99,102,241,0.35);
+    --color-action-secondary-bg: var(--terracotta-500);
+    --color-action-secondary-bg-hover: var(--terracotta-400);
+    --color-action-buy-now-bg: var(--terracotta-500);
+    --color-action-buy-now-bg-hover: var(--terracotta-400);
+
+    --color-rating-fill: var(--brass-300);
+    --color-rating-empty: rgba(196,190,182,0.20);
+
+    /* Badges use ~18% alpha fills with 300/400-step text. */
+    --color-status-success-bg: rgba(16,185,129,0.18);
+    --color-status-success-text: var(--success-400);
+    --color-status-warning-bg: rgba(245,158,11,0.18);
+    --color-status-warning-text: var(--warning-400);
+    --color-status-danger-bg: rgba(239,68,68,0.18);
+    --color-status-danger-text: var(--danger-400);
+    --color-status-info-bg: rgba(14,165,233,0.18);
+    --color-status-info-text: var(--info-400);
+    --color-status-brass-bg: rgba(201,154,40,0.18);
+    --color-status-brass-text: var(--brass-300);
+    --color-status-craft-bg: rgba(212,113,76,0.18);
+    --color-status-craft-text: var(--terracotta-300);
+
+    /* Elevation in dark is expressed by surface lightening, not heavier shadow. */
+    --elevation-1: 0 1px 3px rgba(0,0,0,0.5);
+    --elevation-2: 0 4px 12px rgba(0,0,0,0.5);
+    --elevation-3: 0 12px 24px rgba(0,0,0,0.55);
+    --elevation-4: 0 20px 40px rgba(0,0,0,0.6);
+    --elevation-5: 0 32px 64px rgba(0,0,0,0.65);
+    --elevation-sticky-up: 0 -2px 12px rgba(0,0,0,0.5);
+}
+
+/* Responsive layout tokens */
+@media (min-width: 768px) {
+    :root {
+        --page-pad: 24px;
+    }
+}
+
+@media (min-width: 1200px) {
+    :root {
+        --page-pad: 32px;
+    }
+}
+
+@media (min-width: 1440px) {
+    :root {
+        --page-pad: 40px;
+    }
+}

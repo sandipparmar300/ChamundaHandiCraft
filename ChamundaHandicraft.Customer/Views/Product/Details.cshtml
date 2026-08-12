@@ -1,0 +1,911 @@
+@model ProductCardViewModel
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+    var stock = StockStyle.For(Model.Stock, Model.StockCount);
+    var isOos = Model.Stock == StockState.OutOfStock;
+    var deliveryBy = DateTime.Today.AddDays(6);
+    var reviews = DemoContent.Reviews();
+
+    var gallery = new (string Src, string Alt, string? Kind)[]
+    {
+        (Model.ImageUrl, Model.ImageAlt, null),
+        ("/assets/images/placeholders/decor.svg", "Close macro of the hand-painted floral band showing individual brush strokes", null),
+        ("/assets/images/placeholders/lifestyle.svg", "The vase on a console table beside a brass lamp, for scale", null),
+        ("/assets/images/placeholders/lamp.svg", "The unglazed base showing the artisan's stamped mark", null),
+        ("/assets/images/placeholders/craft.svg", "360 degree view", "360"),
+        ("/assets/images/placeholders/blog.svg", "Craft process film", "video")
+    };
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="layout-gallery-info" style="padding-top:var(--space-md)">
+
+        @* ══════════ Gallery — CMP-MED-Gallery ══════════ *@
+        <div data-gallery data-index="0">
+            <div class="gallery">
+                <div class="gallery__thumbs" role="tablist" aria-label="Product images">
+                    @for (var i = 0; i < gallery.Length; i++)
+                    {
+                        var item = gallery[i];
+                        <button class="gallery__thumb @(i == 0 ? "is-active" : "")" type="button" role="tab"
+                                aria-selected="@(i == 0)" data-full="@item.Src" aria-label="Image @(i + 1) of @gallery.Length">
+                            <img class="img-product" src="@item.Src" alt="@item.Alt" loading="lazy" width="72" height="72" />
+                            @if (item.Kind is not null)
+                            {
+                                <span class="gallery__thumb-icon">
+                                    <svg class="ico ico-sm" aria-hidden="true">
+                                        <use href="#@(item.Kind == "360" ? "i-rotate-3d" : "i-play-circle")"></use>
+                                    </svg>
+                                </span>
+                            }
+                        </button>
+                    }
+                </div>
+
+                <div class="gallery__main">
+                    <img class="img-product" data-gallery-main src="@gallery[0].Src" alt="@gallery[0].Alt"
+                         fetchpriority="high" width="900" height="900" />
+
+                    <div class="gallery__badges">
+                        @foreach (var badge in Model.Badges.Take(2))
+                        {
+                            var style = BadgeStyle.For(badge, Model.DiscountPercent);
+                            <span class="badge @style.Css">
+                                @if (style.Icon is not null)
+                                {
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#@style.Icon"></use></svg>
+                                }
+                                @style.Label
+                            </span>
+                        }
+                    </div>
+
+                    <span class="gallery__counter" data-gallery-counter>1 / @gallery.Length</span>
+
+                    <div class="gallery__controls">
+                        <button class="icon-btn icon-btn-onimage" type="button" data-open="lightbox" aria-label="Open full-size images">
+                            <svg class="ico" aria-hidden="true"><use href="#i-expand"></use></svg>
+                        </button>
+                        <button class="icon-btn icon-btn-onimage wish" type="button" data-wishlist
+                                data-product-name="@Model.Name" aria-label="Save @Model.Name to wishlist">
+                            <svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg>
+                        </button>
+                        <button class="icon-btn icon-btn-onimage" type="button" data-open="shareSheet" aria-label="Share this product">
+                            <svg class="ico" aria-hidden="true"><use href="#i-share"></use></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <p class="t-body-xs text-tertiary-c mt-xs hide-tablet-down">
+                Hover the image to zoom. Press ← and → to change images.
+            </p>
+        </div>
+
+        @* ══════════ Buy box — sticky on desktop ══════════ *@
+        <div class="pdp-info sticky-col">
+            <span class="t-overline">@Model.CategoryName</span>
+
+            @* One H1 per page: the product name. It never truncates (TY-05). *@
+            <h1 class="t-heading-xl mt-xs">@Model.Name</h1>
+
+            <div class="row-flex wrap gap-md mt-sm">
+                <a class="rating" href="#reviews" aria-label="Rated @Model.Rating out of 5 from @Model.ReviewCount reviews. Jump to reviews.">
+                    <span class="rating__stars">
+                        @for (var i = 0; i < 5; i++)
+                        {
+                            <svg class="ico ico-sm @(i < Math.Round(Model.Rating) ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
+                        }
+                    </span>
+                    <span class="rating__value">@Model.Rating.ToString("0.0")</span>
+                    <span class="rating__count">(@Model.ReviewCount reviews)</span>
+                </a>
+
+                <span class="t-body-sm text-tertiary-c t-mono">SKU HC-POT-0421</span>
+            </div>
+
+            @if (Model.Artisan is not null)
+            {
+                <a class="artisan-chip mt-sm" href="/artisans/@Model.Artisan.Slug" style="font-size:var(--fs-body-sm)">
+                    <img src="@Model.Artisan.PhotoUrl" alt="" width="24" height="24" style="width:24px;height:24px" />
+                    Made by @Model.Artisan.Name · @Model.Artisan.Cluster
+                </a>
+            }
+
+            <div class="price price-lg @(Model.IsOnSale ? "is-sale" : "") mt-md"
+                 aria-label="@Money.InrSpoken(Model.Price)@(Model.IsOnSale ? $", reduced from {Money.InrSpoken(Model.Mrp!.Value)}" : "")">
+                <span class="price__now">@Money.Inr(Model.Price)</span>
+                @if (Model.IsOnSale)
+                {
+                    <span class="price__mrp">@Money.Inr(Model.Mrp!.Value)</span>
+                    <span class="price__off">@Model.DiscountPercent% OFF</span>
+                    <span class="price__save">You save @Money.Inr(Model.Savings) (@Model.DiscountPercent%)</span>
+                }
+                <span class="price__tax">Inclusive of all taxes</span>
+            </div>
+
+            @* Mandatory on every handmade PDP — sits directly under the price. *@
+            <div class="mt-md">
+                @await Html.PartialAsync("_VariationNotice")
+            </div>
+
+            @if (isOos)
+            {
+                @* STA-04-01 · Out of stock buy box. Never a dead end. *@
+                <div class="alert alert-info mt-md">
+                    <svg class="ico" aria-hidden="true"><use href="#i-info"></use></svg>
+                    <div>
+                        <p class="alert__title">Currently out of stock</p>
+                        <p>This piece is made in small batches. We expect more by mid-August.</p>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-xl btn-block mt-md" type="button" data-open="notifyMe">
+                    <svg class="ico" aria-hidden="true"><use href="#i-bell"></use></svg>
+                    Notify Me When Available
+                </button>
+                <button class="btn btn-outline btn-lg btn-block mt-xs wish" type="button"
+                        data-wishlist data-product-name="@Model.Name">
+                    <svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg>
+                    Save to Wishlist
+                </button>
+            }
+            else
+            {
+                @* ---- Variants ---- *@
+                <div class="stack stack-md mt-lg">
+                    <div class="option-group">
+                        <span class="option-group__label">
+                            Colour: <span class="option-group__value">Indigo Blue</span>
+                        </span>
+                        <div class="swatch-filter" role="radiogroup" aria-label="Colour">
+                            <button class="swatch is-selected" type="button" role="radio" aria-checked="true" style="background:#4F46E5" aria-label="Indigo Blue"></button>
+                            <button class="swatch" type="button" role="radio" aria-checked="false" style="background:#FFFFFF" aria-label="Ivory White"></button>
+                            <button class="swatch" type="button" role="radio" aria-checked="false" style="background:#D4714C" aria-label="Terracotta"></button>
+                            <button class="swatch is-oos" type="button" role="radio" aria-checked="false" style="background:#047857" aria-label="Forest Green, out of stock"></button>
+                        </div>
+                        <p class="t-body-xs text-tertiary-c">Indigo Blue · Ivory White · Terracotta · Forest Green (out of stock)</p>
+                    </div>
+
+                    <div class="option-group">
+                        <div class="row-flex between">
+                            <span class="option-group__label">
+                                Size: <span class="option-group__value">Medium</span>
+                            </span>
+                            <button class="btn btn-link btn-sm" type="button" data-open="sizeGuide">Size guide</button>
+                        </div>
+                        <div class="option-list" role="radiogroup" aria-label="Size">
+                            <button class="option-pill" type="button" role="radio" aria-checked="false" data-label="Small (18 cm)">S · 18 cm</button>
+                            <button class="option-pill is-selected" type="button" role="radio" aria-checked="true" data-label="Medium (24 cm)">M · 24 cm</button>
+                            <button class="option-pill is-oos" type="button" role="radio" aria-checked="false" disabled>L · 32 cm</button>
+                        </div>
+                    </div>
+                </div>
+
+                @if (stock is not null)
+                {
+                    <div class="row-flex gap-sm mt-md">
+                        <span class="stock stock-pill @stock.Value.Css">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#@stock.Value.Icon"></use></svg>
+                            @stock.Value.Label
+                        </span>
+                        @* Honest social proof only — a real, verifiable figure or nothing. *@
+                        <span class="t-body-sm text-secondary-c">18 sold in the last 7 days</span>
+                    </div>
+                }
+
+                @* ---- Delivery estimate — CMP-PRD-DeliveryEstimate ---- *@
+                <div class="delivery mt-md">
+                    <div class="delivery__row">
+                        <svg class="ico" aria-hidden="true"><use href="#i-truck"></use></svg>
+                        <div class="grow">
+                            <p class="delivery__date">Get it by @Money.DeliveryDate(deliveryBy)</p>
+                            <p class="delivery__meta">Delivered by Delhivery to 380015 · Free above ₹999 · Cash on delivery available</p>
+                        </div>
+                        <button class="btn btn-link btn-sm shrink-0" type="button">Change</button>
+                    </div>
+                    <div class="pin-check">
+                        <label class="sr-only" for="pdpPin">Delivery PIN code</label>
+                        <input class="input" id="pdpPin" type="text" inputmode="numeric" maxlength="6"
+                               placeholder="PIN code" value="380015" />
+                        <button class="btn btn-outline" type="button">Check</button>
+                    </div>
+                </div>
+
+                @* ---- Actions — sentinel marks where the sticky bar takes over ---- *@
+                <div data-cta-sentinel class="mt-lg">
+                    <div class="row-flex gap-sm">
+                        <div class="qty qty-lg shrink-0">
+                            <button class="qty__btn" type="button" data-step="-1" aria-label="Decrease quantity" disabled>
+                                <svg class="ico" aria-hidden="true"><use href="#i-minus"></use></svg>
+                            </button>
+                            <input class="qty__input" type="number" value="1" min="1" max="@(Model.StockCount ?? 10)" aria-label="Quantity" />
+                            <button class="qty__btn" type="button" data-step="1" aria-label="Increase quantity">
+                                <svg class="ico" aria-hidden="true"><use href="#i-plus"></use></svg>
+                            </button>
+                        </div>
+
+                        <button class="btn btn-primary btn-xl grow" type="button" data-add-to-cart data-open-minicart>
+                            <span class="btn__spinner" aria-hidden="true"></span>
+                            <span class="btn__label">
+                                <svg class="ico" aria-hidden="true" style="display:inline;vertical-align:-5px"><use href="#i-cart"></use></svg>
+                                Add to Cart
+                            </span>
+                        </button>
+                    </div>
+
+                    @* Buy Now is visually distinct from Add to Cart but equally weighted. *@
+                    <a class="btn btn-buy btn-xl btn-block mt-xs" href="/checkout">Buy Now</a>
+
+                    <div class="row-flex gap-md mt-sm">
+                        <button class="btn btn-ghost btn-sm wish" type="button" data-wishlist data-product-name="@Model.Name">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-heart"></use></svg>
+                            Save
+                        </button>
+                        <button class="btn btn-ghost btn-sm" type="button">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-compare"></use></svg>
+                            Compare
+                        </button>
+                        <button class="btn btn-ghost btn-sm" type="button" data-open="shareSheet">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-share"></use></svg>
+                            Share
+                        </button>
+                    </div>
+                </div>
+            }
+
+            @* ---- Trust row ---- *@
+            <div class="card mt-lg" style="padding:var(--space-sm)">
+                <div class="stack stack-sm">
+                    <div class="row-flex gap-sm t-body-sm">
+                        <svg class="ico ico-sm text-craft-c shrink-0" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                        <span>Handmade in @(Model.Artisan?.Cluster ?? "India") — the maker is named on the invoice</span>
+                    </div>
+                    <div class="row-flex gap-sm t-body-sm">
+                        <svg class="ico ico-sm text-craft-c shrink-0" aria-hidden="true"><use href="#i-undo"></use></svg>
+                        <span>7-day returns, free pickup, refund in 5 working days</span>
+                    </div>
+                    <div class="row-flex gap-sm t-body-sm">
+                        <svg class="ico ico-sm text-craft-c shrink-0" aria-hidden="true"><use href="#i-shield-check"></use></svg>
+                        <span>Secure payment · UPI, cards, net banking and COD</span>
+                    </div>
+                    <div class="row-flex gap-sm t-body-sm">
+                        <svg class="ico ico-sm text-craft-c shrink-0" aria-hidden="true"><use href="#i-package"></use></svg>
+                        <span>Packed in recycled kraft with corner guards, insured in transit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ══════════ Details — tabs at ≥992px, accordions below ══════════ *@
+    <section class="band-sm" data-tabs-scope>
+        <div class="tabs hide-tablet-down" role="tablist" aria-label="Product information">
+            <button class="tabs__item is-active" data-tab="tab-description" role="tab" aria-selected="true">Description</button>
+            <button class="tabs__item" data-tab="tab-specs" role="tab" aria-selected="false" tabindex="-1">Specifications</button>
+            <button class="tabs__item" data-tab="tab-care" role="tab" aria-selected="false" tabindex="-1">Materials &amp; Care</button>
+            <button class="tabs__item" data-tab="tab-shipping" role="tab" aria-selected="false" tabindex="-1">Shipping &amp; Returns</button>
+        </div>
+
+        <div class="tab-panel is-active hide-tablet-down" id="tab-description" role="tabpanel">
+            <div class="measure t-body-lg stack stack-md">
+                <p>@Model.ShortDescription</p>
+                <p>
+                    The body is thrown from a dough of quartz powder, powdered glass, fuller's earth and gum —
+                    Jaipur blue pottery contains no clay at all. That is what gives the finished piece its
+                    translucence, and why it must be fired at a lower temperature than ordinary ceramics.
+                </p>
+                <p>
+                    The floral band is drawn freehand in cobalt oxide with a squirrel-hair brush before the
+                    glaze goes on, so the motif is under the surface rather than printed on it. It will not
+                    scratch off, and it will not fade.
+                </p>
+                <ul>
+                    <li>Food-safe glaze, lead-free</li>
+                    <li>Watertight — suitable for fresh flowers</li>
+                    <li>Signed and stamped on the base by the artisan</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-panel hide-tablet-down" id="tab-specs" role="tabpanel">
+            <div class="layout-halves" style="align-items:start;gap:var(--space-xl)">
+                <div>
+                    <div class="spec-group">
+                        <h3 class="spec-group__title t-heading-xs">Materials &amp; craft</h3>
+                        <div class="spec-list">
+                            <div class="spec-list__row"><span class="spec-list__key">Material</span><span class="spec-list__val">@Model.Material</span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Technique</span><span class="spec-list__val">Wheel-thrown, hand-painted, twice-fired</span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Finish</span><span class="spec-list__val">Food-safe transparent glaze</span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Craft</span><span class="spec-list__val">Jaipur Blue Pottery (GI tagged)</span></div>
+                        </div>
+                    </div>
+
+                    <div class="spec-group">
+                        <h3 class="spec-group__title t-heading-xs">Origin</h3>
+                        <div class="spec-list">
+                            <div class="spec-list__row"><span class="spec-list__key">Made in</span><span class="spec-list__val">Jaipur, Rajasthan, India</span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Artisan</span><span class="spec-list__val"><a class="link" href="/artisans/ram-prasad-sharma">Ram Prasad Sharma</a></span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Category</span><span class="spec-list__val"><a class="link" href="/c/home-decor">Home Décor</a> › <a class="link" href="/c/home-decor/vases">Vases</a></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="spec-group">
+                        <h3 class="spec-group__title t-heading-xs">Dimensions &amp; weight</h3>
+                        <div class="spec-list">
+                            <div class="spec-list__row"><span class="spec-list__key">Dimensions</span><span class="spec-list__val">@Model.Dimensions (L × W × H)</span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Mouth diameter</span><span class="spec-list__val">8 cm</span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Weight</span><span class="spec-list__val">850 g</span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Capacity</span><span class="spec-list__val">1.2 litres</span></div>
+                        </div>
+                    </div>
+
+                    @* Dimension scale reference — measurably reduces size-related returns. *@
+                    <div class="card card-craft mt-md">
+                        <div class="row-flex gap-sm">
+                            <svg class="ico ico-lg text-craft-c shrink-0" aria-hidden="true"><use href="#i-ruler"></use></svg>
+                            <div>
+                                <p class="t-heading-xs text-craft-c">How big is 24 cm?</p>
+                                <p class="t-body-sm text-craft-c">About the height of a 1-litre water bottle, and roughly two hand-spans around.</p>
+                                <div class="segmented mt-sm">
+                                    <button class="segmented__item is-active" type="button">cm</button>
+                                    <button class="segmented__item" type="button">inches</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-panel hide-tablet-down" id="tab-care" role="tabpanel">
+            <div class="measure t-body-lg stack stack-md">
+                <p>Blue pottery is durable but not indestructible — it is fired at a lower temperature than stoneware.</p>
+                <ul>
+                    <li>Wipe with a soft damp cloth. No abrasives, no scouring pads.</li>
+                    <li>Hand wash only. Not dishwasher safe.</li>
+                    <li>Not microwave or oven safe.</li>
+                    <li>Avoid sudden temperature changes — do not pour boiling water in.</li>
+                    <li>Keep out of direct, sustained sunlight to protect the cobalt.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-panel hide-tablet-down" id="tab-shipping" role="tabpanel">
+            <div class="measure t-body-lg stack stack-md">
+                <p>
+                    Dispatched from our Jaipur studio within 48 hours. Fragile items are triple-wrapped
+                    with corner guards and insured in transit at our cost.
+                </p>
+                <div class="spec-list">
+                    <div class="spec-list__row"><span class="spec-list__key">Delivery</span><span class="spec-list__val">@Money.DeliveryDate(deliveryBy) to 380015</span></div>
+                    <div class="spec-list__row"><span class="spec-list__key">Shipping</span><span class="spec-list__val">Free above ₹999, otherwise ₹79</span></div>
+                    <div class="spec-list__row"><span class="spec-list__key">Cash on delivery</span><span class="spec-list__val">Available, ₹49 handling fee</span></div>
+                    <div class="spec-list__row"><span class="spec-list__key">Returns</span><span class="spec-list__val">7 days, free pickup, refund in 5 working days</span></div>
+                    <div class="spec-list__row"><span class="spec-list__key">Breakage</span><span class="spec-list__val">Arrived damaged? Send a photo and we replace or refund immediately</span></div>
+                </div>
+            </div>
+        </div>
+
+        @* Accordion version for tablet and below — same content, present in the DOM for SEO. *@
+        <div class="accordion accordion-card only-tablet-down">
+            <div class="accordion__item is-open">
+                <button class="accordion__head" type="button" aria-expanded="true">
+                    Description
+                    <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                </button>
+                <div class="accordion__body">
+                    <div class="t-body-md text-secondary-c">
+                        <p>@Model.ShortDescription</p>
+                        <p class="mt-sm">
+                            The floral band is drawn freehand in cobalt oxide before the glaze goes on, so the
+                            motif sits under the surface. It will not scratch off, and it will not fade.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion__item">
+                <button class="accordion__head" type="button" aria-expanded="false">
+                    Specifications
+                    <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                </button>
+                <div class="accordion__body">
+                    <div class="spec-list">
+                        <div class="spec-list__row"><span class="spec-list__key">Material</span><span class="spec-list__val">@Model.Material</span></div>
+                        <div class="spec-list__row"><span class="spec-list__key">Dimensions</span><span class="spec-list__val">@Model.Dimensions</span></div>
+                        <div class="spec-list__row"><span class="spec-list__key">Weight</span><span class="spec-list__val">850 g</span></div>
+                        <div class="spec-list__row"><span class="spec-list__key">Made in</span><span class="spec-list__val">Jaipur, Rajasthan</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion__item">
+                <button class="accordion__head" type="button" aria-expanded="false">
+                    Materials &amp; Care
+                    <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                </button>
+                <div class="accordion__body">
+                    <div class="t-body-md text-secondary-c">
+                        Hand wash with a soft damp cloth. Not dishwasher, microwave or oven safe.
+                        Avoid sudden temperature changes.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion__item">
+                <button class="accordion__head" type="button" aria-expanded="false">
+                    Shipping &amp; Returns
+                    <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                </button>
+                <div class="accordion__body">
+                    <div class="t-body-md text-secondary-c">
+                        Dispatched within 48 hours, delivered by @Money.DeliveryDate(deliveryBy).
+                        Free above ₹999. 7-day returns with free pickup.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@* ══════════ Craft story band — how it's made ══════════ *@
+<section class="band band-craft" aria-labelledby="craftHead">
+    <div class="container">
+        <span class="craft-rule"></span>
+        <span class="t-overline text-craft-c">How it's made</span>
+        <h2 class="t-display-lg mt-xs" id="craftHead">Nine steps, entirely by hand</h2>
+
+        <div class="cat-grid mt-lg" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+            @foreach (var (num, img, title, caption) in new[]
+            {
+                (1, "wood", "Preparing the dough", "Quartz powder, glass and fuller's earth, kneaded and rested overnight."),
+                (2, "pottery", "Shaping on the wheel", "Thrown wet, then pressed into a plaster mould to hold the form."),
+                (3, "art", "Painting by hand", "Cobalt oxide drawn freehand with a squirrel-hair brush."),
+                (4, "lamp", "Firing at 800°C", "A single low-temperature firing. Around one piece in six does not survive it.")
+            })
+            {
+                <figure class="reveal">
+                    <div class="img-box img-1-1">
+                        <img src="~/assets/images/placeholders/@(img).svg" alt="@title" loading="lazy" width="400" height="400" />
+                        <span class="badge badge-handmade" style="position:absolute;top:8px;left:8px">Step @num</span>
+                    </div>
+                    <figcaption class="mt-sm">
+                        <span class="t-heading-xs" style="display:block">@title</span>
+                        <span class="t-body-sm text-secondary-c">@caption</span>
+                    </figcaption>
+                </figure>
+            }
+        </div>
+
+        <p class="t-body-lg measure mt-lg text-craft-c">
+            Jaipur blue pottery uses no clay at all — it is made from quartz powder, glass and fuller's earth,
+            a technique that travelled from Persia in the 14th century and survives in perhaps forty workshops today.
+        </p>
+
+        <a class="link-standalone mt-md" href="/blog/how-blue-pottery-is-made">
+            Read the full story
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+        </a>
+    </div>
+</section>
+
+@* ══════════ Meet the maker ══════════ *@
+@if (Model.Artisan is not null)
+{
+    <section class="band-sm">
+        <div class="container">
+            <div class="artisan-card">
+                <img class="artisan-card__photo" src="@Model.Artisan.PhotoUrl"
+                     alt="@Model.Artisan.Name at his wheel in the Jaipur workshop" loading="lazy" width="96" height="96" />
+                <div class="grow">
+                    <span class="t-overline text-craft-c">Meet the maker</span>
+                    <h2 class="t-heading-lg mt-2xs">@Model.Artisan.Name</h2>
+                    <p class="artisan-card__meta">@Model.Artisan.Craft · @Model.Artisan.Cluster</p>
+                    <p class="t-body-md mt-sm measure">
+                        Third-generation potter working with quartz clay and natural cobalt oxide.
+                        Ram Prasad learned the craft from his father at eleven and has run his own
+                        workshop for eighteen years, training six apprentices in that time.
+                    </p>
+                    <div class="artisan-card__stats mt-sm">
+                        <span class="row-flex gap-2xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg> 4.8 rating</span>
+                        <span class="row-flex gap-2xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-package"></use></svg> 212 products</span>
+                        <span class="row-flex gap-2xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg> 18 years</span>
+                    </div>
+                    <div class="artisan-card__actions">
+                        <a class="btn btn-secondary" href="/artisans/@Model.Artisan.Slug">Read His Story</a>
+                        <a class="btn btn-outline" href="/artisans/@Model.Artisan.Slug#products">Shop His Work</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@* ══════════ Reviews ══════════ *@
+<section class="band band-surface" id="reviews" aria-labelledby="reviewsHead">
+    <div class="container">
+        <div class="band-head">
+            <h2 class="t-display-lg" id="reviewsHead">Customer reviews</h2>
+            <a class="btn btn-outline" href="/reviews/write/@Model.Slug">Write a Review</a>
+        </div>
+
+        <div class="rating-summary card">
+            <div class="text-center">
+                <div class="rating-summary__score">@Model.Rating.ToString("0.0")</div>
+                <span class="rating__stars" role="img" aria-label="@Model.Rating out of 5">
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        <svg class="ico ico-sm @(i < Math.Round(Model.Rating) ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
+                    }
+                </span>
+                <p class="t-body-sm text-secondary-c mt-2xs">@Model.ReviewCount reviews</p>
+
+                <div class="rating-breakdown mt-md" style="text-align:left">
+                    @foreach (var (stars, count) in new[] { (5, 92), (4, 24), (3, 8), (2, 3), (1, 1) })
+                    {
+                        <div class="rating-breakdown__row">
+                            <span class="row-flex gap-2xs">@stars <svg class="ico ico-xs is-filled" style="color:var(--color-rating-fill);fill:currentColor;stroke:none" aria-hidden="true"><use href="#i-star"></use></svg></span>
+                            <span class="rating-breakdown__bar"><span style="width:@(count * 100 / 128)%"></span></span>
+                            <span class="rating-breakdown__count">@count</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div>
+                @* AI summary — clearly labelled, balanced, never only positive. *@
+                <div class="ai-summary">
+                    <div class="row-flex between gap-sm mb-sm">
+                        <span class="ai-chip">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                            AI-generated summary
+                        </span>
+                        <span class="t-body-xs text-tertiary-c">From 128 verified reviews</span>
+                    </div>
+                    <p class="t-body-md">
+                        Customers love the colour depth and the visible hand-painted detail. Several mention
+                        it is smaller than expected — check the dimensions before ordering.
+                    </p>
+                    <div class="row-flex wrap gap-xs mt-sm">
+                        <span class="tag tag-success"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-thumbs-up"></use></svg> colour (42)</span>
+                        <span class="tag tag-success">craftsmanship (38)</span>
+                        <span class="tag tag-success">packing (21)</span>
+                        <span class="tag tag-warning">size (12)</span>
+                        <span class="tag tag-warning">delivery time (6)</span>
+                    </div>
+                </div>
+
+                <div class="row-flex wrap gap-lg mt-md">
+                    <div><span class="t-body-sm text-secondary-c">Quality</span> <strong class="tabular">★ 4.8</strong></div>
+                    <div><span class="t-body-sm text-secondary-c">Value</span> <strong class="tabular">★ 4.3</strong></div>
+                    <div><span class="t-body-sm text-secondary-c">As pictured</span> <strong class="tabular">★ 4.7</strong></div>
+                </div>
+
+                <p class="t-body-xs text-tertiary-c mt-md row-flex gap-2xs">
+                    <svg class="ico ico-xs text-success-c" aria-hidden="true"><use href="#i-badge-check"></use></svg>
+                    We only publish reviews from verified purchases.
+                </p>
+            </div>
+        </div>
+
+        @* Customer photo strip *@
+        <div class="mt-lg">
+            <div class="row-flex between mb-sm">
+                <h3 class="t-heading-sm">Customer photos (24)</h3>
+                <a class="link-standalone" href="#">View all <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg></a>
+            </div>
+            <div class="row-flex gap-xs" style="overflow-x:auto">
+                @foreach (var img in new[] { "pottery", "decor", "lifestyle", "lamp", "art", "craft" })
+                {
+                    <button class="shrink-0" type="button" data-open="lightbox" aria-label="Open customer photo">
+                        <img src="~/assets/images/placeholders/@(img).svg" alt="Customer photo of the vase in their home"
+                             loading="lazy" width="88" height="88"
+                             style="width:88px;height:88px;border-radius:var(--radius-md);object-fit:cover" />
+                    </button>
+                }
+                <span class="order-thumbs__more shrink-0" style="width:88px;height:88px">+17</span>
+            </div>
+        </div>
+
+        @* Review filters and sort *@
+        <div class="plp-toolbar mt-lg">
+            <div class="row-flex wrap gap-xs">
+                <button class="chip is-active" type="button">All</button>
+                <button class="chip" type="button">With photos</button>
+                @foreach (var star in new[] { 5, 4, 3, 2, 1 })
+                {
+                    <button class="chip" type="button">@star ★</button>
+                }
+            </div>
+            <div class="sort-select">
+                <label class="t-body-sm text-secondary-c" for="reviewSort">Sort</label>
+                <select class="select" id="reviewSort">
+                    <option>Most helpful</option>
+                    <option>Most recent</option>
+                    <option>Highest rating</option>
+                    <option>Lowest rating</option>
+                    <option>With photos first</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-md">
+            @foreach (var review in reviews)
+            {
+                <article class="review-card">
+                    <div class="review-card__head">
+                        <span class="avatar avatar-sm">@review.Author[..1]</span>
+                        <div class="grow">
+                            <div class="row-flex wrap gap-sm">
+                                <span class="review-card__author">@review.Author</span>
+                                @if (review.VerifiedPurchase)
+                                {
+                                    <span class="review-card__verified">
+                                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-badge-check"></use></svg>
+                                        Verified purchase
+                                    </span>
+                                }
+                            </div>
+                            <div class="row-flex gap-sm mt-2xs">
+                                <span class="rating__stars" role="img" aria-label="Rated @review.Rating out of 5">
+                                    @for (var i = 0; i < 5; i++)
+                                    {
+                                        <svg class="ico ico-xs @(i < review.Rating ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
+                                    }
+                                </span>
+                                <span class="t-body-xs text-tertiary-c">@Money.Relative(review.PostedOn)</span>
+                                @if (review.VariantPurchased is not null)
+                                {
+                                    <span class="t-body-xs text-tertiary-c">· @review.VariantPurchased</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="t-heading-xs mt-sm">@review.Title</p>
+                    <p class="review-card__body clamp-4">@review.Body</p>
+
+                    @if (review.Photos.Count > 0)
+                    {
+                        <div class="review-card__photos">
+                            @foreach (var photo in review.Photos)
+                            {
+                                <img src="@photo" alt="Customer photo from @review.Author" loading="lazy" width="72" height="72" />
+                            }
+                        </div>
+                    }
+
+                    <div class="review-card__foot">
+                        <button class="review-vote" type="button">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-thumbs-up"></use></svg>
+                            Helpful (@review.HelpfulCount)
+                        </button>
+                        <button class="btn btn-link btn-sm" type="button">Report</button>
+                    </div>
+                </article>
+            }
+        </div>
+
+        <div class="text-center mt-lg">
+            <a class="btn btn-outline btn-lg" href="/p/@Model.Slug/reviews">See all @Model.ReviewCount reviews</a>
+        </div>
+    </div>
+</section>
+
+@* ══════════ Product FAQ — emits FAQPage structured data ══════════ *@
+<section class="band-sm">
+    <div class="container">
+        <h2 class="t-heading-lg mb-md">Questions about this piece</h2>
+        <div class="accordion accordion-card" data-single>
+            @foreach (var faq in new[]
+            {
+                ("Is it watertight for fresh flowers?", "Yes. The glaze is fully vitrified and the base is sealed, so it holds water without seeping. Empty and dry it between uses to protect the cobalt."),
+                ("Will my piece look exactly like the photograph?", "Recognisably the same, but not identical. The floral band is drawn freehand, so the motif varies, and the cobalt pools slightly differently on each firing. Height can vary by up to 8 mm."),
+                ("Can I put it in the dishwasher?", "No. Blue pottery is low-fired and dishwasher detergent will dull the glaze. Wipe with a soft damp cloth instead."),
+                ("What happens if it arrives broken?", "Send us a photo within 48 hours and we replace it or refund you immediately — no return needed for breakage. Every fragile piece is insured in transit at our cost.")
+            })
+            {
+                <div class="accordion__item">
+                    <button class="accordion__head" type="button" aria-expanded="false">
+                        @faq.Item1
+                        <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                    </button>
+                    <div class="accordion__body">
+                        <div class="t-body-md text-secondary-c">@faq.Item2</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="row-flex gap-sm mt-md">
+            <span class="t-body-sm text-secondary-c">Something else?</span>
+            <a class="link" href="/help">Ask us — we reply within one working day</a>
+        </div>
+    </div>
+</section>
+
+@* ══════════ Related rails ══════════ *@
+<section class="band band-subtle">
+    <div class="container stack stack-xl">
+        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        {
+            Heading = "Complete the look",
+            SubHeading = "Pieces our shoppers buy alongside this one.",
+            Products = DemoContent.Products(6, 2)
+        })
+
+        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        {
+            Heading = "Similar pieces",
+            ViewAllUrl = "/c/" + Model.CategorySlug,
+            Products = DemoContent.Products(6, 5)
+        })
+
+        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        {
+            Heading = "More from " + (Model.Artisan?.Name ?? "this cluster"),
+            ViewAllUrl = Model.Artisan is null ? null : $"/artisans/{Model.Artisan.Slug}",
+            Products = DemoContent.Products(5, 7),
+            Compact = true
+        })
+    </div>
+</section>
+
+@* ══════════ Sticky CTA bars ══════════ *@
+<div class="pdp-sticky no-print">
+    <div class="container row-flex between gap-md">
+        <div class="row-flex gap-sm">
+            <img class="img-product" src="@Model.ImageUrl" alt="" width="44" height="44"
+                 style="width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover" />
+            <div>
+                <p class="t-body-sm clamp-1" style="font-weight:600;max-width:280px">@Model.Name</p>
+                <div class="price price-sm @(Model.IsOnSale ? "is-sale" : "")">
+                    <span class="price__now">@Money.Inr(Model.Price)</span>
+                    @if (Model.IsOnSale)
+                    {
+                        <span class="price__mrp">@Money.Inr(Model.Mrp!.Value)</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row-flex gap-xs">
+            <button class="icon-btn icon-btn-outline wish" type="button" data-wishlist data-product-name="@Model.Name" aria-label="Save to wishlist">
+                <svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg>
+            </button>
+            <button class="btn btn-primary" type="button" data-add-to-cart data-open-minicart>
+                <span class="btn__spinner" aria-hidden="true"></span>
+                <span class="btn__label">Add to Cart</span>
+            </button>
+            <a class="btn btn-buy" href="/checkout">Buy Now</a>
+        </div>
+    </div>
+</div>
+
+<div class="sticky-bar only-tablet-down no-print">
+    <button class="icon-btn icon-btn-outline icon-btn-lg wish shrink-0" type="button"
+            data-wishlist data-product-name="@Model.Name" aria-label="Save to wishlist">
+        <svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg>
+    </button>
+    <div class="shrink-0">
+        <div class="price price-sm @(Model.IsOnSale ? "is-sale" : "")">
+            <span class="price__now">@Money.Inr(Model.Price)</span>
+        </div>
+    </div>
+    <button class="btn btn-primary btn-xl grow" type="button" data-add-to-cart data-open-minicart>
+        <span class="btn__spinner" aria-hidden="true"></span>
+        <span class="btn__label">Add to Cart</span>
+    </button>
+</div>
+
+@* ══════════ Overlays ══════════ *@
+@await Html.PartialAsync("_QuickView", Model)
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Product images" aria-hidden="true">
+    <div class="lightbox__head">
+        <span class="t-body-sm">1 / @gallery.Length</span>
+        <div class="row-flex gap-xs">
+            <button class="icon-btn icon-btn-onimage" type="button" aria-label="Zoom out"><svg class="ico" aria-hidden="true"><use href="#i-minus"></use></svg></button>
+            <button class="icon-btn icon-btn-onimage" type="button" aria-label="Zoom in"><svg class="ico" aria-hidden="true"><use href="#i-plus"></use></svg></button>
+            <button class="icon-btn icon-btn-onimage" data-close="lightbox" aria-label="Close"><svg class="ico" aria-hidden="true"><use href="#i-x"></use></svg></button>
+        </div>
+    </div>
+    <div class="lightbox__stage">
+        <img src="@gallery[0].Src" alt="@gallery[0].Alt" />
+    </div>
+    <div class="lightbox__strip">
+        @foreach (var item in gallery)
+        {
+            <img src="@item.Src" alt="@item.Alt" />
+        }
+    </div>
+</div>
+
+<div class="sheet" id="shareSheet" role="dialog" aria-modal="true" aria-label="Share this product" aria-hidden="true" data-scrim="globalScrim">
+    <div class="sheet__handle"></div>
+    <div class="sheet__head">
+        <h2 class="t-heading-md">Share</h2>
+        <button class="icon-btn" data-close aria-label="Close"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg></button>
+    </div>
+    <div class="sheet__body">
+        <div class="pcard-compact mb-md">
+            <img class="pcard-compact__img" src="@Model.ImageUrl" alt="" width="64" height="64" />
+            <div class="grow">
+                <p class="t-body-sm clamp-1" style="font-weight:600">@Model.Name</p>
+                <p class="t-body-sm text-secondary-c tabular">@Money.Inr(Model.Price)</p>
+            </div>
+        </div>
+        <button class="dropdown__item" type="button" data-copy="https://chamundahandicraft.com/p/@Model.Slug">
+            <svg class="ico" aria-hidden="true"><use href="#i-copy"></use></svg> Copy link
+        </button>
+        <a class="dropdown__item" href="https://wa.me/?text=https://chamundahandicraft.com/p/@Model.Slug" rel="noopener">
+            <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg> WhatsApp
+        </a>
+        <a class="dropdown__item" href="https://facebook.com" rel="noopener">
+            <svg class="ico" aria-hidden="true"><use href="#i-facebook"></use></svg> Facebook
+        </a>
+        <a class="dropdown__item" href="https://pinterest.com" rel="noopener">
+            <svg class="ico" aria-hidden="true"><use href="#i-pinterest"></use></svg> Pinterest
+        </a>
+        <a class="dropdown__item" href="mailto:?body=https://chamundahandicraft.com/p/@Model.Slug">
+            <svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg> Email
+        </a>
+    </div>
+</div>
+
+<div class="modal-scrim" id="sizeGuide" role="dialog" aria-modal="true" aria-labelledby="sizeGuideTitle" aria-hidden="true">
+    <div class="modal">
+        <div class="modal__head">
+            <h2 class="t-heading-md" id="sizeGuideTitle">Size guide</h2>
+            <button class="icon-btn" data-close="sizeGuide" aria-label="Close"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg></button>
+        </div>
+        <div class="modal__body">
+            <div class="data-table table-scroll">
+                <table>
+                    <caption class="sr-only">Vase sizes in centimetres and inches</caption>
+                    <thead>
+                        <tr><th scope="col">Size</th><th scope="col">Height</th><th scope="col">Diameter</th><th scope="col">Capacity</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Small</td><td class="tabular">18 cm / 7.1 in</td><td class="tabular">10 cm</td><td class="tabular">0.6 L</td></tr>
+                        <tr><td>Medium</td><td class="tabular">24 cm / 9.4 in</td><td class="tabular">12 cm</td><td class="tabular">1.2 L</td></tr>
+                        <tr><td>Large</td><td class="tabular">32 cm / 12.6 in</td><td class="tabular">15 cm</td><td class="tabular">2.1 L</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="t-body-sm text-secondary-c mt-md">
+                Handmade pieces vary by up to 8 mm from these figures. If exact height matters for your
+                shelf, tell us in the order notes and we'll pick the closest piece in the batch.
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "Product",
+      "name": "@Model.Name",
+      "image": "@Model.ImageUrl",
+      "description": "@Model.ShortDescription",
+      "sku": "HC-POT-0421",
+      "brand": { "@@type": "Brand", "name": "Chamunda Handicraft" },
+      "aggregateRating": {
+        "@@type": "AggregateRating",
+        "ratingValue": "@Model.Rating.ToString("0.0")",
+        "reviewCount": "@Model.ReviewCount"
+      },
+      "offers": {
+        "@@type": "Offer",
+        "priceCurrency": "INR",
+        "price": "@Model.Price",
+        "availability": "https://schema.org/@(Model.Stock == StockState.OutOfStock ? "OutOfStock" : "InStock")"
+      }
+    }
+    </script>
+}

@@ -1,3 +1,4 @@
+@model OrderDetailAdminViewModel
 @*
     Module 06 - Order detail. Spec: docs/Admin Flows/Orders.txt §2 lifecycle,
     §5-10 stage screens, §4 row actions.
@@ -5,7 +6,7 @@
 @{
     ViewData["Title"] = "Order Details";
 
-    var lifecycle = new[] { "New", "Payment Verified", "Processing", "Packed", "Shipped", "In Transit", "Delivered", "Completed" };
+
 }
 
 @section Header {
@@ -30,12 +31,12 @@
         <div class="form-section-body">
             <div class="d-flex align-items-center gap-3 flex-wrap">
                 <div class="flex-grow-1">
-                    <h3 class="mb-1">Order <span id="ordNumber">&mdash;</span></h3>
+                    <h3 class="mb-1">Order <span id="ordNumber">@Model.Header.OrderNumber</span></h3>
                     <p class="text-muted mb-0" style="font-size:.85rem;">
-                        Placed <span id="ordDate">&mdash;</span> &middot;
-                        <span id="ordCustomer">&mdash;</span> &middot;
-                        <span id="ordItems">0</span> items &middot;
-                        <span id="ordTotal">&#8377;0</span>
+                        Placed <span id="ordDate">@Money.LongDate(Model.Header.PlacedOn)</span> &middot;
+                        <span id="ordCustomer">@Model.Header.CustomerName</span> &middot;
+                        <span id="ordItems">@Model.Header.ItemCount</span> items &middot;
+                        <span id="ordTotal">@Money.Inr(Model.Header.Total)</span>
                     </p>
                 </div>
 
@@ -50,11 +51,16 @@
 
             <!-- Lifecycle -->
             <div class="order-timeline mt-4">
-                @foreach (var step in lifecycle)
+                @* Done / current / upcoming, from the order status rather than a static strip. *@
+                @foreach (var step in Model.Timeline)
                 {
-                    <div class="timeline-step">
+                    <div class="timeline-step is-@step.State">
                         <span class="timeline-dot"></span>
-                        <span class="timeline-label">@step</span>
+                        <span class="timeline-label">@step.Title</span>
+                        @if (step.At is not null)
+                        {
+                            <span class="timeline-meta text-muted">@Money.LongDate(step.At.Value)</span>
+                        }
                     </div>
                 }
             </div>
@@ -85,7 +91,26 @@
                                 <th style="min-width:120px;">Total</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                    @foreach (var line in Model.Lines)
+                    {
+                        <tr>
+                            <td><img src="@line.ImageUrl" width="36" height="36" alt="@line.ImageAlt" style="object-fit:cover;border-radius:6px" /></td>
+                            <td>@line.Name</td>
+                            <td>@line.Sku</td>
+                            <td>@line.VariantSummary</td>
+                            <td class="text-end">@line.Quantity</td>
+                            <td class="text-end">@Money.Inr(line.Price)</td>
+                            <td class="text-end">@(line.Mrp is null ? "—" : Money.Inr(line.Mrp.Value - line.Price))</td>
+                            <td class="text-end">Included</td>
+                            <td class="text-end"><strong>@Money.Inr(line.LineTotal)</strong></td>
+                        </tr>
+                    }
+                    @if (!Model.Lines.Any())
+                    {
+                        <tr><td colspan="9" class="text-center py-4">No line items on this order.</td></tr>
+                    }
+                </tbody>
                     </table>
                 </div>
             </section>
@@ -98,19 +123,27 @@
                     <h2><i class="fas fa-receipt" style="color:var(--accent);margin-right:8px;"></i>Order Summary</h2>
                 </div>
                 <div class="form-section-body">
+                    @* The same OrderSummaryViewModel the customer's own order page renders.
+                       One order, one set of numbers — nothing to reconcile. *@
                     <ul class="simple-list">
-                        @foreach (var line in new[] { "Sub Total", "Discount", "Coupon", "Shipping Charges", "COD Charges", "Tax (GST)", "Grand Total" })
-                        {
-                            <li><span>@line</span><strong>&#8377;0</strong></li>
-                        }
+                        <li><span>Sub Total</span><strong>@Money.Inr(Model.Summary.MrpTotal)</strong></li>
+                        <li><span>Discount</span><strong>&minus;@Money.Inr(Model.Summary.ProductSavings)</strong></li>
+                        <li>
+                            <span>Coupon@(Model.Summary.CouponCode is null ? "" : " (" + Model.Summary.CouponCode + ")")</span>
+                            <strong>&minus;@Money.Inr(Model.Summary.CouponDiscount)</strong>
+                        </li>
+                        <li><span>Shipping Charges</span><strong>@(Model.Summary.Shipping == 0 ? "Free" : Money.Inr(Model.Summary.Shipping))</strong></li>
+                        <li><span>COD Charges</span><strong>@Money.Inr(Model.Summary.CodFee)</strong></li>
+                        <li><span>Tax (GST)</span><strong>@(Model.Summary.TaxInclusive ? "Included" : Money.Inr(Model.Summary.TaxTotal))</strong></li>
+                        <li><span>Grand Total</span><strong>@Money.Inr(Model.Summary.Total)</strong></li>
                     </ul>
 
                     <h4 class="section-heading mt-3">Payment</h4>
                     <ul class="simple-list">
-                        @foreach (var line in new[] { "Payment Method", "Payment Status", "Transaction ID", "Paid On" })
-                        {
-                            <li><span>@line</span><strong>&mdash;</strong></li>
-                        }
+                        <li><span>Payment Method</span><strong>@Model.Header.PaymentMethod</strong></li>
+                        <li><span>Payment Status</span><strong>@Model.Header.PaymentStatus</strong></li>
+                        <li><span>Transaction ID</span><strong>@(Model.PaymentReference ?? "&mdash;")</strong></li>
+                        <li><span>Paid On</span><strong>@Money.LongDate(Model.Header.PlacedOn)</strong></li>
                     </ul>
                 </div>
             </section>
@@ -177,7 +210,7 @@
                                     <th style="min-width:280px;">Remarks</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody><tr><td colspan="8" class="text-center py-4">Nothing recorded here yet.</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -197,7 +230,7 @@
                                     <th style="min-width:140px;">Date</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody><tr><td colspan="8" class="text-center py-4">Nothing recorded here yet.</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -213,7 +246,7 @@
                                     <th style="min-width:300px;">Details</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody><tr><td colspan="8" class="text-center py-4">Nothing recorded here yet.</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -237,12 +270,25 @@
                 <h3>Update Order Status</h3>
                 <div class="text-start mt-2">
                     <label class="form-label-custom">New Status</label>
-                    <select class="form-control-custom">
-                        @foreach (var s in lifecycle)
+                    @* Only the legal next steps, computed by the API from the lifecycle in
+                       Orders.txt §2 — an operator cannot skip Packed and jump to Delivered. *@
+                    <select class="form-control-custom" name="NewStatus">
+                        @foreach (var next in Model.AllowedNextStatuses)
                         {
-                            <option>@s</option>
+                            <option value="@((int)next)">@next</option>
+                        }
+                        @if (!Model.AllowedNextStatuses.Any())
+                        {
+                            <option value="">No further transitions from @Model.Header.Status</option>
                         }
                     </select>
+
+                    @* Ticked by default: every transition the shopper can act on fires the
+                       matching notification, which is what keeps their tracking page honest. *@
+                    <label class="d-flex align-items-center gap-2 mt-3">
+                        <input type="checkbox" name="NotifyCustomer" checked />
+                        <span>Notify the customer</span>
+                    </label>
 
                     <label class="form-label-custom mt-2">Notes</label>
                     <textarea class="form-control-custom" rows="3" placeholder="Optional note recorded in the activity log"></textarea>

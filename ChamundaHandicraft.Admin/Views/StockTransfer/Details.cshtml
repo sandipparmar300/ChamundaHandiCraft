@@ -1,4 +1,5 @@
-﻿@{
+@model StockTransferGridItem
+@{
     ViewData["Title"] = "Stock Transfer Details";
 }
 
@@ -22,26 +23,26 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Stock Transfer Information</h2>
-            <a asp-controller="StockTransfer" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="StockTransfer" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Transfer Number</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.TransferNumber</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Transfer Date</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.LongDate(Model.InitiatedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Source Warehouse</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.FromWarehouse</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Destination Warehouse</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.ToWarehouse</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Product</label>
@@ -49,11 +50,11 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Quantity</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.TotalQuantity</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Remarks</label>
@@ -61,7 +62,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Created By</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.CreatedBy ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Approved By</label>

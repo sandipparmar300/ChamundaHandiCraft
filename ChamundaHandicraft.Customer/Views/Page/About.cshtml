@@ -1,0 +1,180 @@
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+    var title = ViewData["Title"] as string ?? "Our story";
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+</div>
+
+@* ---- Hero ---- *@
+<section class="container" style="padding-top:var(--space-md)">
+    <div class="hero" style="min-height:380px">
+        <img class="hero__img" src="~/assets/images/placeholders/artisan-cover.svg"
+             alt="A row of artisans at work in a Jaipur courtyard workshop" fetchpriority="high" />
+        <div class="hero__body">
+            <span class="t-overline hero__eyebrow">Chamunda Handicraft</span>
+            <h1 class="t-display-xl hero__title mt-xs">@title</h1>
+            <p class="hero__sub">
+                We buy handmade objects from the people who make them, at prices they set,
+                and we put their names on the box.
+            </p>
+        </div>
+    </div>
+</section>
+
+@* ---- The premise ---- *@
+<section class="band">
+    <div class="container">
+        <div class="layout-editorial" style="align-items:start">
+            <div class="prose">
+                <p class="t-body-xl">
+                    Chamunda Handicraft began with an uncomfortable observation: in most craft supply chains, the
+                    person who made the object receives the smallest share of what you pay for it.
+                </p>
+                <p>
+                    We started in 2024 with six workshops in and around Jaipur, buying directly and paying
+                    upfront rather than on consignment. Today we work with 240 artisans across 18 craft
+                    clusters, from Channapatna wood in Karnataka to sikki grass in Bihar.
+                </p>
+
+                <h2>What we actually do</h2>
+                <p>
+                    We are not a marketplace. We buy the pieces ourselves, hold the stock, and take the
+                    loss when something does not sell. That matters, because it means an artisan is paid
+                    whether or not we find a buyer.
+                </p>
+                <p>
+                    We visit every workshop before we buy from it and again at least once a year. We do not
+                    list a product we have not held.
+                </p>
+
+                <blockquote>
+                    “We pay the maker first, and price backwards from there.”
+                </blockquote>
+
+                <h2>What we won't do</h2>
+                <ul>
+                    <li>We do not run fake countdown timers or invented “only 2 left” warnings.</li>
+                    <li>We do not inflate an MRP so a discount looks bigger than it is.</li>
+                    <li>We do not sell machine-made goods described as handmade — every listing names its maker.</li>
+                    <li>We do not hide shipping or COD fees until the payment screen.</li>
+                </ul>
+
+                <h2>Where the money goes</h2>
+                <p>
+                    On an average order, 62% of what you pay reaches the artisan's workshop. The rest covers
+                    photography, packaging, insured shipping, payment fees, returns and the people who answer
+                    your emails. We publish this figure and update it every quarter.
+                </p>
+            </div>
+
+            <aside>
+                <div class="card card-craft">
+                    <p class="t-heading-xs text-craft-c mb-md">By the numbers</p>
+                    <div class="stack stack-md">
+                        @foreach (var (value, label) in new[]
+                        {
+                            ("240", "artisans we buy from"),
+                            ("18", "craft clusters"),
+                            ("62%", "of price reaching the maker"),
+                            ("0", "middlemen between us and the workshop")
+                        })
+                        {
+                            <div>
+                                <p class="t-display-lg text-craft-c tabular" style="line-height:1">@value</p>
+                                <p class="t-body-sm text-craft-c">@label</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card mt-md">
+                    <p class="t-heading-xs mb-sm">Elsewhere</p>
+                    <div class="stack stack-2xs">
+                        <a class="link-muted t-body-sm" href="/artisans">Meet the makers</a>
+                        <a class="link-muted t-body-sm" href="/pages/sustainability">Sustainability</a>
+                        <a class="link-muted t-body-sm" href="/pages/careers">Careers</a>
+                        <a class="link-muted t-body-sm" href="/pages/press">Press enquiries</a>
+                        <a class="link-muted t-body-sm" href="/blog">Craft stories</a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+@* ---- Clusters ---- *@
+<section class="band band-craft">
+    <div class="container">
+        <span class="craft-rule"></span>
+        <h2 class="t-display-lg">Where our pieces come from</h2>
+        <p class="t-body-lg text-craft-c mt-sm measure">
+            Eighteen clusters, each with its own material, its own technique and its own history.
+        </p>
+
+        <div class="cat-grid mt-lg">
+            @foreach (var (place, craft, image) in new[]
+            {
+                ("Jaipur, Rajasthan", "Blue pottery", "category-5"),
+                ("Bolpur, West Bengal", "Kantha embroidery", "category-3"),
+                ("Moradabad, UP", "Brass casting", "category-2"),
+                ("Channapatna, Karnataka", "Lacquered woodcraft", "category-6"),
+                ("Cuttack, Odisha", "Silver filigree", "category-4"),
+                ("Madhubani, Bihar", "Mithila painting", "category")
+            })
+            {
+                <a class="cat-tile" href="/c/craft-clusters">
+                    <img src="~/assets/images/placeholders/@(image).svg" alt="@craft from @place" loading="lazy"
+                         width="480" height="360" />
+                    <span class="cat-tile__body">
+                        <span class="cat-tile__title">@craft</span>
+                        <span class="cat-tile__count">@place</span>
+                    </span>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@* ---- Makers ---- *@
+<section class="band band-surface">
+    <div class="container">
+        <div class="band-head">
+            <div class="band-head__text">
+                <h2 class="t-display-lg">The people who make it</h2>
+                <p class="band-head__sub">Every product page credits one of them by name.</p>
+            </div>
+            <a class="link-standalone" href="/artisans">
+                All 240 artisans
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+        </div>
+
+        <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+            @foreach (var artisan in DemoContent.Artisans())
+            {
+                <a class="card card-flush" href="/artisans/@artisan.Slug" style="text-align:center">
+                    <div class="img-box img-1-1" style="border-radius:0">
+                        <img src="@artisan.PhotoUrl" alt="@artisan.Name at work" loading="lazy" width="240" height="240" />
+                    </div>
+                    <div style="padding:var(--space-md)">
+                        <p class="t-heading-xs">@artisan.Name</p>
+                        <p class="t-body-sm text-craft-c">@artisan.Craft</p>
+                        <p class="t-body-xs text-tertiary-c mt-2xs">@artisan.Cluster</p>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@* ---- Trust band ---- *@
+<section class="band-sm">
+    <div class="container">
+        @await Html.PartialAsync("_TrustBand")
+    </div>
+</section>

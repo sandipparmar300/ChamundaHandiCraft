@@ -1,0 +1,66 @@
+@{
+    Layout = "_Layout";
+    ViewData["HideChrome"] = true;
+}
+
+@*
+    Minimal checkout chrome. No navigation, no search, no mega menu, no cart icon —
+    every one of those is a documented source of checkout leakage (§8.12).
+    The only exits are the guarded logo, the summary's "Edit cart" links, and help.
+*@
+<header class="site-header" style="position:static">
+    <div class="container">
+        <div class="header-main">
+            <a class="header-logo" href="/" data-guard-unsaved>
+                @await Html.PartialAsync("_Logo", "auto")
+            </a>
+
+            <span class="row-flex gap-2xs mx-auto t-body-sm text-secondary-c">
+                <svg class="ico ico-sm text-success-c" aria-hidden="true"><use href="#i-lock"></use></svg>
+                Secure checkout
+            </span>
+
+            <div class="dropdown">
+                <button class="btn btn-ghost btn-sm" data-dropdown aria-expanded="false" aria-haspopup="menu">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-circle-help"></use></svg>
+                    Need help?
+                </button>
+                <div class="dropdown__menu" role="menu">
+                    <a class="dropdown__item" role="menuitem" href="tel:+919876543210">
+                        <svg class="ico" aria-hidden="true"><use href="#i-phone"></use></svg> +91 98765 43210
+                    </a>
+                    <a class="dropdown__item" role="menuitem" href="https://wa.me/919876543210" rel="noopener">
+                        <svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg> WhatsApp us
+                    </a>
+                    <a class="dropdown__item" role="menuitem" href="mailto:care@chamundahandicraft.com">
+                        <svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg> care@chamundahandicraft.com
+                    </a>
+                    <div class="dropdown__divider"></div>
+                    <a class="dropdown__item" role="menuitem" href="/help">
+                        <svg class="ico" aria-hidden="true"><use href="#i-book-open"></use></svg> Help Centre
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+@RenderBody()
+
+<footer class="site-footer no-print" style="margin-top:var(--space-2xl)">
+    <div class="container">
+        <div class="footer-legal" style="border-top:0">
+            <span>© @DateTime.Now.Year Chamunda Handicraft Pvt. Ltd.</span>
+            <div class="row-flex wrap gap-md">
+                <a class="link-muted" href="/pages/privacy-policy">Privacy</a>
+                <a class="link-muted" href="/pages/terms">Terms</a>
+                <a class="link-muted" href="/pages/refund-policy">Refund Policy</a>
+                <a class="link-muted" href="mailto:care@chamundahandicraft.com">care@chamundahandicraft.com</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

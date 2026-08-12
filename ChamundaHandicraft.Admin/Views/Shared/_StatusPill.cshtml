@@ -1,0 +1,13 @@
+@model bool
+@*
+    Active / Inactive pill. Used by every reference-data grid, so the two states read
+    identically everywhere rather than each view inventing its own wording.
+*@
+@if (Model)
+{
+    <span class="badge bg-success">Active</span>
+}
+else
+{
+    <span class="badge bg-secondary">Inactive</span>
+}

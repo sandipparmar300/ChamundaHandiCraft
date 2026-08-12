@@ -1,4 +1,5 @@
-﻿@{
+@model MediaGridItem
+@{
     ViewData["Title"] = "Media File Details";
 }
 
@@ -22,30 +23,30 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Media File Information</h2>
-            <a asp-controller="Media" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Media" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">File Name</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.FileName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Type</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.MediaType</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Size</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.SizeDisplay</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Dimensions</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.Width is null ? "—" : Model.Width + " x " + Model.Height)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Alt Text</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.IsMissingAltText ? "Missing — required before it can go on a published product" : Model.AltText)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Title</label>
@@ -53,7 +54,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Storage Path</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Url</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">CDN URL</label>
@@ -61,15 +62,15 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Used In</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.UsedInCount places</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Uploaded On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.LongDate(Model.CreatedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Uploaded By</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.CreatedBy ?? "—")</p>
                     </div>
             </div>
         </div>

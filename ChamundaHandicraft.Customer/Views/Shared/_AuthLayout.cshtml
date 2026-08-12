@@ -1,0 +1,68 @@
+@{
+    Layout = "_Layout";
+    ViewData["HideChrome"] = true;
+
+    // Rotating maker quotes on the brand column — the storefront's voice, not stock copy.
+    var quotes = new (string Quote, string Author)[]
+    {
+        ("Every piece carries the hands that made it.", "Ram Prasad Sharma · Blue Pottery, Jaipur"),
+        ("A stitch that shows is a stitch that is honest.", "Meenakshi Devi · Kantha, Bolpur"),
+        ("Brass remembers the hammer. That is the point.", "Iqbal Hussain · Brass Casting, Moradabad")
+    };
+
+    var quote = quotes[DateTime.Now.DayOfYear % quotes.Length];
+}
+
+<div class="auth-shell">
+
+    @* Left column — full-bleed craft photography, hidden below 992px. *@
+    <aside class="auth-shell__brand">
+        <img src="~/assets/images/placeholders/lifestyle.svg"
+             alt="An artisan's hands shaping wet clay on a potter's wheel" />
+
+        <a class="header-logo" href="/">
+            @await Html.PartialAsync("_Logo", "inverse")
+        </a>
+
+        <div>
+            <blockquote class="t-display-lg" style="color:#fff;font-family:var(--font-display)">
+                “@quote.Quote”
+            </blockquote>
+            <p class="t-body-md mt-md" style="color:rgba(255,255,255,.78)">— @quote.Author</p>
+        </div>
+
+        <div class="row-flex gap-lg" style="color:rgba(255,255,255,.78)">
+            <span class="t-body-sm row-flex gap-2xs">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-hand-heart"></use></svg> 240 artisans
+            </span>
+            <span class="t-body-sm row-flex gap-2xs">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-map-pin"></use></svg> 18 craft clusters
+            </span>
+            <span class="t-body-sm row-flex gap-2xs">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield-check"></use></svg> Secure sign-in
+            </span>
+        </div>
+    </aside>
+
+    @* Right column — the form. *@
+    <div class="auth-shell__form">
+        <div class="auth-form">
+            <div class="row-flex between mb-xl">
+                <a class="header-logo" href="/">
+                    @await Html.PartialAsync("_Logo", "auto")
+                </a>
+                <a class="btn btn-ghost btn-sm" href="/">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-x"></use></svg>
+                    Continue shopping
+                </a>
+            </div>
+
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@* Sections do not cross nested layouts on their own — forward it to _Layout. *@
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

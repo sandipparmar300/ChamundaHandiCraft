@@ -1,3 +1,9 @@
+@*
+    The signed-in operator's own profile. Fields mirror AdminProfileViewModel exactly —
+    the role and last sign-in are shown as facts, not inputs, because neither is
+    something you change about yourself here.
+*@
+@model AdminProfileViewModel
 @{
     ViewData["Title"] = "My Profile";
 }
@@ -16,11 +22,20 @@
 
 <main class="page-content">
 
-    <form method="post" id="profileForm" enctype="multipart/form-data">
+    <form method="post" asp-controller="Profile" asp-action="Save" id="profileForm" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
                 <h2><i class="fas fa-user" style="color:var(--accent);margin-right:8px;"></i>Profile Information</h2>
+                <span class="text-muted" style="font-size:.8rem;">
+                    @Model.RoleName
+                    @if (Model.LastLoginOn.HasValue)
+                    {
+                        <text> &middot; last signed in @Money.Relative(Model.LastLoginOn.Value)</text>
+                    }
+                </span>
             </div>
 
             <div class="form-section-body">
@@ -29,7 +44,9 @@
                     <div class="col-lg-3 col-md-12">
                         <label class="form-label-custom">Profile Photo</label>
                         <div class="profile-pic-box" id="uploadBox">
-                            <img id="ProfilePhotoPreview" src="~/assets/images/default-profile.png" class="pic-preview clickable-img" alt="profile" />
+                            <img id="ProfilePhotoPreview"
+                                 src="@(string.IsNullOrEmpty(Model.PhotoUrl) ? Url.Content("~/assets/images/default-profile.png") : Model.PhotoUrl)"
+                                 class="pic-preview clickable-img" alt="@Model.FullName" />
                             <label class="upload-btn-custom" for="Photo"><i class="fas fa-camera"></i> Upload</label>
                             <input type="file" id="Photo" name="Photo" accept="image/*" class="d-none" />
                             <p class="upload-note">JPG, PNG (Max 5MB)</p>
@@ -37,38 +54,36 @@
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">First Name <span class="req">*</span></label>
-                        <input id="FirstName" name="FirstName" class="form-control-custom" placeholder="Enter first name" />
+                        <label class="form-label-custom" for="FullName">Full Name <span class="req">*</span></label>
+                        <input id="FullName" name="FullName" class="form-control-custom"
+                               value="@Model.FullName" placeholder="Enter full name" />
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Last Name <span class="req">*</span></label>
-                        <input id="LastName" name="LastName" class="form-control-custom" placeholder="Enter last name" />
+                        <label class="form-label-custom" for="Email">Email</label>
+                        <input id="Email" name="Email" class="form-control-custom" value="@Model.Email" readonly />
+                        <p class="upload-note">Changing this needs an administrator.</p>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Email</label>
-                        <input id="Email" name="Email" class="form-control-custom" readonly />
+                        <label class="form-label-custom" for="Phone">Mobile Number</label>
+                        <input id="Phone" name="Phone" class="form-control-custom"
+                               value="@Model.Phone" placeholder="Enter mobile number" />
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Mobile Number</label>
-                        <input id="Mobile" name="Mobile" class="form-control-custom" placeholder="Enter mobile number" />
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Time Zone</label>
-                        <select id="TimeZone" name="TimeZone" class="form-control-custom select2-single">
-                            <option value="India Standard Time" selected>India Standard Time</option>
+                        <label class="form-label-custom" for="Timezone">Time Zone</label>
+                        <select id="Timezone" name="Timezone" class="form-control-custom select2-single">
+                            @foreach (var tz in new[] { "Asia/Kolkata", "Asia/Dubai", "Europe/London", "America/New_York" })
+                            {
+                                <option value="@tz" selected="@(tz == Model.Timezone)">@tz</option>
+                            }
                         </select>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Language</label>
-                        <select id="Language" name="Language" class="form-control-custom select2-single">
-                            <option value="en-IN" selected>English (India)</option>
-                            <option value="hi-IN">Hindi</option>
-                        </select>
+                        <label class="form-label-custom">Role</label>
+                        <input class="form-control-custom" value="@Model.RoleName" readonly />
                     </div>
 
                 </div>
@@ -77,23 +92,39 @@
 
         <section class="form-section">
             <div class="form-section-header">
-                <h2><i class="fas fa-key" style="color:var(--accent);margin-right:8px;"></i>Change Password</h2>
+                <h2><i class="fas fa-shield-halved" style="color:var(--accent);margin-right:8px;"></i>Security</h2>
             </div>
 
             <div class="form-section-body">
-                <div class="row g-3">
+                <div class="row g-3 align-items-center">
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Current Password</label>
+                        <label class="form-label-custom">Two-factor authentication</label>
+                        <div>
+                            @if (Model.TwoFactorEnabled)
+                            {
+                                <span class="status-pill status-active"><i class="fas fa-check"></i> Enabled</span>
+                            }
+                            else
+                            {
+                                <span class="status-pill status-inactive"><i class="fas fa-triangle-exclamation"></i> Not enabled</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom" for="CurrentPassword">Current Password</label>
                         <input type="password" id="CurrentPassword" name="CurrentPassword" class="form-control-custom" autocomplete="current-password" />
                     </div>
 
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">New Password</label>
+                        <label class="form-label-custom" for="NewPassword">New Password</label>
                         <input type="password" id="NewPassword" name="NewPassword" class="form-control-custom" autocomplete="new-password" />
                     </div>
 
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Confirm New Password</label>
+                        <label class="form-label-custom" for="ConfirmPassword">Confirm New Password</label>
                         <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="form-control-custom" autocomplete="new-password" />
                     </div>
                 </div>
@@ -104,7 +135,7 @@
             <div></div>
             <div>
                 <a asp-controller="Dashboard" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+                <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
             </div>
         </div>
 

@@ -1,0 +1,278 @@
+@model ListingViewModel
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+
+    var sortOptions = new (string Value, string Label)[]
+    {
+        ("popularity", "Popularity"),
+        ("latest", "Latest"),
+        ("bestselling", "Bestselling"),
+        ("rating", "Rating"),
+        ("price-asc", "Price: Low to High"),
+        ("price-desc", "Price: High to Low"),
+        ("discount", "Discount")
+    };
+
+    var subCategories = new (string Label, int Count, bool Active)[]
+    {
+        ("All", 84, true), ("Ceramic", 42, false), ("Brass", 18, false),
+        ("Terracotta", 14, false), ("Marble", 6, false), ("Glass", 4, false)
+    };
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    @* ---- Heading block. One H1 per page: the category name (SEO §10). ---- *@
+    <div class="page-head">
+        <h1 class="t-display-lg page-head__title">@Model.Heading</h1>
+        <p class="page-head__sub measure clamp-3">@Model.Intro</p>
+    </div>
+
+    @* ---- Sub-category chips ---- *@
+    <div class="chip-nav mb-sm">
+        @foreach (var sub in subCategories)
+        {
+            <a class="chip-nav__item @(sub.Active ? "is-active" : "")"
+               href="@(Model.CategorySlug is null ? "/shop" : $"/c/{Model.CategorySlug}")?material=@sub.Label.ToLowerInvariant()">
+                @sub.Label <span class="text-tertiary-c">@sub.Count</span>
+            </a>
+        }
+    </div>
+
+    @* ---- Mobile sticky filter/sort bar ---- *@
+    <div class="filter-bar-mobile">
+        <button class="btn btn-outline btn-sm grow" type="button" data-open="filterSheet">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-filter"></use></svg>
+            Filters <span class="counter counter-brand">2</span>
+        </button>
+        <button class="btn btn-outline btn-sm grow" type="button" data-open="sortSheet">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-sort"></use></svg>
+            Sort
+        </button>
+    </div>
+
+    <div class="layout-rail-grid">
+
+        @* ---- Filter rail (desktop) ---- *@
+        <aside class="hide-tablet-down sticky-col" aria-label="Filters">
+            @await Html.PartialAsync("_FilterRail")
+        </aside>
+
+        <div>
+            @* ---- Toolbar ---- *@
+            <div class="plp-toolbar">
+                <p class="t-body-md">
+                    <strong class="tabular" aria-live="polite">@Model.TotalCount</strong>
+                    <span class="text-secondary-c">products</span>
+                </p>
+
+                <div class="row-flex gap-sm hide-tablet-down">
+                    <div class="sort-select">
+                        <label class="t-body-sm text-secondary-c" for="sortSelect">Sort by</label>
+                        <select class="select" id="sortSelect" onchange="location.search='?sort='+this.value">
+                            @foreach (var option in sortOptions)
+                            {
+                                <option value="@option.Value" selected="@(Model.Sort == option.Value)">@option.Label</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="view-toggle" role="group" aria-label="View layout">
+                        <button class="@(Model.View == "grid" ? "is-active" : "")" type="button"
+                                aria-pressed="@(Model.View == "grid")" aria-label="Grid view">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-grid"></use></svg>
+                        </button>
+                        <button class="@(Model.View == "list" ? "is-active" : "")" type="button"
+                                aria-pressed="@(Model.View == "list")" aria-label="List view">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-list"></use></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @* ---- Active filter bar — FL-11 / FL-12 ---- *@
+            <div class="active-filters mb-md">
+                <span class="t-body-sm text-secondary-c">Filtered by</span>
+                <span class="chip is-active">
+                    Ceramic
+                    <button class="chip__remove" type="button" aria-label="Remove Ceramic filter">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-x"></use></svg>
+                    </button>
+                </span>
+                <span class="chip is-active">
+                    Under ₹2,000
+                    <button class="chip__remove" type="button" aria-label="Remove price filter">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-x"></use></svg>
+                    </button>
+                </span>
+                <button class="btn btn-link btn-sm" type="button">Clear all</button>
+            </div>
+
+            @if (Model.Products.Count == 0)
+            {
+                @* STA-03-02 · No results — icon, reason, active chips, clear action. *@
+                <div class="state-block">
+                    <span class="state-block__icon">
+                        <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-search"></use></svg>
+                    </span>
+                    <h2 class="t-heading-md">No pieces match these filters</h2>
+                    <p class="state-block__desc">
+                        Nothing in this category matches <strong>Ceramic</strong> under <strong>₹2,000</strong> right now.
+                        Widen the price, or clear a filter and try again.
+                    </p>
+                    <div class="state-block__actions">
+                        <button class="btn btn-primary" type="button">Clear all filters</button>
+                        <a class="btn btn-outline" href="/shop">Browse everything</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="@(Model.View == "list" ? "pgrid-list" : "pgrid")">
+                    @for (var i = 0; i < Model.Products.Count; i++)
+                    {
+                        var product = Model.Products[i];
+
+                        if (Model.View == "list")
+                        {
+                            @await Html.PartialAsync("_ProductCardList", product)
+                        }
+                        else
+                        {
+                            @await Html.PartialAsync("_ProductCard", product)
+                        }
+
+                        @* Injected collection banner — max 1 per 8 cards, spans the grid. *@
+                        if (Model.View == "grid" && i == 7)
+                        {
+                            <div class="pgrid__injection">
+                                <a class="collection-banner" href="/c/festive">
+                                    <img src="~/assets/images/placeholders/banner.svg"
+                                         alt="Festive collection of brass lamps and diyas" loading="lazy" />
+                                    <span class="collection-banner__body">
+                                        <span class="t-overline" style="color:rgba(255,255,255,.86)">Festive 2026</span>
+                                        <span class="t-heading-lg" style="display:block;color:#fff;margin:4px 0 8px">Light for the season</span>
+                                        <span class="btn btn-inverse btn-sm">Shop Festive</span>
+                                    </span>
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+
+                @* ---- Pagination: Load More with a real paginated fallback for SEO ---- *@
+                <div class="load-more mt-2xl">
+                    <button class="btn btn-outline btn-lg" type="button">
+                        <span class="btn__spinner" aria-hidden="true"></span>
+                        <span class="btn__label">Load More (@Model.Products.Count of @Model.TotalCount)</span>
+                    </button>
+                    <div class="load-more__progress" role="progressbar"
+                         aria-valuenow="@Model.Products.Count" aria-valuemin="0" aria-valuemax="@Model.TotalCount">
+                        <span style="width:@(Model.Products.Count * 100 / Math.Max(1, Model.TotalCount))%"></span>
+                    </div>
+                    <nav class="pagination mt-sm" aria-label="Pagination">
+                        <a class="pagination__item is-disabled" href="#" aria-label="Previous page">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+                        </a>
+                        <a class="pagination__item is-current" href="?page=1" aria-current="page">1</a>
+                        <a class="pagination__item" href="?page=2">2</a>
+                        <a class="pagination__item" href="?page=3">3</a>
+                        <span class="pagination__gap">…</span>
+                        <a class="pagination__item" href="?page=7">7</a>
+                        <a class="pagination__item" href="?page=2" aria-label="Next page">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                        </a>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* ---- Category intro copy (80–150 words, editorially controlled) ---- *@
+    <section class="band-sm">
+        <div class="card">
+            <h2 class="t-heading-md mb-sm">About @Model.Heading</h2>
+            <div class="measure t-body-md text-secondary-c stack stack-sm">
+                <p>@Model.Intro</p>
+                <p>
+                    Prices reflect what the maker is paid, not what a middleman adds. Every listing names the
+                    artisan and their craft cluster, and shows a real delivery date once you enter a PIN code.
+                    Because these are handmade, colour and finish vary a little from piece to piece — the
+                    variation notice on each product page explains exactly what to expect.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    @* ---- Related categories ---- *@
+    <section class="band-sm">
+        <h2 class="t-heading-lg mb-md">Related categories</h2>
+        <div class="cat-grid">
+            @foreach (var category in DemoContent.Categories().Take(6))
+            {
+                <a class="cat-tile" href="@category.Url">
+                    <img src="@category.ImageUrl" alt="@category.Name" loading="lazy" width="480" height="360" />
+                    <span class="cat-tile__body">
+                        <span class="cat-tile__title">@category.Name</span>
+                        <span class="cat-tile__count">@category.ProductCount pieces</span>
+                    </span>
+                </a>
+            }
+        </div>
+    </section>
+
+    <section class="band-sm">
+        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        {
+            Heading = "Recently viewed",
+            Products = DemoContent.Products(5, 3),
+            Compact = true
+        })
+    </section>
+</div>
+
+@* ---- SHT-03-01 · Filters sheet (mobile). Selections batch until "Show N products". ---- *@
+<div class="sheet" id="filterSheet" role="dialog" aria-modal="true" aria-label="Filters"
+     aria-hidden="true" data-scrim="globalScrim">
+    <div class="sheet__handle"></div>
+    <div class="sheet__head">
+        <button class="icon-btn" data-close aria-label="Close filters">
+            <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+        <h2 class="t-heading-md">Filters</h2>
+        <button class="btn btn-link btn-sm" type="button">Clear all</button>
+    </div>
+    <div class="sheet__body">
+        @await Html.PartialAsync("_FilterRail")
+    </div>
+    <div class="sheet__foot">
+        <button class="btn btn-primary btn-xl btn-block" type="button" data-close>Show @Model.TotalCount products</button>
+    </div>
+</div>
+
+@* ---- SHT-03-02 · Sort sheet (mobile) ---- *@
+<div class="sheet" id="sortSheet" role="dialog" aria-modal="true" aria-label="Sort products"
+     aria-hidden="true" data-scrim="globalScrim">
+    <div class="sheet__handle"></div>
+    <div class="sheet__head">
+        <h2 class="t-heading-md">Sort by</h2>
+        <button class="icon-btn" data-close aria-label="Close sort options">
+            <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+    </div>
+    <div class="sheet__body">
+        @foreach (var option in sortOptions)
+        {
+            <label class="check" style="min-height:48px;align-items:center">
+                <input type="radio" name="mobileSort" checked="@(Model.Sort == option.Value)" />
+                <span class="check__label">@option.Label</span>
+            </label>
+        }
+    </div>
+</div>
+
+@await Html.PartialAsync("_QuickView", DemoContent.Products(1)[0])

@@ -1,0 +1,102 @@
+@{
+    Layout = "_Layout";
+
+    var section = ViewData["AccountSection"] as string ?? "dashboard";
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+    var shell = ViewData["Shell"] as ShellViewModel ?? new ShellViewModel();
+
+    var nav = new (string Group, (string Key, string Label, string Icon, string Url, int Badge)[] Items)[]
+    {
+        ("Orders", new[]
+        {
+            ("orders", "My Orders", "i-package", "/account/orders", 0),
+            ("returns", "Returns & Refunds", "i-undo", "/account/returns", 0),
+            ("reviews", "My Reviews", "i-star", "/account/reviews", 0)
+        }),
+        ("Shopping", new[]
+        {
+            ("wishlist", "Wishlist", "i-heart", "/wishlist", shell.WishlistCount),
+            ("rewards", "Rewards & Points", "i-gem", "/account/rewards", 0),
+            ("coupons", "My Coupons", "i-ticket-percent", "/account/coupons", 4),
+            ("referrals", "Refer a Friend", "i-users", "/account/referrals", 0)
+        }),
+        ("Settings", new[]
+        {
+            ("profile", "Profile", "i-user", "/account/profile", 0),
+            ("addresses", "Addresses", "i-map-pin", "/account/addresses", 0),
+            ("payment", "Saved Cards", "i-credit-card", "/account/payment-methods", 0),
+            ("notifications", "Notifications", "i-bell", "/account/notifications", shell.NotificationCount),
+            ("preferences", "Preferences", "i-settings", "/account/preferences", 0),
+            ("security", "Security", "i-lock", "/account/security", 0),
+            ("privacy", "Privacy & Data", "i-shield-check", "/account/privacy", 0)
+        })
+    };
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="layout-sidebar-content" style="padding-block:var(--space-md) var(--space-2xl)">
+
+        <aside aria-label="Account navigation">
+            @* Profile card sits at the top of the rail on desktop; on mobile it is
+               the page header for the drill-down menu. *@
+            <div class="card card-craft mb-md">
+                <div class="profile-card">
+                    <span class="avatar avatar-lg">@(shell.FirstName.Length > 0 ? shell.FirstName[..1] : "A")</span>
+                    <div class="grow">
+                        <p class="t-heading-xs">@shell.FirstName Iyer</p>
+                        <p class="t-body-xs text-craft-c">ananya@example.com</p>
+                        <span class="tag tag-brass mt-2xs">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-gem"></use></svg>
+                            @shell.RewardPoints.ToString("N0") points
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="acc-sidebar">
+                <a class="acc-sidebar__link @(section == "dashboard" ? "is-active" : "")" href="/account">
+                    <svg class="ico" aria-hidden="true"><use href="#i-grid"></use></svg>
+                    Dashboard
+                </a>
+
+                @foreach (var group in nav)
+                {
+                    <span class="acc-sidebar__group t-overline">@group.Group</span>
+
+                    foreach (var item in group.Items)
+                    {
+                        <a class="acc-sidebar__link @(section == item.Key ? "is-active" : "")" href="@item.Url"
+                           aria-current="@(section == item.Key ? "page" : null)">
+                            <svg class="ico" aria-hidden="true"><use href="#@item.Icon"></use></svg>
+                            <span class="grow">@item.Label</span>
+                            @if (item.Badge > 0)
+                            {
+                                <span class="counter counter-brand">@item.Badge</span>
+                            }
+                        </a>
+                    }
+                }
+
+                <div class="dropdown__divider"></div>
+
+                <a class="acc-sidebar__link" href="/logout" style="color:var(--color-status-danger-text)">
+                    <svg class="ico" aria-hidden="true"><use href="#i-log-out"></use></svg>
+                    Sign Out
+                </a>
+            </nav>
+        </aside>
+
+        <div>
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

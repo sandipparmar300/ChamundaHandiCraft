@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ViewModel.Admin;
+using ChamundaHandicraft.Helper.ViewModel.Common;
+using ChamundaHandicraft.Helper.ViewModel.Customer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Admin.Controllers;
 
-/// <summary>
-/// Inventory hub. Stock is never edited directly — it moves through Purchase,
-/// StockAdjustment and StockTransfer, each of which writes a ledger entry.
-/// </summary>
-public class InventoryController : Controller
+/// <summary>Live stock — the only figure the storefront may quote. Read-only — these records are created by the system, not an operator.</summary>
+public class InventoryController : AdminListController<StockGridItem>
 {
-    public IActionResult Index() => View();
+    public InventoryController(IAdminClient client) : base(client) { }
 
-    public IActionResult Details(int id) => View();
+    protected override string Module => "Inventory";
 }

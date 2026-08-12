@@ -1,4 +1,5 @@
-﻿@{
+@model List<SettingsHistoryItem>
+@{
     ViewData["Title"] = "Settings History";
 }
 
@@ -30,7 +31,24 @@
                     <th style="min-width:170px;">Changed By</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model)
+                {
+                    <tr>
+                        <td>@Money.DateAndTime(row.ChangedOn)</td>
+                        <td>@row.Section</td>
+                        <td>@row.SettingKey</td>
+                        <td class="text-muted">@(row.OldValue ?? "—")</td>
+                        <td><strong>@(row.NewValue ?? "—")</strong></td>
+                        <td>@row.ChangedBy</td>
+                        <td class="text-muted">@(row.ChangeNote ?? "—")</td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center py-4">No settings have been changed yet.</td></tr>
+                }
+            </tbody>
         </table>
     </div>
 </section>

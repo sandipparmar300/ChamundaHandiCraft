@@ -1,3 +1,4 @@
+@model PagedResult<StockGridItem>
 @*
     Module 05 - Inventory hub: KPI summary, current stock, and the ledger.
     Spec: docs/Admin Flows/Inventory.txt §3, §4, §13
@@ -113,7 +114,33 @@
                             <th style="min-width:80px;">Action</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                    @foreach (var row in Model.Items)
+                    {
+                        <tr>
+                            <td><img src="/assets/images/default-profile.png" width="32" height="32" alt="@row.ProductName" style="object-fit:cover;border-radius:6px" /></td>
+                            <td><a asp-controller="Product" asp-action="Edit" asp-route-id="@row.ProductId">@row.ProductName</a></td>
+                            <td>@row.Sku</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>@(row.WarehouseName ?? "—")</td>
+                            <td class="text-end">@row.OnHand</td>
+                            @* Reserved is held by carts and unshipped orders — not sellable. *@
+                            <td class="text-end">@row.Reserved</td>
+                            <td class="text-end"><strong>@row.Available</strong></td>
+                            <td class="text-end">@row.LowStockThreshold</td>
+                            <td class="text-end">—</td>
+                            <td>@await Html.PartialAsync("_StockStatePill", row.State)</td>
+                            <td>—</td>
+                            <td><a asp-controller="StockAdjustment" asp-action="Add" title="Adjust"><i class="fas fa-pen"></i></a></td>
+                        </tr>
+                    }
+                    @if (!Model.Items.Any())
+                    {
+                        <tr><td colspan="14" class="text-center py-4">No stock records.</td></tr>
+                    }
+                </tbody>
+
                 </table>
             </div>
         </div>
@@ -135,7 +162,10 @@
                             <th style="min-width:150px;">User</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                    <tr><td colspan="10" class="text-center py-4">Pick a product to see its movement history.</td></tr>
+                </tbody>
+
                 </table>
             </div>
         </div>
@@ -156,7 +186,27 @@
                             <th style="min-width:120px;">Action</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                    @foreach (var row in Model.Items.Where(r => r.Available <= r.LowStockThreshold))
+                    {
+                        <tr>
+                            <td><img src="/assets/images/default-profile.png" width="32" height="32" alt="@row.ProductName" style="object-fit:cover;border-radius:6px" /></td>
+                            <td><a asp-controller="Product" asp-action="Edit" asp-route-id="@row.ProductId">@row.ProductName</a></td>
+                            <td>@row.Sku</td>
+                            <td>@(row.WarehouseName ?? "—")</td>
+                            <td class="text-end">@row.Available</td>
+                            <td class="text-end">@row.LowStockThreshold</td>
+                            <td class="text-end">—</td>
+                            <td>—</td>
+                            <td><a asp-controller="Purchase" asp-action="Add" title="Raise a purchase order"><i class="fas fa-cart-plus"></i></a></td>
+                        </tr>
+                    }
+                    @if (!Model.Items.Any(r => r.Available <= r.LowStockThreshold))
+                    {
+                        <tr><td colspan="9" class="text-center py-4">Nothing below its reorder point.</td></tr>
+                    }
+                </tbody>
+
                 </table>
             </div>
         </div>

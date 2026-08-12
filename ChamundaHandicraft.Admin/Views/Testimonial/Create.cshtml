@@ -1,4 +1,5 @@
-﻿@{
+@model TestimonialSaveRequest
+@{
     ViewData["Title"] = "Testimonial";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Testimonial" : "Add Testimonial";
@@ -23,7 +24,7 @@
 
     <form method="post" id="testimonialForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -55,7 +56,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Location</label>
-                        <input id="Location" name="Location" class="form-control-custom" placeholder="Enter location" />
+                        <input id="Location" name="Location" class="form-control-custom" placeholder="Enter location" / value="@Model.Location" >
                         <span class="error-msg" data-valmsg-for="Location"></span>
                     </div>
 
@@ -86,7 +87,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Sort Order</label>
-                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" />
+                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" / value="@Model.SortOrder" >
                         <span class="error-msg" data-valmsg-for="SortOrder"></span>
                     </div>
 

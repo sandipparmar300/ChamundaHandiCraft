@@ -1,4 +1,5 @@
-﻿@{
+@model CouponGridItem
+@{
     ViewData["Title"] = "Coupon Details";
 }
 
@@ -22,26 +23,26 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Coupon Information</h2>
-            <a asp-controller="Coupon" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Coupon" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Coupon Code</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Code</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Coupon Name</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Title</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Discount Type</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.DiscountType</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Discount Value</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.DiscountValue</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Maximum Discount</label>
@@ -49,19 +50,19 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Minimum Order Value</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.MinimumOrderValue is null ? "None" : Money.Inr(Model.MinimumOrderValue.Value))</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Valid From</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.LongDate(Model.StartsOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Valid To</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.ExpiresOn is null ? "No expiry" : Money.LongDate(Model.ExpiresOn.Value))</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Usage Limit Total</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.TotalUsageLimit is null ? "Unlimited" : Model.TotalUsageLimit.ToString())</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Usage Limit Per Customer</label>
@@ -69,7 +70,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Times Used</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.UsageCount</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Applies To</label>
@@ -77,7 +78,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Customer Eligibility</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.IsPublic ? "Anyone" : "Private — must be typed")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Stackable</label>
@@ -85,11 +86,11 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Created By</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.CreatedBy ?? "—")</p>
                     </div>
             </div>
         </div>

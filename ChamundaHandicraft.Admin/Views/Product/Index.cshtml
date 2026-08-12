@@ -1,8 +1,16 @@
+@model PagedResult<ProductGridItem>
 @*
     Module 03 - Product list.  Spec: docs/Admin Flows/Product.txt
+
+    Bound to the same ProductGridItem the API returns. The "On Storefront" column and
+    the Preview link are the visible half of the Admin -> Customer contract:
+    docs/INTEGRATION-MAP.md §1.
 *@
 @{
     ViewData["Title"] = "Products";
+
+    // Preview opens the customer site, which runs on its own host.
+    var storefrontBase = Configuration["StorefrontBaseUrl"] ?? "https://localhost:7141";
 }
 
 @section Header {
@@ -113,12 +121,85 @@
                     <th style="min-width:90px;">Stock</th>
                     <th style="min-width:120px;">Status</th>
                     <th style="min-width:110px;">Visibility</th>
+                    @* One unambiguous answer to "can a shopper see this right now",
+                       instead of asking the operator to combine Status and Visibility. *@
+                    <th style="min-width:110px;">On Storefront</th>
                     <th style="min-width:100px;">Featured</th>
                     <th style="min-width:130px;">Created</th>
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var product in Model.Items)
+                {
+                    <tr>
+                        <td><input type="checkbox" class="row-check" value="@product.Id" /></td>
+                        <td>
+                            <img src="@product.ImageUrl" width="40" height="40" alt="@product.Name"
+                                 style="border-radius:6px;object-fit:cover" />
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@product.Id">@product.Name</a>
+                        </td>
+                        <td>@product.Sku</td>
+                        <td>@product.ProductCode</td>
+                        <td>@(product.Barcode ?? "—")</td>
+                        <td>@product.CategoryName</td>
+                        <td>@(product.BrandName ?? "—")</td>
+                        <td>@Money.Inr(product.Price)</td>
+                        <td>@(product.DiscountPercent > 0 ? $"{product.DiscountPercent}% OFF" : "—")</td>
+                        <td>
+                            @if (product.StockQuantity == 0)
+                            {
+                                <span class="badge bg-danger">Out of stock</span>
+                            }
+                            else if (product.StockQuantity <= 5)
+                            {
+                                <span class="badge bg-warning text-dark">@product.StockQuantity left</span>
+                            }
+                            else
+                            {
+                                @product.StockQuantity
+                            }
+                        </td>
+                        <td>@product.Status</td>
+                        <td>@product.Visibility</td>
+                        <td>
+                            @if (product.IsLiveOnStorefront)
+                            {
+                                <span class="badge bg-success">Live</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Hidden</span>
+                            }
+                        </td>
+                        <td>@(product.IsFeatured ? "Yes" : "No")</td>
+                        <td>@Money.LongDate(product.CreatedOn)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@product.Id" title="Edit">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            @* Opens the exact page a shopper sees — the storefront half
+                               of this record. *@
+                            <a href="@storefrontBase@product.StorefrontUrl" target="_blank"
+                               rel="noopener" title="Preview on the storefront" class="ms-2">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+
+                @if (!Model.Items.Any())
+                {
+                    <tr>
+                        <td colspan="17" class="text-center py-4">
+                            No products match these filters.
+                            <a asp-action="Add">Add the first one</a>.
+                        </td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
 </section>

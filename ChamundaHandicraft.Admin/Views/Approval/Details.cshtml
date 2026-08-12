@@ -1,4 +1,5 @@
-﻿@{
+@model ApprovalGridItem
+@{
     ViewData["Title"] = "Approval Details";
 }
 
@@ -29,31 +30,31 @@
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Request Type</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.EntityType</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Record</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.EntityName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Requested By</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.RequestedBy</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Requested On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.DateAndTime(Model.RequestedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Reason</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.Reason ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Approver</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.DecidedBy ?? "Not yet decided")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Decided On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.DecidedOn is null ? "—" : Money.DateAndTime(Model.DecidedOn.Value))</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Decision Notes</label>
@@ -61,7 +62,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
-﻿@{
+@model ReviewModerationItem
+@{
     ViewData["Title"] = "Review Details";
 }
 
@@ -29,35 +30,35 @@
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Product</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.ProductName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Customer</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.CustomerName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Rating</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Rating / 5</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Title</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Title</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Review</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Body</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Media</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Photos.Count photos</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Verified Purchase</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.VerifiedPurchase ? "Yes — order " + Model.OrderNumber : "No")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Submitted On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.DateAndTime(Model.SubmittedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Helpful Votes</label>
@@ -73,11 +74,11 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Admin Reply</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.MerchantReply ?? "No reply yet")</p>
                     </div>
             </div>
         </div>

@@ -1,0 +1,113 @@
+@{
+    var shell = ViewData["Shell"] as ShellViewModel ?? new ShellViewModel();
+    var title = ViewData["Title"] as string;
+    var description = ViewData["Description"] as string
+        ?? "Handmade décor, textiles, brass and jewellery bought direct from Indian artisans. Free delivery above ₹999, 7-day returns.";
+    var bodyClass = ViewData["BodyClass"] as string;
+    var hideChrome = ViewData["HideChrome"] as bool? ?? false;
+}
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>@(string.IsNullOrEmpty(title) ? "Chamunda Handicraft — Handmade by Indian artisans" : title + " · Chamunda Handicraft")</title>
+    <meta name="description" content="@description" />
+
+    @* Seo:RobotsIndexable stays false until launch (ARCHITECTURE.md). *@
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#FAF9F7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0F0E0D" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Chamunda Handicraft" />
+    <meta property="og:title" content="@(title ?? "Chamunda Handicraft — Handmade by Indian artisans")" />
+    <meta property="og:description" content="@description" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href="~/assets/images/chamunda-favicon.svg" />
+    <link rel="apple-touch-icon" href="~/assets/images/chamunda-favicon.svg" />
+
+    @* Two families, four weights, ≤180 KB — the performance budget in §9. *@
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" />
+
+    <link rel="stylesheet" href="~/assets/css/tokens.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/css/base.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/css/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/css/storefront.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+
+    <script>
+        // Applied before first paint so the theme never flashes.
+        (function () {
+            try {
+                var pref = localStorage.getItem('chamunda-theme') || 'system';
+                var dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+                document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme-pref', pref);
+            } catch (e) { }
+        })();
+    </script>
+</head>
+<body class="@bodyClass @(shell.ShowBottomTabs && !hideChrome ? "has-bottom-tabs" : "")">
+
+    @await Html.PartialAsync("_Icons")
+
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    @* A11Y-18: cart and wishlist counts announced on change. *@
+    <span id="cartLive" class="sr-only" aria-live="polite"></span>
+
+    @if (!hideChrome)
+    {
+        @await Html.PartialAsync("_Header", shell)
+    }
+
+    <main id="main">
+        @RenderBody()
+    </main>
+
+    @if (!hideChrome)
+    {
+        @await Html.PartialAsync("_Footer", shell)
+        @await Html.PartialAsync("_MiniCart")
+        @await Html.PartialAsync("_MobileDrawer", shell)
+
+        @if (shell.ShowBottomTabs)
+        {
+            @await Html.PartialAsync("_BottomTabs", shell)
+        }
+    }
+
+    <div class="scrim" id="globalScrim"></div>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="false"></div>
+
+    @* Cookie consent — no pre-ticked consent, reject is one click (§8.1). *@
+    <div class="cookie-consent" id="cookieConsent" role="dialog" aria-label="Cookie preferences">
+        <div class="grow">
+            <div class="t-heading-xs mb-xs">We use a few cookies</div>
+            <p class="t-body-sm text-secondary-c">
+                Essential ones keep your cart and sign-in working. Optional ones help us see which pages
+                are useful. You can change this any time in
+                <a class="link" href="/pages/cookie-policy">cookie settings</a>.
+            </p>
+        </div>
+        <div class="row-flex gap-xs">
+            <button class="btn btn-ghost btn-sm" data-cookie-choice="essential">Essential only</button>
+            <button class="btn btn-primary btn-sm" data-cookie-choice="all">Accept all</button>
+        </div>
+    </div>
+
+    <button class="fab no-print" data-back-to-top aria-label="Back to top">
+        <svg class="ico ico-lg" aria-hidden="true"><use href="#i-chevron-up"></use></svg>
+    </button>
+
+    <script src="~/assets/js/storefront.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

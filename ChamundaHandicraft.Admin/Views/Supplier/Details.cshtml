@@ -1,4 +1,5 @@
-﻿@{
+@model SupplierGridItem
+@{
     ViewData["Title"] = "Supplier Details";
 }
 
@@ -22,34 +23,34 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Supplier Information</h2>
-            <a asp-controller="Supplier" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Supplier" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Supplier Code</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Code</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Supplier Name</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.SupplierName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">GSTIN</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.Gstin ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Contact Person</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.ContactPerson ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Phone</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.Phone ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Email</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.Email ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Address</label>
@@ -57,7 +58,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">City</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.City</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">State</label>
@@ -73,15 +74,15 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Total Purchases</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.PurchaseOrderCount</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Outstanding</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.OutstandingAmount)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.IsActive ? "Active" : "Inactive")</p>
                     </div>
             </div>
         </div>

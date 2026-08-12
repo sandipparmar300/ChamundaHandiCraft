@@ -1,0 +1,104 @@
+@model ProductCardViewModel
+@{
+    var badges = Model.Badges.Take(2).ToList();
+    var stock = StockStyle.For(Model.Stock, Model.StockCount);
+    var isOos = Model.Stock == StockState.OutOfStock;
+}
+
+@* CMP-PRD-CardList — used in PLP list view. *@
+<article class="pcard-list">
+    <a class="pcard-list__media" href="@Model.Url" tabindex="-1" aria-hidden="true">
+        <img class="img-product" src="@Model.ImageUrl" alt="" width="200" height="200" loading="lazy" />
+    </a>
+
+    <div class="stack stack-xs">
+        <div class="row-flex between gap-sm" style="align-items:flex-start">
+            <div class="grow">
+                @if (badges.Count > 0)
+                {
+                    <div class="row-flex gap-2xs mb-xs">
+                        @foreach (var badge in badges)
+                        {
+                            var style = BadgeStyle.For(badge, Model.DiscountPercent);
+                            <span class="badge badge-sm @style.Css">@style.Label</span>
+                        }
+                    </div>
+                }
+                <h3 class="t-heading-xs"><a href="@Model.Url" style="color:inherit">@Model.Name</a></h3>
+                @if (Model.Artisan is not null)
+                {
+                    <a class="artisan-chip mt-2xs" href="/artisans/@Model.Artisan.Slug">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                        @Model.Artisan.Name · @Model.Artisan.Cluster
+                    </a>
+                }
+            </div>
+
+            <button class="icon-btn shrink-0 @(Model.IsWishlisted ? "wish is-on" : "wish")" type="button"
+                    data-wishlist data-product-name="@Model.Name"
+                    aria-label="@(Model.IsWishlisted ? "Remove" : "Save") @Model.Name @(Model.IsWishlisted ? "from" : "to") wishlist">
+                <svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg>
+            </button>
+        </div>
+
+        @if (Model.ReviewCount > 0)
+        {
+            <span class="rating rating-compact" aria-label="Rated @Model.Rating out of 5 from @Model.ReviewCount reviews">
+                <svg class="ico" aria-hidden="true"><use href="#i-star"></use></svg>
+                <span class="rating__value">@Model.Rating.ToString("0.0")</span>
+                <span class="rating__count">(@Model.ReviewCount)</span>
+            </span>
+        }
+
+        <p class="t-body-sm text-secondary-c clamp-2">@Model.ShortDescription</p>
+
+        <div class="row-flex wrap gap-md t-body-xs text-tertiary-c">
+            @if (!string.IsNullOrEmpty(Model.Material))
+            {
+                <span><svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-layers"></use></svg> @Model.Material</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.Dimensions))
+            {
+                <span><svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-ruler"></use></svg> @Model.Dimensions</span>
+            }
+        </div>
+
+        <div class="row-flex wrap between gap-sm mt-xs">
+            <div>
+                <div class="price price-md @(Model.IsOnSale ? "is-sale" : "")">
+                    <span class="price__now">@Money.Inr(Model.Price)</span>
+                    @if (Model.IsOnSale)
+                    {
+                        <span class="price__mrp">@Money.Inr(Model.Mrp!.Value)</span>
+                        <span class="price__off">@Model.DiscountPercent% OFF</span>
+                    }
+                </div>
+                @if (stock is not null && Model.Stock != StockState.InStock)
+                {
+                    <span class="stock @stock.Value.Css">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#@stock.Value.Icon"></use></svg>
+                        @stock.Value.Label
+                    </span>
+                }
+            </div>
+
+            <div class="row-flex gap-xs">
+                <button class="btn btn-ghost btn-sm" type="button" data-open="compareInfo">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-compare"></use></svg>
+                    Compare
+                </button>
+                @if (isOos)
+                {
+                    <button class="btn btn-outline btn-sm" type="button" data-open="notifyMe">Notify Me</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary btn-sm" type="button" data-add-to-cart data-slug="@Model.Slug">
+                        <span class="btn__spinner" aria-hidden="true"></span>
+                        <span class="btn__label">Add to Cart</span>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</article>

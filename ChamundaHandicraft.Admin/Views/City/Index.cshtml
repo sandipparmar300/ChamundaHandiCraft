@@ -1,4 +1,5 @@
-﻿@*
+@model PagedResult<CityGridItem>
+@*
     Reference Data - Cities listing.  Spec: docs/Admin Flows/
 *@
 @{
@@ -50,7 +51,29 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-action="Edit" asp-route-id="@row.Id">@row.CityName</a></td>
+                        <td>@row.StateName</td>
+                        <td>@row.CountryName</td>
+                        <td class="text-end">@row.ZipCodeCount</td>
+                        <td>@await Html.PartialAsync("_YesNo", row.ZipCodeCount > 0)</td>
+                        <td>@Money.LongDate(row.CreatedOn)</td>
+                        <td>@await Html.PartialAsync("_StatusPill", row.IsActive)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                            <a asp-action="Details" asp-route-id="@row.Id" title="View" class="ms-2"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="8" class="text-center py-4">No cities yet. <a asp-action="Add">Add the first one</a>.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

@@ -1,4 +1,5 @@
-﻿@*
+@model PagedResult<BlogCategoryGridItem>
+@*
     Content - Blog Categories listing.  Spec: docs/Admin Flows/
 *@
 @{
@@ -49,7 +50,28 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-action="Edit" asp-route-id="@row.Id">@row.Name</a></td>
+                        <td>@row.Slug</td>
+                        <td class="text-muted">@(row.Description ?? "—")</td>
+                        <td class="text-end">@row.PostCount</td>
+                        <td class="text-end">—</td>
+                        <td>@await Html.PartialAsync("_StatusPill", row.IsActive)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                            <a asp-action="Details" asp-route-id="@row.Id" title="View" class="ms-2"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="7" class="text-center py-4">No blog categories yet. <a asp-action="Add">Add the first one</a>.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

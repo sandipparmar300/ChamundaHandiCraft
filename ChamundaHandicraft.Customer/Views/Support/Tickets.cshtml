@@ -1,0 +1,95 @@
+@{
+    Layout = "_AccountLayout";
+    ViewData["AccountSection"] = "support";
+}
+
+<div class="page-head" style="padding-top:0">
+    <div class="row-flex wrap between gap-md">
+        <div>
+            <h1 class="t-heading-xl page-head__title">My support requests</h1>
+            <p class="page-head__sub">Everything you've asked us, and what we said back.</p>
+        </div>
+        <a class="btn btn-primary" href="/help">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"></use></svg>
+            New Request
+        </a>
+    </div>
+</div>
+
+<div class="stack stack-md">
+    @foreach (var (reference, topic, summary, status, modifier, updated, replies) in new[]
+    {
+        ("SR-2026-0412", "Delivery or tracking", "Parcel shows delivered but I haven't received it",
+            "Open", "placed", DateTime.Now.AddHours(-3), 2),
+        ("SR-2026-0387", "Damaged or wrong item", "Planter arrived with a hairline crack",
+            "Resolved", "delivered", DateTime.Now.AddDays(-51), 4)
+    })
+    {
+        <article class="order-card">
+            <div class="order-card__head">
+                <div class="row-flex wrap gap-lg">
+                    <div>
+                        <p class="t-body-xs text-tertiary-c">Reference</p>
+                        <p class="t-body-sm t-mono">@reference</p>
+                    </div>
+                    <div>
+                        <p class="t-body-xs text-tertiary-c">Topic</p>
+                        <p class="t-body-sm">@topic</p>
+                    </div>
+                    <div>
+                        <p class="t-body-xs text-tertiary-c">Last update</p>
+                        <p class="t-body-sm">@Money.Relative(updated)</p>
+                    </div>
+                </div>
+                <span class="status-chip status-chip--@modifier">
+                    <svg class="ico ico-xs" aria-hidden="true">
+                        <use href="#@(status == "Resolved" ? "i-circle-check" : "i-clock")"></use>
+                    </svg>
+                    @status
+                </span>
+            </div>
+
+            <div class="order-card__body">
+                <p class="t-body-md">@summary</p>
+                <p class="t-body-sm text-secondary-c mt-2xs">@replies messages · handled by Nikhil from our care team</p>
+
+                @if (status == "Open")
+                {
+                    <div class="alert alert-info mt-md">
+                        <svg class="ico" aria-hidden="true"><use href="#i-message"></use></svg>
+                        <div>
+                            <p class="alert__title">We've asked the courier for a proof-of-delivery photo</p>
+                            <p>They have until tomorrow to respond. If it doesn't turn up, we replace the order at no cost.</p>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="order-card__foot">
+                <button class="btn btn-outline btn-sm" type="button">View Conversation</button>
+                @if (status == "Open")
+                {
+                    <button class="btn btn-ghost btn-sm" type="button">Add a Message</button>
+                    <button class="btn btn-ghost btn-sm" type="button">Mark as Resolved</button>
+                }
+                else
+                {
+                    <button class="btn btn-ghost btn-sm" type="button">Reopen</button>
+                }
+            </div>
+        </article>
+    }
+</div>
+
+<div class="card card-craft mt-lg">
+    <div class="row-flex wrap gap-md between">
+        <div>
+            <p class="t-heading-xs text-craft-c">Need an answer faster?</p>
+            <p class="t-body-sm text-craft-c">WhatsApp usually gets a reply within the hour, Mon–Sat 10am–7pm.</p>
+        </div>
+        <a class="btn btn-secondary shrink-0" href="https://wa.me/919876543210" rel="noopener">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+            WhatsApp Us
+        </a>
+    </div>
+</div>

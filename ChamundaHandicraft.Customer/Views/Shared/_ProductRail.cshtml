@@ -1,0 +1,44 @@
+@model ProductRailViewModel
+@{
+    var railId = "rail-" + Guid.NewGuid().ToString("N")[..8];
+}
+
+@* CMP-PRD-Rail — 5 cards desktop, 2.2 on mobile to signal scrollability. *@
+<section class="rail-wrap" aria-labelledby="@railId-head">
+    <div class="band-head">
+        <div class="band-head__text">
+            @if (Model.Eyebrow is not null)
+            {
+                <span class="t-overline eyebrow-craft">@Model.Eyebrow</span>
+            }
+            <h2 class="t-display-lg" id="@railId-head">@Model.Heading</h2>
+            @if (Model.SubHeading is not null)
+            {
+                <p class="band-head__sub">@Model.SubHeading</p>
+            }
+        </div>
+
+        @if (Model.ViewAllUrl is not null)
+        {
+            <a class="link-standalone" href="@Model.ViewAllUrl">
+                @Model.ViewAllLabel
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+        }
+    </div>
+
+    <button class="rail__arrow rail__arrow--prev" type="button" aria-label="Scroll left">
+        <svg class="ico" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+    </button>
+
+    <div class="rail @(Model.Compact ? "rail-sm" : "")" tabindex="0" role="group" aria-label="@Model.Heading products">
+        @foreach (var product in Model.Products)
+        {
+            @await Html.PartialAsync("_ProductCard", product)
+        }
+    </div>
+
+    <button class="rail__arrow rail__arrow--next" type="button" aria-label="Scroll right">
+        <svg class="ico" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+    </button>
+</section>

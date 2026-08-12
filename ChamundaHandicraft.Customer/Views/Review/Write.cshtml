@@ -1,0 +1,172 @@
+@model ProductCardViewModel
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">Write a review</h1>
+    <p class="page-head__sub">
+        Honest reviews help the next shopper — and they go straight to the artisan who made this.
+    </p>
+</div>
+
+<div class="card card-craft mb-md">
+    <div class="row-flex gap-md">
+        <img class="img-product shrink-0" src="@Model.ImageUrl" alt="@Model.ImageAlt" width="72" height="72"
+             style="width:72px;height:72px;border-radius:var(--radius-md);object-fit:cover" />
+        <div class="grow">
+            <p class="t-heading-xs text-craft-c">@Model.Name</p>
+            @if (Model.Artisan is not null)
+            {
+                <p class="t-body-sm text-craft-c">Made by @Model.Artisan.Name · @Model.Artisan.Cluster</p>
+            }
+            <span class="tag tag-success mt-xs">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-badge-check"></use></svg>
+                Verified purchase · delivered @Money.LongDate(DateTime.Today.AddDays(-18))
+            </span>
+        </div>
+    </div>
+</div>
+
+<form class="card" data-validate>
+
+    <div class="field">
+        <span class="field__label">Overall rating <span class="field__req">*</span></span>
+        <div class="row-flex gap-md">
+            <div class="rating-input" role="radiogroup" aria-label="Overall rating out of 5">
+                @for (var i = 1; i <= 5; i++)
+                {
+                    <button class="@(i <= 4 ? "is-on" : "")" type="button" role="radio"
+                            aria-checked="@(i == 4 ? "true" : "false")" aria-label="@i out of 5 stars">
+                        <svg class="ico" aria-hidden="true"><use href="#i-star"></use></svg>
+                    </button>
+                }
+            </div>
+            <span class="t-body-md text-secondary-c" id="ratingLabel">Very good</span>
+        </div>
+    </div>
+
+    @* Sub-ratings — these feed the PDP breakdown and are what future shoppers scan first. *@
+    <div class="field">
+        <span class="field__label">Rate the details</span>
+        <div class="stack stack-sm mt-xs">
+            @foreach (var aspect in new[] { "Quality of craft", "Value for money", "As pictured", "Packaging" })
+            {
+                <div class="row-flex wrap between gap-sm">
+                    <span class="t-body-sm">@aspect</span>
+                    <div class="rating-input" role="radiogroup" aria-label="@aspect rating">
+                        @for (var i = 1; i <= 5; i++)
+                        {
+                            <button type="button" role="radio" aria-checked="false" aria-label="@i out of 5"
+                                    style="--s:20px">
+                                <svg class="ico" aria-hidden="true" style="width:20px;height:20px"><use href="#i-star"></use></svg>
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="field__label" for="reviewTitle">Give your review a headline <span class="field__req">*</span></label>
+        <input class="input" id="reviewTitle" type="text" required maxlength="80"
+               placeholder="e.g. The glaze is even better in person" />
+        <p class="field__help">Up to 80 characters. This is what people read first.</p>
+        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+    </div>
+
+    <div class="field">
+        <label class="field__label" for="reviewBody">Your review <span class="field__req">*</span></label>
+        <textarea class="textarea" id="reviewBody" rows="6" required minlength="30" maxlength="2000"
+                  placeholder="What did you buy it for? How does it look in your home? Anything a future buyer should know about size, colour or finish?"></textarea>
+        <div class="row-flex between">
+            <p class="field__help">At least 30 characters.</p>
+            <p class="field__help tabular"><span id="charCount">0</span> / 2000</p>
+        </div>
+        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+    </div>
+
+    <div class="field">
+        <span class="field__label">Add photos <span class="field__optional">(optional)</span></span>
+        <div class="upload">
+            <svg class="ico ico-2xl text-tertiary-c mx-auto mb-sm" aria-hidden="true"><use href="#i-camera"></use></svg>
+            <p class="t-body-md">Drop photos here, or tap to choose</p>
+            <p class="t-body-xs text-tertiary-c mt-2xs">
+                Up to 5 photos, 5 MB each. Reviews with photos are read three times as often.
+            </p>
+            <input type="file" accept="image/*" multiple class="sr-only" />
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="field__label" for="reviewName">Display name</label>
+        <input class="input" id="reviewName" type="text" value="Ananya I." maxlength="40" />
+        <p class="field__help">We show a first name and last initial. Never your full name or email.</p>
+    </div>
+
+    <label class="check mt-md">
+        <input type="checkbox" />
+        <span class="check__label t-body-sm">
+            Post anonymously
+            <span class="check__help">Shows as "Verified buyer" instead of your name.</span>
+        </span>
+    </label>
+
+    <div class="alert alert-craft mt-lg">
+        <svg class="ico" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+        <div>
+            <p class="alert__title">Your words reach the maker</p>
+            <p>
+                We pass every review to the artisan's workshop. Specific feedback about the craft —
+                the glaze, the stitch, the finish — is the most useful thing you can give them.
+            </p>
+        </div>
+    </div>
+
+    <div class="row-flex wrap gap-sm mt-lg">
+        <button class="btn btn-primary btn-lg" type="submit">
+            <span class="btn__spinner" aria-hidden="true"></span>
+            <span class="btn__label">Post Review</span>
+        </button>
+        <button class="btn btn-ghost btn-lg" type="button">Save Draft</button>
+    </div>
+
+    <p class="t-body-xs text-tertiary-c mt-md">
+        Reviews go live within 24 hours after a check for abusive language and personal details.
+        We never edit opinions or remove a review for being negative.
+        You'll earn <strong>50 reward points</strong> once it publishes.
+    </p>
+</form>
+
+@section Scripts {
+    <script>
+        (function () {
+            // Star input with a live label — the numeric meaning is never colour-only.
+            var labels = ['', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent'];
+            var label = document.getElementById('ratingLabel');
+
+            document.querySelectorAll('.rating-input').forEach(function (group) {
+                var stars = Array.prototype.slice.call(group.querySelectorAll('button'));
+
+                stars.forEach(function (star, i) {
+                    star.addEventListener('click', function () {
+                        stars.forEach(function (s, j) {
+                            s.classList.toggle('is-on', j <= i);
+                            s.setAttribute('aria-checked', j === i ? 'true' : 'false');
+                        });
+                        if (label && group === document.querySelector('.rating-input')) {
+                            label.textContent = labels[i + 1];
+                        }
+                    });
+                });
+            });
+
+            var body = document.getElementById('reviewBody');
+            var count = document.getElementById('charCount');
+            if (body && count) {
+                body.addEventListener('input', function () { count.textContent = body.value.length; });
+            }
+        })();
+    </script>
+}

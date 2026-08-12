@@ -1,0 +1,80 @@
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+</div>
+
+@* PG-12-02 · Guest tracking form — SL-06, centred narrow. *@
+<div class="container-narrow" style="padding-block:var(--space-xl) var(--space-2xl)">
+    <div class="text-center">
+        <span class="state-block__icon state-block__icon--craft mx-auto">
+            <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-package"></use></svg>
+        </span>
+        <h1 class="t-display-lg mt-md">Track your order</h1>
+        <p class="t-body-lg text-secondary-c mt-sm">
+            No account needed. Your order number is in the confirmation email and SMS.
+        </p>
+    </div>
+
+    <form class="card mt-lg" method="get" action="/track/HC-2026-000482" data-validate>
+        <div class="field">
+            <label class="field__label" for="trackOrderNumber">Order number</label>
+            <input class="input" id="trackOrderNumber" type="text" required
+                   placeholder="HC-2026-000482" style="font-family:var(--font-mono)" />
+            <p class="field__help">Starts with HC and is 15 characters long.</p>
+            <p class="field__error">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+                <span>Enter your order number</span>
+            </p>
+        </div>
+
+        <div class="field">
+            <label class="field__label" for="trackContact">Email or mobile used at checkout</label>
+            <input class="input" id="trackContact" type="text" required
+                   placeholder="ananya@example.com or 98765 43210" autocomplete="email" />
+            <p class="field__help">We check this so only you can see the delivery address.</p>
+            <p class="field__error">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+                <span>Enter the email or mobile used at checkout</span>
+            </p>
+        </div>
+
+        <button class="btn btn-primary btn-xl btn-block mt-lg" type="submit">
+            <span class="btn__spinner" aria-hidden="true"></span>
+            <span class="btn__label">Track Order</span>
+        </button>
+    </form>
+
+    @* Error state, shown when the pair doesn't match. Explain, don't block. *@
+    <div class="alert alert-danger mt-md" role="alert" hidden>
+        <svg class="ico" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+        <div>
+            <p class="alert__title">We couldn't find that order</p>
+            <p>
+                Check the order number and that the email or mobile matches the one used at checkout.
+                Still stuck? <a class="link" href="/pages/contact">Tell us</a> and we'll look it up.
+            </p>
+        </div>
+    </div>
+
+    <div class="card card-craft mt-lg">
+        <div class="row-flex gap-sm">
+            <svg class="ico ico-lg text-craft-c shrink-0" aria-hidden="true"><use href="#i-user"></use></svg>
+            <div class="grow">
+                <p class="t-heading-xs text-craft-c">Have an account?</p>
+                <p class="t-body-sm text-craft-c">Sign in and all your orders are tracked in one place.</p>
+            </div>
+            <a class="btn btn-secondary btn-sm shrink-0" href="/login?returnUrl=/account/orders">Sign in</a>
+        </div>
+    </div>
+
+    <p class="t-body-sm text-tertiary-c text-center mt-lg">
+        Delivery question we haven't answered? <a class="link" href="/help">Visit the Help Centre</a>
+        or <a class="link" href="https://wa.me/919876543210" rel="noopener">WhatsApp us</a>.
+    </p>
+</div>

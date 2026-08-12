@@ -1,4 +1,5 @@
-﻿@{
+@model StateGridItem
+@{
     ViewData["Title"] = "State";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit State" : "Add State";
@@ -23,7 +24,7 @@
 
     <form method="post" id="stateForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -34,7 +35,7 @@
                 <div class="row g-3">
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">State Name <span class="req">*</span></label>
-                        <input id="StateName" name="StateName" class="form-control-custom" placeholder="Enter state name" />
+                        <input id="StateName" name="StateName" class="form-control-custom" placeholder="Enter state name" / value="@Model.StateName" >
                         <span class="error-msg" data-valmsg-for="StateName"></span>
                     </div>
 
@@ -49,7 +50,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">State Code</label>
-                        <input id="StateCode" name="StateCode" class="form-control-custom" placeholder="Enter state code" />
+                        <input id="StateCode" name="StateCode" class="form-control-custom" placeholder="Enter state code" / value="@Model.StateCode" >
                         <span class="error-msg" data-valmsg-for="StateCode"></span>
                     </div>
 

@@ -1,8 +1,11 @@
+@model List<CategoryViewModel>
 @*
     Module 04 - Category tree + detail split (L-09 in the spec).
     Spec: docs/Admin Flows/Category.txt
 *@
 @{
+    // Preview opens the customer site, which runs on its own host.
+    var storefrontBase = Configuration["StorefrontBaseUrl"] ?? "https://localhost:7141";
     ViewData["Title"] = "Categories";
 }
 
@@ -43,7 +46,31 @@
                 </p>
 
                 <ul class="category-tree" id="categoryTree">
-                    <li class="tree-empty text-muted">No categories yet. Add the first one to start the tree.</li>
+                    @foreach (var parent in Model)
+                    {
+                        <li data-name="@parent.Name">
+                            <a asp-action="Edit" asp-route-id="@parent.Id">@parent.Name</a>
+                            <span class="text-muted">(@parent.ProductCount)</span>
+
+                            @if (parent.Children.Any())
+                            {
+                                <ul>
+                                    @foreach (var child in parent.Children)
+                                    {
+                                        <li data-name="@child.Name">
+                                            <a asp-action="Edit" asp-route-id="@child.Id">@child.Name</a>
+                                            <span class="text-muted">(@child.ProductCount)</span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+
+                    @if (!Model.Any())
+                    {
+                        <li class="tree-empty text-muted">No categories yet. Add the first one to start the tree.</li>
+                    }
                 </ul>
             </div>
         </section>
@@ -69,16 +96,60 @@
                     <thead>
                         <tr>
                             <th style="min-width:60px;">Image</th>
-                            <th style="min-width:220px;">Product</th>
-                            <th style="min-width:120px;">SKU</th>
-                            <th style="min-width:110px;">Price</th>
-                            <th style="min-width:90px;">Stock</th>
+                            <th style="min-width:240px;">Category</th>
+                            <th style="min-width:160px;">Slug</th>
+                            <th style="min-width:160px;">Parent</th>
+                            <th style="min-width:110px;">Products</th>
+                            <th style="min-width:120px;">Sub-categories</th>
                             <th style="min-width:110px;">Status</th>
-                            <th style="min-width:110px;">Sort Order</th>
                             <th style="min-width:80px;">Action</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                        @* Children are indented under their parent, so the hierarchy the
+                           mega menu renders stays readable in a flat grid. *@
+                        @foreach (var parent in Model)
+                        {
+                            <tr>
+                                <td><img src="@(parent.ImageUrl ?? "/assets/images/default-profile.png")" width="40" height="40" alt="@parent.Name" style="object-fit:cover;border-radius:6px" /></td>
+                                <td><a asp-action="Edit" asp-route-id="@parent.Id"><strong>@parent.Name</strong></a></td>
+                                <td class="t-mono">@parent.Slug</td>
+                                <td class="text-muted">—</td>
+                                <td class="text-end">@parent.ProductCount</td>
+                                <td class="text-end">@parent.Children.Count</td>
+                                <td>@await Html.PartialAsync("_StatusPill", true)</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@parent.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                                    <a href="@storefrontBase@parent.Url" target="_blank" rel="noopener" title="Preview on the storefront" class="ms-2"><i class="fas fa-external-link-alt"></i></a>
+                                </td>
+                            </tr>
+
+                            foreach (var child in parent.Children)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td style="padding-left:2rem">
+                                        <i class="fas fa-level-up-alt fa-rotate-90 text-muted me-2"></i>
+                                        <a asp-action="Edit" asp-route-id="@child.Id">@child.Name</a>
+                                    </td>
+                                    <td class="t-mono">@child.Slug</td>
+                                    <td class="text-muted">@parent.Name</td>
+                                    <td class="text-end">@child.ProductCount</td>
+                                    <td class="text-end">—</td>
+                                    <td>@await Html.PartialAsync("_StatusPill", true)</td>
+                                    <td>
+                                        <a asp-action="Edit" asp-route-id="@child.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                                        <a href="@storefrontBase@child.Url" target="_blank" rel="noopener" title="Preview on the storefront" class="ms-2"><i class="fas fa-external-link-alt"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+
+                        @if (!Model.Any())
+                        {
+                            <tr><td colspan="8" class="text-center py-4">No categories yet. <a asp-action="Add">Create the first one</a>.</td></tr>
+                        }
+                    </tbody>
                 </table>
             </div>
         </section>

@@ -1,4 +1,5 @@
-﻿@{
+@model NotificationTemplateGridItem
+@{
     ViewData["Title"] = "Template Details";
 }
 
@@ -22,26 +23,26 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Template Information</h2>
-            <a asp-controller="NotificationTemplate" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="NotificationTemplate" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Template Name</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Name</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Event</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.TriggerEvent ?? "Manual")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Channel</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Channel</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Subject</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.Subject ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Sender</label>
@@ -57,15 +58,15 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Last Updated</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.LongDate(Model.ModifiedOn ?? Model.CreatedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Updated By</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.ModifiedBy ?? Model.CreatedBy ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.IsActive ? "Active" : "Inactive")</p>
                     </div>
             </div>
         </div>

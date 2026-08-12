@@ -1,4 +1,5 @@
-﻿@*
+@model PagedResult<CouponGridItem>
+@*
     Marketing - Coupons listing.  Spec: docs/Admin Flows/
 *@
 @{
@@ -54,7 +55,45 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td class="t-mono"><a asp-action="Edit" asp-route-id="@row.Id">@row.Code</a></td>
+                        <td>@row.Title</td>
+                        <td>@row.DiscountType</td>
+                        <td class="text-end">@(row.DiscountType == DiscountType.Percentage ? row.DiscountValue + "%" : Money.Inr(row.DiscountValue))</td>
+                        <td class="text-end">@(row.MinimumOrderValue is null ? "—" : Money.Inr(row.MinimumOrderValue.Value))</td>
+                        <td class="text-end">@(row.TotalUsageLimit is null ? "Unlimited" : row.TotalUsageLimit.ToString())</td>
+                        <td class="text-end">
+                            @row.UsageCount
+                            @if (row.IsExhausted)
+                            {
+                                <span class="badge bg-secondary ms-1">Exhausted</span>
+                            }
+                        </td>
+                        <td>@Money.LongDate(row.StartsOn)</td>
+                        <td>@(row.ExpiresOn is null ? "No expiry" : Money.LongDate(row.ExpiresOn.Value))</td>
+                        <td>
+                            <span class="badge @(row.Status == CouponStatus.Active ? "bg-success" : "bg-secondary")">@row.Status</span>
+                            @* Hidden coupons never appear in the shopper's "My Coupons" — they must be typed. *@
+                            @if (!row.IsPublic)
+                            {
+                                <span class="badge bg-dark ms-1">Private</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                            <a asp-action="Details" asp-route-id="@row.Id" title="View" class="ms-2"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="11" class="text-center py-4">No coupons yet. <a asp-action="Add">Create the first one</a>.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

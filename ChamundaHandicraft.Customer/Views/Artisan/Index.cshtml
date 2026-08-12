@@ -1,0 +1,96 @@
+@model List<ArtisanSummary>
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+    var all = Model.Concat(Model).ToList();
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="page-head">
+        <span class="craft-rule"></span>
+        <h1 class="t-display-lg page-head__title">Meet the makers</h1>
+        <p class="page-head__sub measure">
+            240 artisans across 18 craft clusters. We visit every workshop before we buy from it,
+            and again at least once a year. Every product page names the person who made the piece.
+        </p>
+    </div>
+
+    <div class="chip-nav mb-lg">
+        <a class="chip-nav__item is-active" href="/artisans">All crafts</a>
+        @foreach (var craft in new[] { "Pottery", "Textiles", "Metal", "Woodcraft", "Jewellery", "Painting", "Basketry" })
+        {
+            <a class="chip-nav__item" href="/artisans?craft=@craft.ToLowerInvariant()">@craft</a>
+        }
+    </div>
+
+    <div class="plp-toolbar">
+        <p class="t-body-md">
+            <strong class="tabular">@all.Count</strong>
+            <span class="text-secondary-c">artisans</span>
+        </p>
+        <div class="sort-select hide-tablet-down">
+            <label class="t-body-sm text-secondary-c" for="artisanSort">Sort by</label>
+            <select class="select" id="artisanSort">
+                <option>Featured</option>
+                <option>Most products</option>
+                <option>Highest rated</option>
+                <option>Longest working with us</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="cat-grid mt-md" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+        @foreach (var artisan in all)
+        {
+            <a class="card card-flush reveal" href="/artisans/@artisan.Slug">
+                <div class="img-box img-1-1" style="border-radius:0">
+                    <img src="@artisan.PhotoUrl" alt="@artisan.Name at work in the @artisan.Cluster workshop"
+                         loading="lazy" width="240" height="240" />
+                </div>
+                <div style="padding:var(--space-md)">
+                    <p class="t-heading-xs">@artisan.Name</p>
+                    <p class="t-body-sm text-craft-c">@artisan.Craft</p>
+                    <p class="t-body-xs text-tertiary-c mt-2xs row-flex gap-2xs">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-map-pin"></use></svg>
+                        @artisan.Cluster
+                    </p>
+
+                    <div class="row-flex wrap gap-md mt-sm t-body-xs text-secondary-c">
+                        <span class="row-flex gap-2xs">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-star"></use></svg> 4.8
+                        </span>
+                        <span class="row-flex gap-2xs">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-package"></use></svg> 212 pieces
+                        </span>
+                        <span class="row-flex gap-2xs">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-clock"></use></svg> 18 yrs
+                        </span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+
+    <div class="load-more mt-2xl">
+        <button class="btn btn-outline btn-lg" type="button">
+            <span class="btn__spinner" aria-hidden="true"></span>
+            <span class="btn__label">Load More (@all.Count of 240)</span>
+        </button>
+    </div>
+</div>
+
+<section class="band band-craft mt-2xl">
+    <div class="container text-center">
+        <span class="craft-rule"></span>
+        <h2 class="t-display-lg">Are you an artisan?</h2>
+        <p class="t-body-lg text-craft-c mt-sm mx-auto measure">
+            We buy directly, pay upfront rather than on consignment, and set the price with you rather
+            than for you. Tell us what you make and where, and someone will visit.
+        </p>
+        <a class="btn btn-secondary btn-xl mt-lg" href="/pages/contact">Work With Us</a>
+    </div>
+</section>

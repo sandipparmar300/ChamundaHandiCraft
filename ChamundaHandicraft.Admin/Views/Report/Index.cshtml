@@ -1,3 +1,4 @@
+@model PagedResult<SavedReportGridItem>
 @*
     Module 18 - Reports hub. Spec: docs/Admin Flows/Reports.txt
 *@
@@ -69,7 +70,9 @@
                     @foreach (var r in g.Reports)
                     {
                         <div class="col-xl-3 col-lg-4 col-md-6">
-                            <a asp-controller="Report" asp-action="Details" asp-route-id="0" class="text-decoration-none">
+                            @* A report type, not a saved record — running one needs the
+                               reporting endpoint, which lands with the API. *@
+                            <a href="#" onclick="notWired('@r'); return false;" class="text-decoration-none">
                                 <div class="kpi-card">
                                     <div class="kpi-icon" style="background:rgba(107,44,44,.10);color:var(--brand-primary,#6B2C2C);">
                                         <i class="fas fa-file-lines"></i>
@@ -100,7 +103,25 @@
                             <th style="min-width:80px;">Action</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                    @foreach (var row in Model.Items)
+                    {
+                        <tr>
+                            <td><a asp-action="Details" asp-route-id="@row.Id">@row.Name</a></td>
+                            <td>@row.ReportType</td>
+                            <td class="text-muted">@(row.DateRange ?? "—")</td>
+                            <td>@(row.CreatedBy ?? "—")</td>
+                            <td>@Money.LongDate(row.CreatedOn)</td>
+                            <td>@(row.LastRunOn is null ? "Never" : Money.Relative(row.LastRunOn.Value))</td>
+                            <td><a asp-action="Details" asp-route-id="@row.Id" title="View"><i class="fas fa-eye"></i></a></td>
+                        </tr>
+                    }
+                    @if (!Model.Items.Any())
+                    {
+                        <tr><td colspan="7" class="text-center py-4">No saved reports yet.</td></tr>
+                    }
+                </tbody>
+
                 </table>
             </div>
         </div>
@@ -120,7 +141,26 @@
                             <th style="min-width:80px;">Action</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                    @foreach (var row in Model.Items.Where(r => r.Schedule is not null))
+                    {
+                        <tr>
+                            <td>@row.Name</td>
+                            <td>@row.ReportType</td>
+                            <td>@row.Schedule</td>
+                            <td>CSV</td>
+                            <td>@(row.Recipients ?? "—")</td>
+                            <td>@(row.LastRunOn is null ? "—" : Money.LongDate(row.LastRunOn.Value.AddDays(1)))</td>
+                            <td>@await Html.PartialAsync("_StatusPill", row.IsActive)</td>
+                            <td><a asp-action="Details" asp-route-id="@row.Id" title="View"><i class="fas fa-eye"></i></a></td>
+                        </tr>
+                    }
+                    @if (!Model.Items.Any(r => r.Schedule is not null))
+                    {
+                        <tr><td colspan="8" class="text-center py-4">No scheduled reports.</td></tr>
+                    }
+                </tbody>
+
                 </table>
             </div>
         </div>

@@ -1,4 +1,5 @@
-﻿@*
+@model PagedResult<NotificationLogGridItem>
+@*
     Insights - Notifications listing.  Spec: docs/Admin Flows/
 *@
 @{
@@ -51,7 +52,32 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td>@row.Title</td>
+                        <td class="text-muted">@(row.Body ?? "—")</td>
+                        <td>—</td>
+                        <td>@row.Recipient</td>
+                        <td>@row.Channel</td>
+                        <td>@Money.Relative(row.SentOn)</td>
+                        <td>
+                            <span class="badge @(row.Status == "Sent" ? "bg-success" : "bg-danger")">@row.Status</span>
+                            @if (row.FailureReason is not null)
+                            {
+                                <span class="text-muted d-block">@row.FailureReason</span>
+                            }
+                        </td>
+                        <td><a asp-action="Details" asp-route-id="@row.Id" title="View"><i class="fas fa-eye"></i></a></td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="8" class="text-center py-4">Nothing sent yet.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

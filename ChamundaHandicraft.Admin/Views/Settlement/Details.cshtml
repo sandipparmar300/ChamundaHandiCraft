@@ -1,4 +1,5 @@
-﻿@{
+@model SettlementGridItem
+@{
     ViewData["Title"] = "Settlement Details";
 }
 
@@ -29,11 +30,11 @@
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Settlement ID</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.SettlementId</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Settlement Date</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.LongDate(Model.SettledOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Gateway</label>
@@ -41,15 +42,15 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Transactions</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.TransactionCount</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Gross Amount</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.GrossAmount)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Gateway Fees</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.Fees)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Tax</label>
@@ -57,11 +58,11 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Net Amount</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.NetAmount)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">UTR Number</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.BankReference ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Bank Account</label>
@@ -69,7 +70,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Reconciled By</label>

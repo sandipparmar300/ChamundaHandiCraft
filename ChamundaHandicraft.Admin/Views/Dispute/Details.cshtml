@@ -1,4 +1,5 @@
-﻿@{
+@model DisputeGridItem
+@{
     ViewData["Title"] = "Dispute Details";
 }
 
@@ -22,22 +23,22 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Dispute Information</h2>
-            <a asp-controller="Dispute" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Dispute" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Dispute ID</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.DisputeId</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Order Number</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.OrderNumber</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Customer</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.CustomerName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Gateway</label>
@@ -45,11 +46,11 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Amount</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.Amount)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Reason</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Reason</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Stage</label>
@@ -57,15 +58,15 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Raised On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.LongDate(Model.RaisedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Due By</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.LongDate(Model.EvidenceDueOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Evidence Submitted On</label>

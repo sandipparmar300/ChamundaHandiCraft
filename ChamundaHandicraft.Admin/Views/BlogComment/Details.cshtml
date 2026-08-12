@@ -1,4 +1,5 @@
-﻿@{
+@model BlogCommentGridItem
+@{
     ViewData["Title"] = "Comment Details";
 }
 
@@ -29,23 +30,23 @@
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Author</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.AuthorName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Email</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.AuthorEmail ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Post</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.PostTitle</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Comment</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Body</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Submitted On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.DateAndTime(Model.SubmittedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">IP Address</label>
@@ -61,7 +62,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
             </div>
         </div>

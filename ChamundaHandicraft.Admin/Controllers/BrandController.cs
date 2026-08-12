@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ViewModel.Admin;
+using ChamundaHandicraft.Helper.ViewModel.Common;
+using ChamundaHandicraft.Helper.ViewModel.Customer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Admin.Controllers;
 
-/// <summary>
-/// View shell for the Brand screens. Each action renders markup only —
-/// the ApiService calls and view models arrive with the API wiring.
-/// </summary>
-public class BrandController : Controller
+/// <summary>Workshops and studio lines.</summary>
+public class BrandController : AdminCrudController<BrandGridItem, BrandGridItem>
 {
-    public IActionResult Index() => View();
+    public BrandController(IAdminClient client) : base(client) { }
 
-    public IActionResult Add() => View("Create");
-
-    public IActionResult Edit(int id) => View("Create");
-
-    public IActionResult Details(int id) => View();
+    protected override string Module => "Brand";
 }

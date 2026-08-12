@@ -1,4 +1,5 @@
-﻿@{
+@model MasterGridItem
+@{
     ViewData["Title"] = "Master Entry";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Master Entry" : "Add Master Entry";
@@ -23,7 +24,7 @@
 
     <form method="post" id="masterForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -57,19 +58,19 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Code</label>
-                        <input id="Code" name="Code" class="form-control-custom" placeholder="Enter code" />
+                        <input id="Code" name="Code" class="form-control-custom" placeholder="Enter code" / value="@Model.Code" >
                         <span class="error-msg" data-valmsg-for="Code"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Sort Order</label>
-                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" />
+                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" / value="@Model.SortOrder" >
                         <span class="error-msg" data-valmsg-for="SortOrder"></span>
                     </div>
 
                     <div class="col-lg-12 col-md-6">
                         <label class="form-label-custom">Description</label>
-                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description"></textarea>
+                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description">@Model.Description</textarea>
                         <span class="error-msg" data-valmsg-for="Description"></span>
                     </div>
                 </div>

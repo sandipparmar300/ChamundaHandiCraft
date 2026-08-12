@@ -1,4 +1,5 @@
-﻿@{
+@model ReturnRequestViewModel
+@{
     ViewData["Title"] = "Return Details";
 }
 
@@ -22,18 +23,18 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Return Information</h2>
-            <a asp-controller="Return" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Return" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Return Number</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.RmaNumber</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Order Number</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.OrderNumber</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Customer</label>
@@ -41,15 +42,15 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Product</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.Lines.FirstOrDefault()?.ProductName ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Quantity</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Lines.Sum(l => l.Quantity)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Return Reason</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Reason</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Inspection Result</label>
@@ -57,15 +58,15 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Restock Action</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Resolution</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Requested On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.LongDate(Model.RequestedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Processed By</label>
@@ -73,7 +74,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Refund Amount</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.RefundAmount)</p>
                     </div>
             </div>
         </div>

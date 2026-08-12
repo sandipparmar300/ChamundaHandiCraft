@@ -1,4 +1,5 @@
-﻿@{
+@model SupportTicketGridItem
+@{
     ViewData["Title"] = "Ticket";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Ticket" : "Add Ticket";
@@ -23,7 +24,7 @@
 
     <form method="post" id="supportForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -34,7 +35,7 @@
                 <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Ticket Number <span class="req">*</span></label>
-                        <input id="TicketNumber" name="TicketNumber" class="form-control-custom" placeholder="Enter ticket number" />
+                        <input id="TicketNumber" name="TicketNumber" class="form-control-custom" placeholder="Enter ticket number" / value="@Model.TicketNumber" >
                         <span class="error-msg" data-valmsg-for="TicketNumber"></span>
                     </div>
 
@@ -104,7 +105,7 @@
 
                     <div class="col-lg-12 col-md-6">
                         <label class="form-label-custom">Subject <span class="req">*</span></label>
-                        <input id="Subject" name="Subject" class="form-control-custom" placeholder="Enter subject" />
+                        <input id="Subject" name="Subject" class="form-control-custom" placeholder="Enter subject" / value="@Model.Subject" >
                         <span class="error-msg" data-valmsg-for="Subject"></span>
                     </div>
 

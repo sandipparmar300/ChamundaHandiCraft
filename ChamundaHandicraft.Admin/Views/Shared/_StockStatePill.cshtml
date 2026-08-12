@@ -1,0 +1,18 @@
+@model StockState
+@*
+    Stock state. This is the same enum the storefront renders as its stock indicator,
+    computed once server-side — see docs/INTEGRATION-MAP.md §3.
+*@
+@{
+    var (css, label) = Model switch
+    {
+        StockState.InStock => ("bg-success", "In stock"),
+        StockState.LowStock => ("bg-warning text-dark", "Low stock"),
+        StockState.OutOfStock => ("bg-danger", "Out of stock"),
+        StockState.MadeToOrder => ("bg-info", "Made to order"),
+        StockState.PreOrder => ("bg-info", "Pre-order"),
+        StockState.Backorder => ("bg-info", "Backorder"),
+        _ => ("bg-secondary", Model.ToString())
+    };
+}
+<span class="badge @css">@label</span>

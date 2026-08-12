@@ -1,0 +1,66 @@
+@{
+    // PG-01-11 · Welcome / First Visit — uses the full site chrome, because the
+    // point of this page is to send the shopper into the catalogue.
+}
+
+<section class="band band-craft">
+    <div class="container text-center">
+        <span class="state-block__icon state-block__icon--success mx-auto">
+            <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+        </span>
+        <h1 class="t-display-xl mt-md">Welcome to Chamunda Handicraft, Ananya</h1>
+        <p class="t-body-lg text-secondary-c mt-sm mx-auto" style="max-width:560px">
+            Your account is ready. Here's what it does for you.
+        </p>
+    </div>
+</section>
+
+<section class="band-sm">
+    <div class="container">
+        <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+            <div class="card">
+                <span class="trust-badge__icon mb-sm"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-package"></use></svg></span>
+                <h2 class="t-heading-xs">Track every order</h2>
+                <p class="t-body-sm text-secondary-c mt-2xs">From the workshop to your door, with the courier and a real delivery date.</p>
+            </div>
+            <div class="card">
+                <span class="trust-badge__icon mb-sm"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-heart"></use></svg></span>
+                <h2 class="t-heading-xs">Wishlist across devices</h2>
+                <p class="t-body-sm text-secondary-c mt-2xs">Save on your phone, buy on your laptop. We'll tell you if a saved piece drops in price.</p>
+            </div>
+            <div class="card">
+                <span class="trust-badge__icon mb-sm"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-gem"></use></svg></span>
+                <h2 class="t-heading-xs">Points on every order</h2>
+                <p class="t-body-sm text-secondary-c mt-2xs">Earn 1 point per ₹100. 100 points is ₹100 off. No expiry games.</p>
+            </div>
+            <div class="card card-premium">
+                <span class="trust-badge__icon mb-sm"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-ticket-percent"></use></svg></span>
+                <h2 class="t-heading-xs">Your welcome coupon</h2>
+                <p class="t-body-sm text-secondary-c mt-2xs">₹200 off your first order above ₹1,500.</p>
+                <div class="row-flex gap-xs mt-sm">
+                    <span class="coupon-card__code">WELCOME200</span>
+                    <button class="icon-btn icon-btn-sm" type="button" data-copy="WELCOME200" aria-label="Copy coupon code">
+                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-copy"></use></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row-flex center wrap gap-sm mt-xl">
+            <a class="btn btn-primary btn-xl" href="/shop">Start Shopping</a>
+            <a class="btn btn-outline btn-xl" href="/account/profile">Complete My Profile</a>
+        </div>
+    </div>
+</section>
+
+<section class="band band-surface">
+    <div class="container">
+        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        {
+            Eyebrow = "Start here",
+            Heading = "Most loved by new shoppers",
+            ViewAllUrl = "/shop?sort=bestselling",
+            Products = DemoContent.Products(6)
+        })
+    </div>
+</section>

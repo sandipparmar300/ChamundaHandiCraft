@@ -1,0 +1,74 @@
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+
+    var groups = new (string Heading, (string Label, string Url)[] Links)[]
+    {
+        ("Shop", new[]
+        {
+            ("All products", "/shop"), ("New Arrivals", "/c/new-arrivals"), ("Home Décor", "/c/home-decor"),
+            ("Pottery & Ceramics", "/c/pottery"), ("Textiles", "/c/textiles"), ("Brass & Metal", "/c/brassware"),
+            ("Jewellery", "/c/jewellery"), ("Gifting", "/c/gifting"), ("Festive", "/c/festive"), ("Sale", "/c/sale")
+        }),
+        ("Discover", new[]
+        {
+            ("Meet the makers", "/artisans"), ("Craft clusters", "/c/craft-clusters"),
+            ("Stories from the workshop", "/blog"), ("Shopping assistant", "/assistant"),
+            ("Search", "/search"), ("Compare", "/compare")
+        }),
+        ("Your account", new[]
+        {
+            ("Dashboard", "/account"), ("Orders", "/account/orders"), ("Returns & refunds", "/account/returns"),
+            ("Wishlist", "/wishlist"), ("Rewards & points", "/account/rewards"), ("Coupons", "/account/coupons"),
+            ("My reviews", "/account/reviews"), ("Notifications", "/account/notifications"),
+            ("Profile", "/account/profile"), ("Addresses", "/account/addresses"),
+            ("Saved cards", "/account/payment-methods"), ("Preferences", "/account/preferences"),
+            ("Security", "/account/security"), ("Privacy & data", "/account/privacy"),
+            ("Refer a friend", "/account/referrals")
+        }),
+        ("Buying", new[]
+        {
+            ("Cart", "/cart"), ("Checkout", "/checkout"), ("Track an order", "/track"),
+            ("Sign in", "/login"), ("Create an account", "/register")
+        }),
+        ("About", new[]
+        {
+            ("Our story", "/pages/about"), ("Sustainability", "/pages/sustainability"),
+            ("Careers", "/pages/careers"), ("Press", "/pages/press"), ("Bulk & corporate orders", "/pages/bulk-orders"),
+            ("Contact us", "/pages/contact")
+        }),
+        ("Help & policies", new[]
+        {
+            ("Help centre", "/help"), ("Shipping information", "/pages/shipping"), ("Returns", "/pages/returns"),
+            ("Privacy policy", "/pages/privacy-policy"), ("Terms & conditions", "/pages/terms"),
+            ("Shipping policy", "/pages/shipping-policy"), ("Return policy", "/pages/return-policy"),
+            ("Refund policy", "/pages/refund-policy"), ("Cookie policy", "/pages/cookie-policy")
+        })
+    };
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="page-head">
+        <h1 class="t-display-lg page-head__title">Sitemap</h1>
+        <p class="page-head__sub">Every page on the storefront, in one list.</p>
+    </div>
+
+    <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));padding-bottom:var(--space-2xl)">
+        @foreach (var group in groups)
+        {
+            <nav class="card" aria-labelledby="sitemap-@group.Heading.GetHashCode()">
+                <h2 class="t-heading-xs mb-sm" id="sitemap-@group.Heading.GetHashCode()">@group.Heading</h2>
+                <div class="stack stack-2xs">
+                    @foreach (var link in group.Links)
+                    {
+                        <a class="link-muted t-body-sm" href="@link.Url">@link.Label</a>
+                    }
+                </div>
+            </nav>
+        }
+    </div>
+</div>

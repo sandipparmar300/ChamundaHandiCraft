@@ -1,0 +1,105 @@
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">Privacy &amp; data</h1>
+    <p class="page-head__sub">
+        What we hold, what we do with it, and how to take it back. Plain language, no legalese.
+    </p>
+</div>
+
+<section class="card">
+    <h2 class="t-heading-md mb-md">How your data is used</h2>
+    <div class="stack stack-md">
+        <div class="row-flex wrap between gap-md" style="padding-bottom:var(--space-md);border-bottom:1px solid var(--color-border-subtle)">
+            <div class="grow">
+                <p class="t-heading-xs">Personalised recommendations</p>
+                <p class="t-body-sm text-secondary-c">
+                    We use what you've viewed and bought to order the products you see. Turning this off
+                    shows everyone the same ranking.
+                </p>
+            </div>
+            <label class="switch shrink-0"><input type="checkbox" checked /><span class="sr-only">Personalised recommendations</span></label>
+        </div>
+
+        <div class="row-flex wrap between gap-md" style="padding-bottom:var(--space-md);border-bottom:1px solid var(--color-border-subtle)">
+            <div class="grow">
+                <p class="t-heading-xs">Analytics cookies</p>
+                <p class="t-body-sm text-secondary-c">
+                    Anonymous page-view counts that tell us which pages are useful. No profile is built.
+                </p>
+            </div>
+            <label class="switch shrink-0"><input type="checkbox" checked /><span class="sr-only">Analytics cookies</span></label>
+        </div>
+
+        <div class="row-flex wrap between gap-md">
+            <div class="grow">
+                <p class="t-heading-xs">Advertising cookies</p>
+                <p class="t-body-sm text-secondary-c">
+                    Lets us show you our products on other sites. Off by default.
+                </p>
+            </div>
+            <label class="switch shrink-0"><input type="checkbox" /><span class="sr-only">Advertising cookies</span></label>
+        </div>
+    </div>
+</section>
+
+<section class="card mt-md">
+    <h2 class="t-heading-md mb-md">Your data</h2>
+    <div class="stack stack-sm">
+        <div class="row-flex wrap between gap-sm" style="padding-bottom:var(--space-sm);border-bottom:1px solid var(--color-border-subtle)">
+            <div>
+                <p class="t-body-md">Download a copy</p>
+                <p class="t-body-xs text-tertiary-c">Orders, addresses, reviews and preferences as a JSON file. Ready within 24 hours.</p>
+            </div>
+            <button class="btn btn-outline btn-sm shrink-0" type="button">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-download"></use></svg>
+                Request Export
+            </button>
+        </div>
+
+        <div class="row-flex wrap between gap-sm">
+            <div>
+                <p class="t-body-md">Delete your account</p>
+                <p class="t-body-xs text-tertiary-c">
+                    Removes your profile, addresses and saved cards. Invoices are kept for 8 years as tax law requires.
+                </p>
+            </div>
+            <button class="btn btn-ghost btn-sm shrink-0" type="button" data-open="deleteAccount"
+                    style="color:var(--color-status-danger-text)">
+                Delete Account
+            </button>
+        </div>
+    </div>
+</section>
+
+<p class="t-body-sm text-tertiary-c mt-md">
+    Read the full <a class="link" href="/pages/privacy-policy">privacy policy</a> and
+    <a class="link" href="/pages/cookie-policy">cookie policy</a>.
+</p>
+
+<div class="modal-scrim" id="deleteAccount" role="dialog" aria-modal="true" aria-labelledby="delAccTitle" aria-hidden="true">
+    <div class="modal modal-sm">
+        <div class="modal__head">
+            <h2 class="t-heading-md" id="delAccTitle">Delete your account?</h2>
+            <button class="icon-btn" data-close="deleteAccount" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <p class="t-body-md text-secondary-c mb-md">
+                This cannot be undone. You'll lose 1,840 reward points and 4 unused coupons.
+                Orders already placed will still be delivered.
+            </p>
+            <div class="field">
+                <label class="field__label" for="deleteConfirm">Type <strong>DELETE</strong> to confirm</label>
+                <input class="input" id="deleteConfirm" type="text" placeholder="DELETE" />
+            </div>
+        </div>
+        <div class="modal__foot">
+            <button class="btn btn-ghost" data-close="deleteAccount">Keep My Account</button>
+            <button class="btn btn-danger" data-close="deleteAccount">Delete Account</button>
+        </div>
+    </div>
+</div>

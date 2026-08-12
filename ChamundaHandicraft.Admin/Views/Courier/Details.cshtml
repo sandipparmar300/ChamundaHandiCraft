@@ -1,4 +1,5 @@
-﻿@{
+@model CourierGridItem
+@{
     ViewData["Title"] = "Courier Details";
 }
 
@@ -22,14 +23,14 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Courier Information</h2>
-            <a asp-controller="Courier" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Courier" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Courier Name</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.CourierName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Integration</label>
@@ -37,7 +38,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Tracking URL Pattern</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.TrackingUrlTemplate ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Pickup Cut-off Time</label>
@@ -49,11 +50,11 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Supports COD</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.SupportsCod ? "Yes" : "No")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Account Code</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Code</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Serviceable Zones</label>
@@ -61,15 +62,15 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Total Shipments</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.ActiveShipmentCount</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Average Delivery</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.OnTimePercent.ToString("0.0") on-time</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.IsActive ? "Active" : "Inactive")</p>
                     </div>
             </div>
         </div>

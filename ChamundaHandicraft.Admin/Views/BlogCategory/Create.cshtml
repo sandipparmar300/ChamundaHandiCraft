@@ -1,4 +1,5 @@
-﻿@{
+@model BlogCategoryGridItem
+@{
     ViewData["Title"] = "Blog Category";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Blog Category" : "Add Blog Category";
@@ -23,7 +24,7 @@
 
     <form method="post" id="blogcategoryForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -40,7 +41,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Slug <span class="req">*</span></label>
-                        <input id="Slug" name="Slug" class="form-control-custom" placeholder="Enter slug" />
+                        <input id="Slug" name="Slug" class="form-control-custom" placeholder="Enter slug" / value="@Model.Slug" >
                         <span class="error-msg" data-valmsg-for="Slug"></span>
                     </div>
 
@@ -52,7 +53,7 @@
 
                     <div class="col-lg-12 col-md-6">
                         <label class="form-label-custom">Description</label>
-                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description"></textarea>
+                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description">@Model.Description</textarea>
                         <span class="error-msg" data-valmsg-for="Description"></span>
                     </div>
                 </div>

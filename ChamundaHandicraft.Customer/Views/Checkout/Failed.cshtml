@@ -1,0 +1,67 @@
+@{
+    Layout = "_CheckoutLayout";
+    var reason = ViewData["Reason"] as string ?? "Your bank declined the transaction.";
+}
+
+@*
+    Module 09 · Payment failure. Template from §7.4:
+    "Payment didn't go through. {Reason}. Your cart is safe."
+    Retry must not lose any data.
+*@
+<div class="container-narrow" style="padding-block:var(--space-2xl)">
+
+    <div class="text-center">
+        <span class="state-block__icon state-block__icon--error mx-auto">
+            <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+        </span>
+
+        <h1 class="t-heading-xl mt-md">Payment didn't go through</h1>
+        <p class="t-body-lg text-secondary-c mt-sm">
+            @reason Nothing has been charged, and your cart is exactly as you left it.
+        </p>
+    </div>
+
+    <div class="card mt-lg">
+        <h2 class="t-heading-xs mb-sm">What usually fixes it</h2>
+        <ul class="stack stack-sm t-body-sm text-secondary-c">
+            <li class="row-flex gap-xs row-start">
+                <svg class="ico ico-sm shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                Check that the card has enough balance and is enabled for online payments.
+            </li>
+            <li class="row-flex gap-xs row-start">
+                <svg class="ico ico-sm shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                If the OTP timed out, try again — banks give a fresh code each attempt.
+            </li>
+            <li class="row-flex gap-xs row-start">
+                <svg class="ico ico-sm shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                UPI apps sometimes reject the first request when the network is slow. A second attempt usually works.
+            </li>
+        </ul>
+    </div>
+
+    <a class="btn btn-primary btn-xl btn-block mt-lg" href="/checkout">Try Payment Again</a>
+
+    <div class="card mt-md">
+        <h2 class="t-heading-xs mb-sm">Or pay a different way</h2>
+        <div class="stack stack-xs">
+            <a class="dropdown__item" href="/checkout">
+                <svg class="ico" aria-hidden="true"><use href="#i-rupee"></use></svg> UPI — GPay, PhonePe, Paytm
+            </a>
+            <a class="dropdown__item" href="/checkout">
+                <svg class="ico" aria-hidden="true"><use href="#i-landmark"></use></svg> Net banking
+            </a>
+            <a class="dropdown__item" href="/checkout">
+                <svg class="ico" aria-hidden="true"><use href="#i-banknote"></use></svg> Cash on delivery (+₹49)
+            </a>
+        </div>
+    </div>
+
+    <p class="t-body-sm text-tertiary-c text-center mt-lg">
+        If money left your account, it will be returned automatically within 5 working days.
+        <a class="link" href="/help">Tell us if it isn't</a> and we'll chase it for you.
+    </p>
+
+    <div class="text-center mt-md">
+        <a class="btn btn-ghost" href="/cart">Back to cart</a>
+    </div>
+</div>

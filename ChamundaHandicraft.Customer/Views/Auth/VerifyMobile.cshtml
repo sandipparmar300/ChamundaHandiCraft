@@ -1,0 +1,46 @@
+@{
+    Layout = "_AuthLayout";
+}
+
+@* PG-01-08 · Mobile Verification — required before COD and before posting a review. *@
+<h1 class="t-heading-xl">Verify your mobile number</h1>
+<p class="t-body-md text-secondary-c mt-xs mb-lg">
+    Couriers call this number on the delivery day, so we check it once.
+    It also unlocks cash on delivery.
+</p>
+
+<form method="post" action="/verify-mobile" id="verifyMobileForm">
+    <div class="field">
+        <label class="field__label" for="mobileToVerify">Mobile number</label>
+        <div class="phone-input">
+            <select class="select" aria-label="Country code">
+                <option selected>+91</option>
+                <option>+1</option>
+                <option>+44</option>
+            </select>
+            <input class="input" id="mobileToVerify" name="mobile" type="tel" value="98765 43210"
+                   autocomplete="tel" inputmode="numeric" />
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="field__label" for="mvOtp1">Verification code</label>
+        <div class="otp">
+            @for (var i = 1; i <= 6; i++)
+            {
+                <input id="mvOtp@(i)" name="digit@(i)" type="text" inputmode="numeric" maxlength="1"
+                       autocomplete="@(i == 1 ? "one-time-code" : "off")" aria-label="Digit @i of 6" />
+            }
+        </div>
+        <p class="field__help">Sent by SMS to the number above.</p>
+    </div>
+
+    <button class="btn btn-primary btn-xl btn-block mt-lg" type="submit">
+        <span class="btn__spinner" aria-hidden="true"></span>
+        <span class="btn__label">Verify Number</span>
+    </button>
+</form>
+
+<p class="t-body-sm text-center text-tertiary-c mt-lg">
+    <a class="link" href="/">Not now</a> — you can verify later from your profile.
+</p>

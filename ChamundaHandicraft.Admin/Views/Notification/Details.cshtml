@@ -1,4 +1,5 @@
-﻿@{
+@model NotificationLogGridItem
+@{
     ViewData["Title"] = "Notification Details";
 }
 
@@ -29,11 +30,11 @@
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Title</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Title</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Message</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.Body ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Type</label>
@@ -41,19 +42,19 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Recipient</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Recipient</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Channel</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Channel</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Sent On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.DateAndTime(Model.SentOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Read On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.ReadOn is null ? "Not read" : Money.DateAndTime(Model.ReadOn.Value))</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Action URL</label>
@@ -61,7 +62,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.FailureReason is null ? Model.Status : Model.Status + " — " + Model.FailureReason)</p>
                     </div>
             </div>
         </div>

@@ -1,0 +1,247 @@
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+    var suggestions = DemoContent.Products(3);
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="page-head">
+        <span class="ai-chip">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+            AI assistant
+        </span>
+        <h1 class="t-display-lg page-head__title mt-xs">Tell us what you're looking for</h1>
+        <p class="page-head__sub measure">
+            Describe the room, the occasion or the person. We'll suggest real pieces from stock —
+            and tell you when we haven't got what you want rather than guessing.
+        </p>
+    </div>
+
+    <div class="layout-content-summary" style="padding-bottom:var(--space-2xl)">
+
+        @* ---- Conversation ---- *@
+        <section class="card" aria-label="Assistant conversation">
+            <div class="stack stack-md" style="min-height:360px">
+
+                <div class="ai-msg">
+                    <span class="avatar avatar-sm shrink-0" aria-hidden="true">
+                        <svg class="ico ico-sm" style="stroke:currentColor"><use href="#i-sparkles"></use></svg>
+                    </span>
+                    <div class="ai-msg__bubble">
+                        Hello. Tell me the room, the occasion or a budget and I'll pull out pieces that fit.
+                        I only suggest things we actually have in stock.
+                    </div>
+                </div>
+
+                <div class="ai-msg ai-msg--user">
+                    <div class="ai-msg__bubble">
+                        Housewarming gift for a friend's new flat in Bangalore, under ₹2,500. She likes blue.
+                    </div>
+                </div>
+
+                <div class="ai-msg">
+                    <span class="avatar avatar-sm shrink-0" aria-hidden="true">
+                        <svg class="ico ico-sm" style="stroke:currentColor"><use href="#i-sparkles"></use></svg>
+                    </span>
+                    <div class="grow">
+                        <div class="ai-msg__bubble">
+                            Three that fit — all under ₹2,500, all in stock, all deliverable to Bangalore
+                            by @Money.DeliveryDate(DateTime.Today.AddDays(5)). The blue pottery vase is the
+                            safest choice for a housewarming; the kantha covers are the most useful if her
+                            flat is still sparse.
+                        </div>
+
+                        <div class="stack stack-xs mt-sm">
+                            @foreach (var product in suggestions)
+                            {
+                                <a class="card row-flex gap-sm" href="@product.Url" style="padding:var(--space-xs)">
+                                    <img class="pcard-compact__img img-product shrink-0" src="@product.ImageUrl" alt=""
+                                         width="56" height="56" style="width:56px;height:56px" />
+                                    <span class="grow">
+                                        <span class="t-body-sm clamp-1" style="display:block;font-weight:500">@product.Name</span>
+                                        <span class="t-body-xs text-secondary-c clamp-1">@product.Material</span>
+                                        <span class="price price-sm mt-2xs">
+                                            <span class="price__now">@Money.Inr(product.Price)</span>
+                                        </span>
+                                    </span>
+                                    <button class="btn btn-outline btn-sm shrink-0" type="button"
+                                            data-add-to-cart data-slug="@product.Slug"
+                                            onclick="event.preventDefault();event.stopPropagation();">
+                                        <span class="btn__spinner" aria-hidden="true"></span>
+                                        <span class="btn__label">Add</span>
+                                    </button>
+                                </a>
+                            }
+                        </div>
+
+                        @* Mandatory disclosure — AI output is labelled and its limits stated. *@
+                        <p class="t-body-xs text-tertiary-c mt-sm">
+                            <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-info"></use></svg>
+                            Suggested by AI from our live catalogue. It can be wrong about taste —
+                            <a class="link" href="/help">ask a person</a> if you'd rather.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="ai-msg">
+                    <span class="avatar avatar-sm shrink-0" aria-hidden="true">
+                        <svg class="ico ico-sm" style="stroke:currentColor"><use href="#i-sparkles"></use></svg>
+                    </span>
+                    <div class="ai-typing" aria-label="Assistant is typing">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card__divider"></div>
+
+            <div class="row-flex wrap gap-xs mb-sm">
+                @foreach (var prompt in new[]
+                {
+                    "Under ₹1,000", "Something for a wedding", "Only brass", "Deliverable this week", "Show more like the vase"
+                })
+                {
+                    <button class="chip" type="button">@prompt</button>
+                }
+            </div>
+
+            <form class="row-flex gap-xs" onsubmit="return false">
+                <label class="sr-only" for="aiInput">Ask the assistant</label>
+                <input class="input" id="aiInput" type="text"
+                       placeholder="Describe what you're looking for…" autocomplete="off" />
+                <button class="btn btn-primary shrink-0" type="submit" aria-label="Send message">
+                    <svg class="ico" aria-hidden="true"><use href="#i-send"></use></svg>
+                </button>
+            </form>
+
+            <p class="t-body-xs text-tertiary-c mt-sm">
+                We keep your conversation for 30 days to improve suggestions.
+                <a class="link" href="/account/privacy">Turn this off</a> or
+                <a class="link" href="#">clear the conversation</a>.
+            </p>
+        </section>
+
+        @* ---- Side panel ---- *@
+        <aside class="stack stack-md">
+            <div class="card">
+                <h2 class="t-heading-md mb-sm">What it's good at</h2>
+                <ul class="stack stack-sm t-body-sm text-secondary-c">
+                    <li class="row-flex gap-xs row-start">
+                        <svg class="ico ico-sm text-success-c shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                        Narrowing by budget, room, occasion or material
+                    </li>
+                    <li class="row-flex gap-xs row-start">
+                        <svg class="ico ico-sm text-success-c shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                        Checking whether something arrives before a date
+                    </li>
+                    <li class="row-flex gap-xs row-start">
+                        <svg class="ico ico-sm text-success-c shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                        Explaining a craft, a material or how to care for it
+                    </li>
+                    <li class="row-flex gap-xs row-start">
+                        <svg class="ico ico-sm text-success-c shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                        Summarising what reviewers actually said
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2 class="t-heading-md mb-sm">What it can't do</h2>
+                <ul class="stack stack-sm t-body-sm text-secondary-c">
+                    <li class="row-flex gap-xs row-start">
+                        <svg class="ico ico-sm text-tertiary-c shrink-0 mt-2xs" aria-hidden="true"><use href="#i-x"></use></svg>
+                        Change, cancel or refund an order — <a class="link" href="/help">a person does that</a>
+                    </li>
+                    <li class="row-flex gap-xs row-start">
+                        <svg class="ico ico-sm text-tertiary-c shrink-0 mt-2xs" aria-hidden="true"><use href="#i-x"></use></svg>
+                        See your payment details or addresses
+                    </li>
+                    <li class="row-flex gap-xs row-start">
+                        <svg class="ico ico-sm text-tertiary-c shrink-0 mt-2xs" aria-hidden="true"><use href="#i-x"></use></svg>
+                        Promise a delivery date outside what the courier gives us
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card card-craft">
+                <p class="t-heading-xs text-craft-c mb-xs">Rather talk to a person?</p>
+                <p class="t-body-sm text-craft-c mb-md">
+                    Our care team knows the catalogue better than any model does.
+                </p>
+                <a class="btn btn-secondary btn-sm" href="https://wa.me/919876543210" rel="noopener">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+                    WhatsApp Us
+                </a>
+            </div>
+
+            @* Visual search — the second AI surface in module 20. *@
+            <div class="card">
+                <h2 class="t-heading-md mb-sm">Search by photo</h2>
+                <p class="t-body-sm text-secondary-c mb-md">
+                    Seen something you like? Upload a photo and we'll find the closest pieces we stock.
+                </p>
+                <div class="upload" style="padding:var(--space-md)">
+                    <svg class="ico ico-xl text-tertiary-c mx-auto mb-xs" aria-hidden="true"><use href="#i-camera"></use></svg>
+                    <p class="t-body-sm">Drop a photo, or tap to choose</p>
+                    <input type="file" accept="image/*" class="sr-only" />
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+@* Launcher, available site-wide from this page's pattern. *@
+<button class="ai-launcher no-print" type="button" data-open="aiPanel" aria-haspopup="dialog">
+    <svg class="ico" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+    Ask the assistant
+</button>
+
+<div class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-label="Shopping assistant"
+     aria-hidden="true" data-scrim="globalScrim">
+    <div class="drawer__head">
+        <div class="row-flex gap-xs">
+            <span class="ai-chip">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                AI assistant
+            </span>
+        </div>
+        <button class="icon-btn" data-close aria-label="Close assistant">
+            <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+    </div>
+
+    <div class="drawer__body stack stack-md">
+        <div class="ai-msg">
+            <span class="avatar avatar-sm shrink-0" aria-hidden="true">
+                <svg class="ico ico-sm" style="stroke:currentColor"><use href="#i-sparkles"></use></svg>
+            </span>
+            <div class="ai-msg__bubble">
+                What are you looking for? A room, an occasion or a budget is enough to start.
+            </div>
+        </div>
+
+        <div class="row-flex wrap gap-xs">
+            @foreach (var prompt in new[] { "Gift under ₹2,000", "Something for Diwali", "Only handmade brass" })
+            {
+                <button class="chip" type="button">@prompt</button>
+            }
+        </div>
+    </div>
+
+    <div class="drawer__foot">
+        <form class="row-flex gap-xs" onsubmit="return false">
+            <label class="sr-only" for="aiPanelInput">Ask the assistant</label>
+            <input class="input" id="aiPanelInput" type="text" placeholder="Type a message…" autocomplete="off" />
+            <button class="btn btn-primary shrink-0" type="submit" aria-label="Send">
+                <svg class="ico" aria-hidden="true"><use href="#i-send"></use></svg>
+            </button>
+        </form>
+        <p class="t-body-xs text-tertiary-c mt-xs text-center">
+            AI-generated. <a class="link" href="/help">Talk to a person instead</a>.
+        </p>
+    </div>
+</div>

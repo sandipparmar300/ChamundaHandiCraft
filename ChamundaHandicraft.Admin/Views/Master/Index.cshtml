@@ -1,4 +1,5 @@
-﻿@*
+@model PagedResult<MasterGridItem>
+@*
     Reference Data - Masters listing.  Spec: docs/Admin Flows/
 *@
 @{
@@ -50,7 +51,33 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td>@row.MasterType</td>
+                        <td><a asp-action="Edit" asp-route-id="@row.Id">@row.Name</a></td>
+                        <td>@(row.Code ?? "—")</td>
+                        <td class="text-muted">@(row.Description ?? "—")</td>
+                        <td class="text-end">@row.SortOrder</td>
+                        <td>@Money.LongDate(row.CreatedOn)</td>
+                        <td>@await Html.PartialAsync("_StatusPill", row.IsActive)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                            @* System values are referenced by the API and cannot be removed. *@
+                            @if (!row.IsSystem)
+                            {
+                                <a href="#" title="Delete" class="ms-2 text-danger"><i class="fas fa-trash"></i></a>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="8" class="text-center py-4">No master values yet. <a asp-action="Add">Add the first one</a>.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

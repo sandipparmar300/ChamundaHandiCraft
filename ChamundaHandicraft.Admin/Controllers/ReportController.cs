@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ViewModel.Admin;
+using ChamundaHandicraft.Helper.ViewModel.Common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Admin.Controllers;
 
-/// <summary>
-/// Report catalogue, saved reports and schedules. Reports are generated, never
-/// created as records, so there is no Add action.
-/// </summary>
-public class ReportController : Controller
+/// <summary>Saved and scheduled reports — sales, inventory, tax.</summary>
+public class ReportController : AdminListController<SavedReportGridItem>
 {
-    public IActionResult Index() => View();
+    public ReportController(IAdminClient client) : base(client) { }
 
-    public IActionResult Details(int id) => View();
+    protected override string Module => "Report";
 }

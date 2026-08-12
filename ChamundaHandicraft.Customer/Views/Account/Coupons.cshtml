@@ -1,0 +1,112 @@
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">My coupons</h1>
+    <p class="page-head__sub">One coupon per order. We show the saving in your cart before you pay.</p>
+</div>
+
+<div class="tabs mb-lg" role="tablist" aria-label="Coupon status" data-tabs-scope>
+    <button class="tabs__item is-active" data-tab="coupons-available" role="tab" aria-selected="true">Available (4)</button>
+    <button class="tabs__item" data-tab="coupons-used" role="tab" aria-selected="false" tabindex="-1">Used (7)</button>
+    <button class="tabs__item" data-tab="coupons-expired" role="tab" aria-selected="false" tabindex="-1">Expired (2)</button>
+</div>
+
+<div class="tab-panel is-active" id="coupons-available" role="tabpanel" style="padding-top:0">
+    <div class="stack stack-sm">
+        @foreach (var (code, title, detail, expires, eligible) in new[]
+        {
+            ("FESTIVE10", "10% off, up to ₹500", "Valid on everything.", DateTime.Today.AddDays(25), true),
+            ("WELCOME200", "₹200 off your first order", "Minimum order ₹1,500.", DateTime.Today.AddDays(60), true),
+            ("BRASS15", "15% off brass and metal", "Applies to Brass & Metal only.", DateTime.Today.AddDays(12), true),
+            ("BULK25", "25% off orders above ₹10,000", "Add ₹4,710 more to your cart to use this.", DateTime.Today.AddDays(90), false)
+        })
+        {
+            <div class="coupon-card" style="@(eligible ? "" : "opacity:.65")">
+                <div class="grow">
+                    <div class="row-flex wrap gap-sm">
+                        <span class="coupon-card__code">@code</span>
+                        <button class="icon-btn icon-btn-sm" type="button" data-copy="@code" aria-label="Copy coupon code @code">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-copy"></use></svg>
+                        </button>
+                    </div>
+                    <p class="t-heading-xs mt-xs">@title</p>
+                    <p class="t-body-sm text-secondary-c">@detail</p>
+                    <p class="t-body-xs @((expires - DateTime.Today).TotalDays <= 14 ? "text-warning-c" : "text-tertiary-c") mt-2xs">
+                        <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-clock"></use></svg>
+                        Expires @Money.LongDate(expires)
+                    </p>
+                </div>
+                <div class="shrink-0">
+                    @if (eligible)
+                    {
+                        <a class="btn btn-primary btn-sm" href="/cart">Use Now</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline btn-sm" href="/shop">Add More</a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="card card-craft mt-lg">
+        <div class="row-flex wrap gap-md between">
+            <div>
+                <p class="t-heading-xs text-craft-c">Have a code from somewhere else?</p>
+                <p class="t-body-sm text-craft-c">Add it here and it'll wait in your account until you shop.</p>
+            </div>
+            <div class="coupon-input shrink-0" style="min-width:280px">
+                <label class="sr-only" for="addCoupon">Coupon code</label>
+                <input class="input" id="addCoupon" type="text" placeholder="Enter code" />
+                <button class="btn btn-secondary shrink-0" type="button">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tab-panel" id="coupons-used" role="tabpanel" style="padding-top:0">
+    <div class="data-table table-scroll">
+        <table>
+            <caption class="sr-only">Coupons you have already used</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Code</th>
+                    <th scope="col">Saving</th>
+                    <th scope="col">Used on</th>
+                    <th scope="col">Order</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var (code, saving, date, order) in new[]
+                {
+                    ("DIWALI25", 875m, DateTime.Today.AddDays(-24), "HC-2026-000391"),
+                    ("FIRST100", 100m, DateTime.Today.AddDays(-62), "HC-2026-000287")
+                })
+                {
+                    <tr>
+                        <td class="t-mono">@code</td>
+                        <td class="tabular text-success-c">−@Money.Inr(saving)</td>
+                        <td>@Money.LongDate(date)</td>
+                        <td><a class="link t-mono" href="/account/orders/@order">@order</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="tab-panel" id="coupons-expired" role="tabpanel" style="padding-top:0">
+    <div class="state-block" style="padding-block:var(--space-2xl)">
+        <span class="state-block__icon">
+            <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-ticket-percent"></use></svg>
+        </span>
+        <h2 class="t-heading-md">2 coupons expired unused</h2>
+        <p class="state-block__desc">
+            We'll email you three days before a coupon expires so this doesn't happen again —
+            <a class="link" href="/account/preferences">turn that off</a> if you'd rather not.
+        </p>
+    </div>
+</div>

@@ -25,7 +25,7 @@ It contains **no code**. All technical references are declarative specifications
 |---------|---------------------------|--------------------------------------|
 | Audience | 9 internal operator roles | Anonymous visitors, registered customers, guests |
 | Priority | Density, speed, control | Desire, trust, clarity, conversion |
-| Design system | `Karigar DS — Admin` | `Karigar DS — Storefront` (shared primitives, different semantic layer and scale) |
+| Design system | `Chamunda DS — Admin` | `Chamunda DS — Storefront` (shared primitives, different semantic layer and scale) |
 | Shared assets | Colour primitives, icon set, spacing scale, motion tokens, illustration family | ✅ Inherited |
 | Divergent | Type scale, density, component styling, imagery weight, motion expressiveness | ✅ Redefined here |
 

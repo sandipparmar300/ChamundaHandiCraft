@@ -1,0 +1,113 @@
+@*
+    CMP-NAV-MegaMenu — panel width = container width, max height 560, elevation-3,
+    radius-lg on the bottom corners only. Column headings use `overline`,
+    items use `body-md`. Full keyboard traversal is handled in storefront.js.
+*@
+
+<div class="megamenu" id="megaShop" role="region" aria-label="Shop categories">
+    <div class="megamenu__inner">
+        <div>
+            <span class="t-overline megamenu__col-title">Home Décor</span>
+            <a class="megamenu__link" href="/c/home-decor/vases">Vases &amp; Planters</a>
+            <a class="megamenu__link" href="/c/home-decor/wall-art">Wall Art</a>
+            <a class="megamenu__link" href="/c/home-decor/lamps">Lamps &amp; Lighting</a>
+            <a class="megamenu__link" href="/c/home-decor/figurines">Figurines</a>
+            <a class="megamenu__link" href="/c/home-decor/mirrors">Mirrors &amp; Frames</a>
+            <a class="megamenu__link" href="/c/home-decor/storage">Baskets &amp; Storage</a>
+        </div>
+
+        <div>
+            <span class="t-overline megamenu__col-title">Textiles</span>
+            <a class="megamenu__link" href="/c/textiles/cushions">Cushion Covers</a>
+            <a class="megamenu__link" href="/c/textiles/throws">Throws &amp; Quilts</a>
+            <a class="megamenu__link" href="/c/textiles/table-linen">Table Linen</a>
+            <a class="megamenu__link" href="/c/textiles/rugs">Rugs &amp; Dhurries</a>
+            <a class="megamenu__link" href="/c/textiles/curtains">Curtains</a>
+            <a class="megamenu__link" href="/c/textiles/stoles">Stoles &amp; Scarves</a>
+        </div>
+
+        <div>
+            <span class="t-overline megamenu__col-title">Brass &amp; Metal</span>
+            <a class="megamenu__link" href="/c/brassware/diyas">Diyas &amp; Lamps</a>
+            <a class="megamenu__link" href="/c/brassware/urli">Urlis &amp; Bowls</a>
+            <a class="megamenu__link" href="/c/brassware/pooja">Pooja Essentials</a>
+            <a class="megamenu__link" href="/c/brassware/serveware">Serveware</a>
+            <a class="megamenu__link" href="/c/brassware/dhokra">Dhokra Art</a>
+            <a class="megamenu__link" href="/c/brassware/bells">Bells &amp; Wind Chimes</a>
+        </div>
+
+        <div>
+            <span class="t-overline megamenu__col-title">Browse by</span>
+            <a class="megamenu__link" href="/c/pottery">Pottery &amp; Ceramics</a>
+            <a class="megamenu__link" href="/c/jewellery">Jewellery</a>
+            <a class="megamenu__link" href="/c/gifting">Gifting</a>
+            <a class="megamenu__link" href="/artisans">Shop by Artisan</a>
+            <a class="megamenu__link" href="/c/craft-clusters">Craft Clusters</a>
+            <a class="megamenu__link" href="/shop">View All Products</a>
+        </div>
+
+        <a class="megamenu__feature" href="/c/blue-pottery">
+            <img src="~/assets/images/placeholders/category-5.svg"
+                 alt="Blue pottery vases and bowls arranged on a wooden shelf" loading="lazy" />
+            <span class="megamenu__feature-body">
+                <span class="t-overline" style="color:rgba(255,255,255,.86)">The collection</span>
+                <span class="t-heading-md" style="display:block;color:#fff;margin:4px 0 6px">Jaipur Blue Pottery</span>
+                <span class="t-body-sm" style="color:rgba(255,255,255,.9)">Quartz, not clay. Fired twice, painted once.</span>
+                <span class="link-standalone mt-sm" style="color:#fff">
+                    Shop the collection
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                </span>
+            </span>
+        </a>
+    </div>
+</div>
+
+<div class="megamenu" id="megaFestive" role="region" aria-label="Festive collections">
+    <div class="megamenu__inner">
+        <div>
+            <span class="t-overline megamenu__col-title">Diwali</span>
+            <a class="megamenu__link" href="/c/festive/diyas">Diyas &amp; Tea Lights</a>
+            <a class="megamenu__link" href="/c/festive/rangoli">Rangoli &amp; Torans</a>
+            <a class="megamenu__link" href="/c/festive/lanterns">Lanterns</a>
+            <a class="megamenu__link" href="/c/festive/pooja-thali">Pooja Thalis</a>
+        </div>
+
+        <div>
+            <span class="t-overline megamenu__col-title">Gift sets</span>
+            <a class="megamenu__link" href="/c/gifting/corporate">Corporate Hampers</a>
+            <a class="megamenu__link" href="/c/gifting/under-1000">Gifts under ₹1,000</a>
+            <a class="megamenu__link" href="/c/gifting/under-2500">Gifts under ₹2,500</a>
+            <a class="megamenu__link" href="/c/gifting/luxury">Luxury Gifting</a>
+        </div>
+
+        <div>
+            <span class="t-overline megamenu__col-title">Other festivals</span>
+            <a class="megamenu__link" href="/c/festive/navratri">Navratri</a>
+            <a class="megamenu__link" href="/c/festive/onam">Onam</a>
+            <a class="megamenu__link" href="/c/festive/pongal">Pongal</a>
+            <a class="megamenu__link" href="/c/festive/christmas">Christmas</a>
+        </div>
+
+        <div>
+            <span class="t-overline megamenu__col-title">Shop by price</span>
+            <a class="megamenu__link" href="/c/festive?price=0-1000">Under ₹1,000</a>
+            <a class="megamenu__link" href="/c/festive?price=1000-2500">₹1,000 – ₹2,500</a>
+            <a class="megamenu__link" href="/c/festive?price=2500-5000">₹2,500 – ₹5,000</a>
+            <a class="megamenu__link" href="/c/festive?price=5000-">Above ₹5,000</a>
+        </div>
+
+        <a class="megamenu__feature" href="/c/festive">
+            <img src="~/assets/images/placeholders/banner-festive.svg"
+                 alt="Brass diyas lit in a row against a dark background" loading="lazy" />
+            <span class="megamenu__feature-body">
+                <span class="t-overline" style="color:rgba(255,255,255,.86)">Festive 2026</span>
+                <span class="t-heading-md" style="display:block;color:#fff;margin:4px 0 6px">Light for the season</span>
+                <span class="t-body-sm" style="color:rgba(255,255,255,.9)">Hand-cast brass, sand-moulded in Moradabad.</span>
+                <span class="link-standalone mt-sm" style="color:#fff">
+                    Explore festive
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                </span>
+            </span>
+        </a>
+    </div>
+</div>

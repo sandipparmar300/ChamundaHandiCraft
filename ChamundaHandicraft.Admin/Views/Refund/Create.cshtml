@@ -1,4 +1,5 @@
-﻿@{
+@model RefundGridItem
+@{
     ViewData["Title"] = "Refund";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Refund" : "Add Refund";
@@ -23,7 +24,7 @@
 
     <form method="post" id="refundForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -34,19 +35,19 @@
                 <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Refund Number <span class="req">*</span></label>
-                        <input id="RefundNumber" name="RefundNumber" class="form-control-custom" placeholder="Enter refund number" />
+                        <input id="RefundNumber" name="RefundNumber" class="form-control-custom" placeholder="Enter refund number" / value="@Model.RefundNumber" >
                         <span class="error-msg" data-valmsg-for="RefundNumber"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Order Number <span class="req">*</span></label>
-                        <input id="OrderNumber" name="OrderNumber" class="form-control-custom" placeholder="Enter order number" />
+                        <input id="OrderNumber" name="OrderNumber" class="form-control-custom" placeholder="Enter order number" / value="@Model.OrderNumber" >
                         <span class="error-msg" data-valmsg-for="OrderNumber"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Amount <span class="req">*</span></label>
-                        <input id="Amount" name="Amount" class="form-control-custom" placeholder="0.00" />
+                        <input id="Amount" name="Amount" class="form-control-custom" placeholder="0.00" / value="@Model.Amount" >
                         <span class="error-msg" data-valmsg-for="Amount"></span>
                     </div>
 

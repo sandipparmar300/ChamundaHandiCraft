@@ -1,0 +1,112 @@
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">Profile</h1>
+    <p class="page-head__sub">Your name, contact details and how we address you.</p>
+</div>
+
+<section class="card">
+    <form data-validate>
+        <div class="row-flex gap-md mb-lg">
+            <span class="avatar avatar-xl">A</span>
+            <div>
+                <p class="t-heading-xs">Profile photo</p>
+                <p class="t-body-sm text-secondary-c">Optional. JPG or PNG, up to 2 MB.</p>
+                <div class="row-flex gap-xs mt-sm">
+                    <button class="btn btn-outline btn-sm" type="button">
+                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-upload"></use></svg>
+                        Upload
+                    </button>
+                    <button class="btn btn-ghost btn-sm" type="button">Remove</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+            <div class="field">
+                <label class="field__label" for="profFirst">First name</label>
+                <input class="input" id="profFirst" type="text" value="Ananya" required autocomplete="given-name" />
+                <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+            </div>
+
+            <div class="field" style="margin-top:0">
+                <label class="field__label" for="profLast">Last name</label>
+                <input class="input" id="profLast" type="text" value="Iyer" autocomplete="family-name" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="field__label" for="profEmail">Email address</label>
+            <div class="input-group has-suffix">
+                <input class="input" id="profEmail" type="email" value="ananya@example.com" required
+                       autocomplete="email" style="padding-left:12px" />
+                <span class="input-group__suffix">
+                    <span class="tag tag-success">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-badge-check"></use></svg>
+                        Verified
+                    </span>
+                </span>
+            </div>
+            <p class="field__help">Changing this sends a verification link to the new address.</p>
+        </div>
+
+        <div class="field">
+            <label class="field__label" for="profPhone">Mobile number</label>
+            <div class="phone-input">
+                <select class="select" aria-label="Country code"><option selected>+91</option></select>
+                <input class="input" id="profPhone" type="tel" value="98765 43210" autocomplete="tel" inputmode="numeric" />
+            </div>
+            <p class="field__help text-warning-c">
+                <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-triangle-alert"></use></svg>
+                Not verified — <a class="link" href="/verify-mobile">verify to enable cash on delivery</a>
+            </p>
+        </div>
+
+        <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+            <div class="field">
+                <label class="field__label" for="profDob">
+                    Date of birth <span class="field__optional">(optional)</span>
+                </label>
+                <input class="input" id="profDob" type="date" />
+                <p class="field__help">We send a birthday coupon. Nothing else.</p>
+            </div>
+
+            <div class="field" style="margin-top:0">
+                <label class="field__label" for="profLang">Preferred language</label>
+                <select class="select" id="profLang">
+                    <option selected>English</option>
+                    <option>हिन्दी (Hindi)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row-flex gap-sm mt-xl">
+            <button class="btn btn-primary" type="submit">
+                <span class="btn__spinner" aria-hidden="true"></span>
+                <span class="btn__label">Save Changes</span>
+            </button>
+            <button class="btn btn-ghost" type="reset">Cancel</button>
+        </div>
+    </form>
+</section>
+
+<section class="card mt-md">
+    <h2 class="t-heading-md mb-sm">GST details for business orders</h2>
+    <p class="t-body-sm text-secondary-c mb-md">
+        Add a GSTIN and we'll put it on every invoice so you can claim input credit.
+    </p>
+    <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+        <div class="field">
+            <label class="field__label" for="gstin">GSTIN</label>
+            <input class="input" id="gstin" type="text" placeholder="08AABCK1234M1Z5" maxlength="15"
+                   style="text-transform:uppercase" />
+        </div>
+        <div class="field" style="margin-top:0">
+            <label class="field__label" for="gstBusiness">Registered business name</label>
+            <input class="input" id="gstBusiness" type="text" placeholder="Iyer Interiors Pvt. Ltd." />
+        </div>
+    </div>
+    <button class="btn btn-outline mt-md" type="button">Save GST Details</button>
+</section>

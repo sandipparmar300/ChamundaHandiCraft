@@ -1,0 +1,208 @@
+@model ListingViewModel
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+    var hasQuery = !string.IsNullOrEmpty(Model.Query);
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    @* ---- Inline search field, pre-filled and focusable ---- *@
+    <div class="page-head">
+        <form class="search-bar search-bar-lg" action="/search" method="get" role="search" style="max-width:640px">
+            <label class="sr-only" for="plpSearch">Search products</label>
+            <svg class="ico search-bar__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input class="search-bar__input" id="plpSearch" name="q" type="search"
+                   value="@Model.Query" placeholder="Search for pottery, diyas, cushions…" autocomplete="off" />
+        </form>
+    </div>
+
+    @if (!hasQuery)
+    {
+        @* ---- Empty query: a browse surface, never an error ---- *@
+        <div class="band-sm">
+            <h1 class="t-heading-lg mb-md">What are you looking for?</h1>
+
+            <div class="stack stack-lg">
+                <div>
+                    <span class="t-overline">Trending searches</span>
+                    <div class="row-flex wrap gap-xs mt-xs">
+                        @foreach (var term in new[] { "diwali gifts", "blue pottery", "kantha cushion", "brass diya", "marble inlay", "dhokra", "block print" })
+                        {
+                            <a class="chip" href="/search?q=@Uri.EscapeDataString(term)">
+                                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-flame"></use></svg>
+                                @term
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <div>
+                    <span class="t-overline">Browse by category</span>
+                    <div class="cat-grid mt-xs">
+                        @foreach (var category in DemoContent.Categories())
+                        {
+                            <a class="cat-tile" href="@category.Url">
+                                <img src="@category.ImageUrl" alt="@category.Name" loading="lazy" width="480" height="360" />
+                                <span class="cat-tile__body">
+                                    <span class="cat-tile__title">@category.Name</span>
+                                    <span class="cat-tile__count">@category.ProductCount pieces</span>
+                                </span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.Products.Count == 0)
+    {
+        @* ---- STA-13 · No results. Explain, don't block: always offer a next step. ---- *@
+        <div class="state-block">
+            <span class="state-block__icon">
+                <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-search"></use></svg>
+            </span>
+            <h1 class="t-heading-md">No results for “@Model.Query”</h1>
+            <p class="state-block__desc">
+                We couldn't find a match. Check the spelling, use fewer words, or try one of these instead.
+            </p>
+
+            <div class="row-flex wrap center gap-xs mt-sm">
+                @foreach (var term in new[] { "pottery", "brass", "cushion covers", "wall art" })
+                {
+                    <a class="chip" href="/search?q=@Uri.EscapeDataString(term)">@term</a>
+                }
+            </div>
+
+            <div class="state-block__actions">
+                <a class="btn btn-primary" href="/shop">Browse all products</a>
+                <a class="btn btn-outline" href="/help">Ask us to find it</a>
+            </div>
+        </div>
+
+        <section class="band-sm">
+            @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+            {
+                Heading = "Popular right now",
+                SubHeading = "Where most shoppers start.",
+                ViewAllUrl = "/shop",
+                Products = DemoContent.Products(6)
+            })
+        </section>
+    }
+    else
+    {
+        <div class="page-head" style="padding-top:0">
+            <h1 class="t-heading-xl page-head__title">
+                <span class="tabular">@Model.TotalCount</span> results for “@Model.Query”
+            </h1>
+            @if (Model.CorrectedFrom is not null)
+            {
+                <p class="page-head__sub">
+                    Showing results for <strong>@Model.Query</strong>.
+                    <a class="link" href="/search?q=@Model.CorrectedFrom&amp;exact=1">Search instead for “@Model.CorrectedFrom”</a>
+                </p>
+            }
+        </div>
+
+        @* ---- Cross-entity matches: categories and artisans surface above the grid ---- *@
+        <div class="row-flex wrap gap-xs mb-md">
+            <span class="t-body-sm text-secondary-c">Also in</span>
+            <a class="chip" href="/c/pottery">Pottery &amp; Ceramics <span class="text-tertiary-c">216</span></a>
+            <a class="chip" href="/artisans/ram-prasad-sharma">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                Ram Prasad Sharma
+            </a>
+            <a class="chip" href="/blog?q=@Model.Query">3 stories</a>
+        </div>
+
+        <div class="filter-bar-mobile">
+            <button class="btn btn-outline btn-sm grow" type="button" data-open="filterSheet">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-filter"></use></svg>
+                Filters
+            </button>
+            <button class="btn btn-outline btn-sm grow" type="button" data-open="sortSheet">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-sort"></use></svg>
+                Sort
+            </button>
+        </div>
+
+        <div class="layout-rail-grid">
+            <aside class="hide-tablet-down sticky-col" aria-label="Filters">
+                @await Html.PartialAsync("_FilterRail")
+            </aside>
+
+            <div>
+                <div class="plp-toolbar">
+                    <p class="t-body-md">
+                        <strong class="tabular" aria-live="polite">@Model.TotalCount</strong>
+                        <span class="text-secondary-c">products</span>
+                    </p>
+                    <div class="sort-select hide-tablet-down">
+                        <label class="t-body-sm text-secondary-c" for="searchSort">Sort by</label>
+                        <select class="select" id="searchSort">
+                            <option value="relevance" selected>Relevance</option>
+                            <option value="popularity">Popularity</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="rating">Rating</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pgrid">
+                    @foreach (var product in Model.Products)
+                    {
+                        @await Html.PartialAsync("_ProductCard", product)
+                    }
+                </div>
+
+                <div class="load-more mt-2xl">
+                    <button class="btn btn-outline btn-lg" type="button">
+                        <span class="btn__spinner" aria-hidden="true"></span>
+                        <span class="btn__label">Load More (@Model.Products.Count of @Model.TotalCount)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="sheet" id="filterSheet" role="dialog" aria-modal="true" aria-label="Filters" aria-hidden="true" data-scrim="globalScrim">
+    <div class="sheet__handle"></div>
+    <div class="sheet__head">
+        <button class="icon-btn" data-close aria-label="Close filters">
+            <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+        <h2 class="t-heading-md">Filters</h2>
+        <button class="btn btn-link btn-sm" type="button">Clear all</button>
+    </div>
+    <div class="sheet__body">
+        @await Html.PartialAsync("_FilterRail")
+    </div>
+    <div class="sheet__foot">
+        <button class="btn btn-primary btn-xl btn-block" type="button" data-close>Show @Model.TotalCount products</button>
+    </div>
+</div>
+
+<div class="sheet" id="sortSheet" role="dialog" aria-modal="true" aria-label="Sort products" aria-hidden="true" data-scrim="globalScrim">
+    <div class="sheet__handle"></div>
+    <div class="sheet__head">
+        <h2 class="t-heading-md">Sort by</h2>
+        <button class="icon-btn" data-close aria-label="Close sort options">
+            <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+    </div>
+    <div class="sheet__body">
+        @foreach (var label in new[] { "Relevance", "Popularity", "Price: Low to High", "Price: High to Low", "Rating" })
+        {
+            <label class="check" style="min-height:48px;align-items:center">
+                <input type="radio" name="mobileSearchSort" checked="@(label == "Relevance")" />
+                <span class="check__label">@label</span>
+            </label>
+        }
+    </div>
+</div>

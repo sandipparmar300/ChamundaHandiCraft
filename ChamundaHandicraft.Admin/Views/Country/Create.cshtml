@@ -1,4 +1,5 @@
-﻿@{
+@model CountryGridItem
+@{
     ViewData["Title"] = "Country";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Country" : "Add Country";
@@ -23,7 +24,7 @@
 
     <form method="post" id="countryForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -43,7 +44,7 @@
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Country Name <span class="req">*</span></label>
-                        <input id="CountryName" name="CountryName" class="form-control-custom" placeholder="Enter country name" />
+                        <input id="CountryName" name="CountryName" class="form-control-custom" placeholder="Enter country name" / value="@Model.CountryName" >
                         <span class="error-msg" data-valmsg-for="CountryName"></span>
                     </div>
 
@@ -55,19 +56,19 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Dial Code</label>
-                        <input id="DialCode" name="DialCode" class="form-control-custom" placeholder="Enter dial code" />
+                        <input id="DialCode" name="DialCode" class="form-control-custom" placeholder="Enter dial code" / value="@Model.DialCode" >
                         <span class="error-msg" data-valmsg-for="DialCode"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Currency</label>
-                        <input id="Currency" name="Currency" class="form-control-custom" placeholder="Enter currency" />
+                        <input id="Currency" name="Currency" class="form-control-custom" placeholder="Enter currency" / value="@Model.Currency" >
                         <span class="error-msg" data-valmsg-for="Currency"></span>
                     </div>
 
                     <div class="col-lg-12 col-md-6">
                         <label class="form-label-custom">Description</label>
-                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description"></textarea>
+                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description">@Model.Description</textarea>
                         <span class="error-msg" data-valmsg-for="Description"></span>
                     </div>
                 </div>

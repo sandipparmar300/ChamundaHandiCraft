@@ -1,0 +1,108 @@
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">Refer a friend</h1>
+    <p class="page-head__sub">They get ₹200 off their first order. You get 200 points when it ships.</p>
+</div>
+
+<section class="card card-craft">
+    <div class="layout-halves" style="align-items:center">
+        <div>
+            <span class="t-overline text-craft-c">Your code</span>
+            <p class="t-display-lg text-craft-c mt-xs" style="letter-spacing:.06em">ANANYA200</p>
+
+            <div class="row-flex wrap gap-xs mt-md">
+                <button class="btn btn-secondary" type="button" data-copy="ANANYA200">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-copy"></use></svg>
+                    Copy Code
+                </button>
+                <a class="btn btn-outline" href="https://wa.me/?text=Use%20ANANYA200%20for%20%E2%82%B9200%20off%20at%20chamundahandicraft.com" rel="noopener">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+                    Share on WhatsApp
+                </a>
+                <button class="btn btn-ghost" type="button" data-copy="https://chamundahandicraft.com/r/ANANYA200">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-share"></use></svg>
+                    Copy Link
+                </button>
+            </div>
+        </div>
+
+        <div class="stack stack-sm">
+            <div class="row-flex gap-sm">
+                <span class="stepper__node" style="background:var(--terracotta-500);border-color:var(--terracotta-500);color:#fff">1</span>
+                <span class="t-body-md text-craft-c">Share your code with a friend</span>
+            </div>
+            <div class="row-flex gap-sm">
+                <span class="stepper__node" style="background:var(--terracotta-500);border-color:var(--terracotta-500);color:#fff">2</span>
+                <span class="t-body-md text-craft-c">They get ₹200 off an order above ₹1,500</span>
+            </div>
+            <div class="row-flex gap-sm">
+                <span class="stepper__node" style="background:var(--terracotta-500);border-color:var(--terracotta-500);color:#fff">3</span>
+                <span class="t-body-md text-craft-c">You get 200 points once it ships</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="stat-grid mt-md">
+    <div class="stat-tile">
+        <p class="stat-tile__value">7</p>
+        <p class="stat-tile__label">Invites sent</p>
+    </div>
+    <div class="stat-tile">
+        <p class="stat-tile__value">3</p>
+        <p class="stat-tile__label">Friends joined</p>
+    </div>
+    <div class="stat-tile">
+        <p class="stat-tile__value">2</p>
+        <p class="stat-tile__label">Orders placed</p>
+    </div>
+    <div class="stat-tile">
+        <p class="stat-tile__value">400</p>
+        <p class="stat-tile__label">Points earned</p>
+    </div>
+</div>
+
+<section class="card mt-md">
+    <h2 class="t-heading-md mb-md">Your referrals</h2>
+    <div class="data-table table-scroll">
+        <table>
+            <caption class="sr-only">People who used your referral code</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Friend</th>
+                    <th scope="col">Joined</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">You earned</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>P••••a S.</td>
+                    <td>@Money.LongDate(DateTime.Today.AddDays(-18))</td>
+                    <td><span class="status-chip status-chip--delivered"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-check"></use></svg> Order shipped</span></td>
+                    <td class="tabular text-success-c">+200 points</td>
+                </tr>
+                <tr>
+                    <td>R••••l M.</td>
+                    <td>@Money.LongDate(DateTime.Today.AddDays(-9))</td>
+                    <td><span class="status-chip status-chip--delivered"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-check"></use></svg> Order shipped</span></td>
+                    <td class="tabular text-success-c">+200 points</td>
+                </tr>
+                <tr>
+                    <td>S••••a K.</td>
+                    <td>@Money.LongDate(DateTime.Today.AddDays(-3))</td>
+                    <td><span class="status-chip status-chip--placed"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-clock"></use></svg> Hasn't ordered yet</span></td>
+                    <td class="text-tertiary-c">—</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p class="t-body-xs text-tertiary-c mt-sm">
+        Names are partly hidden to protect your friends' privacy. Points arrive once their order ships,
+        and are reversed if it is fully returned. <a class="link" href="/pages/terms">Full terms</a>.
+    </p>
+</section>

@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ViewModel.Admin;
+using ChamundaHandicraft.Helper.ViewModel.Common;
+using ChamundaHandicraft.Helper.ViewModel.Customer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Admin.Controllers;
 
-/// <summary>
-/// View shell for the Audit Log screens. Each action renders markup only â€”
-/// the ApiService calls and view models arrive with the API wiring.
-/// </summary>
-public class AuditLogController : Controller
+/// <summary>Who changed what, and when. Read-only — these records are created by the system, not an operator.</summary>
+public class AuditLogController : AdminListController<AuditLogGridItem>
 {
-    public IActionResult Index() => View();
+    public AuditLogController(IAdminClient client) : base(client) { }
 
-    public IActionResult Details(int id) => View();
+    protected override string Module => "AuditLog";
 }

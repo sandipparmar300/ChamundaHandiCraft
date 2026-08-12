@@ -1,4 +1,5 @@
-﻿@{
+@model CourierGridItem
+@{
     ViewData["Title"] = "Courier";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Courier" : "Add Courier";
@@ -23,7 +24,7 @@
 
     <form method="post" id="courierForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -43,7 +44,7 @@
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Courier Name <span class="req">*</span></label>
-                        <input id="CourierName" name="CourierName" class="form-control-custom" placeholder="Enter courier name" />
+                        <input id="CourierName" name="CourierName" class="form-control-custom" placeholder="Enter courier name" / value="@Model.CourierName" >
                         <span class="error-msg" data-valmsg-for="CourierName"></span>
                     </div>
 

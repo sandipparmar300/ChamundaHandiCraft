@@ -1,0 +1,204 @@
+@{
+    Layout = "_AccountLayout";
+    var orderNumber = ViewData["OrderNumber"] as string ?? "HC-2026-000482";
+    var lines = DemoContent.CartLines();
+}
+
+<div class="page-head" style="padding-top:0">
+    <a class="btn btn-ghost btn-sm mb-xs" href="/account/orders/@orderNumber" style="min-width:0;padding-inline:0">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+        Back to order
+    </a>
+    <h1 class="t-heading-xl page-head__title">Return or replace</h1>
+    <p class="page-head__sub">
+        Order <span class="t-mono">@orderNumber</span> ·
+        You have 4 days left of the 7-day window.
+    </p>
+</div>
+
+@* PG-11-04 · three-step return request *@
+<nav class="mb-lg" aria-label="Return progress">
+    <ol class="stepper">
+        <li class="stepper__step is-current">
+            <span class="stepper__node">1</span>
+            <span class="stepper__label">Choose items</span>
+            <span class="stepper__bar"></span>
+        </li>
+        <li class="stepper__step">
+            <span class="stepper__node">2</span>
+            <span class="stepper__label">Reason</span>
+            <span class="stepper__bar"></span>
+        </li>
+        <li class="stepper__step" style="flex:0 0 auto">
+            <span class="stepper__node">3</span>
+            <span class="stepper__label">Pickup</span>
+        </li>
+    </ol>
+</nav>
+
+@* Sets expectations before the shopper invests effort. *@
+<div class="alert alert-craft mb-md">
+    <svg class="ico" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+    <div>
+        <p class="alert__title">Before you start</p>
+        <p>
+            Small differences in colour, finish and size are how handmade pieces are — those aren't
+            defects and we'd rather explain than have you send a good piece back.
+            <a class="link" href="#" data-open="variationModal">See what normal variation looks like</a>.
+            Damage, wrong item or a genuine fault: absolutely return it, we pay the courier.
+        </p>
+    </div>
+</div>
+
+<form data-validate>
+    <section class="card mb-md">
+        <h2 class="t-heading-md mb-md">Which items?</h2>
+
+        <div class="stack stack-sm">
+            @foreach (var line in lines)
+            {
+                <label class="select-card">
+                    <input type="checkbox" style="width:20px;height:20px;margin-top:2px;flex-shrink:0" />
+                    <img class="img-product shrink-0" src="@line.ImageUrl" alt="" width="64" height="64"
+                         style="width:64px;height:64px;border-radius:var(--radius-md);object-fit:cover" />
+                    <span class="grow">
+                        <span class="t-body-md" style="display:block;font-weight:500">@line.Name</span>
+                        <span class="t-body-sm text-secondary-c">@line.VariantSummary · Qty @line.Quantity</span>
+                        <span class="t-body-sm tabular" style="display:block;font-weight:600;margin-top:4px">@Money.Inr(line.LineTotal)</span>
+                    </span>
+                    <span class="shrink-0">
+                        <label class="sr-only" for="qty-@line.Sku">Quantity to return</label>
+                        <select class="select" id="qty-@line.Sku" style="width:88px">
+                            @for (var q = 1; q <= line.Quantity; q++)
+                            {
+                                <option>@q</option>
+                            }
+                        </select>
+                    </span>
+                </label>
+            }
+        </div>
+    </section>
+
+    <section class="card mb-md">
+        <h2 class="t-heading-md mb-md">What went wrong?</h2>
+
+        <div class="stack stack-xs">
+            @foreach (var (reason, help) in new[]
+            {
+                ("Arrived damaged or broken", "We'll replace it or refund immediately — no return needed for breakage."),
+                ("Wrong item received", "We'll send the right one and collect this at no cost."),
+                ("Item doesn't match the description", "Tell us which part, so we can fix the listing."),
+                ("Quality isn't what I expected", "Photos help us judge whether it's variation or a fault."),
+                ("Size doesn't suit my space", "Free return. We'll also suggest a size that fits."),
+                ("I changed my mind", "Free return within 7 days, no explanation needed.")
+            })
+            {
+                <label class="check" style="padding:var(--space-xs);border-radius:var(--radius-md)">
+                    <input type="radio" name="returnReason" required />
+                    <span class="check__label">
+                        @reason
+                        <span class="check__help">@help</span>
+                    </span>
+                </label>
+            }
+        </div>
+
+        <div class="field mt-md">
+            <label class="field__label" for="returnNotes">
+                Tell us more <span class="field__optional">(optional)</span>
+            </label>
+            <textarea class="textarea" id="returnNotes" rows="3"
+                      placeholder="Anything that would help us understand — it goes to the artisan too."></textarea>
+        </div>
+
+        <div class="field">
+            <span class="field__label">Photos <span class="field__optional">(optional, up to 5)</span></span>
+            <div class="upload">
+                <svg class="ico ico-2xl text-tertiary-c mx-auto mb-sm" aria-hidden="true"><use href="#i-camera"></use></svg>
+                <p class="t-body-md">Drop photos here, or tap to choose</p>
+                <p class="t-body-xs text-tertiary-c mt-2xs">JPG or PNG, up to 5 MB each. Photos speed up damage claims considerably.</p>
+                <input type="file" accept="image/*" multiple class="sr-only" />
+            </div>
+        </div>
+    </section>
+
+    <section class="card mb-md">
+        <h2 class="t-heading-md mb-md">What would you like?</h2>
+
+        <div class="stack stack-sm" role="radiogroup" aria-label="Resolution">
+            <label class="select-card is-selected" data-group="resolution">
+                <input type="radio" name="resolution" checked
+                       style="appearance:none;width:20px;height:20px;border:6px solid var(--color-action-primary-bg);border-radius:50%;margin-top:2px;flex-shrink:0" />
+                <span class="grow">
+                    <strong class="t-body-md" style="display:block">Refund to my original payment method</strong>
+                    <span class="t-body-sm text-secondary-c">
+                        @Money.Inr(1250) back to your UPI, within 5 working days of us receiving the item.
+                    </span>
+                </span>
+            </label>
+
+            <label class="select-card" data-group="resolution">
+                <input type="radio" name="resolution"
+                       style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
+                <span class="grow">
+                    <strong class="t-body-md" style="display:block">Replace with the same piece</strong>
+                    <span class="t-body-sm text-secondary-c">
+                        A fresh one ships as soon as we collect this. No extra cost.
+                    </span>
+                </span>
+            </label>
+
+            <label class="select-card" data-group="resolution">
+                <input type="radio" name="resolution"
+                       style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
+                <span class="grow">
+                    <span class="row-flex between gap-sm">
+                        <strong class="t-body-md">Store credit</strong>
+                        <span class="tag tag-brass">+10% bonus</span>
+                    </span>
+                    <span class="t-body-sm text-secondary-c">
+                        @Money.Inr(1375) as credit, available the moment we collect. Never expires.
+                    </span>
+                </span>
+            </label>
+        </div>
+    </section>
+
+    <section class="card mb-md">
+        <h2 class="t-heading-md mb-md">Pickup</h2>
+        @{
+            var address = DemoContent.Addresses().First(a => a.IsDefault);
+        }
+        <p class="t-body-md">
+            <strong>@address.FullName</strong><br />
+            <span class="text-secondary-c">@address.OneLine</span>
+        </p>
+        <button class="btn btn-link btn-sm mt-xs" type="button">Pick up from a different address</button>
+
+        <div class="field mt-md">
+            <label class="field__label" for="pickupSlot">Preferred pickup day</label>
+            <select class="select" id="pickupSlot" style="max-width:320px">
+                <option>@Money.DeliveryDate(DateTime.Today.AddDays(1)) · 10am–6pm</option>
+                <option>@Money.DeliveryDate(DateTime.Today.AddDays(2)) · 10am–6pm</option>
+                <option>@Money.DeliveryDate(DateTime.Today.AddDays(3)) · 10am–6pm</option>
+            </select>
+            <p class="field__help">Keep the original packaging if you still have it — otherwise any box is fine.</p>
+        </div>
+    </section>
+
+    <div class="row-flex wrap gap-sm">
+        <button class="btn btn-primary btn-lg" type="submit">
+            <span class="btn__spinner" aria-hidden="true"></span>
+            <span class="btn__label">Request Return</span>
+        </button>
+        <a class="btn btn-ghost btn-lg" href="/account/orders/@orderNumber">Cancel</a>
+    </div>
+
+    <p class="t-body-xs text-tertiary-c mt-md">
+        We pay the return courier. Refunds start the day the item reaches our studio and land within
+        5 working days. <a class="link" href="/pages/return-policy">Full return policy</a>.
+    </p>
+</form>
+
+@await Html.PartialAsync("_QuickView", DemoContent.Products(1)[0])

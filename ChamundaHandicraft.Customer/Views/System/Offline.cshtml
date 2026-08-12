@@ -1,0 +1,42 @@
+@{
+    Layout = "_Layout";
+    ViewData["HideChrome"] = true;
+}
+
+<div class="container-narrow" style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-block:var(--space-2xl)">
+
+    <a class="header-logo mx-auto mb-2xl" href="/">
+        @await Html.PartialAsync("_Logo", "auto")
+    </a>
+
+    <div class="text-center">
+        <span class="state-block__icon mx-auto">
+            <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+        </span>
+
+        <h1 class="t-display-lg mt-md">You're offline</h1>
+        <p class="t-body-lg text-secondary-c mt-sm">
+            We can't reach the network right now. Your cart is saved on this device and will sync
+            the moment you're back.
+        </p>
+
+        <div class="row-flex center wrap gap-sm mt-lg">
+            <button class="btn btn-primary btn-lg" type="button" onclick="location.reload()">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"></use></svg>
+                Try Again
+            </button>
+        </div>
+
+        <div class="card mt-xl text-left">
+            <p class="t-heading-xs mb-sm">Available offline</p>
+            <div class="stack stack-2xs">
+                <a class="link-muted t-body-sm" href="/cart">Your cart</a>
+                <a class="link-muted t-body-sm" href="/wishlist">Your wishlist</a>
+                <a class="link-muted t-body-sm" href="/account/orders">Recent orders (cached)</a>
+            </div>
+            <p class="t-body-xs text-tertiary-c mt-sm">
+                Cached from your last visit — prices and stock may have changed since.
+            </p>
+        </div>
+    </div>
+</div>

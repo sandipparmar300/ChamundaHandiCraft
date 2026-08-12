@@ -1,3 +1,4 @@
+@model ProductSaveRequest
 @*
     Module 03 - Create / Edit Product.  Spec: docs/Admin Flows/Product.txt §4-9
     Tabbed form (L-02): General, Classification, Pricing, Inventory, Media,
@@ -28,7 +29,7 @@
 
     <form method="post" id="productForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-body">
@@ -51,33 +52,33 @@
                         <div class="row g-3">
                             <div class="col-lg-4 col-md-6">
                                 <label class="form-label-custom">Product Name <span class="req">*</span></label>
-                                <input id="Name" name="Name" class="form-control-custom" placeholder="Enter product name" onkeyup="buildSlug()" />
+                                <input id="Name" name="Name" class="form-control-custom" placeholder="Enter product name" onkeyup="buildSlug()" / value="@Model.Name" >
                                 <span class="error-msg" data-valmsg-for="Name"></span>
                             </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <label class="form-label-custom">Product Code <span class="req">*</span></label>
-                                <input id="ProductCode" name="ProductCode" class="form-control-custom" placeholder="Unique product code" />
+                                <input id="ProductCode" name="ProductCode" class="form-control-custom" placeholder="Unique product code" / value="@Model.ProductCode" >
                             </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <label class="form-label-custom">SKU <span class="req">*</span></label>
-                                <input id="Sku" name="Sku" class="form-control-custom" placeholder="Unique SKU" />
+                                <input id="Sku" name="Sku" class="form-control-custom" placeholder="Unique SKU" / value="@Model.Sku" >
                             </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <label class="form-label-custom">Barcode</label>
-                                <input id="Barcode" name="Barcode" class="form-control-custom" placeholder="EAN / UPC" />
+                                <input id="Barcode" name="Barcode" class="form-control-custom" placeholder="EAN / UPC" / value="@Model.Barcode" >
                             </div>
 
                             <div class="col-lg-8 col-md-6">
                                 <label class="form-label-custom">Slug (SEO URL)</label>
-                                <input id="Slug" name="Slug" class="form-control-custom" placeholder="auto-generated-from-name" />
+                                <input id="Slug" name="Slug" class="form-control-custom" placeholder="auto-generated-from-name" / value="@Model.Slug" >
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label-custom">Short Description</label>
-                                <textarea id="ShortDescription" name="ShortDescription" class="form-control-custom" rows="2" placeholder="One or two lines shown on listing cards"></textarea>
+                                <textarea id="ShortDescription" name="ShortDescription" class="form-control-custom" rows="2" placeholder="One or two lines shown on listing cards">@Model.ShortDescription</textarea>
                             </div>
 
                             <div class="col-12">
@@ -87,12 +88,12 @@
 
                             <div class="col-lg-6">
                                 <label class="form-label-custom">Product Story (Handmade Story)</label>
-                                <textarea id="ProductStory" name="ProductStory" class="form-control-custom" rows="4" placeholder="The story behind this piece"></textarea>
+                                <textarea id="ProductStory" name="ProductStory" class="form-control-custom" rows="4" placeholder="The story behind this piece">@Model.ProductStory</textarea>
                             </div>
 
                             <div class="col-lg-3">
                                 <label class="form-label-custom">Care Instructions</label>
-                                <textarea id="CareInstructions" name="CareInstructions" class="form-control-custom" rows="4"></textarea>
+                                <textarea id="CareInstructions" name="CareInstructions" class="form-control-custom" rows="4">@Model.CareInstructions</textarea>
                             </div>
 
                             <div class="col-lg-3">
@@ -151,7 +152,7 @@
                         <div class="row g-3">
                             <div class="col-lg-3 col-md-6">
                                 <label class="form-label-custom">Cost Price</label>
-                                <input id="CostPrice" name="CostPrice" class="form-control-custom" placeholder="0.00" onkeyup="calcMargin()" />
+                                <input id="CostPrice" name="CostPrice" class="form-control-custom" placeholder="0.00" onkeyup="calcMargin()" / value="@Model.CostPrice" >
                             </div>
                             <div class="col-lg-3 col-md-6">
                                 <label class="form-label-custom">Selling Price <span class="req">*</span></label>
@@ -159,7 +160,7 @@
                             </div>
                             <div class="col-lg-3 col-md-6">
                                 <label class="form-label-custom">MRP</label>
-                                <input id="Mrp" name="Mrp" class="form-control-custom" placeholder="0.00" />
+                                <input id="Mrp" name="Mrp" class="form-control-custom" placeholder="0.00" / value="@Model.Mrp" >
                             </div>
                             <div class="col-lg-3 col-md-6">
                                 <label class="form-label-custom">Profit Margin</label>
@@ -215,7 +216,7 @@
                             </div>
                             <div class="col-lg-3 col-md-6">
                                 <label class="form-label-custom">Low Stock Threshold</label>
-                                <input id="LowStockThreshold" name="LowStockThreshold" class="form-control-custom" placeholder="0" />
+                                <input id="LowStockThreshold" name="LowStockThreshold" class="form-control-custom" placeholder="0" / value="@Model.LowStockThreshold" >
                             </div>
                             <div class="col-lg-3 col-md-6">
                                 <label class="form-label-custom">Reorder Quantity</label>
@@ -309,7 +310,7 @@
                                         <th style="min-width:80px;">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody></tbody>
+                                <tbody><tr><td colspan="8" class="text-center py-4">No variants yet. Add one to sell this product in more than one size or colour.</td></tr></tbody>
                             </table>
                         </div>
                     </div>
@@ -397,7 +398,7 @@
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Publish On</label>
-                        <input type="datetime-local" id="PublishOn" name="PublishOn" class="form-control-custom" />
+                        <input type="datetime-local" id="PublishOn" name="PublishOn" class="form-control-custom" / value="@Model.PublishOn" >
                     </div>
 
                     <div class="col-lg-6">

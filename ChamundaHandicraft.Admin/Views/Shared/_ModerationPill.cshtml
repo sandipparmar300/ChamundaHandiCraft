@@ -1,0 +1,16 @@
+@model ModerationStatus
+@*
+    Moderation state. Approved is the only value the storefront renders — everything
+    else stays hidden from shoppers.
+*@
+@{
+    var (css, label) = Model switch
+    {
+        ModerationStatus.Approved => ("bg-success", "Approved"),
+        ModerationStatus.Pending => ("bg-warning text-dark", "Pending"),
+        ModerationStatus.Rejected => ("bg-secondary", "Rejected"),
+        ModerationStatus.Spam => ("bg-danger", "Spam"),
+        _ => ("bg-secondary", Model.ToString())
+    };
+}
+<span class="badge @css">@label</span>

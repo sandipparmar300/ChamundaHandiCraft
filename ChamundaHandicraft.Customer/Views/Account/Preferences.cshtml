@@ -1,0 +1,101 @@
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">Communication preferences</h1>
+    <p class="page-head__sub">
+        Choose what we send and where. Order and delivery messages are transactional —
+        you'll always get those.
+    </p>
+</div>
+
+<section class="card">
+    <h2 class="t-heading-md mb-md">Marketing</h2>
+
+    <div class="stack stack-md">
+        @foreach (var (label, help, email, sms, whatsapp) in new[]
+        {
+            ("Craft stories and new collections", "Two emails a month from the workshops we buy from.", true, false, false),
+            ("Sales and offers", "Only when a genuine sale window is open.", true, false, true),
+            ("Price drops on saved pieces", "When something in your wishlist gets cheaper.", true, true, false),
+            ("Back in stock", "When a piece you asked about returns.", true, true, false),
+            ("Review requests", "One message after delivery, then nothing more.", true, false, false)
+        })
+        {
+            <div style="padding-bottom:var(--space-md);border-bottom:1px solid var(--color-border-subtle)">
+                <p class="t-heading-xs">@label</p>
+                <p class="t-body-sm text-secondary-c mb-sm">@help</p>
+                <div class="row-flex wrap gap-lg">
+                    <label class="switch">
+                        <input type="checkbox" checked="@email" />
+                        <span class="t-body-sm">Email</span>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" checked="@sms" />
+                        <span class="t-body-sm">SMS</span>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" checked="@whatsapp" />
+                        <span class="t-body-sm">WhatsApp</span>
+                    </label>
+                </div>
+            </div>
+        }
+    </div>
+
+    @* Unsubscribe is one click, never buried (§8.1). *@
+    <div class="alert alert-info mt-lg">
+        <svg class="ico" aria-hidden="true"><use href="#i-info"></use></svg>
+        <div class="grow">
+            <p class="alert__title">Want none of it?</p>
+            <p>One click turns off every marketing message. Order updates keep working.</p>
+        </div>
+        <button class="btn btn-outline btn-sm shrink-0" type="button">Unsubscribe from All</button>
+    </div>
+
+    <button class="btn btn-primary mt-lg" type="button">
+        <span class="btn__spinner" aria-hidden="true"></span>
+        <span class="btn__label">Save Preferences</span>
+    </button>
+</section>
+
+<section class="card mt-md">
+    <h2 class="t-heading-md mb-md">Display</h2>
+
+    <div class="stack stack-md">
+        <div class="row-flex wrap between gap-sm">
+            <div>
+                <p class="t-heading-xs">Theme</p>
+                <p class="t-body-sm text-secondary-c">Follows your device by default.</p>
+            </div>
+            <div class="segmented">
+                <button class="segmented__item" type="button" onclick="Chamunda.theme.set('light')">Light</button>
+                <button class="segmented__item" type="button" onclick="Chamunda.theme.set('dark')">Dark</button>
+                <button class="segmented__item is-active" type="button" onclick="Chamunda.theme.set('system')">System</button>
+            </div>
+        </div>
+
+        <div class="row-flex wrap between gap-sm">
+            <div>
+                <p class="t-heading-xs">Units</p>
+                <p class="t-body-sm text-secondary-c">Used for product dimensions and weight.</p>
+            </div>
+            <div class="segmented">
+                <button class="segmented__item is-active" type="button">cm / g</button>
+                <button class="segmented__item" type="button">in / oz</button>
+            </div>
+        </div>
+
+        <div class="row-flex wrap between gap-sm">
+            <div>
+                <p class="t-heading-xs">Language</p>
+                <p class="t-body-sm text-secondary-c">Untranslated content falls back to English.</p>
+            </div>
+            <select class="select" style="max-width:200px" aria-label="Language">
+                <option selected>English</option>
+                <option>हिन्दी (Hindi)</option>
+            </select>
+        </div>
+    </div>
+</section>

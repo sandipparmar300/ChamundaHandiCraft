@@ -1,2 +1,14 @@
-@* Add `@@using ChamundaHandicraft.Admin.Models` here once the first view model exists. *@
+@using ChamundaHandicraft.Admin
+@using ChamundaHandicraft.Admin.Services
+
+@* The shared contract. These are the shapes the API returns and the Customer site
+   reads — see ChamundaHandicraft.Helper/ARCHITECTURE.md and docs/INTEGRATION-MAP.md. *@
+@using ChamundaHandicraft.Helper.CommonMethod
+@using ChamundaHandicraft.Helper.Enums
+@using ChamundaHandicraft.Helper.ViewModel.Admin
+@using ChamundaHandicraft.Helper.ViewModel.Common
+@using ChamundaHandicraft.Helper.ViewModel.Customer
+
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

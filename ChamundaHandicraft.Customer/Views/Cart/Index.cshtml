@@ -1,0 +1,393 @@
+@model CartPageViewModel
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+    var summary = Model.Summary;
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="page-head">
+        <h1 class="t-display-lg page-head__title">Your cart</h1>
+        @if (Model.Lines.Count > 0)
+        {
+            <p class="page-head__sub">
+                @summary.ItemCount @(summary.ItemCount == 1 ? "item" : "items") ·
+                <a class="link" href="/shop">Continue shopping</a>
+            </p>
+        }
+    </div>
+
+    @if (Model.Lines.Count == 0)
+    {
+        <div class="state-block">
+            <span class="state-block__icon state-block__icon--craft">
+                <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-cart"></use></svg>
+            </span>
+            <h2 class="t-heading-md">Your cart is empty</h2>
+            <p class="state-block__desc">
+                Nothing here yet. Start with the pieces our shoppers reach for most,
+                or pick up where you left off in your wishlist.
+            </p>
+            <div class="state-block__actions">
+                <a class="btn btn-primary btn-lg" href="/shop">Browse the Shop</a>
+                <a class="btn btn-outline btn-lg" href="/wishlist">View Wishlist</a>
+            </div>
+        </div>
+
+        <section class="band-sm">
+            @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+            {
+                Heading = "Popular right now",
+                ViewAllUrl = "/shop",
+                Products = DemoContent.Products(6)
+            })
+        </section>
+    }
+    else
+    {
+        <div class="layout-content-summary">
+
+            @* ══════════ Line items ══════════ *@
+            <div>
+                @* Free-shipping progress: a real threshold, stated plainly. *@
+                <div class="card mb-md">
+                    <div class="ship-progress">
+                        @if (summary.QualifiesForFreeShipping)
+                        {
+                            <span class="ship-progress__label row-flex gap-xs text-success-c">
+                                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-truck"></use></svg>
+                                <strong>Free delivery unlocked on this order</strong>
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="ship-progress__label">
+                                Add <strong>@Money.Inr(summary.AmountToFreeShipping)</strong> more and delivery is free
+                            </span>
+                        }
+                        <div class="progress">
+                            <span class="progress__fill" style="width:@(summary.FreeShippingProgressPercent)%"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-flush" style="padding:0 var(--space-md)">
+                    <ul>
+                        @foreach (var line in Model.Lines)
+                        {
+                            var stock = StockStyle.For(line.Stock, line.StockCount);
+                            <li class="cart-line">
+                                <a class="cart-line__media" href="@line.Url">
+                                    <img class="img-product" src="@line.ImageUrl" alt="@line.ImageAlt"
+                                         width="112" height="112" loading="lazy" />
+                                </a>
+
+                                <div class="grow">
+                                    <a class="cart-line__title" href="@line.Url">@line.Name</a>
+                                    <p class="cart-line__meta">@line.VariantSummary</p>
+                                    @if (line.Artisan is not null)
+                                    {
+                                        <a class="artisan-chip mt-2xs" href="/artisans/@line.Artisan.Slug">
+                                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                                            @line.Artisan.Name
+                                        </a>
+                                    }
+
+                                    @if (stock is not null && line.Stock != StockState.InStock)
+                                    {
+                                        <span class="stock @stock.Value.Css mt-2xs">
+                                            <svg class="ico ico-xs" aria-hidden="true"><use href="#@stock.Value.Icon"></use></svg>
+                                            @stock.Value.Label
+                                        </span>
+                                    }
+
+                                    @if (line.DeliveryBy is not null)
+                                    {
+                                        <p class="cart-line__meta mt-2xs row-flex gap-2xs">
+                                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-truck"></use></svg>
+                                            Get it by <strong class="text-primary-c">@Money.DeliveryDate(line.DeliveryBy.Value)</strong>
+                                        </p>
+                                    }
+
+                                    @if (line.IsHandmade)
+                                    {
+                                        @* Compact variation notice — mandatory on cart line items. *@
+                                        <div class="variation-notice variation-notice-compact mt-xs">
+                                            <svg class="ico ico-xs variation-notice__icon" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                                            <span>Handmade — colour and finish vary slightly.</span>
+                                        </div>
+                                    }
+
+                                    <div class="cart-line__actions">
+                                        <div class="qty">
+                                            <button class="qty__btn" type="button" data-step="-1"
+                                                    aria-label="Decrease quantity of @line.Name" disabled="@(line.Quantity <= 1)">
+                                                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-minus"></use></svg>
+                                            </button>
+                                            <input class="qty__input" type="number" value="@line.Quantity" min="1" max="@line.MaxQuantity"
+                                                   aria-label="Quantity of @line.Name" />
+                                            <button class="qty__btn" type="button" data-step="1"
+                                                    aria-label="Increase quantity of @line.Name" disabled="@(line.Quantity >= line.MaxQuantity)">
+                                                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"></use></svg>
+                                            </button>
+                                        </div>
+
+                                        <button class="cart-line__link" type="button">
+                                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-heart"></use></svg>
+                                            Save for later
+                                        </button>
+                                        <button class="cart-line__link cart-line__link--danger" type="button" data-open="removeConfirm">
+                                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-trash"></use></svg>
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="cart-line__total">
+                                    <div class="price price-md @(line.Mrp > line.Price ? "is-sale" : "") price-stacked" style="align-items:flex-end">
+                                        <span class="price__now">@Money.Inr(line.LineTotal)</span>
+                                        @if (line.Mrp > line.Price)
+                                        {
+                                            <span class="price__mrp">@Money.Inr(line.Mrp!.Value * line.Quantity)</span>
+                                        }
+                                    </div>
+                                    @if (line.Quantity > 1)
+                                    {
+                                        <p class="t-body-xs text-tertiary-c tabular">@Money.Inr(line.Price) each</p>
+                                    }
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                @* ---- Gift options — opt-in only, never pre-ticked ---- *@
+                <div class="card mt-md">
+                    <label class="check">
+                        <input type="checkbox" />
+                        <span class="check__label">
+                            Add gift wrapping (@Money.Inr(99))
+                            <span class="check__help">
+                                Hand-tied in khadi cloth with a handwritten note. Prices are hidden on the packing slip.
+                            </span>
+                        </span>
+                    </label>
+                </div>
+
+                @* ---- Saved for later ---- *@
+                <section class="band-sm">
+                    <h2 class="t-heading-lg mb-md">Saved for later (@Model.SavedForLater.Count)</h2>
+                    <div class="pgrid">
+                        @foreach (var product in Model.SavedForLater)
+                        {
+                            @await Html.PartialAsync("_ProductCard", product)
+                        }
+                    </div>
+                </section>
+            </div>
+
+            @* ══════════ Order summary ══════════ *@
+            <aside class="sticky-col" aria-labelledby="summaryHead">
+                <div class="card">
+                    <h2 class="t-heading-md mb-md" id="summaryHead">Order summary</h2>
+
+                    @* Coupon — CMP-CRT-CouponInput / AppliedCoupon *@
+                    @if (summary.CouponCode is not null)
+                    {
+                        <div class="coupon-applied mb-sm">
+                            <span class="row-flex gap-2xs">
+                                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-ticket-percent"></use></svg>
+                                <strong>@summary.CouponCode</strong> applied — you save @Money.Inr(summary.CouponDiscount)
+                            </span>
+                            <button class="icon-btn icon-btn-sm" type="button" aria-label="Remove coupon @summary.CouponCode">
+                                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-x"></use></svg>
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="coupon-input mb-sm">
+                            <label class="sr-only" for="couponCode">Coupon code</label>
+                            <input class="input" id="couponCode" type="text" placeholder="Coupon code" />
+                            <button class="btn btn-outline shrink-0" type="button">Apply</button>
+                        </div>
+                    }
+
+                    <button class="btn btn-link btn-sm mb-md" type="button" data-open="couponList">
+                        View 4 available coupons
+                    </button>
+
+                    <dl class="summary">
+                        <div class="summary__row">
+                            <dt>Subtotal (@summary.ItemCount items)</dt>
+                            <dd>@Money.Inr(summary.MrpTotal)</dd>
+                        </div>
+
+                        @if (summary.ProductSavings > 0)
+                        {
+                            <div class="summary__row summary__row--discount">
+                                <dt>Product discount</dt>
+                                <dd>−@Money.Inr(summary.ProductSavings)</dd>
+                            </div>
+                        }
+
+                        @if (summary.CouponDiscount > 0)
+                        {
+                            <div class="summary__row summary__row--discount">
+                                <dt>Coupon (@summary.CouponCode)</dt>
+                                <dd>−@Money.Inr(summary.CouponDiscount)</dd>
+                            </div>
+                        }
+
+                        <div class="summary__row @(summary.Shipping == 0 ? "summary__row--free" : "")">
+                            <dt>
+                                Delivery
+                                <span class="tt">
+                                    <svg class="ico ico-xs text-tertiary-c" aria-hidden="true"><use href="#i-info"></use></svg>
+                                    <span class="tt__bubble">Free above ₹999, otherwise ₹79</span>
+                                </span>
+                            </dt>
+                            <dd>@(summary.Shipping == 0 ? "Free" : Money.Inr(summary.Shipping))</dd>
+                        </div>
+
+                        <div class="summary__row">
+                            <dt>
+                                Taxes (GST)
+                                <span class="tt">
+                                    <svg class="ico ico-xs text-tertiary-c" aria-hidden="true"><use href="#i-info"></use></svg>
+                                    <span class="tt__bubble">Already included in the prices shown</span>
+                                </span>
+                            </dt>
+                            <dd class="text-secondary-c">Included</dd>
+                        </div>
+
+                        <div class="summary__total">
+                            <dt>Total</dt>
+                            <dd>@Money.Inr(summary.Total)</dd>
+                        </div>
+                    </dl>
+
+                    @if (summary.TotalSavings > 0)
+                    {
+                        <p class="summary__savings">You save @Money.Inr(summary.TotalSavings) on this order</p>
+                    }
+
+                    <a class="btn btn-primary btn-xl btn-block mt-md" href="/checkout">
+                        Proceed to Checkout
+                    </a>
+
+                    <p class="t-body-xs text-tertiary-c text-center mt-sm">
+                        No hidden charges. This is what you pay.
+                    </p>
+
+                    <div class="card__divider"></div>
+
+                    <div class="stack stack-xs t-body-xs text-secondary-c">
+                        <span class="row-flex gap-xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield-check"></use></svg> 256-bit encrypted payment</span>
+                        <span class="row-flex gap-xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-undo"></use></svg> 7-day returns, free pickup</span>
+                        <span class="row-flex gap-xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-hand-heart"></use></svg> 100% handmade, maker named</span>
+                    </div>
+
+                    <div class="payment-marks mt-sm">
+                        <span class="payment-mark">VISA</span>
+                        <span class="payment-mark">MC</span>
+                        <span class="payment-mark">RuPay</span>
+                        <span class="payment-mark">UPI</span>
+                        <span class="payment-mark">COD</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <section class="band-sm">
+            @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+            {
+                Heading = "Add to your order",
+                SubHeading = "Pieces that go with what's in your cart.",
+                Products = DemoContent.Products(6, 3)
+            })
+        </section>
+    }
+</div>
+
+@if (Model.Lines.Count > 0)
+{
+    @* Mobile sticky summary bar *@
+    <div class="sticky-bar no-print">
+        <div class="grow">
+            <p class="t-body-xs text-secondary-c">Total (@summary.ItemCount items)</p>
+            <p class="t-heading-sm tabular">@Money.Inr(summary.Total)</p>
+        </div>
+        <a class="btn btn-primary btn-xl shrink-0" href="/checkout">Checkout</a>
+    </div>
+}
+
+@* ---- Confirmation dialog: exact copy per §7.32 ---- *@
+<div class="modal-scrim" id="removeConfirm" role="dialog" aria-modal="true" aria-labelledby="removeTitle" aria-hidden="true">
+    <div class="modal modal-sm">
+        <div class="modal__head">
+            <h2 class="t-heading-md" id="removeTitle">Remove this item?</h2>
+            <button class="icon-btn" data-close="removeConfirm" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <p class="t-body-md text-secondary-c">
+                You can move it to your wishlist instead and it will stay saved.
+            </p>
+        </div>
+        <div class="modal__foot">
+            <button class="btn btn-ghost" data-close="removeConfirm">Cancel</button>
+            <button class="btn btn-outline" data-close="removeConfirm">Save for Later</button>
+            <button class="btn btn-danger" data-close="removeConfirm">Remove Item</button>
+        </div>
+    </div>
+</div>
+
+@* ---- Available coupons ---- *@
+<div class="modal-scrim" id="couponList" role="dialog" aria-modal="true" aria-labelledby="couponTitle" aria-hidden="true">
+    <div class="modal">
+        <div class="modal__head">
+            <div>
+                <h2 class="t-heading-md" id="couponTitle">Available coupons</h2>
+                <p class="t-body-sm text-secondary-c mt-2xs">One coupon per order. We'll show the saving before you pay.</p>
+            </div>
+            <button class="icon-btn" data-close="couponList" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <div class="stack stack-sm">
+                @foreach (var (code, title, detail, eligible) in new[]
+                {
+                    ("FESTIVE10", "10% off, up to ₹500", "Valid on everything until 30 Aug 2026.", true),
+                    ("WELCOME200", "₹200 off your first order", "Minimum order ₹1,500.", true),
+                    ("BRASS15", "15% off brass and metal", "Applies to Brass & Metal only.", true),
+                    ("BULK25", "25% off orders above ₹10,000", "Add ₹4,710 more to use this.", false)
+                })
+                {
+                    <div class="coupon-card @(eligible ? "" : "")" style="@(eligible ? "" : "opacity:.6")">
+                        <div class="grow">
+                            <div class="row-flex gap-sm">
+                                <span class="coupon-card__code">@code</span>
+                                <button class="icon-btn icon-btn-sm" type="button" data-copy="@code" aria-label="Copy @code">
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-copy"></use></svg>
+                                </button>
+                            </div>
+                            <p class="t-heading-xs mt-xs">@title</p>
+                            <p class="t-body-sm text-secondary-c">@detail</p>
+                        </div>
+                        <button class="btn @(eligible ? "btn-primary" : "btn-outline") btn-sm shrink-0"
+                                type="button" disabled="@(!eligible)">
+                            @(eligible ? "Apply" : "Not eligible")
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

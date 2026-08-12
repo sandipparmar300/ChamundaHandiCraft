@@ -1,0 +1,20 @@
+@model int
+@{
+    var count = Model == 0 ? 8 : Model;
+}
+
+@* CMP-FBK-Skeleton — geometry matches the loaded product card exactly, so nothing shifts. *@
+<div class="pgrid" aria-hidden="true">
+    @for (var i = 0; i < count; i++)
+    {
+        <div>
+            <div class="skel skel-img"></div>
+            <div class="mt-sm">
+                <div class="skel skel-text" style="width:40%"></div>
+                <div class="skel skel-text" style="width:90%"></div>
+                <div class="skel skel-text" style="width:65%"></div>
+                <div class="skel skel-text" style="width:35%;height:16px;margin-top:12px"></div>
+            </div>
+        </div>
+    }
+</div>

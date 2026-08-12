@@ -1,3 +1,4 @@
+@model PagedResult<OrderGridItem>
 @*
     Module 06 - Order list with the lifecycle summary.
     Spec: docs/Admin Flows/Orders.txt §3 dashboard, §4 list, §11 filters
@@ -132,7 +133,52 @@
                                 <th style="min-width:80px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    @* An order past its promised date leads the grid visually — it is the
+                       one row an operator must act on today. *@
+                    <tr class="@(row.IsBreachingSla ? "table-warning" : "")">
+                        <td><input type="checkbox" class="row-check" value="@row.Id" /></td>
+                        <td class="t-mono"><a asp-action="Details" asp-route-id="@row.Id">@row.OrderNumber</a></td>
+                        <td>@Money.LongDate(row.PlacedOn)</td>
+                        <td>@row.CustomerName</td>
+                        <td>CUS-@row.CustomerId</td>
+                        <td class="text-end">@row.ItemCount</td>
+                        <td class="text-end">@Money.Inr(row.Total)</td>
+                        <td>@row.PaymentMethod</td>
+                        <td>@await Html.PartialAsync("_PaymentStatusPill", row.PaymentStatus)</td>
+                        <td>@await Html.PartialAsync("_OrderStatusPill", row.Status)</td>
+                        <td>
+                            @if (row.HasReturnRequest)
+                            {
+                                <span class="badge bg-warning text-dark">Return raised</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">@row.ShipToCity @row.ShipToPincode</span>
+                            }
+                        </td>
+                        <td>@(row.Courier ?? "—")</td>
+                        <td class="t-mono">@(row.TrackingNumber ?? "—")</td>
+                        <td>
+                            @(row.DeliveryBy is null ? "—" : Money.DeliveryDate(row.DeliveryBy.Value))
+                            @if (row.IsBreachingSla)
+                            {
+                                <span class="badge bg-danger ms-1">Late</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@row.Id" title="View"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="15" class="text-center py-4">No orders match these filters.</td></tr>
+                }
+            </tbody>
                     </table>
                 </div>
             </div>

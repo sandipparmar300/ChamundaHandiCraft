@@ -1,4 +1,5 @@
-﻿@*
+@model PagedResult<ApprovalGridItem>
+@*
     Administration - Approvals listing.  Spec: docs/Admin Flows/
 *@
 @{
@@ -53,7 +54,29 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td>@row.EntityType</td>
+                        <td>@row.EntityName</td>
+                        <td>@row.RequestedBy</td>
+                        <td>@Money.Relative(row.RequestedOn)</td>
+                        <td class="text-muted">@(row.Reason ?? "—")</td>
+                        <td>@(row.DecidedBy ?? "—")</td>
+                        <td>@(row.DecidedOn is null ? "—" : Money.LongDate(row.DecidedOn.Value))</td>
+                        <td>
+                            <span class="badge @(row.Status == "Pending" ? "bg-warning text-dark" : row.Status == "Approved" ? "bg-success" : "bg-secondary")">@row.Status</span>
+                        </td>
+                        <td><a asp-action="Details" asp-route-id="@row.Id" title="Review"><i class="fas fa-eye"></i></a></td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="9" class="text-center py-4">Nothing waiting on approval.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

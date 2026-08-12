@@ -1,4 +1,5 @@
-﻿@*
+@model PagedResult<IntegrationGridItem>
+@*
     Administration - Integrations listing.  Spec: docs/Admin Flows/
 *@
 @{
@@ -50,7 +51,42 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td><i class="fas fa-plug text-muted"></i></td>
+                        <td><a asp-action="Edit" asp-route-id="@row.Id">@row.Name</a></td>
+                        <td>@row.Category</td>
+                        <td>Production</td>
+                        <td>@(row.LastSyncOn is null ? "Never" : Money.Relative(row.LastSyncOn.Value))</td>
+                        <td>
+                            @if (row.IsConnected)
+                            {
+                                <span class="badge bg-success">Healthy</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Disconnected</span>
+                                @if (row.ErrorMessage is not null)
+                                {
+                                    <span class="text-muted d-block">@row.ErrorMessage</span>
+                                }
+                            }
+                        </td>
+                        <td>@await Html.PartialAsync("_StatusPill", row.IsActive)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Configure"><i class="fas fa-pen"></i></a>
+                            <a asp-action="Details" asp-route-id="@row.Id" title="View" class="ms-2"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="8" class="text-center py-4">No integrations configured.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

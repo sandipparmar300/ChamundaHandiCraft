@@ -1,0 +1,134 @@
+@model List<ProductCardViewModel>
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+
+    // Rows marked IsDiff are highlighted so the shopper's eye lands on what
+    // actually differs rather than on a wall of identical values.
+    var rows = new (string Label, Func<ProductCardViewModel, string> Value, bool IsDiff)[]
+    {
+        ("Price", p => Money.Inr(p.Price), true),
+        ("MRP", p => p.Mrp is null ? "—" : Money.Inr(p.Mrp.Value), false),
+        ("Discount", p => p.DiscountPercent > 0 ? $"{p.DiscountPercent}% OFF" : "—", true),
+        ("Rating", p => p.ReviewCount > 0 ? $"★ {p.Rating:0.0} ({p.ReviewCount})" : "No reviews yet", false),
+        ("Material", p => string.IsNullOrEmpty(p.Material) ? "—" : p.Material, true),
+        ("Dimensions", p => string.IsNullOrEmpty(p.Dimensions) ? "—" : p.Dimensions, true),
+        ("Artisan", p => p.Artisan?.Name ?? "—", false),
+        ("Craft cluster", p => p.Artisan?.Cluster ?? "—", false),
+        ("Availability", p => StockStyle.For(p.Stock, p.StockCount)?.Label ?? "—", true),
+        ("Delivery", p => Money.DeliveryDate(DateTime.Today.AddDays(6)), false),
+        ("Returns", _ => "7 days, free pickup", false),
+        ("Cash on delivery", _ => "Available", false)
+    };
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="page-head">
+        <h1 class="t-display-lg page-head__title">Compare</h1>
+        <p class="page-head__sub">
+            @Model.Count pieces side by side. Differences are highlighted.
+            Add up to 4 — <a class="link" href="/shop">browse more</a>.
+        </p>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="state-block">
+            <span class="state-block__icon">
+                <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-compare"></use></svg>
+            </span>
+            <h2 class="t-heading-md">Nothing to compare yet</h2>
+            <p class="state-block__desc">
+                Add pieces from any product card or product page and they'll line up here,
+                material against material.
+            </p>
+            <div class="state-block__actions">
+                <a class="btn btn-primary" href="/shop">Browse the Shop</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="compare-table">
+            <table>
+                <caption class="sr-only">Comparison of @Model.Count products</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Product</th>
+                        @foreach (var product in Model)
+                        {
+                            <th scope="col" style="min-width:220px">
+                                <div class="stack stack-xs">
+                                    <div class="row-flex end">
+                                        <button class="icon-btn icon-btn-sm" type="button" aria-label="Remove @product.Name from comparison">
+                                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-x"></use></svg>
+                                        </button>
+                                    </div>
+                                    <a href="@product.Url">
+                                        <div class="img-box img-1-1" style="max-width:160px">
+                                            <img class="img-product" src="@product.ImageUrl" alt="@product.ImageAlt" loading="lazy" width="160" height="160" />
+                                        </div>
+                                        <span class="t-body-sm clamp-2 mt-xs" style="font-weight:600;color:var(--color-text-primary)">@product.Name</span>
+                                    </a>
+                                </div>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in rows)
+                    {
+                        <tr class="@(row.IsDiff ? "is-diff" : "")">
+                            <th scope="row">@row.Label</th>
+                            @foreach (var product in Model)
+                            {
+                                <td class="@(row.Label.Contains("Price") || row.Label == "MRP" ? "tabular" : "")">@row.Value(product)</td>
+                            }
+                        </tr>
+                    }
+                    <tr>
+                        <th scope="row">Add to cart</th>
+                        @foreach (var product in Model)
+                        {
+                            <td>
+                                @if (product.Stock == StockState.OutOfStock)
+                                {
+                                    <button class="btn btn-outline btn-sm btn-block" type="button" data-open="notifyMe">Notify Me</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary btn-sm btn-block" type="button" data-add-to-cart data-slug="@product.Slug">
+                                        <span class="btn__spinner" aria-hidden="true"></span>
+                                        <span class="btn__label">Add to Cart</span>
+                                    </button>
+                                }
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row-flex wrap gap-sm mt-md">
+            <label class="switch">
+                <input type="checkbox" />
+                <span class="t-body-sm">Show differences only</span>
+            </label>
+            <button class="btn btn-ghost btn-sm" type="button">Clear all</button>
+        </div>
+
+        <section class="band-sm">
+            @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+            {
+                Heading = "Add another to compare",
+                Products = DemoContent.Products(6, 4)
+            })
+        </section>
+    }
+</div>
+
+@await Html.PartialAsync("_QuickView", DemoContent.Products(1)[0])

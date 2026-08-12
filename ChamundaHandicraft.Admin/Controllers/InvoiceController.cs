@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ViewModel.Admin;
+using ChamundaHandicraft.Helper.ViewModel.Common;
+using ChamundaHandicraft.Helper.ViewModel.Customer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Admin.Controllers;
 
-/// <summary>
-/// View shell for the Invoices screens. Each action renders markup only â€”
-/// the ApiService calls and view models arrive with the API wiring.
-/// </summary>
-public class InvoiceController : Controller
+/// <summary>Tax invoices raised against orders. Read-only — these records are created by the system, not an operator.</summary>
+public class InvoiceController : AdminListController<InvoiceGridItem>
 {
-    public IActionResult Index() => View();
+    public InvoiceController(IAdminClient client) : base(client) { }
 
-    public IActionResult Details(int id) => View();
+    protected override string Module => "Invoice";
 }

@@ -1,0 +1,43 @@
+@{
+    Layout = "_AuthLayout";
+}
+
+@* PG-01-09 · Complete Your Profile (post-social) — the shortest possible form. *@
+<h1 class="t-heading-xl">One more thing</h1>
+<p class="t-body-md text-secondary-c mt-xs mb-lg">
+    Signed in as <strong class="text-primary-c">ananya@example.com</strong>.
+    We just need a number for delivery updates.
+</p>
+
+<form method="post" action="/complete-profile" data-validate>
+    <div class="field">
+        <label class="field__label" for="profileMobile">Mobile number</label>
+        <div class="phone-input">
+            <select class="select" aria-label="Country code">
+                <option selected>+91</option>
+                <option>+1</option>
+                <option>+44</option>
+            </select>
+            <input class="input" id="profileMobile" name="mobile" type="tel" required
+                   pattern="[0-9 ]{10,12}" placeholder="98765 43210" autocomplete="tel" inputmode="numeric" />
+        </div>
+        <p class="field__help">Only used for order and delivery messages.</p>
+        <p class="field__error">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+            <span>Enter a valid 10-digit mobile number</span>
+        </p>
+    </div>
+
+    <label class="check mt-md">
+        <input type="checkbox" name="marketingConsent" />
+        <span class="check__label t-body-sm">
+            Send me craft stories and offers
+            <span class="check__help">Two emails a month. Unsubscribe in one click.</span>
+        </span>
+    </label>
+
+    <button class="btn btn-primary btn-xl btn-block mt-lg" type="submit">
+        <span class="btn__spinner" aria-hidden="true"></span>
+        <span class="btn__label">Finish Setting Up</span>
+    </button>
+</form>

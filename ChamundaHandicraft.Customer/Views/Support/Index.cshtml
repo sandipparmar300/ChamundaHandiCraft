@@ -1,0 +1,251 @@
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+
+    var topics = new (string Title, string Blurb, string Icon, string Url)[]
+    {
+        ("Delivery & tracking", "Where your parcel is, delivery dates, changing an address", "i-truck", "/track"),
+        ("Returns & refunds", "How to return, what we pay for, when money comes back", "i-undo", "/pages/return-policy"),
+        ("Orders & payments", "Editing an order, payment failures, invoices and GST", "i-credit-card", "/account/orders"),
+        ("Handmade & variation", "Why pieces differ, what counts as a fault", "i-hand-heart", "/pages/about"),
+        ("Account & privacy", "Sign-in problems, data export, deleting an account", "i-user", "/account/security"),
+        ("Rewards & coupons", "Earning points, using coupons, referrals", "i-gem", "/account/rewards")
+    };
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+</div>
+
+@* ---- Search-first hero ---- *@
+<section class="band-sm band-craft">
+    <div class="container text-center">
+        <h1 class="t-display-lg">How can we help?</h1>
+        <p class="t-body-lg text-craft-c mt-sm mx-auto" style="max-width:560px">
+            Most answers are below. If yours isn't, a real person replies within one working day.
+        </p>
+
+        <form class="search-bar search-bar-lg mx-auto mt-lg" action="/help" method="get" role="search" style="max-width:560px">
+            <label class="sr-only" for="helpSearch">Search help articles</label>
+            <svg class="ico search-bar__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input class="search-bar__input" id="helpSearch" name="q" type="search"
+                   placeholder="Search — e.g. “change my address”" />
+        </form>
+
+        <div class="row-flex center wrap gap-xs mt-md">
+            @foreach (var term in new[] { "track my order", "return an item", "delivery is late", "cancel order", "GST invoice" })
+            {
+                <a class="chip" href="/help?q=@Uri.EscapeDataString(term)">@term</a>
+            }
+        </div>
+    </div>
+</section>
+
+@* ---- Fast paths for the top three jobs ---- *@
+<section class="band-sm">
+    <div class="container">
+        <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+            <a class="card row-flex gap-md" href="/track">
+                <span class="trust-badge__icon shrink-0"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-package"></use></svg></span>
+                <span class="grow">
+                    <span class="t-heading-xs" style="display:block">Track an order</span>
+                    <span class="t-body-sm text-secondary-c">No sign-in needed</span>
+                </span>
+                <svg class="ico text-tertiary-c" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+
+            <a class="card row-flex gap-md" href="/account/orders">
+                <span class="trust-badge__icon shrink-0"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-undo"></use></svg></span>
+                <span class="grow">
+                    <span class="t-heading-xs" style="display:block">Return an item</span>
+                    <span class="t-body-sm text-secondary-c">7 days, we pay the courier</span>
+                </span>
+                <svg class="ico text-tertiary-c" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+
+            <a class="card row-flex gap-md" href="/pages/contact">
+                <span class="trust-badge__icon shrink-0"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-message"></use></svg></span>
+                <span class="grow">
+                    <span class="t-heading-xs" style="display:block">Talk to a person</span>
+                    <span class="t-body-sm text-secondary-c">Mon–Sat, 10am–7pm IST</span>
+                </span>
+                <svg class="ico text-tertiary-c" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+@* ---- Topics ---- *@
+<section class="band-sm band-surface" aria-labelledby="topicsHead">
+    <div class="container">
+        <h2 class="t-heading-lg mb-md" id="topicsHead">Browse by topic</h2>
+        <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+            @foreach (var topic in topics)
+            {
+                <a class="card" href="@topic.Url">
+                    <span class="trust-badge__icon mb-sm"><svg class="ico ico-lg" aria-hidden="true"><use href="#@topic.Icon"></use></svg></span>
+                    <span class="t-heading-xs" style="display:block">@topic.Title</span>
+                    <span class="t-body-sm text-secondary-c">@topic.Blurb</span>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@* ---- FAQ. Emits FAQPage structured data. ---- *@
+<section class="band-sm" id="faq" aria-labelledby="faqHead">
+    <div class="container">
+        <h2 class="t-heading-lg mb-md" id="faqHead">Frequently asked</h2>
+
+        <div class="accordion accordion-card" data-single>
+            @foreach (var faq in DemoContent.ShippingFaqs())
+            {
+                <div class="accordion__item">
+                    <button class="accordion__head" type="button" aria-expanded="false">
+                        @faq.Question
+                        <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                    </button>
+                    <div class="accordion__body">
+                        <div class="t-body-md text-secondary-c measure">
+                            @faq.Answer
+                            <div class="row-flex gap-sm mt-md">
+                                <span class="t-body-xs text-tertiary-c">Was this helpful?</span>
+                                <button class="review-vote" type="button">
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-thumbs-up"></use></svg>
+                                    Yes
+                                </button>
+                                <button class="review-vote" type="button">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@* ---- Contact — never hidden behind a bot ---- *@
+<section class="band band-craft" aria-labelledby="contactHead">
+    <div class="container">
+        <div class="layout-halves" style="align-items:start">
+            <div>
+                <span class="craft-rule"></span>
+                <h2 class="t-display-lg" id="contactHead">Still stuck? Talk to us</h2>
+                <p class="t-body-lg text-craft-c mt-sm">
+                    A named person answers, not a bot. We reply to every message within one working day,
+                    usually much sooner.
+                </p>
+
+                <div class="stack stack-sm mt-lg">
+                    <a class="card row-flex gap-md" href="https://wa.me/919876543210" rel="noopener">
+                        <span class="trust-badge__icon shrink-0"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-whatsapp"></use></svg></span>
+                        <span class="grow">
+                            <span class="t-heading-xs" style="display:block">WhatsApp</span>
+                            <span class="t-body-sm text-secondary-c">Fastest — usually within an hour</span>
+                        </span>
+                        <svg class="ico text-tertiary-c" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                    </a>
+
+                    <a class="card row-flex gap-md" href="tel:+919876543210">
+                        <span class="trust-badge__icon shrink-0"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-phone"></use></svg></span>
+                        <span class="grow">
+                            <span class="t-heading-xs" style="display:block">+91 98765 43210</span>
+                            <span class="t-body-sm text-secondary-c">Mon–Sat, 10am–7pm IST</span>
+                        </span>
+                        <svg class="ico text-tertiary-c" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                    </a>
+
+                    <a class="card row-flex gap-md" href="mailto:care@chamundahandicraft.com">
+                        <span class="trust-badge__icon shrink-0"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-mail"></use></svg></span>
+                        <span class="grow">
+                            <span class="t-heading-xs" style="display:block">care@chamundahandicraft.com</span>
+                            <span class="t-body-sm text-secondary-c">Within one working day</span>
+                        </span>
+                        <svg class="ico text-tertiary-c" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                    </a>
+                </div>
+            </div>
+
+            @* ---- Raise a request ---- *@
+            <div class="card">
+                <h2 class="t-heading-md mb-md">Send us a message</h2>
+                <form data-validate>
+                    <div class="field">
+                        <label class="field__label" for="ticketTopic">What's it about?</label>
+                        <select class="select" id="ticketTopic" required>
+                            <option value="">Choose a topic</option>
+                            <option>Delivery or tracking</option>
+                            <option>Return or refund</option>
+                            <option>Damaged or wrong item</option>
+                            <option>Payment problem</option>
+                            <option>Product question</option>
+                            <option>Bulk or corporate order</option>
+                            <option>Something else</option>
+                        </select>
+                        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                    </div>
+
+                    <div class="field">
+                        <label class="field__label" for="ticketOrder">
+                            Order number <span class="field__optional">(optional)</span>
+                        </label>
+                        <input class="input" id="ticketOrder" type="text" placeholder="HC-2026-000482"
+                               style="font-family:var(--font-mono)" />
+                        <p class="field__help">Including it means we don't have to ask.</p>
+                    </div>
+
+                    <div class="field">
+                        <label class="field__label" for="ticketEmail">Your email</label>
+                        <input class="input" id="ticketEmail" type="email" required value="ananya@example.com" autocomplete="email" />
+                        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                    </div>
+
+                    <div class="field">
+                        <label class="field__label" for="ticketMessage">Your message</label>
+                        <textarea class="textarea" id="ticketMessage" rows="4" required
+                                  placeholder="Tell us what happened. The more specific, the faster we can fix it."></textarea>
+                        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                    </div>
+
+                    <div class="field">
+                        <span class="field__label">Photos <span class="field__optional">(optional)</span></span>
+                        <div class="upload" style="padding:var(--space-md)">
+                            <svg class="ico ico-xl text-tertiary-c mx-auto mb-xs" aria-hidden="true"><use href="#i-camera"></use></svg>
+                            <p class="t-body-sm">Add photos if something arrived damaged</p>
+                            <input type="file" accept="image/*" multiple class="sr-only" />
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg btn-block mt-lg" type="submit">
+                        <span class="btn__spinner" aria-hidden="true"></span>
+                        <span class="btn__label">Send Message</span>
+                    </button>
+
+                    <p class="t-body-xs text-tertiary-c mt-sm text-center">
+                        You'll get a reference number by email straight away.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+@{
+    // FAQPage structured data, built here so the script tag stays a single expression.
+    var faqEntities = DemoContent.ShippingFaqs().Select(f =>
+    {
+        var question = f.Question.Replace("\"", "\\\"");
+        var answer = f.Answer.Replace("\"", "\\\"");
+        return "{\"@type\":\"Question\",\"name\":\"" + question +
+               "\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"" + answer + "\"}}";
+    });
+
+    var faqJsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":["
+                    + string.Join(",", faqEntities) + "]}";
+}
+
+@section Scripts {
+    <script type="application/ld+json">@Html.Raw(faqJsonLd)</script>
+}

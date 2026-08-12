@@ -1,4 +1,5 @@
-﻿@{
+@model RedirectGridItem
+@{
     ViewData["Title"] = "Redirect";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Redirect" : "Add Redirect";
@@ -23,7 +24,7 @@
 
     <form method="post" id="redirectForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">

@@ -1,0 +1,44 @@
+@{
+    Layout = "_AuthLayout";
+}
+
+@* PG-01-06 · Email Verification Pending *@
+<div class="text-center">
+    <span class="state-block__icon state-block__icon--craft mx-auto">
+        <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-mail"></use></svg>
+    </span>
+
+    <h1 class="t-heading-xl mt-md">Check your email</h1>
+    <p class="t-body-md text-secondary-c mt-xs">
+        We sent a verification link to <strong class="text-primary-c">ananya@example.com</strong>.
+        Open it and you're done — the link works for 24 hours.
+    </p>
+</div>
+
+<div class="card mt-lg">
+    <p class="t-heading-xs mb-xs">Not seeing it?</p>
+    <ul class="stack stack-xs t-body-sm text-secondary-c">
+        <li class="row-flex gap-xs row-start">
+            <svg class="ico ico-sm shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+            Check the spam and promotions folders.
+        </li>
+        <li class="row-flex gap-xs row-start">
+            <svg class="ico ico-sm shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+            Add <strong>care@chamundahandicraft.com</strong> to your contacts.
+        </li>
+        <li class="row-flex gap-xs row-start">
+            <svg class="ico ico-sm shrink-0 mt-2xs" aria-hidden="true"><use href="#i-check"></use></svg>
+            Mistyped the address? <a class="link" href="/account/profile">Change it here</a>.
+        </li>
+    </ul>
+</div>
+
+<button class="btn btn-outline btn-lg btn-block mt-lg" type="button">
+    <svg class="ico" aria-hidden="true"><use href="#i-refresh"></use></svg>
+    Resend the link
+</button>
+
+@* Verification is never a gate in front of shopping. *@
+<p class="t-body-sm text-center text-tertiary-c mt-lg">
+    You can keep shopping while you verify. <a class="link" href="/">Back to the store</a>
+</p>

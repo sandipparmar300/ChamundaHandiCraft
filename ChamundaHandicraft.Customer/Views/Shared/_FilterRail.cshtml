@@ -1,0 +1,226 @@
+@*
+    CMP-FLT-Rail — 264px sticky left rail on desktop; the same markup is reused
+    inside the mobile filter sheet.
+
+    FL-02: options producing zero results are disabled and dimmed, never removed —
+    the shopper learns what the catalogue actually contains.
+    FL-07: the first four groups are expanded by default, the rest collapsed.
+*@
+<div class="filter-rail">
+
+    <div class="row-flex between mb-md">
+        <h2 class="t-heading-xs">Filters</h2>
+        <button class="btn btn-link btn-sm" type="button">Clear all</button>
+    </div>
+
+    @* ---- Category ---- *@
+    <div class="filter-group">
+        <button class="filter-group__head" type="button" aria-expanded="true">
+            Category
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="filter-group__body">
+            @foreach (var (label, count, disabled) in new[]
+            {
+                ("Vases & Planters", 84, false), ("Wall Art", 102, false),
+                ("Lamps & Lighting", 68, false), ("Figurines", 41, false),
+                ("Mirrors & Frames", 0, true)
+            })
+            {
+                <label class="check" style="@(disabled ? "opacity:.45;cursor:not-allowed" : "")">
+                    <input type="checkbox" disabled="@disabled" />
+                    <span class="check__label t-body-sm grow">@label</span>
+                    <span class="filter-count">@count</span>
+                </label>
+            }
+        </div>
+    </div>
+
+    @* ---- Price ---- *@
+    <div class="filter-group">
+        <button class="filter-group__head" type="button" aria-expanded="true">
+            Price
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="filter-group__body">
+            @* Histogram behind the track so shoppers see where products cluster. *@
+            <div class="row-flex" style="align-items:flex-end;gap:2px;height:36px" aria-hidden="true">
+                @foreach (var height in new[] { 20, 42, 68, 100, 84, 56, 38, 22, 14, 8 })
+                {
+                    <span style="flex:1;height:@(height)%;background:var(--color-bg-subtle);border-radius:2px 2px 0 0"></span>
+                }
+            </div>
+            <div class="range-slider">
+                <input type="range" min="500" max="6000" value="6000" aria-label="Maximum price" />
+                <div class="range-slider__values">
+                    <input class="input" type="number" value="500" aria-label="Minimum price" />
+                    <span class="text-tertiary-c">to</span>
+                    <input class="input" type="number" value="6000" aria-label="Maximum price" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ---- Material ---- *@
+    <div class="filter-group">
+        <button class="filter-group__head" type="button" aria-expanded="true">
+            Material
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="filter-group__body">
+            @foreach (var (label, count) in new[]
+            {
+                ("Ceramic", 42), ("Brass", 18), ("Terracotta", 14),
+                ("Cotton", 36), ("Wood", 22), ("Marble", 6), ("Silver", 11), ("Jute", 9)
+            })
+            {
+                <label class="check">
+                    <input type="checkbox" />
+                    <span class="check__label t-body-sm grow">@label</span>
+                    <span class="filter-count">@count</span>
+                </label>
+            }
+            <button class="filter-group__more" type="button">Show all (14)</button>
+        </div>
+    </div>
+
+    @* ---- Colour ---- A11Y / CU rule: the colour name is always rendered as text. ---- *@
+    <div class="filter-group">
+        <button class="filter-group__head" type="button" aria-expanded="true">
+            Colour
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="filter-group__body">
+            <div class="swatch-filter">
+                @foreach (var (name, hex, oos) in new[]
+                {
+                    ("Indigo", "#4F46E5", false), ("White", "#FFFFFF", false),
+                    ("Terracotta", "#D4714C", false), ("Brass", "#C99A28", false),
+                    ("Forest", "#047857", false), ("Charcoal", "#2A2724", true)
+                })
+                {
+                    <button class="swatch @(oos ? "is-oos" : "")" type="button"
+                            style="background:@hex" aria-label="Filter by colour @name" title="@name"></button>
+                }
+            </div>
+            <p class="t-body-xs text-tertiary-c mt-xs">
+                Indigo · White · Terracotta · Brass · Forest · Charcoal (out of stock)
+            </p>
+        </div>
+    </div>
+
+    @* ---- Handmade by (artisan) ---- *@
+    <div class="filter-group is-collapsed">
+        <button class="filter-group__head" type="button" aria-expanded="false">
+            Handmade By
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="filter-group__body">
+            <div class="search-bar mb-xs">
+                <label class="sr-only" for="artisanFilterSearch">Search artisans</label>
+                <svg class="ico search-bar__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+                <input class="search-bar__input" id="artisanFilterSearch" type="search"
+                       placeholder="Search artisans" style="height:36px" />
+            </div>
+            @foreach (var artisan in DemoContent.Artisans())
+            {
+                <label class="check">
+                    <input type="checkbox" />
+                    <img src="@artisan.PhotoUrl" alt="" width="20" height="20"
+                         style="width:20px;height:20px;border-radius:50%;object-fit:cover" />
+                    <span class="check__label t-body-sm grow">
+                        @artisan.Name
+                        <span class="check__help">@artisan.Cluster</span>
+                    </span>
+                </label>
+            }
+        </div>
+    </div>
+
+    @* ---- Rating ---- *@
+    <div class="filter-group is-collapsed">
+        <button class="filter-group__head" type="button" aria-expanded="false">
+            Rating
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="filter-group__body">
+            @foreach (var (stars, count) in new[] { (4, 62), (3, 78), (2, 84) })
+            {
+                <label class="check">
+                    <input type="radio" name="ratingFilter" />
+                    <span class="check__label t-body-sm grow row-flex gap-2xs">
+                        <span class="rating__stars">
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                <svg class="ico ico-xs @(i < stars ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
+                            }
+                        </span>
+                        <span>&amp; above</span>
+                    </span>
+                    <span class="filter-count">@count</span>
+                </label>
+            }
+        </div>
+    </div>
+
+    @* ---- Availability ---- *@
+    <div class="filter-group is-collapsed">
+        <button class="filter-group__head" type="button" aria-expanded="false">
+            Availability
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="filter-group__body">
+            <label class="check">
+                <input type="checkbox" checked />
+                <span class="check__label t-body-sm grow">In stock</span>
+                <span class="filter-count">76</span>
+            </label>
+            <label class="check">
+                <input type="checkbox" />
+                <span class="check__label t-body-sm grow">Made to order</span>
+                <span class="filter-count">6</span>
+            </label>
+            <label class="check">
+                <input type="checkbox" />
+                <span class="check__label t-body-sm grow">Pre-order</span>
+                <span class="filter-count">2</span>
+            </label>
+        </div>
+    </div>
+
+    @* ---- Discount ---- *@
+    <div class="filter-group is-collapsed">
+        <button class="filter-group__head" type="button" aria-expanded="false">
+            Discount
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="filter-group__body">
+            @foreach (var (label, count) in new[] { ("10% and above", 38), ("20% and above", 24), ("30% and above", 11), ("50% and above", 3) })
+            {
+                <label class="check">
+                    <input type="radio" name="discountFilter" />
+                    <span class="check__label t-body-sm grow">@label</span>
+                    <span class="filter-count">@count</span>
+                </label>
+            }
+        </div>
+    </div>
+
+    @* ---- Toggles ---- *@
+    <div class="filter-group">
+        <div class="filter-group__body" style="padding-top:0">
+            <label class="switch" style="justify-content:space-between;width:100%">
+                <span class="t-body-sm">New arrivals only</span>
+                <input type="checkbox" />
+            </label>
+            <label class="switch" style="justify-content:space-between;width:100%">
+                <span class="t-body-sm">Eco &amp; sustainable</span>
+                <input type="checkbox" />
+            </label>
+            <label class="switch" style="justify-content:space-between;width:100%">
+                <span class="t-body-sm">GI tagged crafts</span>
+                <input type="checkbox" />
+            </label>
+        </div>
+    </div>
+</div>

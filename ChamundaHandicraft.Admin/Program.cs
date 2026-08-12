@@ -1,3 +1,5 @@
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ApiService;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,8 +13,26 @@ if (builder.Environment.IsDevelopment())
 
 // No database access and no module project references — every action calls the
 // gateway through ApiService. See ARCHITECTURE.md.
-builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddHttpClient<IApiService, ApiService>(client =>
+{
+    client.BaseAddress = new Uri(
+        builder.Configuration["APIGatewayBaseUrl"] ?? "https://localhost:7138/");
+    client.Timeout = TimeSpan.FromSeconds(
+        builder.Configuration.GetValue("Api:TimeoutSeconds", 60));
+});
+
+// The admin panel's data seam, mirroring IStorefrontClient on the customer site.
+// Flip Api:UseLiveGateway once ChamundaHandicraft.API exposes the Admin/* controllers.
+if (builder.Configuration.GetValue("Api:UseLiveGateway", false))
+{
+    builder.Services.AddScoped<IAdminClient, GatewayAdminClient>();
+}
+else
+{
+    builder.Services.AddScoped<IAdminClient, DemoAdminClient>();
+}
 
 builder.Services.AddSession(options =>
 {

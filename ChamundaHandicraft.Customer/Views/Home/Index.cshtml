@@ -1,0 +1,485 @@
+@{
+    var products = DemoContent.AllProducts();
+    var categories = DemoContent.Categories();
+    var artisans = DemoContent.Artisans();
+    var articles = DemoContent.Articles();
+    var reviews = DemoContent.Reviews();
+
+    // Honest scarcity only: the flash sale window is a real scheduled end time,
+    // anchored to server time and rendered from it (CX principle 3).
+    var flashEndsAt = DateTime.Now.Date.AddDays(1).AddHours(20);
+    var flashProducts = products.Where(p => p.IsOnSale).Take(6).ToList();
+
+    var materials = new (string Label, string Slug)[]
+    {
+        ("Brass", "brass"), ("Ceramic", "ceramic"), ("Terracotta", "terracotta"),
+        ("Wood", "wood"), ("Cotton", "cotton"), ("Silk", "silk"),
+        ("Silver", "silver"), ("Jute", "jute")
+    };
+}
+
+@* ══════════ SEC-02-01 · Hero ══════════
+   LCP surface. The first slide is eager with fetchpriority=high; the rest are
+   lazy. No autoplay before LCP, and the carousel never auto-advances without a
+   pause control (A11Y-09). *@
+<section class="container" style="padding-top:var(--space-md)" aria-label="Featured collection">
+    <div class="hero">
+        <img class="hero__img" src="~/assets/images/placeholders/hero.svg"
+             alt="Brass diyas glowing in a row on a dark wooden surface"
+             fetchpriority="high" width="1200" height="500" />
+
+        <div class="hero__body">
+            <span class="t-overline hero__eyebrow">Handmade for Diwali</span>
+            <h1 class="t-display-2xl hero__title mt-xs">Light your home with pieces made by hand</h1>
+            <p class="hero__sub">
+                Brass diyas, blue pottery and festive décor from artisans across India —
+                each piece credited to the person who made it.
+            </p>
+            <div class="hero__actions">
+                <a class="btn btn-primary btn-xl" href="/c/festive">Shop the Collection</a>
+                <a class="btn btn-inverse btn-xl" href="/artisans">Meet the Makers</a>
+            </div>
+        </div>
+
+        <div class="gallery__dots" style="position:absolute;bottom:16px;right:24px;z-index:3">
+            <span class="gallery__dot is-active" role="img" aria-label="Slide 1 of 3, current"></span>
+            <span class="gallery__dot" role="img" aria-label="Slide 2 of 3"></span>
+            <span class="gallery__dot" role="img" aria-label="Slide 3 of 3"></span>
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-02 · Trust badges strip ══════════
+   Trust before persuasion — this sits above every urgency device on the page. *@
+<section class="band-sm" aria-label="Our guarantees">
+    <div class="container">
+        <div class="trust-band card" style="padding:var(--space-md)">
+            <div class="trust-badge">
+                <span class="trust-badge__icon"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-hand-heart"></use></svg></span>
+                <span>
+                    <span class="trust-badge__title">100% handmade</span>
+                    <span class="trust-badge__sub">240 named artisans</span>
+                </span>
+            </div>
+            <div class="trust-badge">
+                <span class="trust-badge__icon"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-undo"></use></svg></span>
+                <span>
+                    <span class="trust-badge__title">7-day returns</span>
+                    <span class="trust-badge__sub">Free pickup anywhere</span>
+                </span>
+            </div>
+            <div class="trust-badge">
+                <span class="trust-badge__icon"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-shield-check"></use></svg></span>
+                <span>
+                    <span class="trust-badge__title">Secure payments</span>
+                    <span class="trust-badge__sub">UPI, cards, COD</span>
+                </span>
+            </div>
+            <div class="trust-badge">
+                <span class="trust-badge__icon"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-truck"></use></svg></span>
+                <span>
+                    <span class="trust-badge__title">Free above ₹999</span>
+                    <span class="trust-badge__sub">Insured in transit</span>
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-03 · Shop by category ══════════ *@
+<section class="band band-surface" aria-labelledby="catHead">
+    <div class="container">
+        <div class="band-head">
+            <div class="band-head__text">
+                <span class="craft-rule"></span>
+                <h2 class="t-display-lg" id="catHead">Shop by category</h2>
+                <p class="band-head__sub">Six families of craft, each from a different corner of the country.</p>
+            </div>
+            <a class="link-standalone" href="/shop">
+                View all
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+        </div>
+
+        <div class="cat-grid">
+            @foreach (var category in categories)
+            {
+                <a class="cat-tile reveal" href="@category.Url">
+                    <img src="@category.ImageUrl" alt="@category.Name" loading="lazy" width="480" height="360" />
+                    <span class="cat-tile__body">
+                        <span class="cat-tile__title">@category.Name</span>
+                        <span class="cat-tile__count">@category.ProductCount pieces</span>
+                    </span>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-04 · Flash sale (conditional) ══════════
+   Only rendered while a genuine scheduled sale window is open. *@
+<section class="band band-craft" aria-labelledby="flashHead">
+    <div class="container">
+        <div class="band-head">
+            <div class="band-head__text">
+                <span class="t-overline text-craft-c">
+                    <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-flame"></use></svg>
+                    Flash sale
+                </span>
+                <h2 class="t-display-lg" id="flashHead">Festive prices, ending @Money.DeliveryDate(flashEndsAt)</h2>
+                <div class="countdown mt-sm" data-countdown-to="@flashEndsAt.ToString("O")"
+                     aria-label="Sale ends on @Money.LongDate(flashEndsAt) at @flashEndsAt.ToString("h:mm tt")">
+                    <span class="countdown__unit"><span class="countdown__num" data-cd-hours>--</span><span class="countdown__lbl">Hrs</span></span>
+                    <span class="countdown__unit"><span class="countdown__num" data-cd-mins>--</span><span class="countdown__lbl">Min</span></span>
+                    <span class="countdown__unit"><span class="countdown__num" data-cd-secs>--</span><span class="countdown__lbl">Sec</span></span>
+                </div>
+            </div>
+            <a class="link-standalone" href="/c/sale">
+                Shop all offers
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+        </div>
+
+        <div class="rail-wrap">
+            <button class="rail__arrow rail__arrow--prev" type="button" aria-label="Scroll left">
+                <svg class="ico" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+            </button>
+            <div class="rail" tabindex="0" role="group" aria-label="Flash sale products">
+                @foreach (var product in flashProducts)
+                {
+                    @await Html.PartialAsync("_ProductCard", product)
+                }
+            </div>
+            <button class="rail__arrow rail__arrow--next" type="button" aria-label="Scroll right">
+                <svg class="ico" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </button>
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-06 · New arrivals ══════════ *@
+<section class="band band-surface">
+    <div class="container">
+        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        {
+            Eyebrow = "Just in",
+            Heading = "New arrivals",
+            SubHeading = "Pieces that reached the studio this fortnight.",
+            ViewAllUrl = "/c/new-arrivals",
+            Products = products.Skip(4).Take(6).ToList()
+        })
+    </div>
+</section>
+
+@* ══════════ SEC-02-08 · The handmade story ══════════ *@
+<section class="band band-craft" aria-labelledby="storyHead">
+    <div class="container">
+        <div class="layout-halves">
+            <div class="img-box img-4-3 reveal" style="border-radius:var(--radius-xl)">
+                <img src="~/assets/images/placeholders/lifestyle.svg"
+                     alt="Ram Prasad Sharma shaping a vase on a potter's wheel in his Jaipur workshop"
+                     loading="lazy" width="900" height="675" />
+                <button class="icon-btn icon-btn-onimage icon-btn-xl" type="button"
+                        style="position:absolute;inset:0;margin:auto"
+                        aria-label="Play the craft process film, 2 minutes 40 seconds">
+                    <svg class="ico ico-xl" aria-hidden="true"><use href="#i-play-circle"></use></svg>
+                </button>
+            </div>
+
+            <div>
+                <span class="craft-rule"></span>
+                <span class="t-overline text-craft-c">Our promise</span>
+                <h2 class="t-display-lg mt-xs" id="storyHead">Made by hand, not by machine</h2>
+                <p class="t-body-lg text-secondary-c mt-md">
+                    Every piece in our collection is made by an artisan whose name we know, in a
+                    workshop we have visited. No two are identical — and that is exactly the point.
+                    We pay the maker first and price backwards from there.
+                </p>
+
+                <div class="row-flex wrap gap-lg mt-lg">
+                    <div>
+                        <div class="t-display-lg text-craft-c tabular">240</div>
+                        <div class="t-body-sm text-secondary-c">artisans we buy from</div>
+                    </div>
+                    <div>
+                        <div class="t-display-lg text-craft-c tabular">18</div>
+                        <div class="t-body-sm text-secondary-c">craft clusters</div>
+                    </div>
+                    <div>
+                        <div class="t-display-lg text-craft-c tabular">62%</div>
+                        <div class="t-body-sm text-secondary-c">of price reaches the maker</div>
+                    </div>
+                </div>
+
+                <div class="row-flex wrap gap-sm mt-lg">
+                    <a class="btn btn-secondary btn-lg" href="/pages/about">Read Our Story</a>
+                    <a class="btn btn-outline btn-lg" href="/artisans">Meet the Makers</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-09 · Shop by material ══════════ *@
+<section class="band-sm band-surface" aria-labelledby="matHead">
+    <div class="container">
+        <h2 class="t-heading-lg mb-md" id="matHead">Shop by material</h2>
+        <div class="chip-nav">
+            @foreach (var material in materials)
+            {
+                <a class="chip-nav__item" href="/shop?material=@material.Slug">
+                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-layers"></use></svg>
+                    @material.Label
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-10 · Bestsellers ══════════ *@
+<section class="band band-surface">
+    <div class="container">
+        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        {
+            Eyebrow = "Most loved",
+            Heading = "Bestsellers",
+            SubHeading = "Ranked by orders in the last 30 days — not by what we want to move.",
+            ViewAllUrl = "/shop?sort=bestselling",
+            Products = products.Take(6).ToList()
+        })
+    </div>
+</section>
+
+@* ══════════ SEC-02-12 · Shop by artisan ══════════ *@
+<section class="band band-subtle" aria-labelledby="makerHead">
+    <div class="container">
+        <div class="band-head">
+            <div class="band-head__text">
+                <span class="craft-rule"></span>
+                <h2 class="t-display-lg" id="makerHead">Meet the makers</h2>
+                <p class="band-head__sub">The people behind the pieces. Every product page credits one of them.</p>
+            </div>
+            <a class="link-standalone" href="/artisans">
+                View all artisans
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+        </div>
+
+        <div class="cat-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+            @foreach (var artisan in artisans)
+            {
+                <a class="card card-flush reveal" href="/artisans/@artisan.Slug" style="text-align:center">
+                    <div class="img-box img-1-1" style="border-radius:0">
+                        <img src="@artisan.PhotoUrl" alt="@artisan.Name at work in the @artisan.Cluster workshop"
+                             loading="lazy" width="240" height="240" />
+                    </div>
+                    <div style="padding:var(--space-md)">
+                        <div class="t-heading-xs">@artisan.Name</div>
+                        <div class="t-body-sm text-craft-c">@artisan.Craft</div>
+                        <div class="t-body-xs text-tertiary-c mt-2xs">@artisan.Cluster</div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-14 · Customer reviews ══════════
+   Real reviews from verified purchases only — the authenticity note is mandatory. *@
+<section class="band band-surface" aria-labelledby="revHead">
+    <div class="container">
+        <div class="band-head">
+            <div class="band-head__text">
+                <h2 class="t-display-lg" id="revHead">What our customers say</h2>
+                <p class="band-head__sub">We only publish reviews from verified purchases.</p>
+            </div>
+            <div class="row-flex gap-xs">
+                <span class="rating rating-lg" aria-label="Average rating 4.7 out of 5 from 3,214 reviews">
+                    <span class="rating__stars">
+                        @for (var i = 0; i < 5; i++)
+                        {
+                            <svg class="ico @(i < 5 ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
+                        }
+                    </span>
+                    <span class="rating__value">4.7</span>
+                    <span class="rating__count">from 3,214 reviews</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="rail-wrap">
+            <div class="rail" tabindex="0" role="group" aria-label="Customer reviews">
+                @foreach (var review in reviews.Concat(reviews))
+                {
+                    <div class="testimonial">
+                        <span class="rating" aria-label="Rated @review.Rating out of 5">
+                            <span class="rating__stars">
+                                @for (var i = 0; i < 5; i++)
+                                {
+                                    <svg class="ico @(i < review.Rating ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
+                                }
+                            </span>
+                        </span>
+                        <p class="t-heading-xs">@review.Title</p>
+                        <p class="testimonial__quote clamp-4">@review.Body</p>
+                        @if (review.Photos.Count > 0)
+                        {
+                            <div class="row-flex gap-xs">
+                                @foreach (var photo in review.Photos.Take(2))
+                                {
+                                    <img src="@photo" alt="Customer photo of the product in their home"
+                                         width="56" height="56" loading="lazy"
+                                         style="width:56px;height:56px;border-radius:var(--radius-sm);object-fit:cover" />
+                                }
+                            </div>
+                        }
+                        <div class="row-flex gap-xs mt-auto" style="padding-top:var(--space-sm)">
+                            <span class="avatar avatar-sm">@review.Author[..1]</span>
+                            <span class="grow">
+                                <span class="t-body-sm" style="font-weight:600;display:block">@review.Author</span>
+                                <span class="review-card__verified">
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-badge-check"></use></svg>
+                                    Verified purchase
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-15/16 · Recently viewed & Recommended ══════════ *@
+<section class="band band-subtle">
+    <div class="container stack stack-xl">
+        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        {
+            Heading = "Recently viewed",
+            ViewAllUrl = "/account/recently-viewed",
+            ViewAllLabel = "Clear history",
+            Products = products.Skip(2).Take(5).ToList(),
+            Compact = true
+        })
+
+        <div>
+            <div class="band-head">
+                <div class="band-head__text">
+                    <span class="ai-chip">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                        Suggested for you
+                    </span>
+                    <h2 class="t-display-lg mt-xs">Because you looked at blue pottery</h2>
+                    <p class="band-head__sub">Recommendations are generated from what you viewed. <a class="link" href="/account/preferences">Manage this</a>.</p>
+                </div>
+            </div>
+            <div class="rail-wrap">
+                <div class="rail" tabindex="0" role="group" aria-label="Recommended products">
+                    @foreach (var product in products.Skip(6).Take(6))
+                    {
+                        @await Html.PartialAsync("_ProductCard", product)
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-17 · Stories from the blog ══════════ *@
+<section class="band band-surface" aria-labelledby="blogHead">
+    <div class="container">
+        <div class="band-head">
+            <div class="band-head__text">
+                <span class="craft-rule"></span>
+                <h2 class="t-display-lg" id="blogHead">Stories from the workshop</h2>
+                <p class="band-head__sub">How things are made, and who makes them.</p>
+            </div>
+            <a class="link-standalone" href="/blog">
+                Read the journal
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </a>
+        </div>
+
+        <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+            @foreach (var article in articles)
+            {
+                <a class="article-card reveal" href="@article.Url">
+                    <div class="article-card__media">
+                        <img src="@article.CoverUrl" alt="@article.Title" loading="lazy" width="800" height="450" />
+                    </div>
+                    <div class="article-card__body">
+                        <span class="t-overline eyebrow-craft">@article.Category</span>
+                        <h3 class="article-card__title clamp-2">@article.Title</h3>
+                        <p class="t-body-sm text-secondary-c clamp-2">@article.Excerpt</p>
+                        <p class="article-card__meta">@article.Author · @Money.LongDate(article.PublishedOn) · @article.ReadMinutes min read</p>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@* ══════════ SEC-02-18 · Instagram feed ══════════ *@
+<section class="band-sm band-surface" aria-labelledby="igHead">
+    <div class="container">
+        <div class="band-head">
+            <div class="band-head__text">
+                <h2 class="t-heading-lg" id="igHead">@@chamundahandicraft on Instagram</h2>
+                <p class="band-head__sub">Pieces in real homes, posted by the people who bought them.</p>
+            </div>
+            <a class="link-standalone" href="https://instagram.com" rel="noopener">
+                Follow us
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-instagram"></use></svg>
+            </a>
+        </div>
+
+        <div class="insta-grid">
+            @{
+                var tiles = new[] { "pottery", "textile", "brass", "wood", "jewellery", "decor" };
+            }
+            @foreach (var tile in tiles)
+            {
+                <a class="insta-tile" href="https://instagram.com" rel="noopener"
+                   aria-label="Instagram post featuring @tile craft">
+                    <img src="~/assets/images/placeholders/@(tile).svg" alt="" loading="lazy" width="400" height="400" />
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Countdown — anchored to a real server-supplied end time. When it reaches
+        // zero the band is removed rather than restarted (no fake urgency).
+        (function () {
+            var el = document.querySelector('[data-countdown-to]');
+            if (!el) return;
+
+            var endsAt = new Date(el.getAttribute('data-countdown-to')).getTime();
+            var hours = el.querySelector('[data-cd-hours]');
+            var mins = el.querySelector('[data-cd-mins]');
+            var secs = el.querySelector('[data-cd-secs]');
+
+            function pad(n) { return String(n).padStart(2, '0'); }
+
+            function tick() {
+                var left = endsAt - Date.now();
+
+                if (left <= 0) {
+                    var band = el.closest('section');
+                    if (band) band.remove();
+                    clearInterval(timer);
+                    return;
+                }
+
+                hours.textContent = pad(Math.floor(left / 3600000));
+                mins.textContent = pad(Math.floor(left / 60000) % 60);
+                secs.textContent = pad(Math.floor(left / 1000) % 60);
+            }
+
+            var timer = setInterval(tick, 1000);
+            tick();
+        })();
+    </script>
+}

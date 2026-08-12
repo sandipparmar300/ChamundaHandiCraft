@@ -1,0 +1,204 @@
+@model ProductCardViewModel
+
+@*
+    MOD-03-01 · Quick View — a conversion shortcut, not a PDP replacement.
+    It carries the essentials plus an unmistakable route to the full page.
+*@
+<div class="modal-scrim" id="quickView" role="dialog" aria-modal="true"
+     aria-labelledby="quickViewTitle" aria-hidden="true">
+    <div class="modal modal-lg">
+        <div class="modal__head">
+            <span class="t-overline">Quick view</span>
+            <button class="icon-btn" data-close="quickView" aria-label="Close quick view">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+
+        <div class="modal__body">
+            <div class="layout-halves" style="align-items:start">
+                <div>
+                    <div class="img-box img-1-1">
+                        <img class="img-product" src="@Model.ImageUrl" alt="@Model.ImageAlt" width="400" height="400" />
+                    </div>
+                    <div class="gallery__dots mt-xs">
+                        <span class="gallery__dot is-active"></span>
+                        <span class="gallery__dot"></span>
+                        <span class="gallery__dot"></span>
+                        <span class="gallery__dot"></span>
+                    </div>
+                </div>
+
+                <div class="stack stack-sm">
+                    <span class="t-overline">@Model.CategoryName</span>
+                    <h2 class="t-heading-lg" id="quickViewTitle">@Model.Name</h2>
+
+                    <div class="row-flex gap-sm wrap">
+                        <span class="rating rating-compact" aria-label="Rated @Model.Rating out of 5 from @Model.ReviewCount reviews">
+                            <svg class="ico" aria-hidden="true"><use href="#i-star"></use></svg>
+                            <span class="rating__value">@Model.Rating.ToString("0.0")</span>
+                            <span class="rating__count">(@Model.ReviewCount)</span>
+                        </span>
+                        @if (Model.Artisan is not null)
+                        {
+                            <a class="artisan-chip" href="/artisans/@Model.Artisan.Slug">
+                                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                                @Model.Artisan.Name
+                            </a>
+                        }
+                    </div>
+
+                    <div class="price price-lg @(Model.IsOnSale ? "is-sale" : "")">
+                        <span class="price__now">@Money.Inr(Model.Price)</span>
+                        @if (Model.IsOnSale)
+                        {
+                            <span class="price__mrp">@Money.Inr(Model.Mrp!.Value)</span>
+                            <span class="price__off">@Model.DiscountPercent% OFF</span>
+                            <span class="price__save">You save @Money.Inr(Model.Savings) (@Model.DiscountPercent%)</span>
+                        }
+                        <span class="price__tax">Inclusive of all taxes</span>
+                    </div>
+
+                    <div class="option-group">
+                        <span class="option-group__label">
+                            Colour: <span class="option-group__value">Indigo Blue</span>
+                        </span>
+                        <div class="swatch-filter">
+                            <button class="swatch is-selected" type="button" style="background:#4F46E5" aria-label="Indigo Blue" aria-pressed="true"></button>
+                            <button class="swatch" type="button" style="background:#FFFFFF" aria-label="Ivory White"></button>
+                            <button class="swatch" type="button" style="background:#D4714C" aria-label="Terracotta"></button>
+                            <button class="swatch is-oos" type="button" style="background:#047857" aria-label="Forest Green, out of stock"></button>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <span class="option-group__label">
+                            Size: <span class="option-group__value">Medium</span>
+                        </span>
+                        <div class="option-list" role="radiogroup" aria-label="Size">
+                            <button class="option-pill" type="button" role="radio" aria-checked="false" data-label="Small">S</button>
+                            <button class="option-pill is-selected" type="button" role="radio" aria-checked="true" data-label="Medium">M</button>
+                            <button class="option-pill is-oos" type="button" role="radio" aria-checked="false" disabled>L</button>
+                        </div>
+                    </div>
+
+                    @{
+                        var stock = StockStyle.For(Model.Stock, Model.StockCount);
+                    }
+                    @if (stock is not null)
+                    {
+                        <span class="stock @stock.Value.Css">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#@stock.Value.Icon"></use></svg>
+                            @stock.Value.Label
+                        </span>
+                    }
+
+                    <div class="row-flex gap-xs t-body-sm">
+                        <svg class="ico ico-sm text-secondary-c" aria-hidden="true"><use href="#i-truck"></use></svg>
+                        <span>Get it by <strong>@Money.DeliveryDate(DateTime.Today.AddDays(6))</strong> to 380015</span>
+                    </div>
+
+                    <div class="row-flex gap-sm mt-sm">
+                        <div class="qty">
+                            <button class="qty__btn" type="button" data-step="-1" aria-label="Decrease quantity" disabled>
+                                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-minus"></use></svg>
+                            </button>
+                            <input class="qty__input" type="number" value="1" min="1" max="3" aria-label="Quantity" />
+                            <button class="qty__btn" type="button" data-step="1" aria-label="Increase quantity">
+                                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"></use></svg>
+                            </button>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg grow" type="button" data-add-to-cart data-open-minicart>
+                            <span class="btn__spinner" aria-hidden="true"></span>
+                            <span class="btn__label">Add to Cart</span>
+                        </button>
+
+                        <button class="icon-btn icon-btn-outline icon-btn-lg wish" type="button"
+                                data-wishlist data-product-name="@Model.Name" aria-label="Save @Model.Name to wishlist">
+                            <svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg>
+                        </button>
+                    </div>
+
+                    <a class="link-standalone mt-xs" href="@Model.Url">
+                        View full details
+                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* MOD · Notify me when back in stock *@
+<div class="modal-scrim" id="notifyMe" role="dialog" aria-modal="true" aria-labelledby="notifyTitle" aria-hidden="true">
+    <div class="modal modal-sm">
+        <div class="modal__head">
+            <div>
+                <h2 class="t-heading-md" id="notifyTitle">Tell me when it's back</h2>
+                <p class="t-body-sm text-secondary-c mt-2xs">
+                    We'll email you once — no marketing, and we won't hold the piece for anyone else.
+                </p>
+            </div>
+            <button class="icon-btn" data-close="notifyMe" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <form data-validate>
+                <div class="field">
+                    <label class="field__label" for="notifyEmail">Email address</label>
+                    <input class="input" id="notifyEmail" type="email" required placeholder="you@example.com" autocomplete="email" />
+                    <p class="field__error">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+                        <span>Enter a valid email address</span>
+                    </p>
+                </div>
+                <button class="btn btn-primary btn-lg btn-block mt-md" type="submit">Notify Me</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* MOD · What variation to expect *@
+<div class="modal-scrim" id="variationModal" role="dialog" aria-modal="true" aria-labelledby="variationTitle" aria-hidden="true">
+    <div class="modal modal-lg">
+        <div class="modal__head">
+            <div>
+                <span class="t-overline eyebrow-craft">Handmade</span>
+                <h2 class="t-heading-md mt-2xs" id="variationTitle">What to expect</h2>
+            </div>
+            <button class="icon-btn" data-close="variationModal" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <p class="t-body-md text-secondary-c mb-lg">
+                These three photographs are all of the same product, made on different days by the same artisan.
+                This is the range of variation we consider normal — and none of these would be a valid return reason.
+            </p>
+            <div class="cat-grid" style="grid-template-columns:repeat(3,1fr)">
+                @foreach (var (img, caption) in new[]
+                {
+                    ("pottery", "Cobalt sits slightly darker where the glaze pooled."),
+                    ("decor", "The floral band is drawn freehand, so no two repeat."),
+                    ("lamp", "Height varies by up to 8 mm across a batch.")
+                })
+                {
+                    <figure>
+                        <div class="img-box img-1-1">
+                            <img class="img-product" src="~/assets/images/placeholders/@(img).svg" alt="@caption" loading="lazy" />
+                        </div>
+                        <figcaption class="t-body-xs text-tertiary-c mt-xs">@caption</figcaption>
+                    </figure>
+                }
+            </div>
+            <div class="alert alert-craft mt-lg">
+                <svg class="ico" aria-hidden="true"><use href="#i-undo"></use></svg>
+                <div>
+                    <p class="alert__title">If it isn't right, send it back</p>
+                    <p>Variation is expected; damage and defects are not. You have 7 days and we pay the return courier.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

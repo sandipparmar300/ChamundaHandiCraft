@@ -1,3 +1,4 @@
+@model CustomerGridItem
 @*
     Module 02 - Customer 360 (L-02 tabbed detail).
     Spec: docs/Admin Flows/Users.txt - Customer Profile, Orders, Wishlist,
@@ -33,9 +34,9 @@
                 <div class="flex-grow-1">
                     <h3 class="mb-1" id="custName">&mdash;</h3>
                     <p class="text-muted mb-0" style="font-size:.85rem;">
-                        <span id="custEmail">&mdash;</span> &middot;
-                        <span id="custMobile">&mdash;</span> &middot;
-                        Registered <span id="custRegistered">&mdash;</span>
+                        <span id="custEmail">@Model.Email</span> &middot;
+                        <span id="custMobile">@(Model.Phone ?? "—")</span> &middot;
+                        Registered <span id="custRegistered">@Money.LongDate(Model.CreatedOn)</span>
                     </p>
                 </div>
 
@@ -101,7 +102,7 @@
                                     <th style="min-width:90px;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody><tr><td colspan="8" class="text-center py-4">Nothing recorded here yet.</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -120,7 +121,7 @@
                                     <th style="min-width:90px;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody><tr><td colspan="8" class="text-center py-4">Nothing recorded here yet.</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -139,7 +140,7 @@
                                     <th style="min-width:100px;">Default</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody><tr><td colspan="8" class="text-center py-4">Nothing recorded here yet.</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -174,7 +175,7 @@
                                     <th style="min-width:110px;">Balance</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody><tr><td colspan="8" class="text-center py-4">Nothing recorded here yet.</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -199,7 +200,7 @@
                                     <th style="min-width:320px;">Note</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody><tr><td colspan="8" class="text-center py-4">Nothing recorded here yet.</td></tr></tbody>
                         </table>
                     </div>
                 </div>

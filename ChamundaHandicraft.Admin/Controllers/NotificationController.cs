@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ViewModel.Admin;
+using ChamundaHandicraft.Helper.ViewModel.Common;
+using ChamundaHandicraft.Helper.ViewModel.Customer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Admin.Controllers;
 
-/// <summary>
-/// View shell for the Notifications screens. Each action renders markup only â€”
-/// the ApiService calls and view models arrive with the API wiring.
-/// </summary>
-public class NotificationController : Controller
+/// <summary>What was sent, to whom, and whether it arrived. Read-only — these records are created by the system, not an operator.</summary>
+public class NotificationController : AdminListController<NotificationLogGridItem>
 {
-    public IActionResult Index() => View();
+    public NotificationController(IAdminClient client) : base(client) { }
 
-    public IActionResult Details(int id) => View();
+    protected override string Module => "Notification";
 }

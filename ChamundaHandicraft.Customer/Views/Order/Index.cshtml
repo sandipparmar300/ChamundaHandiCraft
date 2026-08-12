@@ -1,0 +1,200 @@
+@model List<OrderSummaryCardViewModel>
+@{
+    Layout = "_AccountLayout";
+}
+
+<div class="page-head" style="padding-top:0">
+    <h1 class="t-heading-xl page-head__title">My orders</h1>
+    <p class="page-head__sub">@Model.Count orders. Tap any one to see its full history and invoice.</p>
+</div>
+
+<div class="plp-toolbar" style="padding-top:0">
+    <div class="row-flex wrap gap-xs">
+        <button class="chip is-active" type="button">All (@Model.Count)</button>
+        <button class="chip" type="button">In transit (1)</button>
+        <button class="chip" type="button">Delivered (1)</button>
+        <button class="chip" type="button">Returns (1)</button>
+    </div>
+
+    <div class="row-flex gap-sm">
+        <div class="search-bar" style="min-width:200px">
+            <label class="sr-only" for="orderSearch">Search orders</label>
+            <svg class="ico search-bar__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input class="search-bar__input" id="orderSearch" type="search" placeholder="Order number or item"
+                   style="height:40px" />
+        </div>
+        <select class="select hide-tablet-down" style="width:auto;height:40px" aria-label="Filter by time">
+            <option>Last 6 months</option>
+            <option>Last year</option>
+            <option>2026</option>
+            <option>All time</option>
+        </select>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="state-block">
+        <span class="state-block__icon state-block__icon--craft">
+            <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-package"></use></svg>
+        </span>
+        <h2 class="t-heading-md">No orders yet</h2>
+        <p class="state-block__desc">When you buy something, it will appear here with live tracking.</p>
+        <div class="state-block__actions">
+            <a class="btn btn-primary" href="/shop">Browse the Shop</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="stack stack-md mt-md">
+        @foreach (var order in Model)
+        {
+            <article class="order-card">
+                <div class="order-card__head">
+                    <div class="row-flex wrap gap-lg">
+                        <div>
+                            <p class="t-body-xs text-tertiary-c">Order number</p>
+                            <p class="t-body-sm t-mono">@order.OrderNumber</p>
+                        </div>
+                        <div>
+                            <p class="t-body-xs text-tertiary-c">Placed on</p>
+                            <p class="t-body-sm">@Money.LongDate(order.PlacedOn)</p>
+                        </div>
+                        <div>
+                            <p class="t-body-xs text-tertiary-c">Total</p>
+                            <p class="t-body-sm tabular">@Money.Inr(order.Total)</p>
+                        </div>
+                    </div>
+
+                    <span class="status-chip status-chip--@order.StatusModifier">
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#@order.StatusIcon"></use></svg>
+                        @order.StatusLabel
+                    </span>
+                </div>
+
+                <div class="order-card__body">
+                    <div class="row-flex wrap between gap-md">
+                        <div class="row-flex gap-md">
+                            <div class="order-thumbs">
+                                @foreach (var thumb in order.Thumbnails.Take(3))
+                                {
+                                    <img class="img-product" src="@thumb" alt="" width="56" height="56" loading="lazy" />
+                                }
+                                @if (order.ItemCount > 3)
+                                {
+                                    <span class="order-thumbs__more">+@(order.ItemCount - 3)</span>
+                                }
+                            </div>
+
+                            <div>
+                                <p class="t-body-md">@order.PrimaryItemName</p>
+                                @if (order.ItemCount > 1)
+                                {
+                                    <p class="t-body-sm text-secondary-c">and @(order.ItemCount - 1) more @(order.ItemCount == 2 ? "item" : "items")</p>
+                                }
+
+                                @if (order.Status == OrderStatus.Delivered && order.DeliveredOn is not null)
+                                {
+                                    <p class="t-body-sm text-success-c mt-2xs row-flex gap-2xs">
+                                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+                                        Delivered on @Money.LongDate(order.DeliveredOn.Value)
+                                    </p>
+                                }
+                                else if (order.DeliveryBy is not null)
+                                {
+                                    <p class="t-body-sm text-info-c mt-2xs row-flex gap-2xs">
+                                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-truck"></use></svg>
+                                        Arriving @Money.DeliveryDate(order.DeliveryBy.Value) · @order.Courier
+                                    </p>
+                                }
+                            </div>
+                        </div>
+
+                        <a class="btn btn-outline btn-sm shrink-0" href="@order.Url">View Details</a>
+                    </div>
+                </div>
+
+                <div class="order-card__foot">
+                    @if (order.Status is OrderStatus.Shipped or OrderStatus.OutForDelivery or OrderStatus.Packed)
+                    {
+                        <a class="btn btn-primary btn-sm" href="/track/@order.OrderNumber">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-map-pin"></use></svg>
+                            Track Order
+                        </a>
+                    }
+                    @if (order.CanReview)
+                    {
+                        <a class="btn btn-outline btn-sm" href="/reviews/write/silver-filigree-jhumka">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>
+                            Write a Review
+                        </a>
+                    }
+                    @if (order.CanCancel)
+                    {
+                        <button class="btn btn-ghost btn-sm" type="button" data-open="cancelOrder">Cancel Order</button>
+                    }
+                    <a class="btn btn-ghost btn-sm" href="@order.Url">
+                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-file-text"></use></svg>
+                        Invoice
+                    </a>
+                    <a class="btn btn-ghost btn-sm" href="/shop">
+                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-repeat"></use></svg>
+                        Buy Again
+                    </a>
+                    <a class="btn btn-ghost btn-sm" href="/help" style="margin-left:auto">Need help?</a>
+                </div>
+            </article>
+        }
+    </div>
+}
+
+@* MOD-11 · Cancel order. Neutral wording, no confirm-shaming. *@
+<div class="modal-scrim" id="cancelOrder" role="dialog" aria-modal="true" aria-labelledby="cancelTitle" aria-hidden="true">
+    <div class="modal">
+        <div class="modal__head">
+            <div>
+                <h2 class="t-heading-md" id="cancelTitle">Cancel this order?</h2>
+                <p class="t-body-sm text-secondary-c mt-2xs">
+                    It hasn't shipped yet, so we can stop it. Your refund starts the moment you confirm.
+                </p>
+            </div>
+            <button class="icon-btn" data-close="cancelOrder" aria-label="Close">
+                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <div class="field">
+                <span class="field__label">Why are you cancelling? <span class="field__optional">(optional)</span></span>
+                <div class="stack stack-xs mt-xs">
+                    @foreach (var reason in new[]
+                    {
+                        "I changed my mind",
+                        "Found it cheaper elsewhere",
+                        "Delivery is taking too long",
+                        "Ordered by mistake",
+                        "Something else"
+                    })
+                    {
+                        <label class="check">
+                            <input type="radio" name="cancelReason" />
+                            <span class="check__label">@reason</span>
+                        </label>
+                    }
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-md">
+                <svg class="ico" aria-hidden="true"><use href="#i-banknote"></use></svg>
+                <div>
+                    <p class="alert__title">Refund of @Money.Inr(5290)</p>
+                    <p>Back to your UPI ID within 5 working days. Reward points used are returned immediately.</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal__foot">
+            <button class="btn btn-ghost" data-close="cancelOrder">Keep My Order</button>
+            <button class="btn btn-danger" data-close="cancelOrder">Cancel Order</button>
+        </div>
+    </div>
+</div>

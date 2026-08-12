@@ -10,9 +10,9 @@ One Figma Team, project **`Handicraft Commerce`**, containing both product surfa
 
 | File | Purpose | Published as library |
 |------|---------|---------------------|
-| `00 · Karigar DS — Primitives` | Shared raw tokens: colour primitives, spacing, radius, motion, icon set, brand assets | ✅ Yes — consumed by both storefront and admin |
-| `01 · Karigar DS — Storefront Foundations` | Storefront semantic tokens, type scale, grids, effects, illustrations, photography direction | ✅ Yes |
-| `02 · Karigar DS — Storefront Components` | All 140 component sets from `03-Component-Library.md` | ✅ Yes |
+| `00 · Chamunda DS — Primitives` | Shared raw tokens: colour primitives, spacing, radius, motion, icon set, brand assets | ✅ Yes — consumed by both storefront and admin |
+| `01 · Chamunda DS — Storefront Foundations` | Storefront semantic tokens, type scale, grids, effects, illustrations, photography direction | ✅ Yes |
+| `02 · Chamunda DS — Storefront Components` | All 140 component sets from `03-Component-Library.md` | ✅ Yes |
 | `03 · Storefront — Product Design` | Every page, state and breakpoint | ❌ No |
 | `04 · Storefront — Prototypes` | Interactive flows for testing and demos | ❌ No |
 | `05 · Storefront — Content & Assets` | Real product photography, copy decks, illustration masters | ❌ No |

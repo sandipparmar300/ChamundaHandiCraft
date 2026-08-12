@@ -1,0 +1,10 @@
+@model bool
+@* A boolean column rendered as a word, never as a bare tick that screen readers skip. *@
+@if (Model)
+{
+    <span class="badge bg-success">Yes</span>
+}
+else
+{
+    <span class="badge bg-secondary">No</span>
+}

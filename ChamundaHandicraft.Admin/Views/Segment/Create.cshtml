@@ -1,3 +1,4 @@
+@model SegmentGridItem
 @{
     ViewData["Title"] = "Customer Segment";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
@@ -23,7 +24,7 @@
 
     <form method="post" id="segmentForm">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -34,7 +35,7 @@
                 <div class="row g-3">
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Segment Name <span class="req">*</span></label>
-                        <input id="Name" name="Name" class="form-control-custom" placeholder="Enter segment name" />
+                        <input id="Name" name="Name" class="form-control-custom" placeholder="Enter segment name" / value="@Model.Name" >
                         <span class="error-msg" data-valmsg-for="Name"></span>
                     </div>
 
@@ -48,7 +49,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Description</label>
-                        <input id="Description" name="Description" class="form-control-custom" placeholder="Enter description" />
+                        <input id="Description" name="Description" class="form-control-custom" placeholder="Enter description" / value="@Model.Description" >
                     </div>
                 </div>
             </div>

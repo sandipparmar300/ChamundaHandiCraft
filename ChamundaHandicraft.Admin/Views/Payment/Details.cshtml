@@ -1,4 +1,5 @@
-﻿@{
+@model PaymentGridItem
+@{
     ViewData["Title"] = "Payment Details";
 }
 
@@ -29,51 +30,51 @@
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Transaction ID</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.TransactionId</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Order Number</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.OrderNumber</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Customer</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.CustomerName</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Gateway</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.GatewayName ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Payment Method</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Method</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Amount</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.Amount)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Gateway Fee</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.GatewayFee)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Net Amount</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.Inr(Model.NetAmount)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Currency</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">INR</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Status</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Paid On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.DateAndTime(Model.PaidOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Gateway Response</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.GatewayReference ?? "—")</p>
                     </div>
             </div>
         </div>

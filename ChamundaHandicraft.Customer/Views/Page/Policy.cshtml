@@ -1,0 +1,109 @@
+@{
+    var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
+    var title = ViewData["Title"] as string ?? "Policy";
+
+    var sections = new (string Id, string Heading, string[] Body)[]
+    {
+        ("scope", "What this covers", new[]
+        {
+            "This policy applies to everything you buy from chamundahandicraft.com and to any order placed by phone or WhatsApp with our care team. It sits alongside our terms and conditions — where the two disagree, this page wins for the topic it covers.",
+            "We write these pages in plain language on purpose. If a sentence here is unclear, that is a fault on our side: tell us at care@chamundahandicraft.com and we will rewrite it."
+        }),
+        ("window", "The window", new[]
+        {
+            "You have 7 days from delivery to raise a return, for any reason at all. The clock starts on the delivery date shown in your order history, not on the dispatch date.",
+            "Items marked \"made to order\" carry the same 7 days. Personalised items — anything engraved, monogrammed or made to your measurements — cannot be returned unless they arrive damaged or wrong, because they cannot be resold."
+        }),
+        ("handmade", "Handmade variation is not a defect", new[]
+        {
+            "Every piece we sell is made by a person. Colour, finish, weight and size vary slightly between pieces, and the photograph shows one representative example rather than the exact item you will receive.",
+            "This is not a defect and is not grounds for us to refuse a return — you can still send it back within 7 days — but it is worth knowing before you order. Each product page shows the range of acceptable variation with example photographs."
+        }),
+        ("cost", "What it costs you", new[]
+        {
+            "Nothing. We book the courier and pay for the pickup, anywhere in India, for every return reason including changing your mind.",
+            "The one exception is a second return of the same item after a replacement, where we ask you to speak to our care team first so we can understand what went wrong."
+        }),
+        ("process", "How it works", new[]
+        {
+            "Raise the return from your order history, or message us. Choose the items, tell us why, and pick a pickup day. You will get an RMA number by email within minutes.",
+            "The courier collects within 2–4 working days. Keep the original packaging if you still have it; if not, any sturdy box is fine. Once the item reaches our Jaipur studio we check it — usually the same day — and start the refund."
+        }),
+        ("refund", "When the money comes back", new[]
+        {
+            "Refunds are issued to the original payment method within 5 working days of the item reaching us. UPI and card refunds typically land in 2–3 days; net banking can take 5–7 depending on the bank.",
+            "Reward points used on the order are returned to your account immediately when the return is approved, not when the money moves. Points earned on a returned item are reversed.",
+            "Cash on delivery orders are refunded by bank transfer. We will ask for account details once — never by phone, never by SMS, only inside your account."
+        }),
+        ("damage", "Damaged or wrong on arrival", new[]
+        {
+            "Send a photo within 48 hours of delivery and we replace or refund immediately. We do not ask you to return a broken item — you can dispose of it responsibly and we will handle the courier claim ourselves.",
+            "Fragile pieces are insured in transit at our cost. A breakage is never billed to you and never counts against your return history."
+        }),
+        ("contact", "Talk to a person", new[]
+        {
+            "care@chamundahandicraft.com, +91 98765 43210 or WhatsApp, Monday to Saturday, 10am to 7pm IST. Every message is answered by a named member of our care team within one working day."
+        })
+    };
+}
+
+<div class="container">
+    @if (crumbs is not null)
+    {
+        @await Html.PartialAsync("_Breadcrumb", crumbs)
+    }
+
+    <div class="page-head">
+        <h1 class="t-display-lg page-head__title">@title</h1>
+        <p class="page-head__sub">
+            Last updated @Money.LongDate(DateTime.Today.AddDays(-34)) ·
+            <a class="link" href="/pages/contact">Ask us about anything here</a>
+        </p>
+    </div>
+
+    <div class="layout-editorial" style="padding-bottom:var(--space-2xl)">
+        <div class="prose">
+            @foreach (var part in sections)
+            {
+                <h2 id="@part.Id">@part.Heading</h2>
+                foreach (var paragraph in part.Body)
+                {
+                    <p>@paragraph</p>
+                }
+            }
+
+            <div class="alert alert-craft mt-xl">
+                <svg class="ico" aria-hidden="true"><use href="#i-circle-help"></use></svg>
+                <div>
+                    <p class="alert__title">Something here unclear?</p>
+                    <p>
+                        Policies are only useful if they are understood. Email
+                        <a class="link" href="mailto:care@chamundahandicraft.com">care@chamundahandicraft.com</a>
+                        and we will explain — and rewrite the page if the fault is ours.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <aside class="hide-tablet-down">
+            <nav class="toc" aria-label="On this page">
+                <p class="t-overline mb-sm">On this page</p>
+                @foreach (var part in sections)
+                {
+                    <a class="toc__link" href="#@part.Id">@part.Heading</a>
+                }
+            </nav>
+
+            <div class="card mt-lg">
+                <p class="t-heading-xs mb-sm">Related</p>
+                <div class="stack stack-2xs">
+                    <a class="link-muted t-body-sm" href="/pages/shipping-policy">Shipping policy</a>
+                    <a class="link-muted t-body-sm" href="/pages/refund-policy">Refund policy</a>
+                    <a class="link-muted t-body-sm" href="/pages/terms">Terms &amp; conditions</a>
+                    <a class="link-muted t-body-sm" href="/pages/privacy-policy">Privacy policy</a>
+                    <a class="link-muted t-body-sm" href="/help">Help centre</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>

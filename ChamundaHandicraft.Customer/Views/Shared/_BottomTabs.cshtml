@@ -1,0 +1,28 @@
+@model ShellViewModel
+@{
+    var tabs = new (string Key, string Label, string Icon, string Url, int Badge)[]
+    {
+        ("home",     "Home",     "i-home",   "/",         0),
+        ("shop",     "Shop",     "i-store",  "/shop",     0),
+        ("search",   "Search",   "i-search", "/search",   0),
+        ("wishlist", "Wishlist", "i-heart",  "/wishlist", Model.WishlistCount),
+        ("account",  "Account",  "i-user",   Model.IsSignedIn ? "/account" : "/login", 0)
+    };
+}
+
+@* CMP-NAV-BottomTabs — mobile only, hidden during checkout to reduce distraction. *@
+<nav class="bottom-tabs no-print" aria-label="Primary mobile navigation">
+    @foreach (var tab in tabs)
+    {
+        <a class="bottom-tabs__item @(Model.ActiveNav == tab.Key ? "is-active" : "")"
+           href="@tab.Url"
+           aria-current="@(Model.ActiveNav == tab.Key ? "page" : null)">
+            <svg class="ico ico-lg" aria-hidden="true"><use href="#@tab.Icon"></use></svg>
+            <span>@tab.Label</span>
+            @if (tab.Badge > 0)
+            {
+                <span class="counter bottom-tabs__badge">@tab.Badge</span>
+            }
+        </a>
+    }
+</nav>

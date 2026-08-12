@@ -1,0 +1,93 @@
+@{
+    Layout = "_CheckoutLayout";
+    var method = ViewData["Method"] as string ?? "UPI";
+    var summary = DemoContent.Summary(DemoContent.CartLines());
+}
+
+<div class="container-narrow" style="padding-block:var(--space-3xl)">
+    <div class="text-center">
+        <span class="spinner spinner-lg mx-auto" role="status" aria-live="polite"></span>
+
+        <h1 class="t-heading-xl mt-lg">Completing your payment</h1>
+        <p class="t-body-lg text-secondary-c mt-sm">
+            @if (method == "UPI")
+            {
+                <text>Approve the request for <strong class="text-primary-c">@Money.Inr(summary.Total)</strong> in your UPI app. We're waiting for your bank.</text>
+            }
+            else
+            {
+                <text>We're confirming <strong class="text-primary-c">@Money.Inr(summary.Total)</strong> with your bank. This usually takes a few seconds.</text>
+            }
+        </p>
+    </div>
+
+    @* An explicit instruction is safer than an unattended spinner. *@
+    <div class="alert alert-warning mt-xl" role="alert">
+        <svg class="ico" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div>
+            <p class="alert__title">Don't close this page or press back</p>
+            <p>Doing so could take the payment without placing the order. We'll move you on automatically.</p>
+        </div>
+    </div>
+
+    <div class="card mt-lg">
+        <div class="timeline">
+            <div class="timeline__step is-done">
+                <div class="timeline__marker">
+                    <span class="timeline__dot"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"></use></svg></span>
+                    <span class="timeline__line"></span>
+                </div>
+                <div class="timeline__body">
+                    <p class="timeline__title">Order details confirmed</p>
+                    <p class="timeline__meta">@summary.ItemCount items · @Money.Inr(summary.Total)</p>
+                </div>
+            </div>
+
+            <div class="timeline__step is-current">
+                <div class="timeline__marker">
+                    <span class="timeline__dot"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg></span>
+                    <span class="timeline__line"></span>
+                </div>
+                <div class="timeline__body">
+                    <p class="timeline__title">Waiting for your bank</p>
+                    <p class="timeline__meta">Usually under 30 seconds · <span class="tabular" id="paymentTimer">0:12</span> elapsed</p>
+                </div>
+            </div>
+
+            <div class="timeline__step is-upcoming">
+                <div class="timeline__marker">
+                    <span class="timeline__dot"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-package"></use></svg></span>
+                </div>
+                <div class="timeline__body">
+                    <p class="timeline__title">Order placed</p>
+                    <p class="timeline__meta">You'll get a confirmation by email and SMS</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="t-body-sm text-tertiary-c text-center mt-lg">
+        Taking too long? <a class="link" href="/checkout/failed?reason=The+payment+timed+out.">Cancel and try another method</a> —
+        nothing is charged until the order is placed.
+    </p>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var el = document.getElementById('paymentTimer');
+            var seconds = 12;
+
+            setInterval(function () {
+                seconds++;
+                el.textContent = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+            }, 1000);
+
+            // Warn before an accidental back or refresh loses the in-flight payment.
+            window.addEventListener('beforeunload', function (e) {
+                e.preventDefault();
+                e.returnValue = '';
+            });
+        })();
+    </script>
+}

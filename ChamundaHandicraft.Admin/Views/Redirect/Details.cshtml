@@ -1,4 +1,5 @@
-﻿@{
+@model RedirectGridItem
+@{
     ViewData["Title"] = "Redirect Details";
 }
 
@@ -22,38 +23,38 @@
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Redirect Information</h2>
-            <a asp-controller="Redirect" asp-action="Edit" asp-route-id="0" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
+            <a asp-controller="Redirect" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Source URL</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.FromPath</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Destination URL</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.ToPath</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Redirect Type</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.StatusCode</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Hits</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.HitCount</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Last Hit</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.LastHitOn is null ? "Never" : Money.Relative(Model.LastHitOn.Value))</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Created On</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.LongDate(Model.CreatedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Created By</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.CreatedBy ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Notes</label>
@@ -61,7 +62,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.IsActive ? "Active" : "Inactive")</p>
                     </div>
             </div>
         </div>

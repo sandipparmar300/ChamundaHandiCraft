@@ -1,4 +1,5 @@
-﻿@{
+@model AuditLogGridItem
+@{
     ViewData["Title"] = "Audit Entry Details";
 }
 
@@ -29,27 +30,27 @@
             <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Date</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Money.DateAndTime(Model.PerformedOn)</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">User</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.PerformedBy</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Module</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.EntityType</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Action</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@Model.Action</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Record</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.EntityName ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Change Summary</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.ChangeSummary ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Old Value</label>
@@ -61,7 +62,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">IP Address</label>
-                        <p class="detail-value">&mdash;</p>
+                        <p class="detail-value">@(Model.IpAddress ?? "—")</p>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Device</label>

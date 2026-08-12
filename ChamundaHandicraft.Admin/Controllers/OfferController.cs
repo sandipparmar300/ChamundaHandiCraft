@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.ViewModel.Admin;
+using ChamundaHandicraft.Helper.ViewModel.Common;
+using ChamundaHandicraft.Helper.ViewModel.Customer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Admin.Controllers;
 
-/// <summary>
-/// View shell for the Offers screens. Each action renders markup only â€”
-/// the ApiService calls and view models arrive with the API wiring.
-/// </summary>
-public class OfferController : Controller
+/// <summary>Flash sales and category offers.</summary>
+public class OfferController : AdminCrudController<OfferGridItem, FlashSaleSaveRequest>
 {
-    public IActionResult Index() => View();
+    public OfferController(IAdminClient client) : base(client) { }
 
-    public IActionResult Add() => View("Create");
-
-    public IActionResult Edit(int id) => View("Create");
-
-    public IActionResult Details(int id) => View();
+    protected override string Module => "Offer";
 }

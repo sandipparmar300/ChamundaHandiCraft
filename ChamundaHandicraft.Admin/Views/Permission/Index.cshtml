@@ -1,23 +1,24 @@
 @*
-    Module 02 - Permission catalogue. Read-only view of every permission key
-    and which roles hold it. Spec: docs/Admin Flows/Users.txt - Permission Management.
+    Module 02 - Permission catalogue. Spec: docs/Admin Flows/Users.txt - Permission Management.
+
+    One row per `module.entity.action` key — the same keys the API checks. Showing them
+    grouped by module, for one role at a time, keeps the screen readable as the catalogue
+    grows and matches how the backend actually evaluates a request.
 *@
+@model List<PermissionMatrixItem>
 @{
     ViewData["Title"] = "Permissions";
 
-    var roles = new[]
-    {
-        "Super Admin", "Admin", "Product Manager", "Inventory Manager", "Sales Manager",
-        "Customer Support", "Finance Manager", "Marketing Manager", "Content Manager"
-    };
+    var roles = ViewData["Roles"] as List<IdNamePair> ?? new List<IdNamePair>();
+    var roleId = ViewData["RoleId"] as int?;
+    var roleName = roles.FirstOrDefault(r => r.Id == roleId)?.Name;
 
-    var modules = new[]
-    {
-        "Dashboard", "Products", "Categories", "Inventory", "Orders", "Payments",
-        "Shipping", "Customers", "Coupons", "Offers", "Banners", "CMS", "Blog",
-        "Reviews", "Testimonials", "Newsletter", "Notifications", "Reports",
-        "SEO", "Settings", "Users", "Media", "Support", "Audit"
-    };
+    var grouped = Model
+        .GroupBy(p => p.Module)
+        .OrderBy(g => g.Key)
+        .ToList();
+
+    var grantedCount = Model.Count(p => p.IsGranted);
 }
 
 @section Header {
@@ -28,6 +29,10 @@
         <ul class="page-breadcrumb">
             <li>User Management</li>
             <li>Permission Matrix</li>
+            @if (!string.IsNullOrEmpty(roleName))
+            {
+                <li>@roleName</li>
+            }
         </ul>
     </div>
 }
@@ -45,14 +50,20 @@
                 </div>
             </div>
 
-            <div class="d-flex gap-2 flex-wrap">
-                <select id="filterRole" class="form-control-custom" style="min-width:180px;">
-                    <option value="">All Roles</option>
-                    @foreach (var r in roles)
-                    {
-                        <option>@r</option>
-                    }
-                </select>
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+                <span class="text-muted" style="font-size:.8rem;">
+                    @grantedCount of @Model.Count granted
+                </span>
+                <form method="get" asp-controller="Permission" asp-action="Index" id="roleForm">
+                    <select name="roleId" class="form-control-custom" style="min-width:180px;"
+                            onchange="document.getElementById('roleForm').submit();">
+                        <option value="">Select a role&hellip;</option>
+                        @foreach (var r in roles)
+                        {
+                            <option value="@r.Id" selected="@(r.Id == roleId)">@r.Name</option>
+                        }
+                    </select>
+                </form>
                 <a asp-controller="Role" asp-action="Index" class="custom_button primary_button">Manage Roles</a>
             </div>
         </div>
@@ -62,23 +73,56 @@
         <table id="permission-grid" class="custom-datatable listing-order-table permission-matrix">
             <thead>
                 <tr>
-                    <th style="min-width:180px;">Module</th>
-                    @foreach (var r in roles)
-                    {
-                        <th style="min-width:120px;" class="text-center">@r</th>
-                    }
+                    <th style="min-width:150px;">Module</th>
+                    <th style="min-width:220px;">Permission key</th>
+                    <th style="min-width:280px;">What it allows</th>
+                    <th style="min-width:110px;" class="text-center">Granted</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var m in modules)
+                @if (!Model.Any())
                 {
-                    <tr data-module="@m.ToLowerInvariant()">
-                        <td><strong>@m</strong></td>
-                        @foreach (var r in roles)
-                        {
-                            <td class="text-center"><span class="text-muted">&mdash;</span></td>
-                        }
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            No permissions to show. Pick a role above.
+                        </td>
                     </tr>
+                }
+                else
+                {
+                    @foreach (var group in grouped)
+                    {
+                        var first = true;
+                        @foreach (var p in group.OrderBy(x => x.Entity).ThenBy(x => x.Action))
+                        {
+                            <tr data-search="@($"{p.Module} {p.Key} {p.Description}".ToLowerInvariant())">
+                                <td>
+                                    @if (first)
+                                    {
+                                        <strong style="text-transform:capitalize;">@group.Key</strong>
+                                        <div class="text-muted" style="font-size:.72rem;">@group.Count() keys</div>
+                                        first = false;
+                                    }
+                                </td>
+                                <td><code>@p.Key</code></td>
+                                <td>@p.Description</td>
+                                <td class="text-center">
+                                    @if (p.IsGranted)
+                                    {
+                                        <span class="status-pill status-active">
+                                            <i class="fas fa-check"></i> Granted
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill status-inactive">
+                                            <i class="fas fa-minus"></i> Denied
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
                 }
             </tbody>
         </table>
@@ -96,8 +140,8 @@
             $("#clearSearch").toggle(term.length > 0);
 
             $('#permission-grid tbody tr').each(function () {
-                var m = $(this).data('module') || '';
-                $(this).toggle(m.indexOf(term) > -1);
+                var hay = $(this).data('search') || '';
+                $(this).toggle(hay.indexOf(term) > -1);
             });
         }
 

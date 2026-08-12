@@ -1,4 +1,5 @@
-﻿@{
+@model CampaignGridItem
+@{
     ViewData["Title"] = "Campaign";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Campaign" : "Add Campaign";
@@ -23,7 +24,7 @@
 
     <form method="post" id="campaignForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -64,7 +65,7 @@
 
                     <div class="col-lg-8 col-md-6">
                         <label class="form-label-custom">Subject <span class="req">*</span></label>
-                        <input id="Subject" name="Subject" class="form-control-custom" placeholder="Enter subject" />
+                        <input id="Subject" name="Subject" class="form-control-custom" placeholder="Enter subject" / value="@Model.Subject" >
                         <span class="error-msg" data-valmsg-for="Subject"></span>
                     </div>
 
@@ -82,7 +83,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Scheduled On</label>
-                        <input type="datetime-local" id="ScheduledOn" name="ScheduledOn" class="form-control-custom" />
+                        <input type="datetime-local" id="ScheduledOn" name="ScheduledOn" class="form-control-custom" / value="@Model.ScheduledOn" >
                         <span class="error-msg" data-valmsg-for="ScheduledOn"></span>
                     </div>
 

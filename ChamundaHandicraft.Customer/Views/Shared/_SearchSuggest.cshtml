@@ -1,0 +1,74 @@
+@*
+    CMP-SRC-Suggestions — Recent · Trending · Suggestions · Products · Categories/Artisans
+    Empty query shows Recent + Trending only. Query match is bolded in suggestions.
+*@
+<div class="search-suggest" id="headerSuggest" role="listbox" aria-label="Search suggestions">
+
+    <div class="search-suggest__group">
+        <div class="search-suggest__head">
+            <span class="t-overline">Recent</span>
+            <button class="btn btn-link btn-sm" type="button">Clear all</button>
+        </div>
+        <a class="search-suggest__row" href="/search?q=blue+pottery+vase" role="option">
+            <svg class="ico ico-sm text-tertiary-c" aria-hidden="true"><use href="#i-clock"></use></svg>
+            <span class="grow">blue pottery vase</span>
+            <span class="icon-btn icon-btn-sm" aria-label="Remove from recent searches">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-x"></use></svg>
+            </span>
+        </a>
+        <a class="search-suggest__row" href="/search?q=brass+diya+set" role="option">
+            <svg class="ico ico-sm text-tertiary-c" aria-hidden="true"><use href="#i-clock"></use></svg>
+            <span class="grow">brass diya set</span>
+        </a>
+    </div>
+
+    <div class="search-suggest__group">
+        <span class="t-overline">Trending</span>
+        <div class="row-flex wrap gap-xs mt-xs">
+            <a class="chip" href="/search?q=diwali+gifts">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-flame"></use></svg>diwali gifts
+            </a>
+            <a class="chip" href="/search?q=kantha+cushion">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-flame"></use></svg>kantha cushion
+            </a>
+            <a class="chip" href="/search?q=marble+inlay">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-flame"></use></svg>marble inlay
+            </a>
+        </div>
+    </div>
+
+    <div class="search-suggest__group">
+        <span class="t-overline">Products</span>
+        @foreach (var product in DemoContent.Products(3))
+        {
+            <a class="search-suggest__row search-suggest__product" href="@product.Url" role="option">
+                <img src="@product.ImageUrl" alt="" loading="lazy" width="48" height="48" />
+                <span class="grow">
+                    <span style="display:block">@product.Name</span>
+                    <span class="t-body-xs text-tertiary-c">@product.CategoryName</span>
+                </span>
+                <span class="t-body-sm tabular" style="font-weight:600">@Money.Inr(product.Price)</span>
+            </a>
+        }
+    </div>
+
+    <div class="search-suggest__group">
+        <div class="row-flex gap-lg" style="align-items:flex-start">
+            <div class="grow">
+                <span class="t-overline">Categories</span>
+                <a class="search-suggest__row" href="/c/home-decor/vases" role="option">Vases <span class="text-tertiary-c">(84)</span></a>
+                <a class="search-suggest__row" href="/c/pottery" role="option">Pottery <span class="text-tertiary-c">(216)</span></a>
+            </div>
+            <div class="grow">
+                <span class="t-overline">Artisans</span>
+                <a class="search-suggest__row" href="/artisans/ram-prasad-sharma" role="option">Ram Prasad Sharma</a>
+                <a class="search-suggest__row" href="/artisans/meenakshi-devi" role="option">Meenakshi Devi</a>
+            </div>
+        </div>
+    </div>
+
+    <a class="search-suggest__footer" href="/search?q=blue+pottery">
+        <span>See all 42 results for “blue pottery”</span>
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+    </a>
+</div>

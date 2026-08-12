@@ -1,4 +1,5 @@
-﻿@{
+@model BlogAuthorGridItem
+@{
     ViewData["Title"] = "Author";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Author" : "Add Author";
@@ -23,7 +24,7 @@
 
     <form method="post" id="blogauthorForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -49,7 +50,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Email</label>
-                        <input id="Email" name="Email" class="form-control-custom" placeholder="Enter email" />
+                        <input id="Email" name="Email" class="form-control-custom" placeholder="Enter email" / value="@Model.Email" >
                         <span class="error-msg" data-valmsg-for="Email"></span>
                     </div>
 

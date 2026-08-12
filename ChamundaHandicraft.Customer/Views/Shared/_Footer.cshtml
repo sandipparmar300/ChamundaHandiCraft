@@ -1,0 +1,209 @@
+@model ShellViewModel
+@{
+    var minimal = string.Equals(Model.FooterVariant, "Minimal", StringComparison.OrdinalIgnoreCase);
+}
+
+<footer class="site-footer no-print">
+
+    @if (minimal)
+    {
+        @* Minimal variant — checkout and payment only. No navigation, to protect conversion. *@
+        <div class="container">
+            <div class="footer-legal" style="border-top:0">
+                <a class="header-logo" href="/">@await Html.PartialAsync("_Logo", "auto")</a>
+                <div class="payment-marks">
+                    <span class="payment-mark">VISA</span>
+                    <span class="payment-mark">MC</span>
+                    <span class="payment-mark">RuPay</span>
+                    <span class="payment-mark">UPI</span>
+                    <span class="payment-mark">COD</span>
+                </div>
+                <div class="row-flex gap-md t-body-xs">
+                    <a class="link-muted" href="/help">Need help?</a>
+                    <a class="link-muted" href="tel:+919876543210">+91 98765 43210</a>
+                    <a class="link-muted" href="/pages/privacy-policy">Privacy</a>
+                    <a class="link-muted" href="/pages/terms">Terms</a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="footer-newsletter">
+            <div class="container">
+                <div class="footer-newsletter__inner">
+                    <div>
+                        <span class="craft-rule"></span>
+                        <h2 class="t-heading-lg">Join the Chamunda circle</h2>
+                        <p class="t-body-md text-secondary-c mt-xs">
+                            Craft stories from the workshops we buy from, and first access to new collections.
+                            Two emails a month. Unsubscribe in one click, always.
+                        </p>
+                    </div>
+                    <form class="stack stack-sm" action="/newsletter/subscribe" method="post" data-validate>
+                        <div class="field">
+                            <label class="field__label" for="footerEmail">Email address</label>
+                            <div class="row-flex gap-xs">
+                                <input class="input" id="footerEmail" name="email" type="email" required
+                                       placeholder="you@example.com" autocomplete="email" />
+                                <button class="btn btn-primary shrink-0" type="submit">Subscribe</button>
+                            </div>
+                            <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                        </div>
+                        @* Never pre-ticked (§8.1 anti-dark-pattern). *@
+                        <label class="check">
+                            <input type="checkbox" name="consent" />
+                            <span class="check__label t-body-sm">
+                                I'd like craft stories and collection launches by email.
+                                <span class="check__help">We never share your address. See our <a class="link" href="/pages/privacy-policy">privacy policy</a>.</span>
+                            </span>
+                        </label>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="footer-cols">
+                <div class="footer-col">
+                    <button class="t-overline footer-col__title" type="button" aria-expanded="false">
+                        Shop
+                        <svg class="ico ico-sm only-mobile" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                    </button>
+                    <div class="footer-col__list">
+                        <a href="/c/new-arrivals">New Arrivals</a>
+                        <a href="/c/home-decor">Home Décor</a>
+                        <a href="/c/festive">Festive</a>
+                        <a href="/c/textiles">Textiles</a>
+                        <a href="/c/jewellery">Jewellery</a>
+                        <a href="/c/gifting">Gifting</a>
+                        <a href="/c/sale">Sale</a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <button class="t-overline footer-col__title" type="button" aria-expanded="false">
+                        About
+                        <svg class="ico ico-sm only-mobile" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                    </button>
+                    <div class="footer-col__list">
+                        <a href="/pages/about">Our Story</a>
+                        <a href="/artisans">Meet the Makers</a>
+                        <a href="/c/craft-clusters">Craft Clusters</a>
+                        <a href="/pages/sustainability">Sustainability</a>
+                        <a href="/pages/careers">Careers</a>
+                        <a href="/pages/press">Press</a>
+                        <a href="/blog">Blog</a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <button class="t-overline footer-col__title" type="button" aria-expanded="false">
+                        Help
+                        <svg class="ico ico-sm only-mobile" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                    </button>
+                    <div class="footer-col__list">
+                        <a href="/help">Help Centre</a>
+                        <a href="/track">Track Order</a>
+                        <a href="/pages/shipping">Shipping Info</a>
+                        <a href="/pages/returns">Returns</a>
+                        <a href="/pages/contact">Contact Us</a>
+                        <a href="/help#faq">FAQ</a>
+                        <a href="/pages/bulk-orders">Bulk Orders</a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <button class="t-overline footer-col__title" type="button" aria-expanded="false">
+                        Policies
+                        <svg class="ico ico-sm only-mobile" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                    </button>
+                    <div class="footer-col__list">
+                        <a href="/pages/privacy-policy">Privacy Policy</a>
+                        <a href="/pages/terms">Terms &amp; Conditions</a>
+                        <a href="/pages/shipping-policy">Shipping Policy</a>
+                        <a href="/pages/return-policy">Return Policy</a>
+                        <a href="/pages/refund-policy">Refund Policy</a>
+                        <a href="/pages/cookie-policy">Cookie Policy</a>
+                        <a href="/sitemap">Sitemap</a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <span class="t-overline footer-col__title" style="cursor:default">Connect</span>
+                    <div class="footer-col__list">
+                        <div class="row-flex gap-xs mb-sm">
+                            <a class="icon-btn icon-btn-outline" href="https://instagram.com" rel="noopener" aria-label="Instagram">
+                                <svg class="ico" aria-hidden="true"><use href="#i-instagram"></use></svg>
+                            </a>
+                            <a class="icon-btn icon-btn-outline" href="https://facebook.com" rel="noopener" aria-label="Facebook">
+                                <svg class="ico" aria-hidden="true"><use href="#i-facebook"></use></svg>
+                            </a>
+                            <a class="icon-btn icon-btn-outline" href="https://youtube.com" rel="noopener" aria-label="YouTube">
+                                <svg class="ico" aria-hidden="true"><use href="#i-youtube"></use></svg>
+                            </a>
+                            <a class="icon-btn icon-btn-outline" href="https://pinterest.com" rel="noopener" aria-label="Pinterest">
+                                <svg class="ico" aria-hidden="true"><use href="#i-pinterest"></use></svg>
+                            </a>
+                        </div>
+                        <a href="tel:+919876543210"><svg class="ico ico-sm" aria-hidden="true" style="display:inline;vertical-align:-3px"><use href="#i-phone"></use></svg> +91 98765 43210</a>
+                        <a href="mailto:care@chamundahandicraft.com"><svg class="ico ico-sm" aria-hidden="true" style="display:inline;vertical-align:-3px"><use href="#i-mail"></use></svg> care@chamundahandicraft.com</a>
+                        <a href="https://wa.me/919876543210" rel="noopener"><svg class="ico ico-sm" aria-hidden="true" style="display:inline;vertical-align:-3px"><use href="#i-whatsapp"></use></svg> WhatsApp us</a>
+                        <span class="t-body-xs text-tertiary-c mt-xs">Mon–Sat, 10am–7pm IST</span>
+                    </div>
+                </div>
+            </div>
+
+            @await Html.PartialAsync("_TrustBand")
+
+            <div class="footer-legal">
+                <div class="row-flex wrap gap-md">
+                    <div class="payment-marks">
+                        <span class="payment-mark">VISA</span>
+                        <span class="payment-mark">MC</span>
+                        <span class="payment-mark">RuPay</span>
+                        <span class="payment-mark">UPI</span>
+                        <span class="payment-mark">Razorpay</span>
+                        <span class="payment-mark">COD</span>
+                    </div>
+                </div>
+
+                <div class="row-flex wrap gap-md">
+                    <div class="dropdown">
+                        <button class="btn btn-ghost btn-sm" data-dropdown aria-expanded="false">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-rupee"></use></svg>
+                            India (₹ INR)
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                        </button>
+                        <div class="dropdown__menu" role="menu" style="right:auto;left:0;bottom:100%;top:auto">
+                            <button class="dropdown__item" role="menuitem">India (₹ INR)</button>
+                            <button class="dropdown__item" role="menuitem">United States ($ USD)</button>
+                        </div>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn btn-ghost btn-sm" data-dropdown aria-expanded="false">
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-languages"></use></svg>
+                            English
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                        </button>
+                        <div class="dropdown__menu" role="menu" style="right:auto;left:0;bottom:100%;top:auto">
+                            <button class="dropdown__item" role="menuitem">English</button>
+                            <button class="dropdown__item" role="menuitem">हिन्दी</button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-ghost btn-sm" data-theme-toggle aria-label="Switch between light and dark theme">
+                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-moon"></use></svg>
+                        Theme
+                    </button>
+                </div>
+            </div>
+
+            <div class="footer-legal" style="border-top:1px solid var(--color-border-subtle);padding-top:var(--space-md)">
+                <span>© @DateTime.Now.Year Chamunda Handicraft Pvt. Ltd. · GSTIN 08AABCK1234M1Z5 · CIN U52609RJ2024PTC091234</span>
+                <span>Made with care in Jaipur</span>
+            </div>
+        </div>
+    }
+</footer>

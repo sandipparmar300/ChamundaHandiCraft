@@ -1,4 +1,5 @@
-﻿@*
+@model PagedResult<MediaGridItem>
+@*
     Content - Media Library listing.  Spec: docs/Admin Flows/
 *@
 @{
@@ -53,7 +54,41 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td><img src="@(row.ThumbnailUrl ?? row.Url)" width="44" height="44" alt="@row.AltText" style="object-fit:cover;border-radius:4px" /></td>
+                        <td>@row.FileName</td>
+                        <td>@row.MediaType</td>
+                        <td class="text-end">@row.SizeDisplay</td>
+                        <td>@(row.Width is null ? "—" : row.Width + " x " + row.Height)</td>
+                        @* An image with no alt text cannot be attached to a published product. *@
+                        <td>
+                            @if (row.IsMissingAltText)
+                            {
+                                <span class="badge bg-danger">Missing</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">@row.AltText</span>
+                            }
+                        </td>
+                        <td class="text-end">@row.UsedInCount</td>
+                        <td>@Money.LongDate(row.CreatedOn)</td>
+                        <td>@(row.CreatedBy ?? "—")</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                            <a asp-action="Details" asp-route-id="@row.Id" title="View" class="ms-2"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="10" class="text-center py-4">Nothing in the library yet. <a asp-action="Add">Upload something</a>.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

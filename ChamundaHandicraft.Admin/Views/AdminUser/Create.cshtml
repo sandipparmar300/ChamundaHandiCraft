@@ -1,3 +1,4 @@
+@model AdminUserGridItem
 @*
     Module 02 - Create / Edit Admin User.  Spec: docs/Admin Flows/Users.txt
     Serves both Add and Edit; the controller renders this view for either.
@@ -31,7 +32,7 @@
 
     <form method="post" id="adminUserForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <!-- ================= PERSONAL ================= -->
         <section class="form-section">
@@ -71,7 +72,7 @@
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Full Name</label>
-                        <input id="FullName" name="FullName" class="form-control-custom" placeholder="Auto generated" readonly />
+                        <input id="FullName" name="FullName" class="form-control-custom" placeholder="Auto generated" readonly / value="@Model.FullName" >
                     </div>
 
                     <div class="col-lg-3 col-md-6">
@@ -100,7 +101,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Email <span class="req">*</span></label>
-                        <input type="email" id="Email" name="Email" class="form-control-custom" placeholder="Enter email" />
+                        <input type="email" id="Email" name="Email" class="form-control-custom" placeholder="Enter email" / value="@Model.Email" >
                         <span class="error-msg" data-valmsg-for="Email"></span>
                     </div>
 

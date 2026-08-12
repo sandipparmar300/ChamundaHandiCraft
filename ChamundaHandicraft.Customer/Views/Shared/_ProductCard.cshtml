@@ -1,0 +1,129 @@
+@model ProductCardViewModel
+@{
+    // CU-07: maximum 2 badges, priority Sale > Bestseller > New > Handmade > Limited.
+    var badges = Model.Badges.Take(2).ToList();
+    var stock = StockStyle.For(Model.Stock, Model.StockCount);
+    var isOos = Model.Stock == StockState.OutOfStock;
+}
+
+<article class="pcard @(isOos ? "is-oos" : "")">
+
+    <div class="pcard__media">
+        <img class="pcard__img img-product" src="@Model.ImageUrl" alt="@Model.ImageAlt"
+             width="400" height="400" loading="lazy" decoding="async" />
+
+        @if (Model.HoverImageUrl is not null && !isOos)
+        {
+            <img class="pcard__img pcard__img--alt img-product" src="@Model.HoverImageUrl" alt="" aria-hidden="true"
+                 width="400" height="400" loading="lazy" decoding="async" />
+        }
+
+        @if (badges.Count > 0)
+        {
+            <div class="pcard__badges">
+                @foreach (var badge in badges)
+                {
+                    var style = BadgeStyle.For(badge, Model.DiscountPercent);
+                    <span class="badge badge-sm @style.Css">
+                        @if (style.Icon is not null)
+                        {
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#@style.Icon"></use></svg>
+                        }
+                        @style.Label
+                    </span>
+                }
+            </div>
+        }
+
+        <button class="pcard__wish @(Model.IsWishlisted ? "is-on" : "")" type="button"
+                data-wishlist data-product-name="@Model.Name"
+                aria-pressed="@(Model.IsWishlisted ? "true" : "false")"
+                aria-label="@(Model.IsWishlisted ? "Remove" : "Save") @Model.Name @(Model.IsWishlisted ? "from" : "to") wishlist">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-heart"></use></svg>
+        </button>
+
+        @if (isOos)
+        {
+            <span class="pcard__oos-pill">Out of stock</span>
+        }
+        else
+        {
+            <button class="btn btn-inverse btn-sm pcard__quickview" type="button"
+                    data-open="quickView" aria-label="Quick view of @Model.Name">
+                Quick View
+            </button>
+        }
+    </div>
+
+    <div class="pcard__body">
+        @if (!string.IsNullOrEmpty(Model.CategoryName))
+        {
+            <span class="pcard__cat">@Model.CategoryName</span>
+        }
+
+        <h3 class="pcard__title">
+            <a class="pcard__link" href="@Model.Url" title="@Model.Name" style="color:inherit">@Model.Name</a>
+        </h3>
+
+        @if (Model.Artisan is not null)
+        {
+            <span class="artisan-chip">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                @Model.Artisan.Name
+            </span>
+        }
+
+        @if (Model.ReviewCount > 0)
+        {
+            <span class="rating rating-compact"
+                  aria-label="Rated @Model.Rating out of 5 from @Model.ReviewCount reviews">
+                <svg class="ico" aria-hidden="true"><use href="#i-star"></use></svg>
+                <span class="rating__value">@Model.Rating.ToString("0.0")</span>
+                <span class="rating__count">(@Model.ReviewCount)</span>
+            </span>
+        }
+
+        <div class="price @(Model.IsOnSale ? "is-sale" : "")"
+             aria-label="@Money.InrSpoken(Model.Price)@(Model.IsOnSale ? $", reduced from {Money.InrSpoken(Model.Mrp!.Value)}" : "")">
+            <span class="price__now">@Money.Inr(Model.Price)</span>
+            @if (Model.IsOnSale)
+            {
+                <span class="price__mrp">@Money.Inr(Model.Mrp!.Value)</span>
+                <span class="price__off">@Model.DiscountPercent% OFF</span>
+            }
+        </div>
+
+        @if (stock is not null && Model.Stock != StockState.InStock)
+        {
+            <span class="stock @stock.Value.Css pcard__stock">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#@stock.Value.Icon"></use></svg>
+                @stock.Value.Label
+            </span>
+        }
+
+        <div class="pcard__action">
+            @if (isOos)
+            {
+                <button class="btn btn-outline btn-sm btn-block" type="button" data-open="notifyMe">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-bell"></use></svg>
+                    Notify Me
+                </button>
+            }
+            else if (Model.RequiresOptions)
+            {
+                @* Products with required options open Quick View rather than adding blind. *@
+                <button class="btn btn-outline btn-sm btn-block" type="button" data-open="quickView">
+                    Choose Options
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-primary btn-sm btn-block" type="button"
+                        data-add-to-cart data-slug="@Model.Slug" aria-label="Add @Model.Name to cart">
+                    <span class="btn__spinner" aria-hidden="true"></span>
+                    <span class="btn__label">Add to Cart</span>
+                </button>
+            }
+        </div>
+    </div>
+</article>

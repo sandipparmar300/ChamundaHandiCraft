@@ -1,4 +1,5 @@
-﻿@{
+@model StockAdjustmentGridItem
+@{
     ViewData["Title"] = "Stock Adjustment";
     var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
     var heading = isEdit ? "Edit Stock Adjustment" : "Add Stock Adjustment";
@@ -23,7 +24,7 @@
 
     <form method="post" id="stockadjustmentForm" enctype="multipart/form-data">
 
-        <input type="hidden" id="Id" name="Id" value="0" />
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -34,7 +35,7 @@
                 <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Adjustment Number <span class="req">*</span></label>
-                        <input id="AdjustmentNumber" name="AdjustmentNumber" class="form-control-custom" placeholder="Enter adjustment number" />
+                        <input id="AdjustmentNumber" name="AdjustmentNumber" class="form-control-custom" placeholder="Enter adjustment number" / value="@Model.AdjustmentNumber" >
                         <span class="error-msg" data-valmsg-for="AdjustmentNumber"></span>
                     </div>
 

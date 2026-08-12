@@ -1,4 +1,5 @@
-﻿@*
+@model PagedResult<ShippingZoneGridItem>
+@*
     Sales - Shipping Zones listing.  Spec: docs/Admin Flows/
 *@
 @{
@@ -51,7 +52,31 @@
                     <th style="min-width:80px;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-action="Edit" asp-route-id="@row.Id">@row.ZoneName</a></td>
+                        <td class="text-muted">@row.Coverage</td>
+                        <td>Base + per kg</td>
+                        <td class="text-end">@Money.Inr(row.BaseRate)</td>
+                        @* This figure is the free-shipping promise the cart makes. *@
+                        <td class="text-end">@Money.Inr(row.FreeAboveAmount)</td>
+                        <td class="text-end">@row.StandardDays days</td>
+                        <td class="text-end">@row.PincodeCount PIN codes</td>
+                        <td>@await Html.PartialAsync("_StatusPill", row.IsActive)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit"><i class="fas fa-pen"></i></a>
+                            <a asp-action="Details" asp-route-id="@row.Id" title="View" class="ms-2"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="9" class="text-center py-4">No shipping zones yet. <a asp-action="Add">Add the first one</a>.</td></tr>
+                }
+            </tbody>
+
         </table>
     </div>
 </section>

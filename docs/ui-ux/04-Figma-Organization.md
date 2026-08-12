@@ -10,8 +10,8 @@ The design lives in **one Figma Team** with **four files** in a project named `H
 
 | File | Purpose | Published as library |
 |------|---------|---------------------|
-| `01 · Karigar DS — Foundations` | Variables, styles, tokens, icons, illustrations, grids | ✅ Yes |
-| `02 · Karigar DS — Components` | All component sets from `03-Component-Library.md` | ✅ Yes |
+| `01 · Chamunda DS — Foundations` | Variables, styles, tokens, icons, illustrations, grids | ✅ Yes |
+| `02 · Chamunda DS — Components` | All component sets from `03-Component-Library.md` | ✅ Yes |
 | `03 · Admin Panel — Product Design` | Every screen, every state, every breakpoint | ❌ No |
 | `04 · Admin Panel — Prototypes` | Interactive flows for testing & stakeholder demos | ❌ No |
 

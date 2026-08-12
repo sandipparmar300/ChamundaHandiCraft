@@ -1,0 +1,152 @@
+@{
+    Layout = "_AccountLayout";
+
+    var items = new (string Icon, string Title, string Body, DateTime When, bool Unread, string Url, string Action)[]
+    {
+        ("i-bike", "Out for delivery",
+         "Order HC-2026-000482 is with the courier and arrives today between 10am and 6pm.",
+         DateTime.Now.AddHours(-2), true, "/track/HC-2026-000482", "Track"),
+
+        ("i-percent", "A saved piece dropped in price",
+         "Madhubani Painting — Tree of Life is now ₹4,600, down from ₹5,800.",
+         DateTime.Now.AddHours(-9), true, "/wishlist", "View wishlist"),
+
+        ("i-star", "How was your order?",
+         "The Cuttack jhumkas arrived 18 days ago. A review takes two minutes and earns 50 points.",
+         DateTime.Now.AddDays(-2), false, "/reviews/write/silver-filigree-jhumka", "Write a review"),
+
+        ("i-truck", "Shipped",
+         "Order HC-2026-000482 left our Jaipur studio with Delhivery.",
+         DateTime.Now.AddDays(-1), false, "/track/HC-2026-000482", "Track"),
+
+        ("i-gem", "200 points added",
+         "R••••l M. used your referral code and their order has shipped.",
+         DateTime.Now.AddDays(-9), false, "/account/rewards", "View rewards"),
+
+        ("i-ticket-percent", "Your coupon expires in 12 days",
+         "BRASS15 gives 15% off brass and metal until " + Money.LongDate(DateTime.Today.AddDays(12)) + ".",
+         DateTime.Now.AddDays(-11), false, "/account/coupons", "Use it")
+    };
+}
+
+<div class="page-head" style="padding-top:0">
+    <div class="row-flex wrap between gap-md">
+        <div>
+            <h1 class="t-heading-xl page-head__title">Notifications</h1>
+            <p class="page-head__sub">Order updates, price drops and reminders. Nothing we can't act on.</p>
+        </div>
+        <div class="row-flex gap-xs">
+            <button class="btn btn-ghost btn-sm" type="button">Mark all as read</button>
+            <a class="btn btn-outline btn-sm" href="/account/preferences">
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-settings"></use></svg>
+                Settings
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="tabs mb-md" role="tablist" aria-label="Notification type" data-tabs-scope>
+    <button class="tabs__item is-active" data-tab="notif-all" role="tab" aria-selected="true">All (@items.Length)</button>
+    <button class="tabs__item" data-tab="notif-unread" role="tab" aria-selected="false" tabindex="-1">
+        Unread (@items.Count(i => i.Unread))
+    </button>
+    <button class="tabs__item" data-tab="notif-orders" role="tab" aria-selected="false" tabindex="-1">Orders</button>
+</div>
+
+<div class="tab-panel is-active" id="notif-all" role="tabpanel" style="padding-top:0">
+    <div class="card card-flush">
+        @foreach (var item in items)
+        {
+            <article class="notif-item @(item.Unread ? "is-unread" : "")">
+                <span class="notif-item__icon">
+                    <svg class="ico" aria-hidden="true"><use href="#@item.Icon"></use></svg>
+                </span>
+
+                <div class="grow">
+                    <div class="row-flex wrap between gap-sm">
+                        <p class="t-heading-xs">@item.Title</p>
+                        <span class="t-body-xs text-tertiary-c shrink-0">@Money.Relative(item.When)</span>
+                    </div>
+                    <p class="t-body-sm text-secondary-c mt-2xs">@item.Body</p>
+                    <div class="row-flex gap-md mt-xs">
+                        <a class="link-standalone t-body-sm" href="@item.Url">
+                            @item.Action
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                        </a>
+                        @if (item.Unread)
+                        {
+                            <button class="cart-line__link" type="button">Mark as read</button>
+                        }
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+
+    <div class="text-center mt-lg">
+        <button class="btn btn-outline" type="button">
+            <span class="btn__spinner" aria-hidden="true"></span>
+            <span class="btn__label">Load older notifications</span>
+        </button>
+    </div>
+</div>
+
+<div class="tab-panel" id="notif-unread" role="tabpanel" style="padding-top:0">
+    <div class="card card-flush">
+        @foreach (var item in items.Where(i => i.Unread))
+        {
+            <article class="notif-item is-unread">
+                <span class="notif-item__icon">
+                    <svg class="ico" aria-hidden="true"><use href="#@item.Icon"></use></svg>
+                </span>
+                <div class="grow">
+                    <div class="row-flex wrap between gap-sm">
+                        <p class="t-heading-xs">@item.Title</p>
+                        <span class="t-body-xs text-tertiary-c shrink-0">@Money.Relative(item.When)</span>
+                    </div>
+                    <p class="t-body-sm text-secondary-c mt-2xs">@item.Body</p>
+                    <a class="link-standalone t-body-sm mt-xs" href="@item.Url">
+                        @item.Action
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                    </a>
+                </div>
+            </article>
+        }
+    </div>
+</div>
+
+<div class="tab-panel" id="notif-orders" role="tabpanel" style="padding-top:0">
+    <div class="card card-flush">
+        @foreach (var item in items.Where(i => i.Icon is "i-bike" or "i-truck"))
+        {
+            <article class="notif-item @(item.Unread ? "is-unread" : "")">
+                <span class="notif-item__icon">
+                    <svg class="ico" aria-hidden="true"><use href="#@item.Icon"></use></svg>
+                </span>
+                <div class="grow">
+                    <div class="row-flex wrap between gap-sm">
+                        <p class="t-heading-xs">@item.Title</p>
+                        <span class="t-body-xs text-tertiary-c shrink-0">@Money.Relative(item.When)</span>
+                    </div>
+                    <p class="t-body-sm text-secondary-c mt-2xs">@item.Body</p>
+                    <a class="link-standalone t-body-sm mt-xs" href="@item.Url">
+                        @item.Action
+                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                    </a>
+                </div>
+            </article>
+        }
+    </div>
+</div>
+
+<div class="card card-craft mt-lg">
+    <div class="row-flex wrap gap-md between">
+        <div>
+            <p class="t-heading-xs text-craft-c">Too many notifications?</p>
+            <p class="t-body-sm text-craft-c">
+                Choose exactly what you get and where — email, SMS or WhatsApp, per type.
+            </p>
+        </div>
+        <a class="btn btn-secondary shrink-0" href="/account/preferences">Manage Preferences</a>
+    </div>
+</div>
