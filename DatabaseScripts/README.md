@@ -52,25 +52,63 @@ Foreign keys mean these must run in dependency order:
 12_Payments.sql        Payments, Refunds, Settlements, Disputes, Gateways
 13_Shipping.sql        Zones, Rates, Couriers, Shipments, TrackingEvents, Manifests
 14_Content.sql         CmsPages, Faq, ContactSubmissions, Blog, Banners, Testimonials
-15_Reviews.sql         Reviews, SubRatings, Media, Replies, Reports, Requests
-16_Communications.sql  Subscribers, Lists, Campaigns, Flows, Notifications
-17_Support.sql         SupportTickets, TicketMessages
-18_Seo.sql             SeoMeta, Redirects, NotFoundLog, Sitemap, Keywords
-19_Analytics.sql       Daily*Summary, OrderProfitability, SavedReports, Schedules
+15_Reviews.sql              Reviews, SubRatings, Media, Replies, AbuseReports, HelpfulVotes,
+                            ModerationHistories, ReviewRequests, ProductRatingSummaries,
+                            TestimonialMedia
+16_Communications.sql       NotificationEvents, Templates, Notifications, DeliveryLogs,
+                            Preferences, CustomerDevices, Subscribers, Segments,
+                            Campaigns, CampaignRecipients, CampaignEvents
+17_Support.sql              InquiryCategories, SupportTickets, TicketMessages,
+                            TicketAttachments, TicketStatusHistories
+18_Seo.sql                  SeoMetas, Redirects, NotFoundLogs, SitemapEntries, SitemapRuns,
+                            RobotsRules, SeoAuditRuns/Findings, BrokenLinks, Keywords
+19_Analytics.sql            SearchQueries/TermSummaries/Synonyms, PopularSearches,
+                            ProductViewLogs, BannerEvents, VisitorSessions, PageViewLogs,
+                            DailySalesSummaries, DailyTrafficSummaries, Report* config
+20_Concurrency_And_Tax.sql  OrderItemTaxes, RefundTaxes, TaxRateHistories
+                            + rowversion on 8 contended tables
 ```
+
+Current totals: **179 tables, 7 views, 16 procedures, 483 indexes, 310 foreign keys.**
+Full documentation lives in `docs/Database/`.
+
+---
+
+## Deployment
+
+`Apply-Database.ps1` applies everything in dependency order
+(`01-Schema` → `02-StoredProcedures` → `05-Views` → `03-Seed` → `04-Patches`),
+tracking a SHA-256 per file in `dbo.SchemaHistory`. Safe to re-run; nothing is
+ever dropped.
+
+```powershell
+.\Apply-Database.ps1                                   # default target
+.\Apply-Database.ps1 -ServerInstance "x" -Database "y" # any environment
+.\Apply-Database.ps1 -WhatIf                           # dry run
+```
+
+See `docs/Database/Database-Deployment.md`.
 
 ---
 
 ## 03-Seed contents
 
+Applied (`03-Seed/01_Identity_And_Access.sql`, `02_Reference_Data.sql`) —
+1,180 rows, verified idempotent across three consecutive runs:
+
 - 9 roles from `docs/ui-ux/05-Roles-And-Permission-Matrix.md`
-- Full permission key catalog and the per-role grants
-- Admin sidebar pages with icons and menu order
-- Countries / states / cities / pincodes (India first)
-- Currencies, exchange rate placeholders, GST tax classes, HSN codes
-- Order status master, return reason codes, adjustment reason codes
-- Default platform settings for every section in Module 20
+- 225 permission keys and 701 per-role grants
 - One Super Admin account with a forced password change on first login
+- 7 currencies, 6 GST tax classes with open rate-history windows
+- 46 reason codes (cancel, return, adjustment, damage, review moderation, abuse, refund)
+- 44 notification events, 14 inquiry categories, 9 robots rules
+- 14 report definitions, 20 handicraft search synonyms
+- 42 default platform settings across 10 sections
+
+Still to load (data imports, not reference data):
+
+- Countries / states / cities / pincodes (India first)
+- HSN codes, admin sidebar pages, notification templates
 
 ---
 
