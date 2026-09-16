@@ -1,4 +1,4 @@
-@model AttributeGridItem
+@model AttributeSaveRequest
 @{
     ViewData["Title"] = "Attribute Details";
 }
@@ -13,7 +13,7 @@
         </div>
         <ul class="page-breadcrumb">
             <li><a asp-controller="Attribute" asp-action="Index" class="links">Attribute Listing</a></li>
-            <li>Details</li>
+            <li>@Model.AttributeName</li>
         </ul>
     </div>
 }
@@ -22,46 +22,117 @@
 
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
-            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Attribute Information</h2>
-            <a asp-controller="Attribute" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button">
-                <i class="fas fa-pen"></i> Edit
-            </a>
+            <h2><i class="fas fa-sliders" style="color:var(--accent);margin-right:8px;"></i>Attribute Overview</h2>
+            <div class="d-flex gap-2">
+                <a asp-controller="Attribute" asp-action="Index" class="custom_button secondary_button">
+                    <i class="fas fa-arrow-left me-1"></i> Back to List
+                </a>
+                <a asp-controller="Attribute" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button primary_button">
+                    <i class="fas fa-pen me-1"></i> Edit Attribute
+                </a>
+            </div>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Attribute</label>
-                        <p class="detail-value">@Model.AttributeName</p>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Attribute Name</label>
+                    <p class="detail-value fw-semibold">@Model.AttributeName</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Attribute Code</label>
+                    <p class="detail-value text-monospace">@(string.IsNullOrEmpty(Model.AttributeCode) ? "—" : Model.AttributeCode)</p>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label-custom">Display Type</label>
+                    <p class="detail-value"><span class="badge bg-light text-dark border">@Model.DisplayType</span></p>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label-custom">Sort Order</label>
+                    <p class="detail-value">@Model.SortOrder</p>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label-custom">Status</label>
+                    <p class="detail-value">@await Html.PartialAsync("_StatusPill", Model.IsActive)</p>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex gap-3 flex-wrap pt-2 border-top">
+                        <span class="badge @(Model.IsFilterable ? "bg-primary" : "bg-light text-muted border") p-2">
+                            <i class="fas fa-filter me-1"></i> @(Model.IsFilterable ? "Storefront Filter (Enabled)" : "Not Filterable")
+                        </span>
+                        <span class="badge @(Model.IsRequired ? "bg-danger" : "bg-light text-muted border") p-2">
+                            <i class="fas fa-asterisk me-1"></i> @(Model.IsRequired ? "Required On Products" : "Optional")
+                        </span>
+                        <span class="badge @(Model.IsVariantDefining ? "bg-info text-dark" : "bg-light text-muted border") p-2">
+                            <i class="fas fa-cubes me-1"></i> @(Model.IsVariantDefining ? "Defines SKU Variants" : "Descriptive Only")
+                        </span>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Input Type</label>
-                        <p class="detail-value">@Model.DisplayType</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Attribute Set</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Filterable</label>
-                        <p class="detail-value">@(Model.IsFilterable ? "Yes — appears as a PLP filter" : "No — display only")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Required</label>
-                        <p class="detail-value">@(Model.IsRequired ? "Yes" : "No")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Variant Option</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Values</label>
-                        <p class="detail-value">@Model.ValueCount</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <p class="detail-value">@(Model.IsActive ? "Active" : "Inactive")</p>
-                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Attribute Values Table -->
+    <section class="form-section">
+        <div class="form-section-header">
+            <h2><i class="fas fa-list-check" style="color:var(--accent);margin-right:8px;"></i>Configured Values (@(Model.Values?.Count ?? 0))</h2>
+        </div>
+
+        <div class="form-section-body">
+            <div class="table-main">
+                <table class="custom-datatable listing-order-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width:200px;">Label</th>
+                            <th style="min-width:140px;">Code</th>
+                            @if (string.Equals(Model.DisplayType, "Swatch", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <th style="min-width:140px;">Color Swatch</th>
+                            }
+                            <th style="min-width:100px;">Sort Order</th>
+                            <th style="min-width:100px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Values != null && Model.Values.Any())
+                        {
+                            foreach (var val in Model.Values.OrderBy(v => v.SortOrder))
+                            {
+                                <tr>
+                                    <td class="fw-medium">@val.Label</td>
+                                    <td class="text-monospace">@(string.IsNullOrEmpty(val.ValueCode) ? "—" : val.ValueCode)</td>
+                                    @if (string.Equals(Model.DisplayType, "Swatch", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(val.ColourHex))
+                                            {
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span style="display:inline-block;width:20px;height:20px;background-color:@val.ColourHex;border-radius:50%;border:1px solid #ccc;"></span>
+                                                    <span class="font-12 text-muted">@val.ColourHex</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span>—</span>
+                                            }
+                                        </td>
+                                    }
+                                    <td>@val.SortOrder</td>
+                                    <td>@await Html.PartialAsync("_StatusPill", val.IsActive)</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No values configured for this attribute.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>

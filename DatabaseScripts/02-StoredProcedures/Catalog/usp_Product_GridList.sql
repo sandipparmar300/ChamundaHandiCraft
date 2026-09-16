@@ -251,7 +251,7 @@ BEGIN
         Status, Visibility, IsFeatured, IsBestseller, IsTrending,
         AverageRating, ReviewCount, SoldCount,
         CategoryName, BrandName, ArtisanName,
-        OnHand, Reserved, Available, LowStockThreshold,
+        OnHand, Reserved, Available, StockQuantity = Available, LowStockThreshold,
         ImageUrl, ImageAlt,
         CreatedAt, UpdatedAt
     FROM Filtered

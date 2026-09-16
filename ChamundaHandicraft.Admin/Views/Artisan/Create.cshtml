@@ -1,7 +1,7 @@
 @model ArtisanSaveRequest
 @{
     ViewData["Title"] = "Artisan";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var isEdit = Model.Id > 0;
     var heading = isEdit ? "Edit Artisan" : "Add Artisan";
 }
 
@@ -22,66 +22,89 @@
 
 <main class="page-content">
 
-    <form method="post" id="artisanForm" enctype="multipart/form-data">
-
-        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+    <form asp-action="Save" method="post" id="artisanForm" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
 
         <section class="form-section">
             <div class="form-section-header">
-                <h2><i class="fas fa-person-workspace" style="color:var(--accent);margin-right:8px;"></i>Artisan Information</h2>
+                <h2><i class="fas fa-person-chalkboard" style="color:var(--accent);margin-right:8px;"></i>Artisan Information</h2>
             </div>
 
             <div class="form-section-body">
                 <div class="row g-3">
                     <div class="col-lg-3 col-md-12">
-                        <label class="form-label-custom">Photo</label>
+                        <label class="form-label-custom">Artisan Photo</label>
                         <div class="profile-pic-box" id="uploadBox">
-                            <img id="ImagePreview" src="~/assets/images/default-profile.png" class="pic-preview clickable-img" alt="photo" />
+                            <img id="ImagePreview" src="@(string.IsNullOrEmpty(Model.PhotoUrl) ? "/assets/images/default-profile.png" : Model.PhotoUrl)" class="pic-preview clickable-img" alt="photo" />
                             <label class="upload-btn-custom" for="Photo"><i class="fas fa-camera"></i> Upload</label>
                             <input type="file" id="Photo" name="Photo" accept="image/*" class="d-none" onchange="previewUpload(this)" />
+                            <input type="hidden" asp-for="PhotoUrl" id="PhotoUrlHidden" />
                             <p class="upload-note">JPG, PNG (Max 5MB)</p>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
+
+                    <div class="col-lg-5 col-md-6">
                         <label class="form-label-custom">Artisan Name <span class="req">*</span></label>
-                        <input id="ArtisanName" name="ArtisanName" class="form-control-custom" placeholder="Enter artisan name" />
-                        <span class="error-msg" data-valmsg-for="ArtisanName"></span>
+                        <input asp-for="Name" class="form-control-custom" placeholder="e.g. Ramesh Soni" onkeyup="buildSlug()" required />
+                        <span class="text-danger font-12" asp-validation-for="Name"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Craft Cluster</label>
-                        <input id="CraftCluster" name="CraftCluster" class="form-control-custom" placeholder="Enter craft cluster" />
-                        <span class="error-msg" data-valmsg-for="CraftCluster"></span>
+                        <label class="form-label-custom">Slug (URL identifier)</label>
+                        <input asp-for="Slug" class="form-control-custom" placeholder="auto-generated-from-name" />
+                        <span class="text-danger font-12" asp-validation-for="Slug"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Region</label>
-                        <input id="Region" name="Region" class="form-control-custom" placeholder="Enter region" />
-                        <span class="error-msg" data-valmsg-for="Region"></span>
+                        <label class="form-label-custom">Craft Specialization <span class="req">*</span></label>
+                        <input asp-for="Craft" class="form-control-custom" placeholder="e.g. Brass Casting &amp; Etching" required />
+                        <span class="text-danger font-12" asp-validation-for="Craft"></span>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Experience (years)</label>
-                        <input type="number" id="Experienceyears" name="Experienceyears" class="form-control-custom" placeholder="0" />
-                        <span class="error-msg" data-valmsg-for="Experienceyears"></span>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Craft Cluster / Region <span class="req">*</span></label>
+                        <input asp-for="Cluster" class="form-control-custom" placeholder="e.g. Jamnagar, Gujarat" required />
+                        <span class="text-danger font-12" asp-validation-for="Cluster"></span>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Contact Number</label>
-                        <input id="ContactNumber" name="ContactNumber" class="form-control-custom" placeholder="Enter contact number" />
-                        <span class="error-msg" data-valmsg-for="ContactNumber"></span>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label-custom">Craft Documentary / Video URL</label>
+                        <input asp-for="VideoUrl" type="url" class="form-control-custom" placeholder="https://youtube.com/..." />
+                        <span class="text-danger font-12" asp-validation-for="VideoUrl"></span>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Email</label>
-                        <input id="Email" name="Email" class="form-control-custom" placeholder="Enter email" />
-                        <span class="error-msg" data-valmsg-for="Email"></span>
+                    <div class="col-lg-4 col-md-4">
+                        <label class="form-label-custom">Practicing Craft Since (Year)</label>
+                        <input asp-for="WorkingSinceYear" type="number" class="form-control-custom" placeholder="e.g. 1995" min="1950" max="@DateTime.Now.Year" />
+                        <span class="text-danger font-12" asp-validation-for="WorkingSinceYear"></span>
                     </div>
 
-                    <div class="col-lg-12 col-md-6">
-                        <label class="form-label-custom">Artisan Story</label>
-                        <textarea id="ArtisanStory" name="ArtisanStory" class="form-control-custom" rows="3" placeholder="Enter artisan story"></textarea>
-                        <span class="error-msg" data-valmsg-for="ArtisanStory"></span>
+                    <div class="col-lg-4 col-md-4">
+                        <label class="form-label-custom">Partner Since (Year)</label>
+                        <input asp-for="PartnerSinceYear" type="number" class="form-control-custom" placeholder="e.g. 2021" min="2000" max="@DateTime.Now.Year" />
+                        <span class="text-danger font-12" asp-validation-for="PartnerSinceYear"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4">
+                        <label class="form-label-custom">Apprentices Trained</label>
+                        <input asp-for="ApprenticesTrained" type="number" class="form-control-custom" placeholder="0" min="0" />
+                        <span class="text-danger font-12" asp-validation-for="ApprenticesTrained"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check pt-2">
+                            <input class="form-check-input" type="checkbox" asp-for="IsGiTagged" id="IsGiTagged" />
+                            <label class="form-check-label fw-medium" for="IsGiTagged">
+                                <i class="fas fa-certificate text-success me-1"></i> GI Tagged Craft Heritage (Geographical Indication certified maker)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label-custom">Artisan Story &amp; Craft Heritage</label>
+                        <textarea asp-for="Story" class="form-control-custom" rows="4" placeholder="Tell the master artisan's story, lineage, technique, and community impact..."></textarea>
+                        <span class="text-danger font-12" asp-validation-for="Story"></span>
                     </div>
                 </div>
             </div>
@@ -90,19 +113,19 @@
         <div class="form-action-bar">
             <div class="is-active-row" id="isActiveRow">
                 <div class="is-toggle-item" id="isToggleItem">
-                    <span class="ia-label">Is Active</span>
+                    <span class="ia-label">Status</span>
                     <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <input type="checkbox" asp-for="IsActive" id="IsActiveCheckbox" />
                         <span class="ia-slider"></span>
                     </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
+                    <span class="ia-status" id="isActiveStatus">@(Model.IsActive ? "Active" : "Inactive")</span>
                 </div>
             </div>
 
-            <div>
-                <a asp-controller="Artisan" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save">
-                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+            <div class="d-flex gap-2">
+                <a asp-controller="Artisan" asp-action="Index" class="custom_button secondary_button">Cancel</a>
+                <button type="submit" id="btnSaveArtisan" class="custom_button primary_button">
+                    <i class="fas fa-save me-1"></i> @(isEdit ? "Update Artisan" : "Save Artisan")
                 </button>
             </div>
         </div>
@@ -112,17 +135,57 @@
 </main>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Product"); }
             $('#uploadBox').click(function () { $('#Photo').click(); });
+
+            $('#IsActiveCheckbox').change(function () {
+                $('#isActiveStatus').text(this.checked ? 'Active' : 'Inactive');
+            });
+
+            $('#artisanForm').on('submit', function () {
+                if ($(this).valid()) {
+                    $('#btnSaveArtisan').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+                }
+            });
         });
+
+        function buildSlug() {
+            var name = $('#Name').val() || '';
+            if (!$('#Slug').data('touched')) {
+                $('#Slug').val(name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+            }
+        }
+
+        $('#Slug').on('input', function () { $(this).data('touched', true); });
 
         function previewUpload(input) {
             if (!input.files || !input.files[0]) return;
+            var f = input.files[0];
             var reader = new FileReader();
-            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
-            reader.readAsDataURL(input.files[0]);
+            reader.onload = function (e) {
+                document.getElementById('ImagePreview').src = e.target.result;
+            };
+            reader.readAsDataURL(f);
+
+            var formData = new FormData();
+            formData.append('file', f);
+            fetch('/Artisan/UploadPhoto', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                }
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data && data.success && data.url) {
+                    $('#PhotoUrlHidden').val(data.url);
+                }
+            })
+            .catch(function (err) { console.error(err); });
         }
     </script>
 }

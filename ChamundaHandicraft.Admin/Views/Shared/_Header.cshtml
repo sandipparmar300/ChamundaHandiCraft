@@ -1,6 +1,16 @@
+@using Microsoft.AspNetCore.Http
+@using System.Security.Claims
 @{
-    var fullName = Context?.User?.FindFirst("FullName")?.Value ?? "Administrator";
-    var roleName = Context?.User?.FindFirst("RoleName")?.Value ?? "Super Admin";
+    var fullName = Context?.Session?.GetString(ChamundaHandicraft.Helper.Constants.SessionKeys.AdminUserName)
+        ?? User.FindFirst("FullName")?.Value
+        ?? User.Identity?.Name
+        ?? "Administrator";
+
+    var roleName = Context?.Session?.GetString(ChamundaHandicraft.Helper.Constants.SessionKeys.AdminRole)
+        ?? User.FindFirst("RoleName")?.Value
+        ?? User.FindFirst(ClaimTypes.Role)?.Value
+        ?? "Admin";
+
     var searchText = ViewBag.GlobalSearchText as string ?? "";
 }
 

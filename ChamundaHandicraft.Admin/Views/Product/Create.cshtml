@@ -1,13 +1,9 @@
 @model ProductSaveRequest
-@*
-    Module 03 - Create / Edit Product.  Spec: docs/Admin Flows/Product.txt §4-9
-    Tabbed form (L-02): General, Classification, Pricing, Inventory, Media,
-    Variants, SEO, Related. Serves both Add and Edit.
-*@
 @{
     ViewData["Title"] = "Product";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var isEdit = Model.Id > 0;
     var heading = isEdit ? "Edit Product" : "Add Product";
+    var lookups = ViewBag.Lookups as ProductLookupsViewModel ?? new ProductLookupsViewModel();
 }
 
 @section Header {
@@ -27,349 +23,463 @@
 
 <main class="page-content">
 
-    <form method="post" id="productForm" enctype="multipart/form-data">
-
-        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+    <form asp-action="Save" method="post" id="productForm" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
 
         <section class="form-section">
             <div class="form-section-body">
 
                 <ul class="nav nav-tabs" id="productTabs" role="tablist">
-                    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-general" type="button" role="tab">General</button></li>
-                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-classification" type="button" role="tab">Classification</button></li>
-                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pricing" type="button" role="tab">Pricing</button></li>
-                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-inventory" type="button" role="tab">Inventory</button></li>
-                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab">Images &amp; Videos</button></li>
-                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-variants" type="button" role="tab">Variants</button></li>
-                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-seo" type="button" role="tab">SEO</button></li>
-                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-related" type="button" role="tab">Related</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-general" type="button" role="tab"><i class="fas fa-info-circle me-1"></i> General</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-story" type="button" role="tab"><i class="fas fa-hands-holding-child me-1"></i> Craft Story</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-classification" type="button" role="tab"><i class="fas fa-tags me-1"></i> Classification</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pricing" type="button" role="tab"><i class="fas fa-indian-rupee-sign me-1"></i> Pricing</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-inventory" type="button" role="tab"><i class="fas fa-boxes-stacked me-1"></i> Inventory</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab"><i class="fas fa-images me-1"></i> Images &amp; Media</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-variants" type="button" role="tab"><i class="fas fa-cubes me-1"></i> Variants</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-seo" type="button" role="tab"><i class="fas fa-globe me-1"></i> SEO</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-related" type="button" role="tab"><i class="fas fa-link me-1"></i> Related</button></li>
                 </ul>
 
                 <div class="tab-content pt-3">
 
-                    <!-- ============ GENERAL ============ -->
+                    <!-- ============ 1. GENERAL ============ -->
                     <div class="tab-pane fade show active" id="tab-general" role="tabpanel">
                         <div class="row g-3">
                             <div class="col-lg-4 col-md-6">
                                 <label class="form-label-custom">Product Name <span class="req">*</span></label>
-                                <input id="Name" name="Name" class="form-control-custom" placeholder="Enter product name" onkeyup="buildSlug()" / value="@Model.Name" >
-                                <span class="error-msg" data-valmsg-for="Name"></span>
+                                <input asp-for="Name" class="form-control-custom" placeholder="e.g. Handmade Brass Radha Krishna" onkeyup="buildSlug()" required />
+                                <span class="text-danger font-12" asp-validation-for="Name"></span>
                             </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <label class="form-label-custom">Product Code <span class="req">*</span></label>
-                                <input id="ProductCode" name="ProductCode" class="form-control-custom" placeholder="Unique product code" / value="@Model.ProductCode" >
+                                <input asp-for="ProductCode" class="form-control-custom" placeholder="e.g. PRD-BRS-001" required />
+                                <span class="text-danger font-12" asp-validation-for="ProductCode"></span>
                             </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <label class="form-label-custom">SKU <span class="req">*</span></label>
-                                <input id="Sku" name="Sku" class="form-control-custom" placeholder="Unique SKU" / value="@Model.Sku" >
+                                <input asp-for="Sku" class="form-control-custom" placeholder="e.g. SKU-BRS-RK-01" required />
+                                <span class="text-danger font-12" asp-validation-for="Sku"></span>
                             </div>
 
                             <div class="col-lg-4 col-md-6">
-                                <label class="form-label-custom">Barcode</label>
-                                <input id="Barcode" name="Barcode" class="form-control-custom" placeholder="EAN / UPC" / value="@Model.Barcode" >
+                                <label class="form-label-custom">Barcode / EAN</label>
+                                <input asp-for="Barcode" class="form-control-custom" placeholder="e.g. 890123456789" />
+                                <span class="text-danger font-12" asp-validation-for="Barcode"></span>
                             </div>
 
                             <div class="col-lg-8 col-md-6">
-                                <label class="form-label-custom">Slug (SEO URL)</label>
-                                <input id="Slug" name="Slug" class="form-control-custom" placeholder="auto-generated-from-name" / value="@Model.Slug" >
+                                <label class="form-label-custom">Slug (SEO URL) <span class="req">*</span></label>
+                                <input asp-for="Slug" class="form-control-custom" placeholder="auto-generated-from-name" required />
+                                <span class="text-danger font-12" asp-validation-for="Slug"></span>
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label-custom">Short Description</label>
-                                <textarea id="ShortDescription" name="ShortDescription" class="form-control-custom" rows="2" placeholder="One or two lines shown on listing cards">@Model.ShortDescription</textarea>
+                                <label class="form-label-custom">Short Summary</label>
+                                <textarea asp-for="ShortDescription" class="form-control-custom" rows="2" placeholder="Brief summary displayed on catalog cards and quick view"></textarea>
+                                <span class="text-danger font-12" asp-validation-for="ShortDescription"></span>
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label-custom">Full Description</label>
-                                <textarea id="Description" name="Description" class="form-control-custom" rows="5" placeholder="Full product description"></textarea>
+                                <label class="form-label-custom">Full Product Description</label>
+                                <textarea asp-for="FullDescription" class="form-control-custom" rows="4" placeholder="Detailed product narrative, specifications, and features"></textarea>
+                                <span class="text-danger font-12" asp-validation-for="FullDescription"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ CRAFT STORY ============ -->
+                    <div class="tab-pane fade" id="tab-story" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label-custom">Handmade Story &amp; Cultural Heritage</label>
+                                <textarea asp-for="ProductStory" class="form-control-custom" rows="4" placeholder="Describe the artisan lineage, craft tradition, and making process"></textarea>
+                                <span class="text-danger font-12" asp-validation-for="ProductStory"></span>
                             </div>
 
                             <div class="col-lg-6">
-                                <label class="form-label-custom">Product Story (Handmade Story)</label>
-                                <textarea id="ProductStory" name="ProductStory" class="form-control-custom" rows="4" placeholder="The story behind this piece">@Model.ProductStory</textarea>
-                            </div>
-
-                            <div class="col-lg-3">
                                 <label class="form-label-custom">Care Instructions</label>
-                                <textarea id="CareInstructions" name="CareInstructions" class="form-control-custom" rows="4">@Model.CareInstructions</textarea>
+                                <textarea asp-for="CareInstructions" class="form-control-custom" rows="3" placeholder="e.g. Wipe with dry soft cotton cloth; avoid moisture"></textarea>
+                                <span class="text-danger font-12" asp-validation-for="CareInstructions"></span>
                             </div>
 
-                            <div class="col-lg-3">
-                                <label class="form-label-custom">Warranty Information</label>
-                                <textarea id="Warranty" name="Warranty" class="form-control-custom" rows="4"></textarea>
+                            <div class="col-lg-6">
+                                <label class="form-label-custom">Warranty / Guarantee</label>
+                                <textarea asp-for="WarrantyInformation" class="form-control-custom" rows="3" placeholder="e.g. Authenticity guaranteed; 6 months polish warranty"></textarea>
+                                <span class="text-danger font-12" asp-validation-for="WarrantyInformation"></span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- ============ CLASSIFICATION ============ -->
+                    <!-- ============ 2. CLASSIFICATION ============ -->
                     <div class="tab-pane fade" id="tab-classification" role="tabpanel">
                         <div class="row g-3">
-                            @{
-                                var classification = new[]
-                                {
-                                    "Category", "Subcategory", "Collection", "Brand", "Material", "Style",
-                                    "Color", "Handmade By (Artisan)", "Country of Origin", "Occasion",
-                                    "Festival Collection", "Season"
-                                };
-                            }
-                            @foreach (var c in classification)
-                            {
-                                <div class="col-lg-3 col-md-6">
-                                    <label class="form-label-custom">@c</label>
-                                    <select class="form-control-custom select2-single"><option value="">Select @c.ToLowerInvariant()</option></select>
-                                </div>
-                            }
-                        </div>
-
-                        <h4 class="section-heading mt-4">Physical Attributes</h4>
-                        <div class="row g-3 mt-1">
-                            @foreach (var p in new[] { "Weight (g)", "Length (cm)", "Width (cm)", "Height (cm)", "Package Weight (g)", "Package Dimensions" })
-                            {
-                                <div class="col-lg-2 col-md-4 col-6">
-                                    <label class="form-label-custom">@p</label>
-                                    <input class="form-control-custom" placeholder="0" />
-                                </div>
-                            }
-                        </div>
-
-                        <h4 class="section-heading mt-4">Tags</h4>
-                        <div class="row g-3 mt-1">
-                            <div class="col-lg-8">
-                                <select id="Tags" name="Tags" class="form-control-custom select2-multiple" multiple>
-                                    @foreach (var t in new[] { "Handmade", "Wooden", "Traditional", "Festival", "Eco-Friendly", "Gift", "Premium" })
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Category <span class="req">*</span></label>
+                                <select asp-for="CategoryId" class="form-control-custom" required>
+                                    <option value="">-- Select Category --</option>
+                                    @foreach (var c in lookups.Categories)
                                     {
-                                        <option>@t</option>
+                                        <option value="@c.Id">@c.Name</option>
                                     }
                                 </select>
+                                <span class="text-danger font-12" asp-validation-for="CategoryId"></span>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Brand / Studio</label>
+                                <select asp-for="BrandId" class="form-control-custom">
+                                    <option value="">-- Select Brand --</option>
+                                    @foreach (var b in lookups.Brands)
+                                    {
+                                        <option value="@b.Id">@b.Name</option>
+                                    }
+                                </select>
+                                <span class="text-danger font-12" asp-validation-for="BrandId"></span>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Master Artisan</label>
+                                <select asp-for="ArtisanId" class="form-control-custom">
+                                    <option value="">-- Select Artisan --</option>
+                                    @foreach (var a in lookups.Artisans)
+                                    {
+                                        <option value="@a.Id">@a.Name</option>
+                                    }
+                                </select>
+                                <span class="text-danger font-12" asp-validation-for="ArtisanId"></span>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Primary Material</label>
+                                <input asp-for="Material" class="form-control-custom" placeholder="e.g. Pure Brass, Teak Wood, Pure Silk" />
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Craft Technique</label>
+                                <input asp-for="CraftTechnique" class="form-control-custom" placeholder="e.g. Lost-wax casting, Hand carving, Double ikat" />
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label class="form-label-custom">Origin Cluster / District</label>
+                                <input asp-for="OriginCluster" class="form-control-custom" placeholder="e.g. Surendranagar, Patan, Jamnagar" />
+                            </div>
+                        </div>
+
+                        <h4 class="section-heading mt-4"><i class="fas fa-ruler-combined me-1 text-primary"></i> Dimensions &amp; Shipping Weight</h4>
+                        <div class="row g-3 mt-1">
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Length (cm)</label>
+                                <input asp-for="LengthCm" type="number" step="0.1" class="form-control-custom" placeholder="0.0" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Width (cm)</label>
+                                <input asp-for="WidthCm" type="number" step="0.1" class="form-control-custom" placeholder="0.0" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Height (cm)</label>
+                                <input asp-for="HeightCm" type="number" step="0.1" class="form-control-custom" placeholder="0.0" />
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Weight (Grams)</label>
+                                <input asp-for="WeightGrams" type="number" step="1" class="form-control-custom" placeholder="0" />
                             </div>
                         </div>
                     </div>
 
-                    <!-- ============ PRICING ============ -->
+                    <!-- ============ 3. PRICING ============ -->
                     <div class="tab-pane fade" id="tab-pricing" role="tabpanel">
                         <div class="row g-3">
                             <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Cost Price</label>
-                                <input id="CostPrice" name="CostPrice" class="form-control-custom" placeholder="0.00" onkeyup="calcMargin()" / value="@Model.CostPrice" >
+                                <label class="form-label-custom">Cost Price (₹)</label>
+                                <input asp-for="CostPrice" id="CostPrice" type="number" step="0.01" class="form-control-custom" placeholder="0.00" onkeyup="calcMargin()" />
                             </div>
+
                             <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Selling Price <span class="req">*</span></label>
-                                <input id="SellingPrice" name="SellingPrice" class="form-control-custom" placeholder="0.00" onkeyup="calcMargin()" />
+                                <label class="form-label-custom">Selling Price (₹) <span class="req">*</span></label>
+                                <input asp-for="Price" id="SellingPrice" type="number" step="0.01" class="form-control-custom" placeholder="0.00" onkeyup="calcMargin()" required />
+                                <span class="text-danger font-12" asp-validation-for="Price"></span>
                             </div>
+
                             <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">MRP</label>
-                                <input id="Mrp" name="Mrp" class="form-control-custom" placeholder="0.00" / value="@Model.Mrp" >
+                                <label class="form-label-custom">MRP / List Price (₹)</label>
+                                <input asp-for="Mrp" id="Mrp" type="number" step="0.01" class="form-control-custom" placeholder="0.00" />
+                                <span class="text-danger font-12" asp-validation-for="Mrp"></span>
                             </div>
+
                             <div class="col-lg-3 col-md-6">
                                 <label class="form-label-custom">Profit Margin</label>
-                                <input id="ProfitMargin" class="form-control-custom" readonly placeholder="Calculated" />
+                                <input id="ProfitMargin" class="form-control-custom bg-light" readonly placeholder="Calculated margin %" />
                             </div>
 
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Discount Type</label>
-                                <select id="DiscountType" name="DiscountType" class="form-control-custom">
-                                    <option value="">None</option>
-                                    <option value="percent">Percentage</option>
-                                    <option value="fixed">Fixed Amount</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Discount Value</label>
-                                <input id="DiscountValue" name="DiscountValue" class="form-control-custom" placeholder="0" />
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Tax Category</label>
-                                <select id="TaxCategory" name="TaxCategory" class="form-control-custom"><option value="">Select tax class</option></select>
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">GST Rate (%)</label>
-                                <input id="GstRate" name="GstRate" class="form-control-custom" placeholder="0" />
-                            </div>
-
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Display Price</label>
-                                <input id="DisplayPrice" name="DisplayPrice" class="form-control-custom" placeholder="0.00" />
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Strike Price</label>
-                                <input id="StrikePrice" name="StrikePrice" class="form-control-custom" placeholder="0.00" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ============ INVENTORY ============ -->
-                    <div class="tab-pane fade" id="tab-inventory" role="tabpanel">
-                        <div class="row g-3">
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Stock Quantity</label>
-                                <input id="StockQuantity" name="StockQuantity" class="form-control-custom" placeholder="0" />
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Reserved Stock</label>
-                                <input id="ReservedStock" class="form-control-custom" readonly placeholder="0" />
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Available Stock</label>
-                                <input id="AvailableStock" class="form-control-custom" readonly placeholder="0" />
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Low Stock Threshold</label>
-                                <input id="LowStockThreshold" name="LowStockThreshold" class="form-control-custom" placeholder="0" / value="@Model.LowStockThreshold" >
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Reorder Quantity</label>
-                                <input id="ReorderQuantity" name="ReorderQuantity" class="form-control-custom" placeholder="0" />
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Warehouse</label>
-                                <select id="WarehouseId" name="WarehouseId" class="form-control-custom select2-single"><option value="">Select warehouse</option></select>
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label-custom">Stock Status</label>
-                                <select id="StockStatus" name="StockStatus" class="form-control-custom">
-                                    <option>In Stock</option>
-                                    <option>Low Stock</option>
-                                    <option>Out of Stock</option>
-                                    <option>Back Order</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ============ MEDIA ============ -->
-                    <div class="tab-pane fade" id="tab-media" role="tabpanel">
-                        <div class="row g-3">
-                            <div class="col-lg-8">
-                                <label class="form-label-custom">Product Images</label>
-                                <div class="upload-dropzone" id="imageDropzone">
-                                    <i class="fas fa-cloud-arrow-up"></i>
-                                    <p>Drag and drop images here, or click to browse</p>
-                                    <span class="upload-note">JPG, PNG, WEBP &middot; max 5MB each &middot; first image becomes the primary</span>
-                                    <input type="file" id="ProductImages" name="ProductImages" accept="image/*" multiple class="d-none" />
-                                </div>
-                                <div class="media-thumbs mt-3" id="imageThumbs"></div>
-                            </div>
-
-                            <div class="col-lg-4">
-                                <label class="form-label-custom">360&deg; Image Sequence</label>
-                                <div class="upload-dropzone" id="spinDropzone">
-                                    <i class="fas fa-arrows-rotate"></i>
-                                    <p>Upload the rotation sequence</p>
-                                    <input type="file" id="SpinImages" accept="image/*" multiple class="d-none" />
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <label class="form-label-custom">Video Source</label>
-                                <select id="VideoSource" name="VideoSource" class="form-control-custom">
-                                    <option value="">None</option>
-                                    <option value="upload">Upload</option>
-                                    <option value="youtube">YouTube</option>
-                                    <option value="vimeo">Vimeo</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-8 col-md-6">
-                                <label class="form-label-custom">Video URL</label>
-                                <input id="VideoUrl" name="VideoUrl" class="form-control-custom" placeholder="https://" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ============ VARIANTS ============ -->
-                    <div class="tab-pane fade" id="tab-variants" role="tabpanel">
-                        <div class="row g-3">
-                            <div class="col-lg-6">
-                                <label class="form-label-custom">Variant Types</label>
-                                <select id="VariantTypes" class="form-control-custom select2-multiple" multiple>
-                                    @foreach (var v in new[] { "Size", "Color", "Material", "Finish", "Design", "Pattern", "Weight" })
+                            <div class="col-lg-6 col-md-6">
+                                <label class="form-label-custom">GST / Tax Class</label>
+                                <select asp-for="TaxClassId" class="form-control-custom">
+                                    <option value="">-- Select Tax Category --</option>
+                                    @foreach (var t in lookups.TaxClasses)
                                     {
-                                        <option>@v</option>
+                                        <option value="@t.Id">@t.Name</option>
                                     }
                                 </select>
                             </div>
-                            <div class="col-lg-6 d-flex align-items-end">
-                                <button type="button" class="custom_button secondary_button" onclick="addVariantRow()">
-                                    <i class="fas fa-plus"></i> Add Variant
-                                </button>
+
+                            <div class="col-lg-6 col-md-6 d-flex align-items-center pt-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" asp-for="IsTaxInclusive" id="IsTaxInclusive" />
+                                    <label class="form-check-label fw-medium" for="IsTaxInclusive">Price is inclusive of GST taxes</label>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="table-main mt-3">
+                    <!-- ============ 4. INVENTORY ============ -->
+                    <div class="tab-pane fade" id="tab-inventory" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Stock Quantity (On Hand) <span class="req">*</span></label>
+                                <input asp-for="StockQuantity" type="number" class="form-control-custom" placeholder="0" min="0" required />
+                                <span class="text-danger font-12" asp-validation-for="StockQuantity"></span>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Low Stock Alert Threshold</label>
+                                <input asp-for="LowStockThreshold" type="number" class="form-control-custom" placeholder="5" min="1" />
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Max Quantity Per Order</label>
+                                <input asp-for="MaxQuantityPerOrder" type="number" class="form-control-custom" placeholder="Unlimited" min="1" />
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Made to Order Lead Time (Days)</label>
+                                <input asp-for="MadeToOrderDays" type="number" class="form-control-custom" placeholder="e.g. 14 days" min="1" />
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex gap-4 flex-wrap pt-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="TrackInventory" id="TrackInventory" />
+                                        <label class="form-check-label fw-medium" for="TrackInventory">Track Stock Quantities</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="AllowBackorder" id="AllowBackorder" />
+                                        <label class="form-check-label fw-medium" for="AllowBackorder">Allow Backorders when Out of Stock</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="IsMadeToOrder" id="IsMadeToOrder" />
+                                        <label class="form-check-label fw-medium" for="IsMadeToOrder">Handcrafted Made-to-Order Piece</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="HasVariants" id="HasVariants" onchange="$('#tab-variants').toggle(this.checked)" />
+                                        <label class="form-check-label fw-medium" for="HasVariants">Product has Multiple Variants / Sizes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ 5. IMAGES & MEDIA ============ -->
+                    <div class="tab-pane fade" id="tab-media" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-lg-8">
+                                <label for="ProductImages" class="upload-dropzone text-center d-block w-100" id="imageDropzone" style="cursor: pointer;">
+                                    <i class="fas fa-cloud-arrow-up fa-2x mb-2 text-primary"></i>
+                                    <p class="mb-1 fw-medium">Drag &amp; drop photos here, or click to browse</p>
+                                    <span class="upload-note">JPG, PNG, WEBP (max 5MB each)</span>
+                                    <div class="mt-2">
+                                        <span class="custom_button secondary_button btn-sm"><i class="fas fa-folder-open me-1"></i> Browse Files</span>
+                                    </div>
+                                </label>
+                                <input type="file" id="ProductImages" name="ProductImages" accept="image/*" multiple class="d-none" />
+                                <div class="media-thumbs mt-3 d-flex flex-wrap gap-2" id="imageThumbs">
+                                    @if (Model.Media != null && Model.Media.Any())
+                                    {
+                                        for (int m = 0; m < Model.Media.Count; m++)
+                                        {
+                                            <div class="media-thumb position-relative border rounded p-1 bg-white shadow-sm" style="width: 96px; height: 96px;">
+                                                <input type="hidden" class="media-url" name="Media[@m].Url" value="@Model.Media[m].Url" />
+                                                <input type="hidden" class="media-primary" name="Media[@m].IsPrimary" value="@(Model.Media[m].IsPrimary ? "true" : "false")" />
+                                                <input type="hidden" class="media-alt" name="Media[@m].AltText" value="@Model.Media[m].AltText" />
+                                                <img src="@Model.Media[m].Url" alt="product" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" />
+                                                @if (Model.Media[m].IsPrimary)
+                                                {
+                                                    <span class="badge bg-primary position-absolute bottom-0 start-0 m-1 primary-badge" style="font-size: 9px;">Primary</span>
+                                                }
+                                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 p-0 px-1" title="Remove" onclick="removeMediaThumb(this)">&times;</button>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <label class="form-label-custom">Craft Showcase Video</label>
+                                <p class="text-muted font-12 mb-2">Show the artisan crafting this piece on the product page.</p>
+                                <input asp-for="VideoUrl" type="url" class="form-control-custom" placeholder="https://youtube.com/watch?v=..." />
+                                <span class="text-danger font-12" asp-validation-for="VideoUrl"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ 6. VARIANTS ============ -->
+                    <div class="tab-pane fade" id="tab-variants" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 fw-semibold"><i class="fas fa-cubes me-1 text-primary"></i> SKU Variants</h5>
+                            <button type="button" class="custom_button secondary_button" onclick="addVariantRow()">
+                                <i class="fas fa-plus me-1"></i> Add Variant Row
+                            </button>
+                        </div>
+
+                        <div class="table-main">
                             <table class="custom-datatable listing-order-table" id="variant-table">
                                 <thead>
                                     <tr>
-                                        <th style="min-width:180px;">Variant</th>
-                                        <th style="min-width:130px;">SKU</th>
-                                        <th style="min-width:130px;">Barcode</th>
-                                        <th style="min-width:130px;">Price Difference</th>
-                                        <th style="min-width:100px;">Stock</th>
-                                        <th style="min-width:110px;">Weight</th>
-                                        <th style="min-width:110px;">Image</th>
-                                        <th style="min-width:80px;">Action</th>
+                                        <th style="min-width:160px;">SKU <span class="req">*</span></th>
+                                        <th style="min-width:130px;">Price (₹) <span class="req">*</span></th>
+                                        <th style="min-width:130px;">MRP (₹)</th>
+                                        <th style="min-width:110px;">Stock Qty</th>
+                                        <th style="min-width:90px;" class="text-center">Default</th>
+                                        <th style="min-width:80px; text-align:center;">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody><tr><td colspan="8" class="text-center py-4">No variants yet. Add one to sell this product in more than one size or colour.</td></tr></tbody>
+                                <tbody id="variantTableBody">
+                                    @if (Model.Variants != null && Model.Variants.Any())
+                                    {
+                                        for (int v = 0; v < Model.Variants.Count; v++)
+                                        {
+                                            <tr class="variant-row">
+                                                <td>
+                                                    <input type="hidden" name="Variants[@v].Id" value="@Model.Variants[v].Id" />
+                                                    <input name="Variants[@v].Sku" value="@Model.Variants[v].Sku" class="form-control-custom" placeholder="Variant SKU" required />
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.01" name="Variants[@v].Price" value="@Model.Variants[v].Price" class="form-control-custom" placeholder="0.00" required />
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.01" name="Variants[@v].Mrp" value="@Model.Variants[v].Mrp" class="form-control-custom" placeholder="0.00" />
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="Variants[@v].StockQuantity" value="@Model.Variants[v].StockQuantity" class="form-control-custom" placeholder="0" />
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="hidden" name="Variants[@v].IsDefault" class="variant-is-default" value="@(Model.Variants[v].IsDefault ? "true" : "false")" />
+                                                    <input type="radio" name="variant-default-radio" class="variant-default-radio" @(Model.Variants[v].IsDefault ? "checked" : "") onchange="updateDefaultVariant(this)" />
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="custom_button secondary_button text-danger" onclick="removeVariantRow(this)"><i class="fas fa-trash-alt"></i></button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- ============ SEO ============ -->
+                    <!-- ============ 7. SEO ============ -->
                     <div class="tab-pane fade" id="tab-seo" role="tabpanel">
                         <div class="row g-3">
                             <div class="col-lg-6">
-                                <label class="form-label-custom">SEO Title</label>
-                                <input id="SeoTitle" name="SeoTitle" class="form-control-custom" maxlength="60" />
+                                <label class="form-label-custom">Meta Title (Max 60 chars)</label>
+                                <input asp-for="Seo.MetaTitle" class="form-control-custom" maxlength="60" placeholder="e.g. Handcrafted Brass Radha Krishna | Chamunda Handicraft" />
                             </div>
                             <div class="col-lg-6">
                                 <label class="form-label-custom">Canonical URL</label>
-                                <input id="CanonicalUrl" name="CanonicalUrl" class="form-control-custom" placeholder="https://" />
+                                <input asp-for="Seo.CanonicalUrl" class="form-control-custom" placeholder="https://chamundahandicraft.com/p/..." />
                             </div>
                             <div class="col-12">
-                                <label class="form-label-custom">Meta Description</label>
-                                <textarea id="MetaDescription" name="MetaDescription" class="form-control-custom" rows="2" maxlength="160"></textarea>
+                                <label class="form-label-custom">Meta Description (Max 160 chars)</label>
+                                <textarea asp-for="Seo.MetaDescription" class="form-control-custom" rows="2" maxlength="160" placeholder="Authentic handmade brass Radha Krishna idol crafted by master artisans of Gujarat. Free shipping across India."></textarea>
                             </div>
                             <div class="col-lg-6">
                                 <label class="form-label-custom">Meta Keywords</label>
-                                <input id="MetaKeywords" name="MetaKeywords" class="form-control-custom" placeholder="Comma separated" />
+                                <input asp-for="Seo.MetaKeywords" class="form-control-custom" placeholder="brass idols, handmade statue, gujarat handicrafts" />
                             </div>
                             <div class="col-lg-6">
-                                <label class="form-label-custom">SEO URL</label>
-                                <input id="SeoUrl" name="SeoUrl" class="form-control-custom" />
-                            </div>
-                            <div class="col-lg-6">
-                                <label class="form-label-custom">Open Graph Title</label>
-                                <input id="OgTitle" name="OgTitle" class="form-control-custom" />
-                            </div>
-                            <div class="col-lg-6">
-                                <label class="form-label-custom">Open Graph Image</label>
-                                <input type="file" id="OgImage" name="OgImage" class="form-control-custom" accept="image/*" />
-                            </div>
-                            <div class="col-lg-6">
-                                <label class="form-label-custom">Twitter Card</label>
-                                <select id="TwitterCard" name="TwitterCard" class="form-control-custom">
-                                    <option>summary</option>
-                                    <option>summary_large_image</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-6">
-                                <label class="form-label-custom">Image Alt Text</label>
-                                <input id="ImageAltText" name="ImageAltText" class="form-control-custom" />
+                                <label class="form-label-custom">Open Graph (Social) Title</label>
+                                <input asp-for="Seo.OgTitle" class="form-control-custom" placeholder="Handmade Brass Radha Krishna" />
                             </div>
                         </div>
                     </div>
 
-                    <!-- ============ RELATED ============ -->
+                    <!-- ============ 8. RELATED ============ -->
                     <div class="tab-pane fade" id="tab-related" role="tabpanel">
                         <div class="row g-3">
-                            @foreach (var rel in new[] { "Similar Products", "Frequently Bought Together", "Recommended Products", "Cross Sell", "Upsell" })
-                            {
-                                <div class="col-lg-6">
-                                    <label class="form-label-custom">@rel</label>
-                                    <select class="form-control-custom select2-multiple" multiple></select>
+                            <div class="col-lg-6">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label-custom mb-0">Frequently Bought Together</label>
+                                    <span class="badge bg-light text-dark border font-12" id="badge-comp-count">
+                                        @((Model.ComplementaryProductIds?.Count ?? 0)) selected
+                                    </span>
                                 </div>
-                            }
+                                <p class="text-muted font-12 mb-2">Display complementary handicrafts on the PDP (e.g. recommend a Pooja Thali with an Idol). Click checkboxes to select.</p>
+                                
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                    <input type="text" class="form-control" placeholder="Search catalog products..." oninput="filterRelatedList(this, 'comp-list')" />
+                                </div>
+
+                                <div class="border rounded p-2 bg-white" id="comp-list" style="max-height: 240px; overflow-y: auto;">
+                                    @if (lookups.Products != null && lookups.Products.Any())
+                                    {
+                                        foreach (var p in lookups.Products.Where(x => x.Id != Model.Id))
+                                        {
+                                            var isSelected = Model.ComplementaryProductIds != null && Model.ComplementaryProductIds.Contains(p.Id);
+                                            <div class="d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded related-row @(isSelected ? "bg-light" : "")" style="cursor: pointer; transition: background 0.15s;">
+                                                <input class="form-check-input m-0 flex-shrink-0" type="checkbox" name="ComplementaryProductIds" value="@p.Id" id="comp_@p.Id" @(isSelected ? "checked" : "") onchange="updateRelatedBadge('comp-list', 'badge-comp-count', this)" style="cursor: pointer;" />
+                                                <label class="form-check-label w-100 font-13 text-dark d-flex justify-content-between align-items-center mb-0" for="comp_@p.Id" style="cursor: pointer;">
+                                                    <span class="product-title">@p.Name</span>
+                                                    <span class="badge bg-light text-muted border font-11">#@p.Id</span>
+                                                </label>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted font-12 text-center py-3 mb-0">No other products in catalog yet.</p>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label-custom mb-0">Similar Products (Cross-Sell)</label>
+                                    <span class="badge bg-light text-dark border font-12" id="badge-sim-count">
+                                        @((Model.SimilarProductIds?.Count ?? 0)) selected
+                                    </span>
+                                </div>
+                                <p class="text-muted font-12 mb-2">Alternative artisanal choices in the same craft tradition. Click checkboxes to select.</p>
+
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                    <input type="text" class="form-control" placeholder="Search catalog products..." oninput="filterRelatedList(this, 'sim-list')" />
+                                </div>
+
+                                <div class="border rounded p-2 bg-white" id="sim-list" style="max-height: 240px; overflow-y: auto;">
+                                    @if (lookups.Products != null && lookups.Products.Any())
+                                    {
+                                        foreach (var p in lookups.Products.Where(x => x.Id != Model.Id))
+                                        {
+                                            var isSelected = Model.SimilarProductIds != null && Model.SimilarProductIds.Contains(p.Id);
+                                            <div class="d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded related-row @(isSelected ? "bg-light" : "")" style="cursor: pointer; transition: background 0.15s;">
+                                                <input class="form-check-input m-0 flex-shrink-0" type="checkbox" name="SimilarProductIds" value="@p.Id" id="sim_@p.Id" @(isSelected ? "checked" : "") onchange="updateRelatedBadge('sim-list', 'badge-sim-count', this)" style="cursor: pointer;" />
+                                                <label class="form-check-label w-100 font-13 text-dark d-flex justify-content-between align-items-center mb-0" for="sim_@p.Id" style="cursor: pointer;">
+                                                    <span class="product-title">@p.Name</span>
+                                                    <span class="badge bg-light text-muted border font-11">#@p.Id</span>
+                                                </label>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted font-12 text-center py-3 mb-0">No other products in catalog yet.</p>
+                                    }
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -377,63 +487,77 @@
             </div>
         </section>
 
-        <!-- ============ VISIBILITY ============ -->
+        <!-- Visibility & Placement Section -->
         <section class="form-section">
             <div class="form-section-header">
-                <h2><i class="fas fa-eye" style="color:var(--accent);margin-right:8px;"></i>Visibility &amp; Placement</h2>
+                <h2><i class="fas fa-eye" style="color:var(--accent);margin-right:8px;"></i>Status, Visibility &amp; Merchandising</h2>
             </div>
 
             <div class="form-section-body">
                 <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <select id="Status" name="Status" class="form-control-custom">
-                            <option>Draft</option>
-                            <option>Published</option>
-                            <option>Scheduled</option>
-                            <option>Hidden</option>
-                            <option>Archived</option>
+                        <label class="form-label-custom">Publish Status <span class="req">*</span></label>
+                        <select asp-for="Status" id="StatusSelect" class="form-control-custom">
+                            <option value="Draft">Draft (Hidden)</option>
+                            <option value="Published">Published (Live on Storefront)</option>
+                            <option value="Hidden">Hidden</option>
+                            <option value="Archived">Archived</option>
                         </select>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Publish On</label>
-                        <input type="datetime-local" id="PublishOn" name="PublishOn" class="form-control-custom" / value="@Model.PublishOn" >
+                        <label class="form-label-custom">Storefront Visibility</label>
+                        <select asp-for="Visibility" class="form-control-custom">
+                            <option value="Everywhere">Everywhere (Search &amp; Catalog)</option>
+                            <option value="CatalogOnly">Catalog Only</option>
+                            <option value="SearchOnly">Search Only</option>
+                            <option value="Hidden">Hidden</option>
+                        </select>
                     </div>
 
                     <div class="col-lg-6">
-                        <label class="form-label-custom">Homepage Flags</label>
-                        <div class="d-flex gap-3 flex-wrap pt-2">
-                            @foreach (var flag in new[] { "Featured", "New Arrival", "Bestseller", "Trending", "Recommended", "Flash Sale", "Festival Collection" })
-                            {
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="flag-@flag.Replace(" ", "")" />
-                                    <label class="form-check-label" for="flag-@flag.Replace(" ", "")">@flag</label>
-                                </div>
-                            }
+                        <label class="form-label-custom">Merchandising Badges</label>
+                        <div class="d-flex gap-4 flex-wrap pt-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="IsFeatured" id="IsFeatured" />
+                                <label class="form-check-label fw-medium" for="IsFeatured">
+                                    <i class="fas fa-star text-warning me-1"></i> Featured Product
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="IsBestseller" id="IsBestseller" />
+                                <label class="form-check-label fw-medium" for="IsBestseller">
+                                    <i class="fas fa-trophy text-primary me-1"></i> Bestseller
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="IsTrending" id="IsTrending" />
+                                <label class="form-check-label fw-medium" for="IsTrending">
+                                    <i class="fas fa-arrow-trend-up text-danger me-1"></i> Trending
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- Form Action Bar -->
         <div class="form-action-bar">
-            <div class="is-active-row" id="isActiveRow">
-                <div class="is-toggle-item" id="isToggleItem">
-                    <span class="ia-label">Is Active</span>
-                    <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
-                        <span class="ia-slider"></span>
-                    </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
-                </div>
+            <div class="is-active-row">
+                <span class="badge @(Model.Status == ProductStatus.Published ? "bg-success" : "bg-secondary") p-2" id="statusBadgeDisplay">
+                    Status: @Model.Status
+                </span>
             </div>
 
-            <div>
-                <a asp-controller="Product" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save"><i class="fas fa-eye"></i> Preview</button>
-                <button type="button" class="btn-save"><i class="fas fa-save"></i> Save as Draft</button>
-                <button type="button" class="btn-save"><i class="fas fa-upload"></i> @(isEdit ? "Update &amp; Publish" : "Save &amp; Publish")</button>
+            <div class="d-flex gap-2">
+                <a asp-controller="Product" asp-action="Index" class="custom_button secondary_button">Cancel</a>
+                <button type="submit" onclick="$('#StatusSelect').val('Draft')" class="custom_button secondary_button">
+                    <i class="fas fa-save me-1"></i> Save as Draft
+                </button>
+                <button type="submit" id="btnSaveProduct" onclick="$('#StatusSelect').val('Published')" class="custom_button primary_button">
+                    <i class="fas fa-check-circle me-1"></i> @(isEdit ? "Update Product" : "Save & Publish")
+                </button>
             </div>
         </div>
 
@@ -442,47 +566,57 @@
 </main>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Product"); }
+            calcMargin();
 
-            $('#imageDropzone').on('click', function () { $('#ProductImages').click(); });
-            $('#spinDropzone').on('click', function () { $('#SpinImages').click(); });
-
-            $('#ProductImages').on('change', function () { renderThumbs(this.files); });
-
-            ['dragenter', 'dragover'].forEach(function (evt) {
-                document.getElementById('imageDropzone').addEventListener(evt, function (e) {
-                    e.preventDefault(); e.stopPropagation();
-                    this.classList.add('is-dragging');
-                });
+            var $dropzone = $('#imageDropzone');
+            $dropzone.on('dragover dragenter', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).addClass('bg-light border-primary');
+            });
+            $dropzone.on('dragleave dragend drop', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).removeClass('bg-light border-primary');
+            });
+            $dropzone.on('drop', function (e) {
+                var dt = e.originalEvent.dataTransfer;
+                if (dt && dt.files && dt.files.length > 0) {
+                    renderThumbs(dt.files);
+                }
             });
 
-            ['dragleave', 'drop'].forEach(function (evt) {
-                document.getElementById('imageDropzone').addEventListener(evt, function (e) {
-                    e.preventDefault(); e.stopPropagation();
-                    this.classList.remove('is-dragging');
-                });
+            $('#ProductImages').on('change', function () {
+                if (this.files && this.files.length > 0) {
+                    renderThumbs(this.files);
+                    this.value = '';
+                }
             });
 
-            document.getElementById('imageDropzone').addEventListener('drop', function (e) {
-                renderThumbs(e.dataTransfer.files);
+            $('#StatusSelect').on('change', function () {
+                var s = $(this).val();
+                $('#statusBadgeDisplay').text('Status: ' + s)
+                    .removeClass('bg-success bg-secondary bg-warning text-dark')
+                    .addClass(s === 'Published' ? 'bg-success' : 'bg-secondary');
+            });
+
+            reindexMedia();
+
+            $('#productForm').on('submit', function () {
+                if ($(this).valid()) {
+                    reindexMedia();
+                    reindexVariants();
+                    if ($('#variantTableBody tr.variant-row').length > 0) {
+                        $('#HasVariants').prop('checked', true);
+                    }
+                    $('#btnSaveProduct').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+                }
             });
         });
-
-        function renderThumbs(files) {
-            if (!files) return;
-            var $wrap = $('#imageThumbs');
-            Array.prototype.forEach.call(files, function (f) {
-                if (!/^image\//.test(f.type)) return;
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    $wrap.append('<div class="media-thumb"><img src="' + e.target.result + '" alt="' + f.name + '" />' +
-                                 '<button type="button" class="thumb-remove" onclick="$(this).parent().remove()">&times;</button></div>');
-                };
-                reader.readAsDataURL(f);
-            });
-        }
 
         function buildSlug() {
             var name = $('#Name').val() || '';
@@ -497,24 +631,177 @@
             var cost = parseFloat($('#CostPrice').val()) || 0;
             var sell = parseFloat($('#SellingPrice').val()) || 0;
             if (sell > 0) {
-                $('#ProfitMargin').val((((sell - cost) / sell) * 100).toFixed(2) + ' %');
+                var margin = (((sell - cost) / sell) * 100).toFixed(1);
+                $('#ProfitMargin').val(margin + ' %');
             } else {
-                $('#ProfitMargin').val('');
+                $('#ProfitMargin').val('—');
             }
         }
 
+        function removeMediaThumb(btn) {
+            $(btn).closest('.media-thumb').remove();
+            reindexMedia();
+        }
+
+        function reindexMedia() {
+            var thumbs = $('#imageThumbs .media-thumb').not('[id^="up_"]');
+            thumbs.each(function (idx, el) {
+                $(el).find('input.media-url').attr('name', 'Media[' + idx + '].Url');
+                var isPrim = (idx === 0);
+                $(el).find('input.media-primary').attr('name', 'Media[' + idx + '].IsPrimary').val(isPrim ? 'true' : 'false');
+                $(el).find('input.media-alt').attr('name', 'Media[' + idx + '].AltText');
+
+                $(el).find('.primary-badge').remove();
+                if (isPrim) {
+                    $(el).append('<span class="badge bg-primary position-absolute bottom-0 start-0 m-1 primary-badge" style="font-size: 9px;">Primary</span>');
+                }
+            });
+        }
+
+        function renderThumbs(files) {
+            if (!files || files.length === 0) return;
+            var $wrap = $('#imageThumbs');
+            Array.prototype.forEach.call(files, function (f) {
+                if (!/^image\//.test(f.type)) return;
+
+                var formData = new FormData();
+                formData.append('file', f);
+
+                var tempId = 'up_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+                var tempCard = '<div id="' + tempId + '" class="media-thumb position-relative border rounded p-1 d-flex flex-column align-items-center justify-content-center bg-light" style="width: 96px; height: 96px;">' +
+                    '<i class="fas fa-spinner fa-spin text-primary mb-1"></i>' +
+                    '<span style="font-size:10px;" class="text-muted">Uploading...</span>' +
+                    '</div>';
+                $wrap.append(tempCard);
+
+                var token = $('input[name="__RequestVerificationToken"]').val();
+                if (token) {
+                    formData.append('__RequestVerificationToken', token);
+                }
+
+                fetch('/Product/UploadImage', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'RequestVerificationToken': token || ''
+                    }
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data && data.success && data.url) {
+                        var altVal = $('#Name').val() || 'Product Image';
+                        var thumb = '<div class="media-thumb position-relative border rounded p-1 bg-white shadow-sm" style="width: 96px; height: 96px;">' +
+                            '<input type="hidden" class="media-url" value="' + data.url + '" />' +
+                            '<input type="hidden" class="media-primary" value="false" />' +
+                            '<input type="hidden" class="media-alt" value="' + altVal + '" />' +
+                            '<img src="' + data.url + '" alt="product" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" />' +
+                            '<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 p-0 px-1" title="Remove" onclick="removeMediaThumb(this)">&times;</button>' +
+                            '</div>';
+                        $('#' + tempId).replaceWith(thumb);
+                        reindexMedia();
+                    } else {
+                        $('#' + tempId).remove();
+                        alert('Upload failed: ' + (data && data.message ? data.message : 'Error uploading image'));
+                    }
+                })
+                .catch(function (err) {
+                    $('#' + tempId).remove();
+                    console.error(err);
+                });
+            });
+        }
+
+        function updateDefaultVariant(radioEl) {
+            $('.variant-is-default').val('false');
+            $(radioEl).closest('tr').find('.variant-is-default').val('true');
+        }
+
         function addVariantRow() {
-            var row = '<tr>' +
-                '<td><input class="form-control-custom" placeholder="e.g. Small - Brown" /></td>' +
-                '<td><input class="form-control-custom" placeholder="SKU" /></td>' +
-                '<td><input class="form-control-custom" placeholder="Barcode" /></td>' +
-                '<td><input class="form-control-custom" placeholder="0.00" /></td>' +
-                '<td><input class="form-control-custom" placeholder="0" /></td>' +
-                '<td><input class="form-control-custom" placeholder="0" /></td>' +
-                '<td><input type="file" class="form-control-custom" accept="image/*" /></td>' +
-                '<td class="text-center"><button type="button" class="custom_button secondary_button" onclick="$(this).closest(\'tr\').remove()">Remove</button></td>' +
+            var vIdx = $('#variantTableBody tr.variant-row').length;
+            var baseSku = $('#Sku').val() || 'SKU';
+            var basePrice = $('#SellingPrice').val() || '0.00';
+            var baseMrp = $('#Mrp').val() || '0.00';
+            var isDef = (vIdx === 0);
+
+            var row = '<tr class="variant-row">' +
+                '<td>' +
+                    '<input type="hidden" name="Variants[' + vIdx + '].Id" value="0" />' +
+                    '<input name="Variants[' + vIdx + '].Sku" value="' + baseSku + '-V' + (vIdx + 1) + '" class="form-control-custom" placeholder="SKU" required />' +
+                '</td>' +
+                '<td>' +
+                    '<input type="number" step="0.01" name="Variants[' + vIdx + '].Price" value="' + basePrice + '" class="form-control-custom" placeholder="0.00" required />' +
+                '</td>' +
+                '<td>' +
+                    '<input type="number" step="0.01" name="Variants[' + vIdx + '].Mrp" value="' + baseMrp + '" class="form-control-custom" placeholder="0.00" />' +
+                '</td>' +
+                '<td>' +
+                    '<input type="number" name="Variants[' + vIdx + '].StockQuantity" value="10" class="form-control-custom" placeholder="0" />' +
+                '</td>' +
+                '<td class="text-center">' +
+                    '<input type="hidden" name="Variants[' + vIdx + '].IsDefault" class="variant-is-default" value="' + (isDef ? 'true' : 'false') + '" />' +
+                    '<input type="radio" name="variant-default-radio" class="variant-default-radio" ' + (isDef ? 'checked' : '') + ' onchange="updateDefaultVariant(this)" />' +
+                '</td>' +
+                '<td class="text-center">' +
+                    '<button type="button" class="custom_button secondary_button text-danger" onclick="removeVariantRow(this)"><i class="fas fa-trash-alt"></i></button>' +
+                '</td>' +
                 '</tr>';
-            $('#variant-table tbody').append(row);
+
+            $('#variantTableBody').append(row);
+            $('#HasVariants').prop('checked', true);
+            reindexVariants();
+        }
+
+        function removeVariantRow(btn) {
+            $(btn).closest('tr').remove();
+            reindexVariants();
+        }
+
+        function reindexVariants() {
+            var rows = $('#variantTableBody tr.variant-row');
+            if (rows.length > 0) {
+                $('#HasVariants').prop('checked', true);
+            }
+            var hasDefault = false;
+            rows.each(function (idx, row) {
+                $(row).find('input[name*="Variants["]').each(function () {
+                    var name = $(this).attr('name');
+                    var newName = name.replace(/Variants\[\d+\]/, 'Variants[' + idx + ']');
+                    $(this).attr('name', newName);
+                });
+
+                var isDefVal = $(row).find('.variant-is-default').val() === 'true';
+                if (isDefVal) {
+                    hasDefault = true;
+                    $(row).find('.variant-default-radio').prop('checked', true);
+                }
+            });
+
+            if (!hasDefault && rows.length > 0) {
+                rows.first().find('.variant-is-default').val('true');
+                rows.first().find('.variant-default-radio').prop('checked', true);
+            }
+        }
+
+        function updateRelatedBadge(listId, badgeId, chk) {
+            var count = $('#' + listId + ' input[type="checkbox"]:checked').length;
+            $('#' + badgeId).text(count + ' selected');
+            if (chk) {
+                $(chk).closest('.related-row').toggleClass('bg-light', chk.checked);
+            }
+        }
+
+        function filterRelatedList(input, listId) {
+            var term = $(input).val().toLowerCase().trim();
+            $('#' + listId + ' .related-row').each(function () {
+                var title = $(this).find('.product-title').text().toLowerCase();
+                var idBadge = $(this).find('.badge').text().toLowerCase();
+                var matches = (term === '') || (title.indexOf(term) > -1) || (idBadge.indexOf(term) > -1);
+                if (matches) {
+                    $(this).removeClass('d-none').addClass('d-flex');
+                } else {
+                    $(this).removeClass('d-flex').addClass('d-none');
+                }
+            });
         }
     </script>
 }

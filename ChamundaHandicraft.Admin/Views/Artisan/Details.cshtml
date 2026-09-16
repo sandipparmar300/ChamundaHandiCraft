@@ -1,6 +1,7 @@
-@model ArtisanGridItem
+@model ArtisanSaveRequest
 @{
     ViewData["Title"] = "Artisan Details";
+    var yearsExp = Model.WorkingSinceYear.HasValue ? (DateTime.Now.Year - Model.WorkingSinceYear.Value) : (int?)null;
 }
 
 @section Header {
@@ -13,7 +14,7 @@
         </div>
         <ul class="page-breadcrumb">
             <li><a asp-controller="Artisan" asp-action="Index" class="links">Artisan Listing</a></li>
-            <li>Details</li>
+            <li>@Model.Name</li>
         </ul>
     </div>
 }
@@ -22,46 +23,85 @@
 
     <section class="form-section">
         <div class="form-section-header d-flex justify-content-between align-items-center">
-            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Artisan Information</h2>
-            <a asp-controller="Artisan" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button">
-                <i class="fas fa-pen"></i> Edit
-            </a>
+            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Master Artisan Profile</h2>
+            <div class="d-flex gap-2">
+                <a asp-controller="Artisan" asp-action="Index" class="custom_button secondary_button">
+                    <i class="fas fa-arrow-left me-1"></i> Back to List
+                </a>
+                <a asp-controller="Artisan" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button primary_button">
+                    <i class="fas fa-pen me-1"></i> Edit Artisan
+                </a>
+            </div>
         </div>
 
         <div class="form-section-body">
-            <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Artisan</label>
-                        <p class="detail-value">@Model.Name</p>
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-4 text-center">
+                    <div class="p-3 border rounded bg-white shadow-sm">
+                        <img src="@(string.IsNullOrEmpty(Model.PhotoUrl) ? "/assets/images/default-profile.png" : Model.PhotoUrl)" 
+                             alt="@Model.Name" 
+                             class="rounded-circle shadow-sm mb-3" 
+                             style="width: 130px; height: 130px; object-fit: cover;" />
+                        <h4 class="mb-1 fw-bold">@Model.Name</h4>
+                        <p class="text-muted font-13 mb-2">@Model.Craft</p>
+                        <div class="mt-2">
+                            @await Html.PartialAsync("_StatusPill", Model.IsActive)
+                            @if (Model.IsGiTagged)
+                            {
+                                <span class="badge bg-success ms-1"><i class="fas fa-certificate me-1"></i> GI Tagged</span>
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.VideoUrl))
+                        {
+                            <div class="mt-3">
+                                <a href="@Model.VideoUrl" target="_blank" rel="noopener" class="custom_button secondary_button font-12 w-100">
+                                    <i class="fas fa-play text-danger me-1"></i> Watch Craft Video
+                                </a>
+                            </div>
+                        }
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Craft Cluster</label>
-                        <p class="detail-value">@Model.Craft</p>
+                </div>
+
+                <div class="col-lg-9 col-md-8">
+                    <div class="row g-3">
+                        <div class="col-lg-6 col-md-6">
+                            <label class="form-label-custom">Artisan Name</label>
+                            <p class="detail-value fw-semibold">@Model.Name</p>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <label class="form-label-custom">Slug (URL identifier)</label>
+                            <p class="detail-value text-monospace">@(string.IsNullOrEmpty(Model.Slug) ? "—" : Model.Slug)</p>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <label class="form-label-custom">Craft Specialization</label>
+                            <p class="detail-value">@Model.Craft</p>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <label class="form-label-custom">Craft Cluster &amp; Region</label>
+                            <p class="detail-value">@Model.Cluster</p>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <label class="form-label-custom">Practicing Since</label>
+                            <p class="detail-value">
+                                @(Model.WorkingSinceYear.HasValue ? $"{Model.WorkingSinceYear.Value} ({yearsExp} years)" : "—")
+                            </p>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <label class="form-label-custom">Platform Partner Since</label>
+                            <p class="detail-value">@(Model.PartnerSinceYear?.ToString() ?? "—")</p>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <label class="form-label-custom">Apprentices Trained</label>
+                            <p class="detail-value">@(Model.ApprenticesTrained?.ToString() ?? "0") craftspeople</p>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label-custom">Artisan Story &amp; Heritage</label>
+                            <div class="p-3 bg-light rounded border text-secondary" style="min-height: 100px; white-space: pre-line;">
+                                @(string.IsNullOrWhiteSpace(Model.Story) ? "No personal story recorded for this artisan." : Model.Story)
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Region</label>
-                        <p class="detail-value">@Model.Cluster</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Experience</label>
-                        <p class="detail-value">@(Model.WorkingSinceYear is null ? "—" : (DateTime.Today.Year - Model.WorkingSinceYear.Value) + " years")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Contact Number</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Email</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Products</label>
-                        <p class="detail-value">@Model.ProductCount</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <p class="detail-value">@(Model.IsActive ? "Active" : "Inactive")</p>
-                    </div>
+                </div>
             </div>
         </div>
     </section>

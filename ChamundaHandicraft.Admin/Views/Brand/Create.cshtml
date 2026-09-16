@@ -1,7 +1,7 @@
-@model BrandGridItem
+@model BrandSaveRequest
 @{
     ViewData["Title"] = "Brand";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var isEdit = Model.Id > 0;
     var heading = isEdit ? "Edit Brand" : "Add Brand";
 }
 
@@ -22,9 +22,9 @@
 
 <main class="page-content">
 
-    <form method="post" id="brandForm" enctype="multipart/form-data">
-
-        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+    <form asp-action="Save" method="post" id="brandForm" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -36,40 +36,48 @@
                     <div class="col-lg-3 col-md-12">
                         <label class="form-label-custom">Logo</label>
                         <div class="profile-pic-box" id="uploadBox">
-                            <img id="ImagePreview" src="~/assets/images/default-profile.png" class="pic-preview clickable-img" alt="logo" />
+                            <img id="ImagePreview" src="@(string.IsNullOrEmpty(Model.LogoUrl) ? "/assets/images/default-profile.png" : Model.LogoUrl)" class="pic-preview clickable-img" alt="logo" />
                             <label class="upload-btn-custom" for="Photo"><i class="fas fa-camera"></i> Upload</label>
                             <input type="file" id="Photo" name="Photo" accept="image/*" class="d-none" onchange="previewUpload(this)" />
+                            <input type="hidden" asp-for="LogoUrl" id="LogoUrlHidden" />
                             <p class="upload-note">JPG, PNG (Max 5MB)</p>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-5 col-md-6">
                         <label class="form-label-custom">Brand Name <span class="req">*</span></label>
-                        <input id="BrandName" name="BrandName" class="form-control-custom" placeholder="Enter brand name" / value="@Model.BrandName" >
-                        <span class="error-msg" data-valmsg-for="BrandName"></span>
+                        <input asp-for="BrandName" class="form-control-custom" placeholder="Enter brand name" onkeyup="buildSlug()" required />
+                        <span class="text-danger font-12" asp-validation-for="BrandName"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Slug</label>
-                        <input id="Slug" name="Slug" class="form-control-custom" placeholder="Enter slug" / value="@Model.Slug" >
-                        <span class="error-msg" data-valmsg-for="Slug"></span>
+                        <label class="form-label-custom">Slug (URL identifier)</label>
+                        <input asp-for="Slug" class="form-control-custom" placeholder="auto-generated-from-name" />
+                        <span class="text-danger font-12" asp-validation-for="Slug"></span>
                     </div>
 
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-6 col-md-6">
                         <label class="form-label-custom">Website</label>
-                        <input type="url" id="Website" name="Website" class="form-control-custom" placeholder="https://" />
-                        <span class="error-msg" data-valmsg-for="Website"></span>
-                    </div>
-
-                    <div class="col-lg-12 col-md-6">
-                        <label class="form-label-custom">Description</label>
-                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description">@Model.Description</textarea>
-                        <span class="error-msg" data-valmsg-for="Description"></span>
+                        <input asp-for="Website" type="url" class="form-control-custom" placeholder="https://example.com" />
+                        <span class="text-danger font-12" asp-validation-for="Website"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Sort Order</label>
-                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" />
-                        <span class="error-msg" data-valmsg-for="SortOrder"></span>
+                        <input asp-for="SortOrder" type="number" class="form-control-custom" placeholder="0" min="0" />
+                        <span class="text-danger font-12" asp-validation-for="SortOrder"></span>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 d-flex align-items-center pt-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" asp-for="IsFeatured" id="IsFeatured" />
+                            <label class="form-check-label fw-medium" for="IsFeatured">Feature on Homepage</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <label class="form-label-custom">Description</label>
+                        <textarea asp-for="Description" class="form-control-custom" rows="3" placeholder="Enter brand background, craft heritage, or description..."></textarea>
+                        <span class="text-danger font-12" asp-validation-for="Description"></span>
                     </div>
                 </div>
             </div>
@@ -78,19 +86,19 @@
         <div class="form-action-bar">
             <div class="is-active-row" id="isActiveRow">
                 <div class="is-toggle-item" id="isToggleItem">
-                    <span class="ia-label">Is Active</span>
+                    <span class="ia-label">Status</span>
                     <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <input type="checkbox" asp-for="IsActive" id="IsActiveCheckbox" />
                         <span class="ia-slider"></span>
                     </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
+                    <span class="ia-status" id="isActiveStatus">@(Model.IsActive ? "Active" : "Inactive")</span>
                 </div>
             </div>
 
-            <div>
-                <a asp-controller="Brand" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save">
-                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+            <div class="d-flex gap-2">
+                <a asp-controller="Brand" asp-action="Index" class="custom_button secondary_button">Cancel</a>
+                <button type="submit" id="btnSaveBrand" class="custom_button primary_button">
+                    <i class="fas fa-save me-1"></i> @(isEdit ? "Update Brand" : "Save Brand")
                 </button>
             </div>
         </div>
@@ -100,17 +108,57 @@
 </main>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Product"); }
             $('#uploadBox').click(function () { $('#Photo').click(); });
+
+            $('#IsActiveCheckbox').change(function () {
+                $('#isActiveStatus').text(this.checked ? 'Active' : 'Inactive');
+            });
+
+            $('#brandForm').on('submit', function () {
+                if ($(this).valid()) {
+                    $('#btnSaveBrand').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+                }
+            });
         });
+
+        function buildSlug() {
+            var name = $('#BrandName').val() || '';
+            if (!$('#Slug').data('touched')) {
+                $('#Slug').val(name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+            }
+        }
+
+        $('#Slug').on('input', function () { $(this).data('touched', true); });
 
         function previewUpload(input) {
             if (!input.files || !input.files[0]) return;
+            var f = input.files[0];
             var reader = new FileReader();
-            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
-            reader.readAsDataURL(input.files[0]);
+            reader.onload = function (e) {
+                document.getElementById('ImagePreview').src = e.target.result;
+            };
+            reader.readAsDataURL(f);
+
+            var formData = new FormData();
+            formData.append('file', f);
+            fetch('/Brand/UploadLogo', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                }
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data && data.success && data.url) {
+                    $('#LogoUrlHidden').val(data.url);
+                }
+            })
+            .catch(function (err) { console.error(err); });
         }
     </script>
 }

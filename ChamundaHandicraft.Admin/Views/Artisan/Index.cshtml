@@ -17,6 +17,8 @@
     </div>
 }
 
+@Html.AntiForgeryToken()
+
 <section class="listing-section common-box">
     <div class="latest-orders">
         <div class="div-search-box-panel flex-ending-cls-here">
@@ -30,7 +32,9 @@
                 </div>
             </div>
 
-            <a asp-controller="Artisan" asp-action="Add" class="custom_button primary_button">Add Artisan</a>
+            <a asp-controller="Artisan" asp-action="Add" class="custom_button primary_button">
+                <i class="fas fa-plus me-1"></i> Add Artisan
+            </a>
         </div>
     </div>
 
@@ -40,29 +44,40 @@
                 <tr>
                     <th style="min-width:60px;">Photo</th>
                     <th style="min-width:190px;">Artisan</th>
-                    <th style="min-width:160px;">Craft Cluster</th>
-                    <th style="min-width:150px;">Region</th>
-                    <th style="min-width:120px;">Products</th>
+                    <th style="min-width:160px;">Craft</th>
+                    <th style="min-width:150px;">Cluster / Region</th>
+                    <th style="min-width:100px;">Products</th>
                     <th style="min-width:130px;">Created At</th>
-                    <th style="min-width:110px;">Status</th>
-                    <th style="min-width:80px;">Action</th>
+                    <th style="min-width:100px;">Status</th>
+                    <th style="min-width:120px; text-align:center;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var row in Model.Items)
                 {
-                    <tr>
-                        <td><img src="@(row.PhotoUrl ?? "/assets/images/default-profile.png")" width="36" height="36" alt="@row.Name" style="object-fit:cover;border-radius:50%" /></td>
-                        <td><a asp-action="Edit" asp-route-id="@row.Id">@row.Name</a></td>
+                    <tr id="artisan-row-@row.Id">
+                        <td>
+                            <img src="@(string.IsNullOrEmpty(row.PhotoUrl) ? "/assets/images/default-profile.png" : row.PhotoUrl)" 
+                                 alt="@row.Name" 
+                                 style="width: 40px !important; height: 40px !important; min-width: 40px; min-height: 40px; max-width: 40px; max-height: 40px; aspect-ratio: 1/1; object-fit: cover; border-radius: 50%; display: block;" />
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@row.Id" class="fw-semibold">@row.Name</a>
+                            @if (row.IsGiTagged)
+                            {
+                                <span class="badge bg-success ms-1" style="font-size: 10px;">GI Tagged</span>
+                            }
+                        </td>
                         <td>@row.Craft</td>
                         <td>@row.Cluster</td>
                         <td class="text-end">@row.ProductCount</td>
                         <td>@Money.LongDate(row.CreatedOn)</td>
                         <td>@await Html.PartialAsync("_StatusPill", row.IsActive)</td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit"><i class="fas fa-pen"></i></a>
-                            @* The artisan is a first-class storefront page, not a metadata field. *@
-                            <a href="@storefrontBase@row.StorefrontUrl" target="_blank" rel="noopener" title="Preview on the storefront" class="ms-2"><i class="fas fa-external-link-alt"></i></a>
+                        <td class="text-center">
+                            <a asp-action="Edit" asp-route-id="@row.Id" title="Edit" class="text-primary"><i class="fas fa-pen"></i></a>
+                            <a asp-action="Details" asp-route-id="@row.Id" title="View Details" class="ms-2 text-info"><i class="fas fa-eye"></i></a>
+                            <a href="javascript:void(0);" onclick="confirmDeleteArtisan(@row.Id, '@Html.Raw(Html.Encode(row.Name))')" title="Delete" class="ms-2 text-danger"><i class="fas fa-trash-alt"></i></a>
+                            <a href="@storefrontBase@row.StorefrontUrl" target="_blank" rel="noopener" title="Preview on the storefront" class="ms-2 text-secondary"><i class="fas fa-external-link-alt"></i></a>
                         </td>
                     </tr>
                 }
@@ -71,12 +86,12 @@
                     <tr><td colspan="8" class="text-center py-4">No artisans yet. <a asp-action="Add">Add the first one</a>.</td></tr>
                 }
             </tbody>
-
         </table>
     </div>
 </section>
 
-<div class="modal delete-common-modal common-modal" id="artisan-delete-confirm-modal">
+<!-- Delete Confirmation Modal -->
+<div class="modal delete-common-modal common-modal" id="artisan-delete-confirm-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -85,11 +100,13 @@
                 </button>
             </div>
             <div class="modal-body">
-                <h3>Delete Confirmation</h3>
-                <p>Are you sure you want to delete this record?</p>
+                <h3>Delete Artisan</h3>
+                <p>Are you sure you want to delete <strong id="deleteArtisanName"></strong>? This artisan record will be archived.</p>
                 <div class="delete-edit-btn">
                     <button type="button" class="custom_button secondary_button" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="btn-delete-yes" class="custom_button primary_button" data-bs-dismiss="modal">Delete</button>
+                    <button type="button" id="btn-delete-yes" class="custom_button primary_button" onclick="executeDeleteArtisan()">
+                        <i class="fas fa-trash-alt me-1"></i> Delete
+                    </button>
                 </div>
             </div>
         </div>
@@ -99,14 +116,16 @@
 @section Scripts {
     <script>
         let datatable;
+        let deleteTargetId = 0;
 
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Product"); }
 
             datatable = $('#artisan-grid').DataTable({
-                paging: true, ordering: true, filter: false, destroy: true,
+                paging: true, ordering: true, filter: true, destroy: true,
                 bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
                 language: { emptyTable: "No records to show yet" },
+                dom: 'rtip',
                 initComplete: function () {
                     const $w = $("#artisan-grid").closest(".dataTables_wrapper");
                     if (!$w.parent().hasClass("tb-responsive")) { $w.wrap("<div class='tb-responsive'></div>"); }
@@ -115,14 +134,63 @@
         });
 
         function fnSearch(ctrl) {
-            $("#clearSearch").toggle(($(ctrl).val() || '').length > 0);
-            if (datatable) datatable.draw();
+            const query = $(ctrl).val() || '';
+            $("#clearSearch").toggle(query.length > 0);
+            if (datatable) {
+                datatable.search(query).draw();
+            }
         }
 
         function clearSearch() {
             $("#txtSearch").val('');
             $("#clearSearch").hide();
-            if (datatable) datatable.draw();
+            if (datatable) {
+                datatable.search('').draw();
+            }
+        }
+
+        function confirmDeleteArtisan(id, name) {
+            deleteTargetId = id;
+            $('#deleteArtisanName').text(name);
+            $('#artisan-delete-confirm-modal').modal('show');
+        }
+
+        function executeDeleteArtisan() {
+            if (!deleteTargetId) return;
+
+            const token = $('input[name="__RequestVerificationToken"]').val();
+            const $btn = $('#btn-delete-yes');
+            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Deleting...');
+
+            $.ajax({
+                url: '@Url.Action("Delete", "Artisan")',
+                type: 'POST',
+                data: {
+                    id: deleteTargetId,
+                    __RequestVerificationToken: token
+                },
+                success: function (res) {
+                    $('#artisan-delete-confirm-modal').modal('hide');
+                    $btn.prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Delete');
+
+                    if (res && res.success) {
+                        toastr.success(res.message || 'Artisan deleted successfully.', 'Deleted');
+                        const row = document.getElementById('artisan-row-' + deleteTargetId);
+                        if (row && datatable) {
+                            datatable.row($(row)).remove().draw();
+                        } else {
+                            setTimeout(function () { location.reload(); }, 600);
+                        }
+                    } else {
+                        toastr.error(res ? res.message : 'Failed to delete artisan.', 'Error');
+                    }
+                },
+                error: function () {
+                    $('#artisan-delete-confirm-modal').modal('hide');
+                    $btn.prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Delete');
+                    toastr.error('An error occurred while deleting the artisan.', 'Error');
+                }
+            });
         }
     </script>
 }

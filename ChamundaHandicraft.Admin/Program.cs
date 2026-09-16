@@ -21,6 +21,9 @@ builder.Services.AddHttpClient<IApiService, ApiService>(client =>
         builder.Configuration["APIGatewayBaseUrl"] ?? "https://localhost:7138/");
     client.Timeout = TimeSpan.FromSeconds(
         builder.Configuration.GetValue("Api:TimeoutSeconds", 60));
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
 });
 
 // The admin panel's data seam, mirroring IStorefrontClient on the customer site.
@@ -33,6 +36,8 @@ else
 {
     builder.Services.AddScoped<IAdminClient, DemoAdminClient>();
 }
+
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 builder.Services.AddSession(options =>
 {

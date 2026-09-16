@@ -231,6 +231,7 @@ BEGIN
         ProductStory        NVARCHAR(MAX)   NULL,
         CareInstructions    NVARCHAR(MAX)   NULL,
         WarrantyInformation NVARCHAR(MAX)   NULL,
+        VideoUrl            NVARCHAR(1000)  NULL,
 
         -- Classification (Category FKs added in 07_Categories.sql)
         CategoryId          INT             NOT NULL,

@@ -12,11 +12,16 @@
 
     <title>Chamunda Handicraft - @ViewData["Title"]</title>
 
+    <!-- Main design CSS -->
+    <link rel="stylesheet" href="~/css/Style.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="@Url.Content("~/assets/css/bootstrap-select.min.css")" asp-append-version="true" />
     <link rel="stylesheet" href="@Url.Content("~/assets/css/scss/style.css")" asp-append-version="true" />
     <link rel="stylesheet" href="@Url.Content("~/assets/css/toastr.min.css")" asp-append-version="true" />
     <link rel="stylesheet" href="@Url.Content("~/assets/css/style-dev.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="@Url.Content("~/assets/css/admin-custom.css")" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
     @* Brand palette — shared with the authenticated shell. Must stay after the
        imported themes so it wins the cascade. *@
@@ -34,13 +39,20 @@
 
                     <div class="form-side">
                         <div class="welc-head newwelcome-cls-adding">
-                            <a class="for-logocommoncls">
+                            <a class="for-logocommoncls" asp-controller="Auth" asp-action="Login">
                                 <picture>
-                                    <img src="~/assets/images/chamunda-logo-dark.svg" class="dropdown-menu-dark Logo" alt="Chamunda Handicraft" width="200">
+                                    <img src="~/assets/images/chamunda-logo-dark.svg" class="Logo" alt="Chamunda Handicraft" width="210">
                                 </picture>
                             </a>
-                            <h1 class="welcome-title"><strong>Welcome To Chamunda Handicraft</strong></h1>
-                            <p>Please enter your details</p>
+                            @{
+                                var welcomeTitle = ViewData["WelcomeTitle"] as string ?? "Welcome To Chamunda Handicraft";
+                                var welcomeSubtitle = ViewData["WelcomeSubtitle"] as string ?? "Please enter your details";
+                            }
+                            <h1 class="welcome-title"><strong>@welcomeTitle</strong></h1>
+                            @if (!string.IsNullOrWhiteSpace(welcomeSubtitle))
+                            {
+                                <p>@welcomeSubtitle</p>
+                            }
                         </div>
 
                         <div class="common_form">

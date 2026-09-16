@@ -1,7 +1,7 @@
-@model AttributeGridItem
+@model AttributeSaveRequest
 @{
     ViewData["Title"] = "Attribute";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var isEdit = Model.Id > 0;
     var heading = isEdit ? "Edit Attribute" : "Add Attribute";
 }
 
@@ -22,55 +22,65 @@
 
 <main class="page-content">
 
-    <form method="post" id="attributeForm">
-
-        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+    <form asp-action="Save" method="post" id="attributeForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
 
         <section class="form-section">
             <div class="form-section-header">
-                <h2><i class="fas fa-sliders" style="color:var(--accent);margin-right:8px;"></i>Attribute Information</h2>
+                <h2><i class="fas fa-sliders" style="color:var(--accent);margin-right:8px;"></i>Attribute Details</h2>
             </div>
 
             <div class="form-section-body">
                 <div class="row g-3">
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label-custom">Attribute Name <span class="req">*</span></label>
-                        <input id="Name" name="Name" class="form-control-custom" placeholder="e.g. Size, Colour, Material" />
-                        <span class="error-msg" data-valmsg-for="Name"></span>
+                        <input asp-for="AttributeName" class="form-control-custom" placeholder="e.g. Color, Size, Material" required />
+                        <span class="text-danger font-12" asp-validation-for="AttributeName"></span>
                     </div>
 
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Input Type <span class="req">*</span></label>
-                        <select id="InputType" name="InputType" class="form-control-custom" onchange="toggleValueRows()">
-                            <option value="select">Dropdown</option>
-                            <option value="multiselect">Multi Select</option>
-                            <option value="swatch">Colour Swatch</option>
-                            <option value="text">Free Text</option>
-                            <option value="number">Number</option>
-                            <option value="boolean">Yes / No</option>
-                        </select>
+                        <label class="form-label-custom">Attribute Code</label>
+                        <input asp-for="AttributeCode" class="form-control-custom" placeholder="e.g. color, size, material" />
+                        <span class="text-danger font-12" asp-validation-for="AttributeCode"></span>
                     </div>
 
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Attribute Set</label>
-                        <select id="AttributeSetId" name="AttributeSetId" class="form-control-custom select2-single">
-                            <option value="">Select attribute set</option>
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label-custom">Display Type</label>
+                        <select asp-for="DisplayType" class="form-control-custom" id="DisplayTypeSelect" onchange="toggleValueRows()">
+                            <option value="Pill">Pill / Badge</option>
+                            <option value="Swatch">Color Swatch</option>
+                            <option value="Dropdown">Dropdown Select</option>
+                            <option value="Text">Free Text</option>
                         </select>
+                        <span class="text-danger font-12" asp-validation-for="DisplayType"></span>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label-custom">Sort Order</label>
+                        <input asp-for="SortOrder" type="number" class="form-control-custom" placeholder="0" min="0" />
+                        <span class="text-danger font-12" asp-validation-for="SortOrder"></span>
                     </div>
 
                     <div class="col-12">
-                        <div class="d-flex gap-3 flex-wrap pt-2">
+                        <div class="d-flex gap-4 flex-wrap pt-2">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="IsFilterable" name="IsFilterable" />
-                                <label class="form-check-label" for="IsFilterable">Use as a storefront filter</label>
+                                <input class="form-check-input" type="checkbox" asp-for="IsFilterable" id="IsFilterable" />
+                                <label class="form-check-label fw-medium" for="IsFilterable">
+                                    <i class="fas fa-filter text-primary me-1"></i> Storefront Filter (shown on PLP side rail)
+                                </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="IsRequired" name="IsRequired" />
-                                <label class="form-check-label" for="IsRequired">Required on every product</label>
+                                <input class="form-check-input" type="checkbox" asp-for="IsRequired" id="IsRequired" />
+                                <label class="form-check-label fw-medium" for="IsRequired">
+                                    <i class="fas fa-asterisk text-danger me-1"></i> Required on Product Entry
+                                </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="IsVariantOption" name="IsVariantOption" />
-                                <label class="form-check-label" for="IsVariantOption">Can define variants</label>
+                                <input class="form-check-input" type="checkbox" asp-for="IsVariantDefining" id="IsVariantDefining" />
+                                <label class="form-check-label fw-medium" for="IsVariantDefining">
+                                    <i class="fas fa-cubes text-info me-1"></i> Variant Defining (used to generate SKU variants)
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -78,11 +88,12 @@
             </div>
         </section>
 
+        <!-- Attribute Values Section -->
         <section class="form-section" id="valuesSection">
             <div class="form-section-header d-flex justify-content-between align-items-center">
-                <h2><i class="fas fa-list" style="color:var(--accent);margin-right:8px;"></i>Attribute Values</h2>
+                <h2><i class="fas fa-list-ol" style="color:var(--accent);margin-right:8px;"></i>Attribute Values</h2>
                 <button type="button" class="custom_button secondary_button" onclick="addValueRow()">
-                    <i class="fas fa-plus"></i> Add Value
+                    <i class="fas fa-plus me-1"></i> Add Value
                 </button>
             </div>
 
@@ -91,23 +102,71 @@
                     <table class="custom-datatable listing-order-table" id="value-table">
                         <thead>
                             <tr>
-                                <th style="min-width:220px;">Value</th>
-                                <th style="min-width:180px;">Display Label</th>
-                                <th style="min-width:140px;">Swatch</th>
+                                <th style="min-width:200px;">Label (Display Name) <span class="req">*</span></th>
+                                <th style="min-width:160px;">Code / Key</th>
+                                <th style="min-width:140px;" class="col-swatch">Color Swatch</th>
                                 <th style="min-width:110px;">Sort Order</th>
-                                <th style="min-width:90px;">Action</th>
+                                <th style="min-width:90px; text-align:center;">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td><input class="form-control-custom" placeholder="Enter value" /></td>
-                                <td><input class="form-control-custom" placeholder="Shown to customers" /></td>
-                                <td><input type="color" class="form-control-custom" value="#6B2C2C" /></td>
-                                <td><input type="number" class="form-control-custom" placeholder="0" /></td>
-                                <td class="text-center">
-                                    <button type="button" class="custom_button secondary_button" onclick="removeValueRow(this)">Remove</button>
-                                </td>
-                            </tr>
+                        <tbody id="valuesTableBody">
+                            @if (Model.Values != null && Model.Values.Any())
+                            {
+                                for (int i = 0; i < Model.Values.Count; i++)
+                                {
+                                    <tr class="value-row">
+                                        <td>
+                                            <input type="hidden" name="Values[@i].Id" value="@Model.Values[i].Id" />
+                                            <input type="hidden" name="Values[@i].IsActive" value="true" />
+                                            <input name="Values[@i].Label" value="@Model.Values[i].Label" class="form-control-custom val-label" placeholder="e.g. Royal Blue, Large" required />
+                                        </td>
+                                        <td>
+                                            <input name="Values[@i].ValueCode" value="@Model.Values[i].ValueCode" class="form-control-custom val-code" placeholder="e.g. BLUE, L" />
+                                        </td>
+                                        <td class="col-swatch">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="color" name="Values[@i].ColourHex" value="@(string.IsNullOrEmpty(Model.Values[i].ColourHex) ? "#8E1F2F" : Model.Values[i].ColourHex)" class="form-control form-control-color" style="width: 44px; height: 38px; padding: 2px;" />
+                                                <span class="font-12 text-muted hex-label">@(Model.Values[i].ColourHex ?? "#8E1F2F")</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="Values[@i].SortOrder" value="@Model.Values[i].SortOrder" class="form-control-custom val-sort" placeholder="0" min="0" />
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="custom_button secondary_button text-danger" onclick="removeValueRow(this)" title="Remove Value">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr class="value-row">
+                                    <td>
+                                        <input type="hidden" name="Values[0].Id" value="0" />
+                                        <input type="hidden" name="Values[0].IsActive" value="true" />
+                                        <input name="Values[0].Label" class="form-control-custom val-label" placeholder="e.g. Brass, Copper" required />
+                                    </td>
+                                    <td>
+                                        <input name="Values[0].ValueCode" class="form-control-custom val-code" placeholder="e.g. BRASS" />
+                                    </td>
+                                    <td class="col-swatch">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="color" name="Values[0].ColourHex" value="#8E1F2F" class="form-control form-control-color" style="width: 44px; height: 38px; padding: 2px;" />
+                                            <span class="font-12 text-muted hex-label">#8E1F2F</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="Values[0].SortOrder" value="1" class="form-control-custom val-sort" placeholder="1" min="0" />
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="custom_button secondary_button text-danger" onclick="removeValueRow(this)" title="Remove Value">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -117,19 +176,19 @@
         <div class="form-action-bar">
             <div class="is-active-row" id="isActiveRow">
                 <div class="is-toggle-item" id="isToggleItem">
-                    <span class="ia-label">Is Active</span>
+                    <span class="ia-label">Status</span>
                     <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <input type="checkbox" asp-for="IsActive" id="IsActiveCheckbox" />
                         <span class="ia-slider"></span>
                     </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
+                    <span class="ia-status" id="isActiveStatus">@(Model.IsActive ? "Active" : "Inactive")</span>
                 </div>
             </div>
 
-            <div>
-                <a asp-controller="Attribute" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save">
-                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+            <div class="d-flex gap-2">
+                <a asp-controller="Attribute" asp-action="Index" class="custom_button secondary_button">Cancel</a>
+                <button type="submit" id="btnSaveAttribute" class="custom_button primary_button">
+                    <i class="fas fa-save me-1"></i> @(isEdit ? "Update Attribute" : "Save Attribute")
                 </button>
             </div>
         </div>
@@ -139,28 +198,84 @@
 </main>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Product"); }
             toggleValueRows();
+
+            $('#IsActiveCheckbox').change(function () {
+                $('#isActiveStatus').text(this.checked ? 'Active' : 'Inactive');
+            });
+
+            $(document).on('input', 'input[type="color"]', function () {
+                $(this).siblings('.hex-label').text($(this).val());
+            });
+
+            $('#attributeForm').on('submit', function () {
+                if ($(this).valid()) {
+                    reindexValues();
+                    $('#btnSaveAttribute').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+                }
+            });
         });
 
-        // Free text, number and boolean attributes carry no value list.
         function toggleValueRows() {
-            var t = $('#InputType').val();
-            $('#valuesSection').toggle(t === 'select' || t === 'multiselect' || t === 'swatch');
+            var displayType = $('#DisplayTypeSelect').val();
+            var showValues = (displayType !== 'Text');
+            $('#valuesSection').toggle(showValues);
+            $('.col-swatch').toggle(displayType === 'Swatch');
         }
 
         function addValueRow() {
-            var $row = $('#value-table tbody tr').first().clone();
-            $row.find('input').not('[type=color]').val('');
-            $('#value-table tbody').append($row);
+            var nextIndex = $('#valuesTableBody tr.value-row').length;
+            var sortNum = nextIndex + 1;
+            var newRow = '<tr class="value-row">' +
+                '<td>' +
+                    '<input type="hidden" name="Values[' + nextIndex + '].Id" value="0" />' +
+                    '<input type="hidden" name="Values[' + nextIndex + '].IsActive" value="true" />' +
+                    '<input name="Values[' + nextIndex + '].Label" class="form-control-custom val-label" placeholder="Enter label" required />' +
+                '</td>' +
+                '<td>' +
+                    '<input name="Values[' + nextIndex + '].ValueCode" class="form-control-custom val-code" placeholder="Code" />' +
+                '</td>' +
+                '<td class="col-swatch">' +
+                    '<div class="d-flex align-items-center gap-2">' +
+                        '<input type="color" name="Values[' + nextIndex + '].ColourHex" value="#8E1F2F" class="form-control form-control-color" style="width: 44px; height: 38px; padding: 2px;" />' +
+                        '<span class="font-12 text-muted hex-label">#8E1F2F</span>' +
+                    '</div>' +
+                '</td>' +
+                '<td>' +
+                    '<input type="number" name="Values[' + nextIndex + '].SortOrder" value="' + sortNum + '" class="form-control-custom val-sort" placeholder="' + sortNum + '" min="0" />' +
+                '</td>' +
+                '<td class="text-center">' +
+                    '<button type="button" class="custom_button secondary_button text-danger" onclick="removeValueRow(this)" title="Remove Value">' +
+                        '<i class="fas fa-trash-alt"></i>' +
+                    '</button>' +
+                '</td>' +
+                '</tr>';
+
+            $('#valuesTableBody').append(newRow);
+            toggleValueRows();
         }
 
         function removeValueRow(btn) {
-            if ($('#value-table tbody tr').length > 1) {
+            if ($('#valuesTableBody tr.value-row').length > 1) {
                 $(btn).closest('tr').remove();
+                reindexValues();
+            } else {
+                toastr.warning('At least one value is required for this attribute.', 'Validation');
             }
+        }
+
+        function reindexValues() {
+            $('#valuesTableBody tr.value-row').each(function (idx, row) {
+                $(row).find('input[name*="Values["]').each(function () {
+                    var name = $(this).attr('name');
+                    var newName = name.replace(/Values\[\d+\]/, 'Values[' + idx + ']');
+                    $(this).attr('name', newName);
+                });
+            });
         }
     </script>
 }

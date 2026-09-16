@@ -72,6 +72,8 @@ public interface IAdminClient
     /// storefront — nothing else does.
     /// </summary>
     Task<ResponseViewModel<bool>> UpdateProductStatusAsync(UpdateStatusRequest request, CancellationToken ct = default);
+    Task<ResponseViewModel<bool>> DeleteProductAsync(int id, CancellationToken ct = default);
+    Task<ResponseViewModel<ProductLookupsViewModel>> GetProductLookupsAsync(CancellationToken ct = default);
 
     Task<ResponseViewModel<List<CategoryViewModel>>> GetCategoryTreeAsync(CancellationToken ct = default);
     Task<ResponseViewModel<int>> SaveCategoryAsync(CategorySaveRequest request, CancellationToken ct = default);

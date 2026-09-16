@@ -87,7 +87,7 @@
                 @foreach (var row in Model.Items)
                 {
                     <tr>
-                        <td><img src="@(row.PhotoUrl ?? "/assets/images/default-profile.png")" width="36" height="36" alt="@row.FullName" style="object-fit:cover;border-radius:50%" /></td>
+                        <td><img src="@(row.PhotoUrl ?? "/assets/images/default-profile.png")" alt="@row.FullName" style="width: 40px !important; height: 40px !important; min-width: 40px; min-height: 40px; max-width: 40px; max-height: 40px; aspect-ratio: 1/1; object-fit: cover; border-radius: 50%; display: block;" /></td>
                         <td><a asp-action="Edit" asp-route-id="@row.Id">@row.FullName</a></td>
                         <td>EMP-@row.Id.ToString("D4")</td>
                         <td>@row.Email</td>

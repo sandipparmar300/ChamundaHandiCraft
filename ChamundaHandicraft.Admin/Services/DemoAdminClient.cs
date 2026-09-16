@@ -276,6 +276,19 @@ public class DemoAdminClient : IAdminClient
                 ? "Published. It is now live on the storefront."
                 : "Unpublished. It is no longer visible to shoppers."));
 
+    public Task<ResponseViewModel<bool>> DeleteProductAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(ResponseViewModel<bool>.Success(true, "Product deleted successfully."));
+
+    public Task<ResponseViewModel<ProductLookupsViewModel>> GetProductLookupsAsync(CancellationToken ct = default) =>
+        Task.FromResult(Ok(new ProductLookupsViewModel
+        {
+            Categories = new List<IdNamePair> { new() { Id = 1, Name = "Brass & Metalware" }, new() { Id = 2, Name = "Wooden Handicrafts" }, new() { Id = 3, Name = "Handloom & Textiles" } },
+            Brands = new List<IdNamePair> { new() { Id = 1, Name = "Chamunda Heritage" }, new() { Id = 2, Name = "Sankheda Artisans" } },
+            Artisans = new List<IdNamePair> { new() { Id = 1, Name = "Ramesh Soni (Brass Casting)" }, new() { Id = 2, Name = "Kalpesh Mistry (Woodwork)" } },
+            TaxClasses = new List<IdNamePair> { new() { Id = 1, Name = "GST 5%" }, new() { Id = 2, Name = "GST 12%" }, new() { Id = 3, Name = "GST 18%" } },
+            Attributes = new List<IdNamePair> { new() { Id = 1, Name = "Material" }, new() { Id = 2, Name = "Color" } }
+        }));
+
     public Task<ResponseViewModel<List<CategoryViewModel>>> GetCategoryTreeAsync(CancellationToken ct = default) =>
         Task.FromResult(Ok(new List<CategoryViewModel>
         {

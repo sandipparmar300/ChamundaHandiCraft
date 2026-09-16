@@ -68,6 +68,12 @@ public class GatewayAdminClient : IAdminClient
         UpdateStatusRequest request, CancellationToken ct = default) =>
         _api.PostAsync<bool>(ApiEndPoint.Product.UpdateStatus, request, ct);
 
+    public Task<ResponseViewModel<bool>> DeleteProductAsync(int id, CancellationToken ct = default) =>
+        _api.DeleteAsync<bool>(ApiEndPoint.Product.Delete, new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
+    public Task<ResponseViewModel<ProductLookupsViewModel>> GetProductLookupsAsync(CancellationToken ct = default) =>
+        _api.GetAsync<ProductLookupsViewModel>("Admin/Product/Lookups", null, ct);
+
     public Task<ResponseViewModel<List<CategoryViewModel>>> GetCategoryTreeAsync(CancellationToken ct = default) =>
         _api.GetAsync<List<CategoryViewModel>>(ApiEndPoint.Category.Tree, null, ct);
 

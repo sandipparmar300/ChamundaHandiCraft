@@ -10,11 +10,12 @@ namespace ChamundaHandicraft.Helper.ViewModel.Admin;
 /// </summary>
 
 /// <summary>One row in the Admin product grid (docs/Admin Flows/Product.txt §3).</summary>
-public class ProductGridItem : AuditableViewModel
+public class ProductGridItem : AuditableViewModel, IAdminGridRow
 {
     public int Id { get; set; }
     public string ImageUrl { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public string Sku { get; set; } = string.Empty;
     public string ProductCode { get; set; } = string.Empty;
     public string? Barcode { get; set; }
@@ -30,6 +31,9 @@ public class ProductGridItem : AuditableViewModel
     public bool IsFeatured { get; set; }
     public bool IsBestseller { get; set; }
     public bool IsTrending { get; set; }
+    public bool IsActive => Status == ProductStatus.Published;
+
+    public string DisplayName => Name;
 
     /// <summary>
     /// Live on the storefront only when published, visible and in a published category.
@@ -59,14 +63,15 @@ public class ProductSaveRequest
     /// <summary>Drives <c>/p/{slug}</c>. Changing it must create a 301 in the Seo module.</summary>
     public string Slug { get; set; } = string.Empty;
 
-    public string ShortDescription { get; set; } = string.Empty;
-    public string FullDescription { get; set; } = string.Empty;
+    public string? ShortDescription { get; set; }
+    public string? FullDescription { get; set; }
 
     /// <summary>The handmade story rendered in the PDP craft band.</summary>
     public string? ProductStory { get; set; }
 
     public string? CareInstructions { get; set; }
     public string? WarrantyInformation { get; set; }
+    public string? VideoUrl { get; set; }
 
     // Classification
     public int CategoryId { get; set; }
@@ -102,12 +107,18 @@ public class ProductSaveRequest
     public decimal? WeightGrams { get; set; }
 
     // Inventory
+    public int StockQuantity { get; set; } = 10;
     public bool TrackInventory { get; set; } = true;
     public int? LowStockThreshold { get; set; } = 5;
     public int? MaxQuantityPerOrder { get; set; }
     public bool AllowBackorder { get; set; }
     public bool IsMadeToOrder { get; set; }
     public int? MadeToOrderDays { get; set; }
+    public bool HasVariants { get; set; }
+
+    // Related Products
+    public List<int> ComplementaryProductIds { get; set; } = new();
+    public List<int> SimilarProductIds { get; set; } = new();
 
     // Merchandising
     public ProductStatus Status { get; set; } = ProductStatus.Draft;
@@ -187,7 +198,7 @@ public class ArtisanSaveRequest
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string Slug { get; set; } = string.Empty;
+    public string? Slug { get; set; }
     public string Craft { get; set; } = string.Empty;
     public string Cluster { get; set; } = string.Empty;
     public string? Story { get; set; }
@@ -222,4 +233,65 @@ public class StockGridItem
     public StockState State => Available <= 0
         ? StockState.OutOfStock
         : Available <= LowStockThreshold ? StockState.LowStock : StockState.InStock;
+}
+
+public class BrandSaveRequest
+{
+    public int Id { get; set; }
+    public string BrandName { get; set; } = string.Empty;
+    public string? Slug { get; set; }
+    public string? LogoUrl { get; set; }
+    public string? Description { get; set; }
+    public string? Website { get; set; }
+    public int SortOrder { get; set; }
+    public bool IsFeatured { get; set; }
+    public bool IsActive { get; set; } = true;
+}
+
+public class AttributeValueSaveRequest
+{
+    public int Id { get; set; }
+    public string Label { get; set; } = string.Empty;
+    public string? ValueCode { get; set; }
+    public string? ColourHex { get; set; }
+    public string? ImageUrl { get; set; }
+    public int SortOrder { get; set; }
+    public bool IsActive { get; set; } = true;
+}
+
+public class AttributeSaveRequest
+{
+    public int Id { get; set; }
+    public string AttributeName { get; set; } = string.Empty;
+    public string? AttributeCode { get; set; }
+    public string DisplayType { get; set; } = "Pill";
+    public bool IsFilterable { get; set; } = true;
+    public bool IsRequired { get; set; }
+    public bool IsVariantDefining { get; set; }
+    public int SortOrder { get; set; }
+    public bool IsActive { get; set; } = true;
+    public List<AttributeValueSaveRequest> Values { get; set; } = new();
+}
+
+public class ProductLookupsViewModel
+{
+    public List<IdNamePair> Categories { get; set; } = new();
+    public List<IdNamePair> Brands { get; set; } = new();
+    public List<IdNamePair> Artisans { get; set; } = new();
+    public List<IdNamePair> TaxClasses { get; set; } = new();
+    public List<IdNamePair> Attributes { get; set; } = new();
+    public List<IdNamePair> Products { get; set; } = new();
+}
+
+public class ProductRelationItem
+{
+    public long Id { get; set; }
+    public int ProductId { get; set; }
+    public int RelatedProductId { get; set; }
+    public string RelationType { get; set; } = "Complementary";
+    public int SortOrder { get; set; }
+    public string? RelatedProductName { get; set; }
+    public string? RelatedProductSku { get; set; }
+    public decimal RelatedProductPrice { get; set; }
+    public string? RelatedProductImage { get; set; }
 }

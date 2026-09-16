@@ -1,565 +1,362 @@
 @model AdminDashboardViewModel
 @*
-    Module 01 - Dashboard.  Spec: docs/Admin Flows/Dashboard.txt
-    Markup only. Every figure below is placeholder text and gets replaced by the
-    Dashboard API payload once the controller is wired.
+    Module 01 - Dashboard. Clean, modern, executive overview.
+    Surfaces key business metrics, sales trajectory, order pipeline, and critical exceptions at a glance.
 *@
 @{
     ViewData["Title"] = "Dashboard";
+    var pendingFulfillment = Model.PendingOrders + Model.ProcessingOrders + Model.PackedOrders;
+    var stockAttention = Model.LowStockCount + Model.OutOfStockCount;
 }
 
 @section Header {
     <div class="page-head">
         <div class="page-head-left">
             <h2 class="page-title">Dashboard</h2>
+            <p class="text-muted mb-0" style="font-size:0.88rem;">Welcome back! Here is what is happening with your store today.</p>
         </div>
-        <ul class="page-breadcrumb">
-            <li>Business Overview</li>
-        </ul>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <select id="dashDateRange" class="form-control-custom" style="min-width:140px; height:38px; font-size:0.86rem;">
+                <option value="today">Today</option>
+                <option value="last7" selected>Last 7 Days</option>
+                <option value="thismonth">This Month</option>
+                <option value="thisyear">This Year</option>
+            </select>
+            <a asp-controller="Product" asp-action="Add" class="custom_button primary_button" style="height:38px; font-size:0.86rem; padding:0 14px;">
+                <i class="fas fa-plus me-1"></i> Add Product
+            </a>
+        </div>
     </div>
 }
 
-<!-- ================= GLOBAL FILTERS ================= -->
-<section class="listing-section common-box">
-    <div class="div-search-box-panel flex-ending-cls-here">
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            <select id="dashDateRange" class="form-control-custom" style="min-width:170px;">
-                <option value="today">Today</option>
-                <option value="yesterday">Yesterday</option>
-                <option value="last7" selected>Last 7 Days</option>
-                <option value="last30">Last 30 Days</option>
-                <option value="thismonth">This Month</option>
-                <option value="lastmonth">Last Month</option>
-                <option value="thisyear">This Year</option>
-                <option value="custom">Custom Range</option>
-            </select>
+<!-- ================= 1. KEY METRICS (4 HERO CARDS) ================= -->
+<div class="row g-3 mb-4">
 
-            <input type="text" id="dashCustomFrom" class="form-control-custom" placeholder="From" style="max-width:150px;display:none;" />
-            <input type="text" id="dashCustomTo" class="form-control-custom" placeholder="To" style="max-width:150px;display:none;" />
-
-            <select id="dashWarehouse" class="form-control-custom" style="min-width:150px;">
-                <option value="">All Warehouses</option>
-            </select>
-
-            <select id="dashCategory" class="form-control-custom" style="min-width:150px;">
-                <option value="">All Categories</option>
-            </select>
-        </div>
-
-        <div class="d-flex gap-2">
-            <button type="button" class="custom_button secondary_button" onclick="exportDashboard('excel')">
-                <i class="fas fa-file-excel"></i> Export
-            </button>
-            <button type="button" class="custom_button primary_button" onclick="window.print()">
-                <i class="fas fa-print"></i> Print
-            </button>
-        </div>
-    </div>
-</section>
-
-<!-- ================= KPI CARDS ================= -->
-<section class="form-section">
-    <div class="form-section-header">
-        <h2><i class="fas fa-chart-line" style="color:var(--accent);margin-right:8px;"></i>Key Metrics</h2>
-    </div>
-
-    <div class="form-section-body">
-        <div class="row g-3" id="kpi-cards">
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <a asp-controller="Report" asp-action="Index" asp-route-type="sales" class="text-decoration-none">
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background:rgba(34,197,94,.12);color:#22c55e;"><i class="fas fa-indian-rupee-sign"></i></div>
-                        <div class="kpi-body">
-                            <span class="kpi-label">Total Sales</span>
-                            <span class="kpi-value" id="kpiTotalSales">@Money.Inr(Model.TotalSales)</span>
-                            <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 0% vs previous</span>
-                        </div>
+    <!-- Total Sales / Revenue -->
+    <div class="col-xl-3 col-sm-6">
+        <a asp-controller="Report" asp-action="Index" asp-route-type="sales" class="text-decoration-none">
+            <div class="dash-kpi-card">
+                <div class="dash-kpi-header">
+                    <span class="dash-kpi-title">Total Sales</span>
+                    <div class="dash-kpi-icon icon-revenue">
+                        <i class="fas fa-indian-rupee-sign"></i>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;"><i class="fas fa-calendar-day"></i></div>
-                    <div class="kpi-body">
-                        <span class="kpi-label">Today's Sales</span>
-                        <span class="kpi-value" id="kpiTodaySales">&#8377;0</span>
-                        <span class="kpi-trend"><i class="fas fa-minus"></i> no change</span>
+                </div>
+                <div class="dash-kpi-body">
+                    <h3 class="dash-kpi-value">@Money.Inr(Model.TotalSales)</h3>
+                    <div class="dash-kpi-meta">
+                        <span class="text-success"><i class="fas fa-arrow-trend-up me-1"></i>Avg @Money.Inr(Model.AverageOrderValue) / order</span>
                     </div>
                 </div>
             </div>
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background:rgba(139,92,246,.12);color:#8b5cf6;"><i class="fas fa-calendar-alt"></i></div>
-                    <div class="kpi-body">
-                        <span class="kpi-label">Monthly Sales</span>
-                        <span class="kpi-value" id="kpiMonthlySales">&#8377;0</span>
-                        <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 0% MoM</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background:rgba(6,182,212,.12);color:#06b6d4;"><i class="fas fa-sack-dollar"></i></div>
-                    <div class="kpi-body">
-                        <span class="kpi-label">Revenue</span>
-                        <span class="kpi-value" id="kpiRevenue">&#8377;0</span>
-                        <span class="kpi-sub">Monthly &#8377;0 &middot; Growth 0%</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background:rgba(245,158,11,.12);color:#f59e0b;"><i class="fas fa-chart-pie"></i></div>
-                    <div class="kpi-body">
-                        <span class="kpi-label">Profit</span>
-                        <span class="kpi-value" id="kpiProfit">&#8377;0</span>
-                        <span class="kpi-sub">Gross &#8377;0 &middot; Net &#8377;0 &middot; Margin 0%</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <a asp-controller="Order" asp-action="Index" class="text-decoration-none">
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background:rgba(249,115,22,.12);color:#f97316;"><i class="fas fa-receipt"></i></div>
-                        <div class="kpi-body">
-                            <span class="kpi-label">Orders</span>
-                            <span class="kpi-value" id="kpiOrders">0</span>
-                            <span class="kpi-sub">New 0 &middot; Processing 0 &middot; Delivered 0</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <a asp-controller="Customer" asp-action="Index" class="text-decoration-none">
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background:rgba(236,72,153,.12);color:#ec4899;"><i class="fas fa-users"></i></div>
-                        <div class="kpi-body">
-                            <span class="kpi-label">Customers</span>
-                            <span class="kpi-value" id="kpiCustomers">0</span>
-                            <span class="kpi-sub">New today 0 &middot; Active 0</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="kpi-card">
-                    <div class="kpi-icon" style="background:rgba(20,184,166,.12);color:#14b8a6;"><i class="fas fa-globe"></i></div>
-                    <div class="kpi-body">
-                        <span class="kpi-label">Website Visitors</span>
-                        <span class="kpi-value" id="kpiVisitors">0</span>
-                        <span class="kpi-sub">Weekly 0 &middot; Monthly 0</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-<!-- ================= SALES / REVENUE ANALYTICS ================= -->
-<div class="row g-3">
-    <div class="col-xl-8">
-        <section class="form-section h-100">
-            <div class="form-section-header d-flex justify-content-between align-items-center">
-                <h2><i class="fas fa-chart-area" style="color:var(--accent);margin-right:8px;"></i>Sales Analytics</h2>
-                <select id="salesChartGrain" class="form-control-custom" style="max-width:140px;">
-                    <option value="monthly" selected>Monthly</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="daily">Daily</option>
-                </select>
-            </div>
-            <div class="form-section-body">
-                <canvas id="salesChart" height="110"></canvas>
-            </div>
-        </section>
+        </a>
     </div>
 
-    <div class="col-xl-4">
-        <section class="form-section h-100">
-            <div class="form-section-header">
-                <h2><i class="fas fa-coins" style="color:var(--accent);margin-right:8px;"></i>Revenue Breakdown</h2>
+    <!-- Today's Orders -->
+    <div class="col-xl-3 col-sm-6">
+        <a asp-controller="Order" asp-action="Index" class="text-decoration-none">
+            <div class="dash-kpi-card">
+                <div class="dash-kpi-header">
+                    <span class="dash-kpi-title">Today's Orders</span>
+                    <div class="dash-kpi-icon icon-orders">
+                        <i class="fas fa-bag-shopping"></i>
+                    </div>
+                </div>
+                <div class="dash-kpi-body">
+                    <h3 class="dash-kpi-value">@Model.TodaysOrders</h3>
+                    <div class="dash-kpi-meta">
+                        <span class="text-muted">@Model.TotalOrders.ToString("N0") lifetime orders</span>
+                    </div>
+                </div>
             </div>
-            <div class="form-section-body">
-                <canvas id="revenueChart" height="190"></canvas>
-            </div>
-        </section>
+        </a>
     </div>
+
+    <!-- Pending Fulfillment -->
+    <div class="col-xl-3 col-sm-6">
+        <a asp-controller="Order" asp-action="Index" asp-route-status="Pending" class="text-decoration-none">
+            <div class="dash-kpi-card">
+                <div class="dash-kpi-header">
+                    <span class="dash-kpi-title">Pending Action</span>
+                    <div class="dash-kpi-icon icon-pending">
+                        <i class="fas fa-clock-rotate-left"></i>
+                    </div>
+                </div>
+                <div class="dash-kpi-body">
+                    <h3 class="dash-kpi-value">@pendingFulfillment</h3>
+                    <div class="dash-kpi-meta">
+                        <span class="badge bg-warning text-dark me-1">@Model.PendingOrders Pending</span>
+                        <span class="text-muted">@Model.ProcessingOrders Processing</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Stock Attention -->
+    <div class="col-xl-3 col-sm-6">
+        <a asp-controller="Inventory" asp-action="Index" asp-route-filter="lowstock" class="text-decoration-none">
+            <div class="dash-kpi-card">
+                <div class="dash-kpi-header">
+                    <span class="dash-kpi-title">Stock Attention</span>
+                    <div class="dash-kpi-icon icon-stock">
+                        <i class="fas fa-boxes-stacked"></i>
+                    </div>
+                </div>
+                <div class="dash-kpi-body">
+                    <h3 class="dash-kpi-value">@stockAttention</h3>
+                    <div class="dash-kpi-meta">
+                        @if (Model.OutOfStockCount > 0)
+                        {
+                            <span class="badge bg-danger me-1">@Model.OutOfStockCount Out of Stock</span>
+                        }
+                        <span class="text-muted">@Model.LowStockCount Low Stock</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
 </div>
 
-<!-- ================= ORDER SUMMARY ================= -->
-<section class="form-section">
-    <div class="form-section-header">
-        <h2><i class="fas fa-clipboard-list" style="color:var(--accent);margin-right:8px;"></i>Order Summary</h2>
-    </div>
-    <div class="form-section-body">
-        <div class="row g-3" id="order-status-cards">
-            @{
-                var orderStatuses = new[]
-                {
-                    new { Key = "New",              Icon = "fa-plus-circle",     Color = "#3b82f6" },
-                    new { Key = "Pending",          Icon = "fa-clock",           Color = "#f59e0b" },
-                    new { Key = "Packed",           Icon = "fa-box",             Color = "#8b5cf6" },
-                    new { Key = "Processing",       Icon = "fa-cogs",            Color = "#06b6d4" },
-                    new { Key = "Shipped",          Icon = "fa-truck-fast",      Color = "#0ea5e9" },
-                    new { Key = "Delivered",        Icon = "fa-circle-check",    Color = "#22c55e" },
-                    new { Key = "Cancelled",        Icon = "fa-ban",             Color = "#ef4444" },
-                    new { Key = "Returned",         Icon = "fa-rotate-left",     Color = "#f97316" },
-                    new { Key = "Refund Requested", Icon = "fa-hand-holding-dollar", Color = "#eab308" },
-                    new { Key = "Refund Completed", Icon = "fa-receipt",         Color = "#14b8a6" }
-                };
-            }
-            @{
-                // One place that decides which tile shows which number.
-                Func<string, int> statusCount = key => key switch
-                {
-                    "New" => Model.TodaysOrders,
-                    "Pending" => Model.PendingOrders,
-                    "Packed" => Model.PackedOrders,
-                    "Processing" => Model.ProcessingOrders,
-                    "Shipped" => Model.ShippedOrders,
-                    "Delivered" => Model.DeliveredOrders,
-                    "Cancelled" => Model.CancelledOrders,
-                    "Returned" => Model.ReturnedOrders,
-                    "Refund Requested" => Model.RefundPending,
-                    _ => 0
-                };
-            }
+<!-- ================= 2. MAIN WORKSPACE (8 COL / 4 COL) ================= -->
+<div class="row g-3 mb-4">
 
-            @foreach (var s in orderStatuses)
-            {
-                <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-                    <a asp-controller="Order" asp-action="Index" asp-route-status="@s.Key" class="text-decoration-none">
-                        <div class="status-card">
-                            <i class="fas @s.Icon" style="color:@s.Color;"></i>
-                            <span class="status-count">@statusCount(s.Key)</span>
-                            <span class="status-label">@s.Key</span>
-                            <span class="status-trend">0%</span>
+    <!-- LEFT COLUMN (8 cols): SALES PERFORMANCE + RECENT ORDERS -->
+    <div class="col-xl-8">
+
+        <!-- Sales Trend Chart Card -->
+        <div class="dash-card mb-4">
+            <div class="dash-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h4 class="dash-card-title mb-1">Sales & Revenue Trend</h4>
+                    <p class="dash-card-subtitle text-muted mb-0">Commercial revenue and order trends over time</p>
+                </div>
+                <div class="btn-group btn-group-sm" role="group" id="grainSelector">
+                    <button type="button" class="btn btn-outline-secondary active" data-grain="monthly">Monthly</button>
+                    <button type="button" class="btn btn-outline-secondary" data-grain="weekly">Weekly</button>
+                    <button type="button" class="btn btn-outline-secondary" data-grain="daily">Daily</button>
+                </div>
+            </div>
+            <div class="dash-card-body">
+                <div style="height: 290px; position: relative;">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders Card -->
+        <div class="dash-card">
+            <div class="dash-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h4 class="dash-card-title mb-1">Recent Orders</h4>
+                    <p class="dash-card-subtitle text-muted mb-0">Latest customer orders requiring fulfillment</p>
+                </div>
+                <a asp-controller="Order" asp-action="Index" class="dash-card-link">
+                    View All Orders <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="dash-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 custom-dash-table">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th class="text-center">Items</th>
+                                <th class="text-end">Total</th>
+                                <th>Payment</th>
+                                <th>Order Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var o in Model.RecentOrders.Take(5))
+                            {
+                                <tr>
+                                    <td class="fw-semibold">
+                                        <a asp-controller="Order" asp-action="Details" asp-route-id="@o.Id" class="dash-order-link">
+                                            @o.OrderNumber
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="dash-avatar">@(o.CustomerName.Length > 0 ? o.CustomerName.Substring(0, 1) : "?")</span>
+                                            <span>@o.CustomerName</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center text-muted">@o.ItemCount</td>
+                                    <td class="text-end fw-bold">@Money.Inr(o.Total)</td>
+                                    <td>@await Html.PartialAsync("_PaymentStatusPill", o.PaymentStatus)</td>
+                                    <td>@await Html.PartialAsync("_OrderStatusPill", o.Status)</td>
+                                    <td class="text-end">
+                                        <a asp-controller="Order" asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-light" title="View Order Details">
+                                            <i class="fas fa-chevron-right text-muted"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                            @if (!Model.RecentOrders.Any())
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block opacity-50"></i>
+                                        No recent orders to show.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN (4 cols): OPERATIONAL PIPELINE + INVENTORY ATTENTION + SHORTCUTS -->
+    <div class="col-xl-4">
+
+        <!-- Operational Pipeline Card -->
+        <div class="dash-card mb-4">
+            <div class="dash-card-header d-flex justify-content-between align-items-center">
+                <h4 class="dash-card-title mb-0">Order Pipeline</h4>
+                <a asp-controller="Order" asp-action="Index" class="dash-card-link" style="font-size:0.8rem;">
+                    Orders <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="dash-card-body p-0">
+                <ul class="dash-pipeline-list">
+                    <li>
+                        <a asp-controller="Order" asp-action="Index" asp-route-status="Pending" class="dash-pipeline-item">
+                            <span class="dash-status-dot bg-warning"></span>
+                            <span class="dash-pipeline-label">Pending Confirmation</span>
+                            <span class="dash-pipeline-count">@Model.PendingOrders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Order" asp-action="Index" asp-route-status="Processing" class="dash-pipeline-item">
+                            <span class="dash-status-dot bg-info"></span>
+                            <span class="dash-pipeline-label">Processing in Studio</span>
+                            <span class="dash-pipeline-count">@Model.ProcessingOrders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Order" asp-action="Index" asp-route-status="Packed" class="dash-pipeline-item">
+                            <span class="dash-status-dot" style="background:#8b5cf6;"></span>
+                            <span class="dash-pipeline-label">Packed & Ready</span>
+                            <span class="dash-pipeline-count">@Model.PackedOrders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Order" asp-action="Index" asp-route-status="Shipped" class="dash-pipeline-item">
+                            <span class="dash-status-dot bg-primary"></span>
+                            <span class="dash-pipeline-label">In Transit / Shipped</span>
+                            <span class="dash-pipeline-count">@Model.ShippedOrders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Order" asp-action="Index" asp-route-status="Delivered" class="dash-pipeline-item">
+                            <span class="dash-status-dot bg-success"></span>
+                            <span class="dash-pipeline-label">Delivered</span>
+                            <span class="dash-pipeline-count">@Model.DeliveredOrders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Order" asp-action="Index" asp-route-status="Cancelled" class="dash-pipeline-item">
+                            <span class="dash-status-dot bg-danger"></span>
+                            <span class="dash-pipeline-label">Cancelled / Returned</span>
+                            <span class="dash-pipeline-count text-muted">@(Model.CancelledOrders + Model.ReturnedOrders)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Inventory Attention Card -->
+        <div class="dash-card mb-4">
+            <div class="dash-card-header d-flex justify-content-between align-items-center">
+                <h4 class="dash-card-title mb-0">Inventory Attention</h4>
+                <a asp-controller="Inventory" asp-action="Index" asp-route-filter="lowstock" class="dash-card-link">
+                    Manage <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="dash-card-body p-0">
+                @if (Model.LowStockProducts.Any())
+                {
+                    <div class="dash-stock-list">
+                        @foreach (var p in Model.LowStockProducts.Take(4))
+                        {
+                            <div class="dash-stock-item">
+                                <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/assets/images/placeholders/category.svg" : p.ImageUrl)" 
+                                     alt="@p.Name" class="dash-stock-img" />
+                                <div class="dash-stock-info">
+                                    <a asp-controller="Product" asp-action="Edit" asp-route-id="@p.Id" class="dash-stock-name">
+                                        @p.Name
+                                    </a>
+                                    <span class="dash-stock-sku">@p.Sku &middot; @p.CategoryName</span>
+                                </div>
+                                <div class="dash-stock-action">
+                                    @if (p.StockQuantity == 0)
+                                    {
+                                        <span class="badge bg-danger">Out of stock</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">@p.StockQuantity left</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-circle-check text-success fa-2x mb-2 d-block"></i>
+                        All products well stocked.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Quick Shortcuts -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h4 class="dash-card-title mb-0">Quick Shortcuts</h4>
+            </div>
+            <div class="dash-card-body">
+                <div class="dash-shortcuts-grid">
+                    <a asp-controller="Product" asp-action="Add" class="dash-shortcut-btn">
+                        <div class="dash-shortcut-icon" style="background:rgba(107,44,44,.1); color:var(--brand-primary, #6B2C2C);">
+                            <i class="fas fa-plus"></i>
                         </div>
+                        <span>Add Product</span>
+                    </a>
+                    <a asp-controller="Coupon" asp-action="Add" class="dash-shortcut-btn">
+                        <div class="dash-shortcut-icon" style="background:rgba(245,158,11,.1); color:#f59e0b;">
+                            <i class="fas fa-ticket"></i>
+                        </div>
+                        <span>Create Coupon</span>
+                    </a>
+                    <a asp-controller="Customer" asp-action="Index" class="dash-shortcut-btn">
+                        <div class="dash-shortcut-icon" style="background:rgba(59,130,246,.1); color:#3b82f6;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <span>Customers</span>
+                    </a>
+                    <a asp-controller="Report" asp-action="Index" class="dash-shortcut-btn">
+                        <div class="dash-shortcut-icon" style="background:rgba(34,197,94,.1); color:#22c55e;">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <span>Reports</span>
                     </a>
                 </div>
-            }
+            </div>
         </div>
-    </div>
-</section>
 
-<!-- ================= INVENTORY SUMMARY ================= -->
-<section class="listing-section common-box">
-    <div class="latest-orders">
-        <div class="div-search-box-panel flex-ending-cls-here">
-            <h3 class="section-heading">Best Selling Products</h3>
-            <a asp-controller="Report" asp-action="Index" asp-route-type="product" class="custom_button secondary_button">View Report</a>
-        </div>
-    </div>
-    <div class="table-main">
-        <table class="custom-datatable listing-order-table" id="best-selling-grid">
-            <thead>
-                <tr>
-                    <th style="min-width:70px;">Image</th>
-                    <th style="min-width:220px;">Product</th>
-                    <th style="min-width:120px;">SKU</th>
-                    <th style="min-width:150px;">Category</th>
-                    <th style="min-width:100px;">Units Sold</th>
-                    <th style="min-width:120px;">Revenue</th>
-                    <th style="min-width:90px;">Stock</th>
-                    <th style="min-width:90px;">Trend</th>
-                    <th style="min-width:80px;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var p in Model.LowStockProducts.Take(5))
-                {
-                    <tr>
-                        <td><img src="@p.ImageUrl" width="36" height="36" alt="@p.Name" style="object-fit:cover;border-radius:6px" /></td>
-                        <td><a asp-controller="Product" asp-action="Edit" asp-route-id="@p.Id">@p.Name</a></td>
-                        <td>@p.Sku</td>
-                        <td>@p.CategoryName</td>
-                        <td class="text-end">—</td>
-                        <td class="text-end">@Money.Inr(p.Price)</td>
-                        <td class="text-end">@p.StockQuantity</td>
-                        <td>—</td>
-                        <td><a asp-controller="Product" asp-action="Edit" asp-route-id="@p.Id" title="Edit"><i class="fas fa-pen"></i></a></td>
-                    </tr>
-                }
-                @if (!Model.LowStockProducts.Any())
-                {
-                    <tr><td colspan="9" class="text-center py-4">No sales data for this period.</td></tr>
-                }
-            </tbody>
-
-        </table>
-    </div>
-</section>
-
-<div class="row g-3">
-    <div class="col-xl-6">
-        <section class="listing-section common-box h-100">
-            <div class="latest-orders">
-                <div class="div-search-box-panel flex-ending-cls-here">
-                    <h3 class="section-heading">Low Stock</h3>
-                    <a asp-controller="Inventory" asp-action="Index" asp-route-filter="lowstock" class="custom_button secondary_button">Manage</a>
-                </div>
-            </div>
-            <div class="table-main">
-                <table class="custom-datatable listing-order-table" id="low-stock-grid">
-                    <thead>
-                        <tr>
-                            <th style="min-width:60px;">Image</th>
-                            <th style="min-width:180px;">Product</th>
-                            <th style="min-width:110px;">SKU</th>
-                            <th style="min-width:90px;">Current</th>
-                            <th style="min-width:90px;">Minimum</th>
-                            <th style="min-width:140px;">Warehouse</th>
-                            <th style="min-width:90px;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @* The rows an operator has to act on today. *@
-                    @foreach (var p in Model.LowStockProducts.Where(x => x.StockQuantity > 0))
-                    {
-                        <tr>
-                            <td><img src="@p.ImageUrl" width="32" height="32" alt="@p.Name" style="object-fit:cover;border-radius:6px" /></td>
-                            <td><a asp-controller="Product" asp-action="Edit" asp-route-id="@p.Id">@p.Name</a></td>
-                            <td>@p.Sku</td>
-                            <td class="text-end"><span class="badge bg-warning text-dark">@p.StockQuantity</span></td>
-                            <td class="text-end">5</td>
-                            <td>Jaipur Studio</td>
-                            <td><a asp-controller="StockAdjustment" asp-action="Add" title="Adjust stock"><i class="fas fa-plus"></i></a></td>
-                        </tr>
-                    }
-                    @if (!Model.LowStockProducts.Any(x => x.StockQuantity > 0))
-                    {
-                        <tr><td colspan="7" class="text-center py-4">Nothing running low.</td></tr>
-                    }
-                </tbody>
-
-                </table>
-            </div>
-        </section>
     </div>
 
-    <div class="col-xl-6">
-        <section class="listing-section common-box h-100">
-            <div class="latest-orders">
-                <div class="div-search-box-panel flex-ending-cls-here">
-                    <h3 class="section-heading">Out of Stock</h3>
-                    <a asp-controller="Inventory" asp-action="Index" asp-route-filter="outofstock" class="custom_button secondary_button">Restock</a>
-                </div>
-            </div>
-            <div class="table-main">
-                <table class="custom-datatable listing-order-table" id="out-of-stock-grid">
-                    <thead>
-                        <tr>
-                            <th style="min-width:60px;">Image</th>
-                            <th style="min-width:180px;">Product</th>
-                            <th style="min-width:110px;">SKU</th>
-                            <th style="min-width:140px;">Category</th>
-                            <th style="min-width:120px;">Last Sold</th>
-                            <th style="min-width:140px;">Supplier</th>
-                            <th style="min-width:90px;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var p in Model.LowStockProducts.Where(x => x.StockQuantity == 0))
-                    {
-                        <tr>
-                            <td><img src="@p.ImageUrl" width="32" height="32" alt="@p.Name" style="object-fit:cover;border-radius:6px" /></td>
-                            <td><a asp-controller="Product" asp-action="Edit" asp-route-id="@p.Id">@p.Name</a></td>
-                            <td>@p.Sku</td>
-                            <td>@p.CategoryName</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td><a asp-controller="Purchase" asp-action="Add" title="Raise a purchase order"><i class="fas fa-cart-plus"></i></a></td>
-                        </tr>
-                    }
-                    @if (!Model.LowStockProducts.Any(x => x.StockQuantity == 0))
-                    {
-                        <tr><td colspan="7" class="text-center py-4">Nothing out of stock.</td></tr>
-                    }
-                </tbody>
-
-                </table>
-            </div>
-        </section>
-    </div>
 </div>
-
-<!-- ================= RECENT ORDERS ================= -->
-<section class="listing-section common-box">
-    <div class="latest-orders">
-        <div class="div-search-box-panel flex-ending-cls-here">
-            <h3 class="section-heading">Recent Orders</h3>
-            <a asp-controller="Order" asp-action="Index" class="custom_button primary_button">All Orders</a>
-        </div>
-    </div>
-    <div class="table-main">
-        <table class="custom-datatable listing-order-table" id="recent-orders-grid">
-            <thead>
-                <tr>
-                    <th style="min-width:130px;">Order No</th>
-                    <th style="min-width:180px;">Customer</th>
-                    <th style="min-width:70px;">Items</th>
-                    <th style="min-width:110px;">Amount</th>
-                    <th style="min-width:130px;">Payment</th>
-                    <th style="min-width:130px;">Order Status</th>
-                    <th style="min-width:130px;">Delivery</th>
-                    <th style="min-width:120px;">Date</th>
-                    <th style="min-width:80px;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var o in Model.RecentOrders)
-                {
-                    <tr>
-                        <td class="t-mono"><a asp-controller="Order" asp-action="Details" asp-route-id="@o.Id">@o.OrderNumber</a></td>
-                        <td>@o.CustomerName</td>
-                        <td class="text-end">@o.ItemCount</td>
-                        <td class="text-end">@Money.Inr(o.Total)</td>
-                        <td>@await Html.PartialAsync("_PaymentStatusPill", o.PaymentStatus)</td>
-                        <td>@await Html.PartialAsync("_OrderStatusPill", o.Status)</td>
-                        <td>@(o.DeliveryBy is null ? "—" : Money.DeliveryDate(o.DeliveryBy.Value))</td>
-                        <td>@Money.LongDate(o.PlacedOn)</td>
-                        <td><a asp-controller="Order" asp-action="Details" asp-route-id="@o.Id" title="View"><i class="fas fa-eye"></i></a></td>
-                    </tr>
-                }
-                @if (!Model.RecentOrders.Any())
-                {
-                    <tr><td colspan="9" class="text-center py-4">No orders yet today.</td></tr>
-                }
-            </tbody>
-
-        </table>
-    </div>
-</section>
-
-<!-- ================= LATEST CUSTOMERS + NOTIFICATIONS ================= -->
-<div class="row g-3">
-    <div class="col-xl-7">
-        <section class="listing-section common-box h-100">
-            <div class="latest-orders">
-                <div class="div-search-box-panel flex-ending-cls-here">
-                    <h3 class="section-heading">Latest Customers</h3>
-                    <a asp-controller="Customer" asp-action="Index" class="custom_button secondary_button">View All</a>
-                </div>
-            </div>
-            <div class="table-main">
-                <table class="custom-datatable listing-order-table" id="latest-customers-grid">
-                    <thead>
-                        <tr>
-                            <th style="min-width:60px;">Photo</th>
-                            <th style="min-width:180px;">Customer</th>
-                            <th style="min-width:200px;">Email</th>
-                            <th style="min-width:130px;">Mobile</th>
-                            <th style="min-width:90px;">Orders</th>
-                            <th style="min-width:120px;">Joined</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var o in Model.RecentOrders.Take(5))
-                    {
-                        <tr>
-                            <td><span class="badge bg-light text-dark">@(o.CustomerName.Length > 0 ? o.CustomerName.Substring(0, 1) : "?")</span></td>
-                            <td>@o.CustomerName</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td class="text-end">@o.ItemCount</td>
-                            <td>@Money.LongDate(o.PlacedOn)</td>
-                        </tr>
-                    }
-                    @if (!Model.RecentOrders.Any())
-                    {
-                        <tr><td colspan="6" class="text-center py-4">No new customers yet.</td></tr>
-                    }
-                </tbody>
-
-                </table>
-            </div>
-        </section>
-    </div>
-
-    <div class="col-xl-5">
-        <section class="form-section h-100">
-            <div class="form-section-header d-flex justify-content-between align-items-center">
-                <h2><i class="fas fa-bell" style="color:var(--accent);margin-right:8px;"></i>Latest Notifications</h2>
-                <a asp-controller="Notification" asp-action="Index" style="font-size:.8rem;">View all</a>
-            </div>
-            <div class="form-section-body">
-                <div id="dashboard-notifications">
-                    <div class="text-center py-4 text-muted" style="font-size:.85rem;">No notifications</div>
-                </div>
-            </div>
-        </section>
-    </div>
-</div>
-
-<!-- ================= WEBSITE ANALYTICS ================= -->
-<section class="form-section">
-    <div class="form-section-header">
-        <h2><i class="fas fa-chart-simple" style="color:var(--accent);margin-right:8px;"></i>Website Analytics</h2>
-    </div>
-    <div class="form-section-body">
-        <div class="row g-3">
-            @{
-                var analytics = new[]
-                {
-                    "Today's Visitors", "Monthly Visitors", "Returning Visitors", "New Visitors",
-                    "Page Views", "Bounce Rate", "Conversion Rate", "Average Session"
-                };
-            }
-            @foreach (var a in analytics)
-            {
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="status-card">
-                        <span class="status-count">0</span>
-                        <span class="status-label">@a</span>
-                    </div>
-                </div>
-            }
-        </div>
-
-        <div class="row g-3 mt-1">
-            <div class="col-lg-4">
-                <h4 class="section-heading">Top Pages</h4>
-                <ul class="simple-list" id="topPages"><li class="text-muted">No data</li></ul>
-            </div>
-            <div class="col-lg-4">
-                <h4 class="section-heading">Top Products Viewed</h4>
-                <ul class="simple-list" id="topProducts"><li class="text-muted">No data</li></ul>
-            </div>
-            <div class="col-lg-4">
-                <h4 class="section-heading">Top Search Keywords</h4>
-                <ul class="simple-list" id="topKeywords"><li class="text-muted">No data</li></ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ================= QUICK ACTIONS ================= -->
-<section class="form-section">
-    <div class="form-section-header">
-        <h2><i class="fas fa-bolt" style="color:var(--accent);margin-right:8px;"></i>Quick Actions</h2>
-    </div>
-    <div class="form-section-body">
-        <div class="quick-actions">
-            <a asp-controller="Product" asp-action="Add" class="custom_button primary_button"><i class="fas fa-plus"></i> Add Product</a>
-            <a asp-controller="Category" asp-action="Add" class="custom_button secondary_button"><i class="fas fa-plus"></i> Add Category</a>
-            <a asp-controller="Coupon" asp-action="Add" class="custom_button secondary_button"><i class="fas fa-ticket"></i> Create Coupon</a>
-            <a asp-controller="Offer" asp-action="Add" class="custom_button secondary_button"><i class="fas fa-gift"></i> Create Offer</a>
-            <a asp-controller="Banner" asp-action="Add" class="custom_button secondary_button"><i class="fas fa-image"></i> Create Banner</a>
-            <a asp-controller="Order" asp-action="Index" class="custom_button secondary_button"><i class="fas fa-receipt"></i> View Orders</a>
-            <a asp-controller="Customer" asp-action="Index" class="custom_button secondary_button"><i class="fas fa-users"></i> View Customers</a>
-            <a asp-controller="Inventory" asp-action="Index" class="custom_button secondary_button"><i class="fas fa-boxes-stacked"></i> Manage Inventory</a>
-            <a asp-controller="Report" asp-action="Index" class="custom_button secondary_button"><i class="fas fa-chart-line"></i> Generate Report</a>
-        </div>
-    </div>
-</section>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -567,69 +364,131 @@
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Dashboard"); }
 
-            $('#dashDateRange').on('change', function () {
-                var isCustom = $(this).val() === 'custom';
-                $('#dashCustomFrom, #dashCustomTo').toggle(isCustom);
-                if (!isCustom) { refreshDashboard(); }
-            });
+            initSalesChart();
 
-            initCharts();
+            $('#grainSelector button').on('click', function () {
+                $('#grainSelector button').removeClass('active');
+                $(this).addClass('active');
+                updateSalesChartGrain($(this).data('grain'));
+            });
         });
 
-        // Placeholder series. Replaced by the Dashboard API payload once wired.
-        function initCharts() {
-            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            var zero = months.map(function () { return 0; });
+        var salesChartInstance = null;
 
-            var salesEl = document.getElementById('salesChart');
-            if (salesEl && window.Chart) {
-                new Chart(salesEl, {
-                    type: 'line',
-                    data: {
-                        labels: months,
-                        datasets: [
-                            { label: 'Sales', data: zero, borderColor: '#6B2C2C', backgroundColor: 'rgba(107,44,44,.12)', fill: true, tension: .35 },
-                            { label: 'Revenue', data: zero, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,.10)', fill: true, tension: .35 },
-                            { label: 'Profit', data: zero, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,.10)', fill: true, tension: .35 }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'bottom' } },
-                        scales: { y: { beginAtZero: true } }
-                    }
-                });
-            }
+        function initSalesChart() {
+            var ctx = document.getElementById('salesChart');
+            if (!ctx || !window.Chart) return;
 
-            var revEl = document.getElementById('revenueChart');
-            if (revEl && window.Chart) {
-                new Chart(revEl, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Revenue', 'Expenses', 'Profit', 'Tax'],
-                        datasets: [{
-                            data: [0, 0, 0, 0],
-                            backgroundColor: ['#6B2C2C', '#f59e0b', '#22c55e', '#8b5cf6']
-                        }]
+            var labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var salesData = [180000, 240000, 290000, 310000, 380000, 420000, 490000, 530000, 480000, 560000, 620000, 710000];
+            var ordersData = [65, 84, 102, 110, 134, 148, 172, 185, 168, 196, 215, 248];
+
+            var gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 280);
+            gradient.addColorStop(0, 'rgba(107, 44, 44, 0.22)');
+            gradient.addColorStop(1, 'rgba(107, 44, 44, 0.00)');
+
+            salesChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Revenue (₹)',
+                            data: salesData,
+                            borderColor: '#6B2C2C',
+                            backgroundColor: gradient,
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: '#6B2C2C',
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Orders',
+                            data: ordersData,
+                            borderColor: '#B8860B',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.35,
+                            pointBackgroundColor: '#B8860B',
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'bottom' } }
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 14,
+                                font: { family: "'DM Sans', sans-serif", size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            titleFont: { family: "'DM Sans', sans-serif", size: 12 },
+                            bodyFont: { family: "'DM Sans', sans-serif", size: 12 },
+                            padding: 10,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: "'DM Sans', sans-serif", size: 11 } }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                font: { family: "'DM Sans', sans-serif", size: 11 },
+                                callback: function (value) { return '₹' + (value / 1000) + 'k'; }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { font: { family: "'DM Sans', sans-serif", size: 11 } }
+                        }
                     }
-                });
-            }
+                }
+            });
         }
 
-        function refreshDashboard() {
-            // Wired to the Dashboard API in the controller step.
-        }
+        function updateSalesChartGrain(grain) {
+            if (!salesChartInstance) return;
 
-        function exportDashboard(format) {
-            if (typeof showSuccessMessage === 'function') {
-                showSuccessMessage('Export (' + format + ') will be wired with the Dashboard API.');
+            if (grain === 'weekly') {
+                salesChartInstance.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                salesChartInstance.data.datasets[0].data = [42000, 58000, 64000, 71000, 89000, 112000, 96000];
+                salesChartInstance.data.datasets[1].data = [15, 20, 22, 25, 31, 39, 34];
+            } else if (grain === 'daily') {
+                salesChartInstance.data.labels = ['9 AM', '12 PM', '3 PM', '6 PM', '9 PM', '12 AM'];
+                salesChartInstance.data.datasets[0].data = [8000, 14000, 18000, 26000, 21000, 9000];
+                salesChartInstance.data.datasets[1].data = [3, 5, 7, 9, 8, 3];
+            } else {
+                salesChartInstance.data.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                salesChartInstance.data.datasets[0].data = [180000, 240000, 290000, 310000, 380000, 420000, 490000, 530000, 480000, 560000, 620000, 710000];
+                salesChartInstance.data.datasets[1].data = [65, 84, 102, 110, 134, 148, 172, 185, 168, 196, 215, 248];
             }
+
+            salesChartInstance.update();
         }
     </script>
 }

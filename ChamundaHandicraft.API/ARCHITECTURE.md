@@ -155,3 +155,16 @@ Success, Code, Message, Data, TotalRecord, TotalFilteredRecord
 
 Exceptions never escape: `ExceptionMiddleware` converts `RepositoryException` and
 unhandled errors into the same envelope with the right status code.
+
+---
+
+## Email & Communications Standard
+
+- **Zero HTML in Code**: NEVER hardcode HTML markup or message bodies inside C# source code.
+- **Template-First Architecture**: All platform emails are dispatched through `IEmailService.SendEmailWithTemplateAsync(email, name, templateName, tokens)`.
+- **Template Resolution Hierarchy**:
+  1. `dbo.NotificationTemplates` table (where `TemplateCode = @templateName AND Channel = 0`).
+  2. Physical HTML template files located in `EmailTemplates/{templateName}.html`.
+- **Token Placeholders**: All templates use `{{TokenName}}` placeholders (e.g. `{{RecipientName}}`, `{{ResetUrl}}`, `{{OrderNumber}}`, `{{ExpirationMinutes}}`).
+- **Global Tokens**: `IEmailTemplateService` automatically supplies standard platform tokens: `{{CompanyName}}`, `{{CurrentYear}}`, `{{SupportEmail}}`, `{{AdminPortalUrl}}`, and `{{StorefrontUrl}}`.
+

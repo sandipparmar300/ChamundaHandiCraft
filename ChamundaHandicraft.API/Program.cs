@@ -1,4 +1,6 @@
 using System.Text;
+using Catalog.Application.Extentions;
+using Identity.Application.Extentions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -18,9 +20,11 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 
-// TODO: builder.Services.AddServiceModule(builder.Configuration);
-//       ServiceExtension wires the Dapper SqlConnection, all 25 module registrations
-//       and their AutoMapper profiles. See ARCHITECTURE.md.
+// Identity & Infrastructure Services
+builder.Services.AddIdentityModule(builder.Configuration);
+builder.Services.AddCatalogModule(builder.Configuration);
+builder.Services.AddScoped<ChamundaHandicraft.API.Services.Email.IEmailTemplateService, ChamundaHandicraft.API.Services.Email.EmailTemplateService>();
+builder.Services.AddScoped<ChamundaHandicraft.API.Services.Email.IEmailService, ChamundaHandicraft.API.Services.Email.SmtpEmailService>();
 
 #endregion
 

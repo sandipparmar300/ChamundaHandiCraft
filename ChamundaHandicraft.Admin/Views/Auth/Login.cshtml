@@ -1,38 +1,62 @@
+@model ChamundaHandicraft.Helper.ViewModel.Admin.AdminLoginRequest
 @{
     ViewData["Title"] = "Login";
     Layout = "_OuterLayout";
+    var returnUrl = ViewData["ReturnUrl"] as string;
 }
 
-<form id="loginForm" method="post">
+<form id="loginForm" asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@returnUrl" method="post" novalidate>
+    @Html.AntiForgeryToken()
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-1"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-1"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size: 0.88rem;"></div>
 
     <div class="form-group">
-        <label class="form-label-custom">Email <span class="req">*</span></label>
-        <input type="email" id="Email" name="Email" class="form-control-custom" placeholder="Enter your email" autocomplete="username" />
-        <span class="error-msg" data-valmsg-for="Email"></span>
+        <label class="form-label-custom" asp-for="Email">Email or Phone <span class="req">*</span></label>
+        <input asp-for="Email" class="form-control form-control-custom" placeholder="Enter your email or phone" autocomplete="username" autofocus required />
+        <span asp-validation-for="Email" class="text-danger" style="font-size: 0.82rem;"></span>
     </div>
 
     <div class="form-group">
-        <label class="form-label-custom">Password <span class="req">*</span></label>
+        <label class="form-label-custom" asp-for="Password">Password <span class="req">*</span></label>
         <div class="password-box">
-            <input type="password" id="Password" name="Password" class="form-control-custom" placeholder="Enter your password" autocomplete="current-password" />
-            <span class="toggle-password" onclick="togglePassword()"><i class="fas fa-eye" id="pwdIcon"></i></span>
+            <input asp-for="Password" class="form-control form-control-custom" placeholder="Enter your password" autocomplete="current-password" required />
+            <span class="toggle-password" onclick="togglePassword()" role="button" aria-label="Toggle password visibility"><i class="fas fa-eye" id="pwdIcon"></i></span>
         </div>
-        <span class="error-msg" data-valmsg-for="Password"></span>
+        <span asp-validation-for="Password" class="text-danger" style="font-size: 0.82rem;"></span>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="RememberMe" name="RememberMe" />
-            <label class="form-check-label" for="RememberMe">Remember me</label>
-        </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <label class="remember-wrap" for="RememberMe">
+            <input asp-for="RememberMe" class="custom-checkbox-input" id="RememberMe" type="checkbox" />
+            <span class="custom-checkbox-label">Remember me</span>
+        </label>
         <a asp-controller="Auth" asp-action="ForgotPassword" class="links">Forgot password?</a>
     </div>
 
-    <button type="submit" class="custom_button primary_button w-100 mt-3">Sign In</button>
+    <button type="submit" id="btnSignIn" class="custom_button primary_button w-100 mt-3">
+        <span id="btnSignInText">Sign In</span>
+    </button>
 
 </form>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         function togglePassword() {
             var input = document.getElementById('Password');
@@ -41,5 +65,14 @@
             input.type = show ? 'text' : 'password';
             icon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
         }
+
+        $(function () {
+            $('#loginForm').on('submit', function () {
+                if ($(this).valid()) {
+                    $('#btnSignIn').prop('disabled', true);
+                    $('#btnSignInText').html('<i class="fas fa-spinner fa-spin me-2"></i>Signing In...');
+                }
+            });
+        });
     </script>
 }

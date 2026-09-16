@@ -244,6 +244,20 @@
                 window.location.href = '@Url.Action("Logout", "Auth")';
             }
         });
+
+        // Global Toastr notification triggers
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>toastr.success('@Html.Raw(TempData["SuccessMessage"])', 'Success');</text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>toastr.error('@Html.Raw(TempData["ErrorMessage"])', 'Error');</text>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>toastr.warning('@Html.Raw(TempData["WarningMessage"])', 'Warning');</text>
+        }
     </script>
 
     @await RenderSectionAsync("BodyAppend", required: false)
