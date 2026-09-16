@@ -1,12 +1,10 @@
 @model List<CategoryViewModel>
-@*
-    Module 04 - Category tree + detail split (L-09 in the spec).
-    Spec: docs/Admin Flows/Category.txt
-*@
 @{
-    // Preview opens the customer site, which runs on its own host.
     var storefrontBase = Configuration["StorefrontBaseUrl"] ?? "https://localhost:7141";
     ViewData["Title"] = "Categories";
+    var totalParents = Model.Count;
+    var totalSubs = Model.Sum(m => m.Children?.Count ?? 0);
+    var totalProducts = Model.Sum(m => m.ProductCount + (m.Children?.Sum(c => c.ProductCount) ?? 0));
 }
 
 @section Header {
@@ -16,170 +14,532 @@
         </div>
         <ul class="page-breadcrumb">
             <li>Catalog</li>
-            <li>Category Tree</li>
+            <li>Category Management</li>
         </ul>
     </div>
 }
 
-<div class="row g-3">
+@Html.AntiForgeryToken()
 
-    <!-- ============ TREE ============ -->
-    <div class="col-xl-4">
-        <section class="listing-section common-box h-100">
-            <div class="latest-orders">
-                <div class="div-search-box-panel flex-ending-cls-here">
-                    <div class="listing-search">
-                        <div class="search-box">
-                            <span class="search-icon">
-                                <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
-                            </span>
-                            <input placeholder="Search category" id="txtTreeSearch" onkeyup="filterTree(this)">
-                        </div>
-                    </div>
-                    <a asp-controller="Category" asp-action="Add" class="custom_button primary_button">Add</a>
+<section class="listing-section common-box">
+    <!-- ================= SINGLE UNIFIED TOOLBAR ================= -->
+    <div class="p-3 border-bottom bg-white rounded-top">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 w-100">
+            <!-- Left: Search & Filter Controls -->
+            <div class="d-flex align-items-center gap-2 flex-wrap flex-grow-1" style="min-width: 280px;">
+                <!-- Search Box -->
+                <div class="position-relative" style="min-width: 240px; max-width: 340px; flex: 1 1 240px;">
+                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+                        <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
+                    </span>
+                    <input placeholder="Search category, slug, or parent..." id="txtSearch" onkeyup="fnSearch(this);"
+                           class="form-control rounded-pill ps-5 font-13" 
+                           style="height: 40px; background: #F3F8FD; border: 1px solid #e2e8f0;">
+                    <span id="clearSearch" onclick="clearSearch()" 
+                          style="display:none; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor:pointer; color: #888;">&#10006;</span>
                 </div>
+
+                <!-- Level Filter -->
+                <select id="levelFilter" class="form-select font-13 rounded-3" style="width: 175px; height: 40px; background-color: #fff; border: 1px solid #e2e8f0;" onchange="filterCategoryLevel(this)">
+                    <option value="">All Categories (@(totalParents + totalSubs))</option>
+                    <option value="parent">Main Categories Only (@totalParents)</option>
+                    <option value="sub">Subcategories Only (@totalSubs)</option>
+                </select>
+
+                <!-- Status Filter -->
+                <select id="statusFilter" class="form-select font-13 rounded-3" style="width: 125px; height: 40px; background-color: #fff; border: 1px solid #e2e8f0;" onchange="filterCategoryStatus(this)">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
             </div>
 
-            <div class="p-3">
-                <p class="text-muted" style="font-size:.78rem;">
-                    Drag a node to re-parent or reorder. Depth is capped at three levels.
-                </p>
+            <!-- Right: View Mode Toggle & Action Buttons -->
+            <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+                <!-- View Mode Toggle -->
+                <div class="btn-group p-1 bg-light border rounded-pill" role="group" aria-label="View Mode">
+                    <button type="button" class="btn btn-sm px-3 py-1 font-12 fw-semibold rounded-pill btn-primary" id="btnViewTable" onclick="switchCategoryView('table')">
+                        <i class="fas fa-table-list me-1"></i> Table View
+                    </button>
+                    <button type="button" class="btn btn-sm px-3 py-1 font-12 fw-semibold rounded-pill btn-light text-secondary border-0" id="btnViewTree" onclick="switchCategoryView('tree')">
+                        <i class="fas fa-sitemap me-1"></i> Tree View
+                    </button>
+                </div>
 
-                <ul class="category-tree" id="categoryTree">
-                    @foreach (var parent in Model)
-                    {
-                        <li data-name="@parent.Name">
-                            <a asp-action="Edit" asp-route-id="@parent.Id">@parent.Name</a>
-                            <span class="text-muted">(@parent.ProductCount)</span>
-
-                            @if (parent.Children.Any())
-                            {
-                                <ul>
-                                    @foreach (var child in parent.Children)
-                                    {
-                                        <li data-name="@child.Name">
-                                            <a asp-action="Edit" asp-route-id="@child.Id">@child.Name</a>
-                                            <span class="text-muted">(@child.ProductCount)</span>
-                                        </li>
-                                    }
-                                </ul>
-                            }
-                        </li>
-                    }
-
-                    @if (!Model.Any())
-                    {
-                        <li class="tree-empty text-muted">No categories yet. Add the first one to start the tree.</li>
-                    }
-                </ul>
+                <a asp-controller="Category" asp-action="Add" class="custom_button primary_button" style="white-space: nowrap;">
+                    <i class="fas fa-plus me-1"></i> Add Category
+                </a>
+                <a asp-controller="Product" asp-action="Index" class="custom_button secondary_button" style="white-space: nowrap;">
+                    <i class="fas fa-box me-1"></i> All Products
+                </a>
             </div>
-        </section>
+        </div>
     </div>
 
-    <!-- ============ DETAIL ============ -->
-    <div class="col-xl-8">
-        <section class="listing-section common-box h-100">
-            <div class="latest-orders">
-                <div class="div-search-box-panel flex-ending-cls-here">
-                    <h3 class="section-heading">Products in selected category</h3>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="custom_button secondary_button" onclick="reorderMode()">
-                            <i class="fas fa-arrows-up-down-left-right"></i> Reorder
-                        </button>
-                        <a asp-controller="Product" asp-action="Index" class="custom_button secondary_button">All Products</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="table-main">
-                <table id="category-products-grid" class="custom-datatable listing-order-table">
-                    <thead>
-                        <tr>
-                            <th style="min-width:60px;">Image</th>
-                            <th style="min-width:240px;">Category</th>
-                            <th style="min-width:160px;">Slug</th>
-                            <th style="min-width:160px;">Parent</th>
-                            <th style="min-width:110px;">Products</th>
-                            <th style="min-width:120px;">Sub-categories</th>
-                            <th style="min-width:110px;">Status</th>
-                            <th style="min-width:80px;">Action</th>
+    <!-- ================= 1. FULL WIDTH TABLE VIEW (DEFAULT) ================= -->
+    <div id="tableViewContainer" class="table-main">
+        <div class="tb-responsive">
+            <table id="category-grid" class="custom-datatable listing-order-table w-100">
+                <thead>
+                    <tr>
+                        <th style="width:50px; min-width:50px;">Image</th>
+                        <th style="min-width:220px;">Category</th>
+                        <th style="width:130px; min-width:130px;">Hierarchy</th>
+                        <th style="width:80px; min-width:80px;" class="text-center">Products</th>
+                        <th style="width:70px; min-width:70px;" class="text-center">Order</th>
+                        <th style="width:95px; min-width:95px;">Status</th>
+                        <th style="width:175px; min-width:175px; text-align:center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var parent in Model)
+                    {
+                        <tr id="cat-row-@parent.Id" data-level="parent" data-status="@(parent.IsActive ? "active" : "inactive")">
+                            <td style="width:50px;">
+                                <img src="@(string.IsNullOrEmpty(parent.ImageUrl) ? "/assets/images/default-profile.png" : parent.ImageUrl)" 
+                                     alt="@parent.Name" 
+                                     style="width:38px !important; height:38px !important; min-width:38px; min-height:38px; aspect-ratio:1/1; object-fit:cover; border-radius:6px; display:block;" />
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    @if (parent.Children != null && parent.Children.Any())
+                                    {
+                                        <button type="button" class="btn btn-sm btn-link p-0 me-1 text-secondary toggle-children-btn" 
+                                                onclick="toggleParentChildren(@parent.Id, this)" title="Expand/Collapse Subcategories" style="text-decoration:none;">
+                                            <i class="fas fa-chevron-down font-11" id="chevron-@parent.Id"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <span class="d-inline-block" style="width: 16px;"></span>
+                                    }
+                                    <i class="fas fa-folder text-warning me-2 font-14"></i>
+                                    <a asp-action="Edit" asp-route-id="@parent.Id" class="fw-bold text-dark font-14">@parent.Name</a>
+                                    @if (parent.Children != null && parent.Children.Any())
+                                    {
+                                        <span class="badge bg-light text-primary border font-11 ms-2">@parent.Children.Count Subs</span>
+                                    }
+                                </div>
+                                <div class="text-muted font-11 t-mono ps-4">/@parent.Slug</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-muted border font-11">Top Level (Root)</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-primary rounded-pill font-12">@parent.ProductCount</span>
+                            </td>
+                            <td class="text-center font-12">@parent.SortOrder</td>
+                            <td>@await Html.PartialAsync("_StatusPill", parent.IsActive)</td>
+                            <td class="text-center" style="white-space: nowrap !important;">
+                                <div class="d-inline-flex align-items-center gap-1 justify-content-center">
+                                    <a asp-action="Add" asp-route-parentId="@parent.Id" class="btn btn-sm btn-outline-primary py-1 px-2 font-11" title="Add subcategory under @parent.Name">
+                                        <i class="fas fa-plus font-10 me-1"></i>Sub
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@parent.Id" class="btn btn-sm btn-light border py-1 px-2 text-primary font-11" title="Edit">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@parent.Id" class="btn btn-sm btn-light border py-1 px-2 text-info font-11" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="@storefrontBase@parent.Url" target="_blank" rel="noopener" class="btn btn-sm btn-light border py-1 px-2 text-secondary font-11" title="Storefront Preview">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" onclick="confirmDeleteCategory(@parent.Id, '@Html.Raw(Html.Encode(parent.Name))', @parent.ProductCount, @(parent.Children?.Count ?? 0))" class="btn btn-sm btn-light border py-1 px-2 text-danger font-11" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @* Children are indented under their parent, so the hierarchy the
-                           mega menu renders stays readable in a flat grid. *@
-                        @foreach (var parent in Model)
-                        {
-                            <tr>
-                                <td><img src="@(parent.ImageUrl ?? "/assets/images/default-profile.png")" width="40" height="40" alt="@parent.Name" style="object-fit:cover;border-radius:6px" /></td>
-                                <td><a asp-action="Edit" asp-route-id="@parent.Id"><strong>@parent.Name</strong></a></td>
-                                <td class="t-mono">@parent.Slug</td>
-                                <td class="text-muted">—</td>
-                                <td class="text-end">@parent.ProductCount</td>
-                                <td class="text-end">@parent.Children.Count</td>
-                                <td>@await Html.PartialAsync("_StatusPill", true)</td>
-                                <td>
-                                    <a asp-action="Edit" asp-route-id="@parent.Id" title="Edit"><i class="fas fa-pen"></i></a>
-                                    <a href="@storefrontBase@parent.Url" target="_blank" rel="noopener" title="Preview on the storefront" class="ms-2"><i class="fas fa-external-link-alt"></i></a>
-                                </td>
-                            </tr>
 
-                            foreach (var child in parent.Children)
+                        @if (parent.Children != null)
+                        {
+                            @foreach (var child in parent.Children)
                             {
-                                <tr>
-                                    <td></td>
-                                    <td style="padding-left:2rem">
-                                        <i class="fas fa-level-up-alt fa-rotate-90 text-muted me-2"></i>
-                                        <a asp-action="Edit" asp-route-id="@child.Id">@child.Name</a>
+                                <tr id="cat-row-@child.Id" data-level="sub" data-parent-id="@parent.Id" data-status="@(child.IsActive ? "active" : "inactive")" class="bg-light-subtle child-of-@parent.Id">
+                                    <td style="width:50px;">
+                                        <img src="@(string.IsNullOrEmpty(child.ImageUrl) ? "/assets/images/default-profile.png" : child.ImageUrl)" 
+                                             alt="@child.Name" 
+                                             style="width:34px !important; height:34px !important; min-width:34px; min-height:34px; aspect-ratio:1/1; object-fit:cover; border-radius:6px; display:block;" />
                                     </td>
-                                    <td class="t-mono">@child.Slug</td>
-                                    <td class="text-muted">@parent.Name</td>
-                                    <td class="text-end">@child.ProductCount</td>
-                                    <td class="text-end">—</td>
-                                    <td>@await Html.PartialAsync("_StatusPill", true)</td>
                                     <td>
-                                        <a asp-action="Edit" asp-route-id="@child.Id" title="Edit"><i class="fas fa-pen"></i></a>
-                                        <a href="@storefrontBase@child.Url" target="_blank" rel="noopener" title="Preview on the storefront" class="ms-2"><i class="fas fa-external-link-alt"></i></a>
+                                        <div style="padding-left: 1.5rem;">
+                                            <i class="fas fa-level-up-alt fa-rotate-90 text-muted me-2 font-11"></i>
+                                            <a asp-action="Edit" asp-route-id="@child.Id" class="fw-semibold text-secondary font-13">@child.Name</a>
+                                            <div class="text-muted font-11 t-mono ps-3">/@child.Slug</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted font-12">
+                                        <i class="fas fa-folder-open text-warning font-11 me-1"></i>@parent.Name
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark border font-12">@child.ProductCount</span>
+                                    </td>
+                                    <td class="text-center font-12">@child.SortOrder</td>
+                                    <td>@await Html.PartialAsync("_StatusPill", child.IsActive)</td>
+                                    <td class="text-center" style="white-space: nowrap !important;">
+                                        <div class="d-inline-flex align-items-center gap-1 justify-content-center">
+                                            <span class="d-inline-block" style="width: 52px;"></span>
+                                            <a asp-action="Edit" asp-route-id="@child.Id" class="btn btn-sm btn-light border py-1 px-2 text-primary font-11" title="Edit">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                            <a asp-action="Details" asp-route-id="@child.Id" class="btn btn-sm btn-light border py-1 px-2 text-info font-11" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="@storefrontBase@child.Url" target="_blank" rel="noopener" class="btn btn-sm btn-light border py-1 px-2 text-secondary font-11" title="Storefront Preview">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                            <a href="javascript:void(0);" onclick="confirmDeleteCategory(@child.Id, '@Html.Raw(Html.Encode(child.Name))', @child.ProductCount, 0)" class="btn btn-sm btn-light border py-1 px-2 text-danger font-11" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             }
                         }
-
-                        @if (!Model.Any())
-                        {
-                            <tr><td colspan="8" class="text-center py-4">No categories yet. <a asp-action="Add">Create the first one</a>.</td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <!-- ================= 2. TREE HIERARCHY CARDS VIEW ================= -->
+    <div id="treeViewContainer" class="p-4" style="display:none;">
+        <div class="row g-3" id="treeCategoryCards">
+            @foreach (var parent in Model)
+            {
+                <div class="col-xl-6 col-12 tree-card-item" data-name="@parent.Name.ToLower()" data-slug="@parent.Slug.ToLower()" data-status="@(parent.IsActive ? "active" : "inactive")" data-subs="@(parent.Children?.Count ?? 0)">
+                    <div class="card border rounded-3 shadow-sm h-100">
+                        <div class="card-header bg-white d-flex align-items-center justify-content-between py-3 border-bottom">
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="@(string.IsNullOrEmpty(parent.ImageUrl) ? "/assets/images/default-profile.png" : parent.ImageUrl)" 
+                                     alt="@parent.Name" 
+                                     style="width:42px; height:42px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0;" />
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h6 class="mb-0 fw-bold">
+                                            <a asp-action="Edit" asp-route-id="@parent.Id" class="text-dark">@parent.Name</a>
+                                        </h6>
+                                        @await Html.PartialAsync("_StatusPill", parent.IsActive)
+                                    </div>
+                                    <span class="text-muted font-11 t-mono">/@parent.Slug</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="badge bg-primary rounded-pill font-11 me-1" title="Products count">
+                                    <i class="fas fa-box me-1"></i>@parent.ProductCount
+                                </span>
+                                <a asp-action="Add" asp-route-parentId="@parent.Id" class="btn btn-sm btn-outline-primary py-1 px-2 font-11" title="Add subcategory">
+                                    <i class="fas fa-plus me-1"></i>Sub
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@parent.Id" class="btn btn-sm btn-light border py-1 px-2 text-primary font-11" title="Edit">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@parent.Id" class="btn btn-sm btn-light border py-1 px-2 text-info font-11" title="Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="card-body py-3">
+                            @if (parent.Children != null && parent.Children.Any())
+                            {
+                                <div class="tree-sub-list">
+                                    <div class="font-11 text-muted fw-semibold text-uppercase mb-2">
+                                        <i class="fas fa-sitemap me-1 text-primary"></i> Subcategories (@parent.Children.Count)
+                                    </div>
+                                    <ul class="list-unstyled mb-0 ps-2" style="border-left: 2px dashed #cbd5e1;">
+                                    @foreach (var child in parent.Children)
+                                    {
+                                        <li class="py-2 d-flex align-items-center justify-content-between border-bottom border-light">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="fas fa-level-up-alt fa-rotate-90 text-muted font-11"></i>
+                                                <img src="@(string.IsNullOrEmpty(child.ImageUrl) ? "/assets/images/default-profile.png" : child.ImageUrl)" 
+                                                     alt="@child.Name" 
+                                                     style="width:28px; height:28px; object-fit:cover; border-radius:4px; border:1px solid #e2e8f0;" />
+                                                <a asp-action="Edit" asp-route-id="@child.Id" class="font-13 fw-semibold text-secondary">@child.Name</a>
+                                                <span class="text-muted font-11 t-mono">/@child.Slug</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-light text-muted border font-11">@child.ProductCount products</span>
+                                                <a asp-action="Edit" asp-route-id="@child.Id" class="text-primary font-11"><i class="fas fa-pen"></i></a>
+                                                <a asp-action="Details" asp-route-id="@child.Id" class="text-info font-11"><i class="fas fa-eye"></i></a>
+                                                <a href="javascript:void(0);" onclick="confirmDeleteCategory(@child.Id, '@Html.Raw(Html.Encode(child.Name))', @child.ProductCount, 0)" class="text-danger font-11"><i class="fas fa-trash-alt"></i></a>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="py-2 text-center text-muted font-12 bg-light rounded border border-dashed">
+                                    <em>No subcategories under @parent.Name yet.</em>
+                                    <a asp-action="Add" asp-route-parentId="@parent.Id" class="ms-1 text-primary fw-semibold">+ Add Subcategory</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal delete-common-modal common-modal" id="category-delete-confirm-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close-modal" data-bs-dismiss="modal" aria-label="Close">
+                    <picture><img src="~/assets/images/close-icon.svg" alt="close" width="24" height="24"></picture>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>Delete Category</h3>
+                <p>Are you sure you want to delete <strong id="deleteCategoryName"></strong>?</p>
+                <div id="deleteWarningMessage" class="alert alert-warning d-none font-12 text-start"></div>
+                <div class="delete-edit-btn">
+                    <button type="button" class="custom_button secondary_button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btn-delete-yes" class="custom_button primary_button" onclick="executeDeleteCategory()">
+                        <i class="fas fa-trash-alt me-1"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script>
+        let categoryDataTable;
+        let deleteTargetId = 0;
+        let currentLevelFilter = '';
+        let currentStatusFilter = '';
+        let collapsedParents = new Set();
+
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Category"); }
 
-            $('#category-products-grid').DataTable({
-                paging: true, ordering: true, filter: false,
-                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
-                language: { emptyTable: "Select a category to see its products" }
+            // Custom DataTable filter for Level, Status & Collapsed state
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                if (settings.nTable.id !== 'category-grid') return true;
+
+                var rowNode = settings.aoData[dataIndex].nTr;
+                if (!rowNode) return true;
+
+                var rowLevel = $(rowNode).data('level') || '';
+                var rowStatus = $(rowNode).data('status') || '';
+                var parentRef = $(rowNode).data('parent-id');
+
+                // If parent is collapsed, hide child rows
+                if (parentRef && collapsedParents.has(parentRef)) {
+                    return false;
+                }
+
+                if (currentLevelFilter && rowLevel !== currentLevelFilter) {
+                    return false;
+                }
+
+                if (currentStatusFilter && rowStatus !== currentStatusFilter) {
+                    return false;
+                }
+
+                return true;
             });
+
+            categoryDataTable = $('#category-grid').DataTable({
+                paging: true,
+                ordering: false,
+                filter: true,
+                dom: 't<"table-footer-controls d-flex justify-content-between align-items-center mt-3"ip>',
+                bLengthChange: false,
+                pageLength: 50,
+                autoWidth: false,
+                columnDefs: [
+                    { targets: [0, 6], orderable: false, searchable: false }
+                ],
+                language: {
+                    emptyTable: 'No categories yet. <a href="/Category/Add">Create the first one</a>.',
+                    zeroRecords: "No matching categories found"
+                }
+            });
+
+            // Restore saved view mode
+            var savedView = localStorage.getItem('categoryViewMode') || 'table';
+            switchCategoryView(savedView, false);
         });
 
-        function filterTree(ctrl) {
-            var term = ($(ctrl).val() || '').toLowerCase();
-            $('#categoryTree li[data-name]').each(function () {
-                $(this).toggle(($(this).data('name') + '').toLowerCase().indexOf(term) > -1);
+        function switchCategoryView(mode, persist) {
+            if (persist !== false) {
+                localStorage.setItem('categoryViewMode', mode);
+            }
+
+            if (mode === 'tree') {
+                $('#tableViewContainer').hide();
+                $('#treeViewContainer').fadeIn(200);
+                $('#btnViewTable').removeClass('btn-primary').addClass('btn-light text-secondary');
+                $('#btnViewTree').removeClass('btn-light text-secondary').addClass('btn-primary');
+            } else {
+                $('#treeViewContainer').hide();
+                $('#tableViewContainer').fadeIn(200);
+                $('#btnViewTree').removeClass('btn-primary').addClass('btn-light text-secondary');
+                $('#btnViewTable').removeClass('btn-light text-secondary').addClass('btn-primary');
+                if (categoryDataTable) {
+                    categoryDataTable.columns.adjust().draw();
+                }
+            }
+        }
+
+        function toggleParentChildren(parentId, btnEl) {
+            var $icon = $('#chevron-' + parentId);
+            if (collapsedParents.has(parentId)) {
+                collapsedParents.delete(parentId);
+                $icon.removeClass('fa-chevron-right').addClass('fa-chevron-down');
+            } else {
+                collapsedParents.add(parentId);
+                $icon.removeClass('fa-chevron-down').addClass('fa-chevron-right');
+            }
+            if (categoryDataTable) {
+                categoryDataTable.draw();
+            }
+        }
+
+        function fnSearch(ctrl) {
+            var val = ($(ctrl).val() || '').toLowerCase().trim();
+            $("#clearSearch").toggle(val.length > 0);
+
+            // Auto expand collapsed parents so search matches are visible
+            if (val.length > 0) {
+                collapsedParents.clear();
+                $('[id^="chevron-"]').removeClass('fa-chevron-right').addClass('fa-chevron-down');
+            }
+
+            // Filter Table View
+            if (categoryDataTable) {
+                categoryDataTable.search(val).draw();
+            }
+
+            // Filter Tree View Cards
+            applyTreeFilters();
+        }
+
+        function clearSearch() {
+            $("#txtSearch").val('');
+            $("#clearSearch").hide();
+            if (categoryDataTable) {
+                categoryDataTable.search('').draw();
+            }
+            applyTreeFilters();
+        }
+
+        function filterCategoryLevel(ctrl) {
+            currentLevelFilter = $(ctrl).val() || '';
+            if (categoryDataTable) {
+                categoryDataTable.draw();
+            }
+            applyTreeFilters();
+        }
+
+        function filterCategoryStatus(ctrl) {
+            currentStatusFilter = $(ctrl).val() || '';
+            if (categoryDataTable) {
+                categoryDataTable.draw();
+            }
+            applyTreeFilters();
+        }
+
+        function applyTreeFilters() {
+            var searchVal = ($("#txtSearch").val() || '').toLowerCase().trim();
+            $('#treeCategoryCards .tree-card-item').each(function () {
+                var $card = $(this);
+                var name = $card.data('name') || '';
+                var slug = $card.data('slug') || '';
+                var status = $card.data('status') || '';
+                var subCount = parseInt($card.data('subs') || '0', 10);
+                var subtext = $card.text().toLowerCase();
+
+                var matchesSearch = !searchVal || name.indexOf(searchVal) > -1 || slug.indexOf(searchVal) > -1 || subtext.indexOf(searchVal) > -1;
+                var matchesStatus = !currentStatusFilter || status === currentStatusFilter;
+                var matchesLevel = true;
+                if (currentLevelFilter === 'parent') {
+                    $card.find('.tree-sub-list').hide();
+                } else if (currentLevelFilter === 'sub') {
+                    $card.find('.tree-sub-list').show();
+                    if (subCount === 0) matchesLevel = false;
+                } else {
+                    $card.find('.tree-sub-list').show();
+                }
+
+                $card.toggle(matchesSearch && matchesStatus && matchesLevel);
             });
         }
 
-        function reorderMode() {
-            if (typeof showSuccessMessage === 'function') {
-                showSuccessMessage('Drag-and-drop reordering will be wired with the Category API.');
+        function confirmDeleteCategory(id, name, productCount, subCategoryCount) {
+            deleteTargetId = id;
+            $('#deleteCategoryName').text(name);
+
+            var $warning = $('#deleteWarningMessage');
+            if (subCategoryCount > 0) {
+                $warning.removeClass('d-none').html('<i class="fas fa-exclamation-triangle me-1"></i> This category has <strong>' + subCategoryCount + ' subcategories</strong>. Deletion will be blocked until subcategories are moved or deleted.');
+                $('#btn-delete-yes').prop('disabled', true).addClass('opacity-50');
+            } else if (productCount > 0) {
+                $warning.removeClass('d-none').html('<i class="fas fa-exclamation-triangle me-1"></i> This category has <strong>' + productCount + ' active products</strong>. Deletion will be blocked until products are reassigned.');
+                $('#btn-delete-yes').prop('disabled', true).addClass('opacity-50');
+            } else {
+                $warning.addClass('d-none').empty();
+                $('#btn-delete-yes').prop('disabled', false).removeClass('opacity-50');
             }
+
+            var modal = new bootstrap.Modal(document.getElementById('category-delete-confirm-modal'));
+            modal.show();
+        }
+
+        function executeDeleteCategory() {
+            if (!deleteTargetId) return;
+
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            var $btn = $('#btn-delete-yes');
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Deleting...');
+
+            $.ajax({
+                url: '/Category/Delete?id=' + deleteTargetId,
+                type: 'POST',
+                headers: { 'RequestVerificationToken': token },
+                success: function (res) {
+                    $('#category-delete-confirm-modal').modal('hide');
+                    $btn.prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Delete');
+
+                    if (res.success) {
+                        if (typeof showSuccessMessage === 'function') {
+                            showSuccessMessage(res.message || 'Category deleted successfully.');
+                        } else if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'success', title: 'Deleted', text: res.message || 'Category deleted successfully.', timer: 1500, showConfirmButton: false });
+                        }
+                        $('#cat-row-' + deleteTargetId).fadeOut(400, function () {
+                            if (categoryDataTable) categoryDataTable.row(this).remove().draw(false);
+                        });
+                    } else {
+                        if (typeof showErrorMessage === 'function') {
+                            showErrorMessage(res.message || 'Failed to delete category.');
+                        } else if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'error', title: 'Cannot Delete', text: res.message || 'Failed to delete category.' });
+                        } else {
+                            alert(res.message || 'Failed to delete category.');
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    $('#category-delete-confirm-modal').modal('hide');
+                    $btn.prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Delete');
+                    var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'An unexpected error occurred while deleting.';
+                    if (typeof showErrorMessage === 'function') {
+                        showErrorMessage(msg);
+                    } else {
+                        alert(msg);
+                    }
+                }
+            });
         }
     </script>
 }

@@ -21,11 +21,6 @@ public class DashboardController : Controller
     {
         var response = await _client.GetDashboardAsync(ct);
 
-        if (!response.IsSuccess)
-        {
-            TempData["ErrorMessage"] = response.Message;
-        }
-
-        return View(response.Data ?? new AdminDashboardViewModel());
+        return View(response?.Data ?? new AdminDashboardViewModel());
     }
 }

@@ -77,8 +77,20 @@ public class GatewayAdminClient : IAdminClient
     public Task<ResponseViewModel<List<CategoryViewModel>>> GetCategoryTreeAsync(CancellationToken ct = default) =>
         _api.GetAsync<List<CategoryViewModel>>(ApiEndPoint.Category.Tree, null, ct);
 
+    public Task<ResponseViewModel<CategorySaveRequest>> GetCategoryAsync(int id, CancellationToken ct = default) =>
+        _api.GetAsync<CategorySaveRequest>(ApiEndPoint.Category.GetById, new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
     public Task<ResponseViewModel<int>> SaveCategoryAsync(CategorySaveRequest request, CancellationToken ct = default) =>
         _api.PostAsync<int>(ApiEndPoint.Category.Save, request, ct);
+
+    public Task<ResponseViewModel<bool>> DeleteCategoryAsync(int id, CancellationToken ct = default) =>
+        _api.DeleteAsync<bool>(ApiEndPoint.Category.Delete, new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
+    public Task<ResponseViewModel<bool>> UpdateCategoryStatusAsync(UpdateStatusRequest request, CancellationToken ct = default) =>
+        _api.PostAsync<bool>(ApiEndPoint.Category.UpdateStatus, request, ct);
+
+    public Task<ResponseViewModel<List<IdNamePair>>> GetCategoryLookupAsync(CancellationToken ct = default) =>
+        _api.GetAsync<List<IdNamePair>>(ApiEndPoint.Category.Lookup, null, ct);
 
     public Task<ResponseViewModel<PagedResult<StockGridItem>>> GetStockAsync(
         DataTableRequest request, CancellationToken ct = default) =>

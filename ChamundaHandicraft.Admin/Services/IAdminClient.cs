@@ -76,7 +76,11 @@ public interface IAdminClient
     Task<ResponseViewModel<ProductLookupsViewModel>> GetProductLookupsAsync(CancellationToken ct = default);
 
     Task<ResponseViewModel<List<CategoryViewModel>>> GetCategoryTreeAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<CategorySaveRequest>> GetCategoryAsync(int id, CancellationToken ct = default);
     Task<ResponseViewModel<int>> SaveCategoryAsync(CategorySaveRequest request, CancellationToken ct = default);
+    Task<ResponseViewModel<bool>> DeleteCategoryAsync(int id, CancellationToken ct = default);
+    Task<ResponseViewModel<bool>> UpdateCategoryStatusAsync(UpdateStatusRequest request, CancellationToken ct = default);
+    Task<ResponseViewModel<List<IdNamePair>>> GetCategoryLookupAsync(CancellationToken ct = default);
 
     Task<ResponseViewModel<PagedResult<StockGridItem>>> GetStockAsync(
         DataTableRequest request, CancellationToken ct = default);

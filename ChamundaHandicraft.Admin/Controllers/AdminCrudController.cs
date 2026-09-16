@@ -67,8 +67,15 @@ public abstract class AdminCrudController<TGrid, TSave> : Controller
     [ValidateAntiForgeryToken]
     public virtual async Task<IActionResult> Save(TSave request, CancellationToken ct = default)
     {
+        if (request is AuditableViewModel auditable && (auditable.CreatedOn == DateTime.MinValue || auditable.CreatedOn.Year <= 1))
+        {
+            auditable.CreatedOn = DateTime.UtcNow;
+        }
+
         if (!ModelState.IsValid)
         {
+            var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+            TempData["ErrorMessage"] = string.IsNullOrWhiteSpace(firstError) ? "Please fill in all required fields correctly." : firstError;
             return View("Create", request);
         }
 
@@ -76,11 +83,21 @@ public abstract class AdminCrudController<TGrid, TSave> : Controller
 
         if (!response.IsSuccess)
         {
-            TempData["ErrorMessage"] = response.Message;
+            var msg = response.Message;
+            if (response.Errors != null && response.Errors.Count > 0)
+            {
+                var errList = response.Errors.Select(e => $"{e.Key}: {string.Join(", ", e.Value)}");
+                msg = string.IsNullOrWhiteSpace(msg) ? string.Join("; ", errList) : $"{msg} ({string.Join("; ", errList)})";
+            }
+            if (string.IsNullOrWhiteSpace(msg))
+            {
+                msg = $"Failed to save (HTTP {(int)response.StatusCode}).";
+            }
+            TempData["ErrorMessage"] = msg;
             return View("Create", request);
         }
 
-        TempData["SuccessMessage"] = response.Message;
+        TempData["SuccessMessage"] = response.Message ?? "Saved successfully.";
         return RedirectToAction(nameof(Index));
     }
 

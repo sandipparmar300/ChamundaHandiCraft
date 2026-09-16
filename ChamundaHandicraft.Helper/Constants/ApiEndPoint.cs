@@ -124,12 +124,23 @@ public static class ApiEndPoint
         public const string Reorder = AdminPrefix + "Category/Reorder";
         public const string Delete = AdminPrefix + "Category/Delete";
         public const string UpdateStatus = AdminPrefix + "Category/UpdateStatus";
+        public const string Lookup = AdminPrefix + "Category/Lookup";
 
         // Storefront reads
         public const string ShopMegaMenu = ShopPrefix + "Category/MegaMenu";
         public const string ShopTree = ShopPrefix + "Category/Tree";
         public const string ShopDetail = ShopPrefix + "Category/Detail";
         public const string ShopFeatured = ShopPrefix + "Category/Featured";
+    }
+
+    public static class Menu
+    {
+        public const string GridList = AdminPrefix + "Menu/GridList";
+        public const string GetById = AdminPrefix + "Menu/GetById";
+        public const string Save = AdminPrefix + "Menu/Save";
+        public const string Delete = AdminPrefix + "Menu/Delete";
+        public const string UpdateStatus = AdminPrefix + "Menu/UpdateStatus";
+        public const string Lookup = AdminPrefix + "Menu/Lookup";
     }
 
     #endregion

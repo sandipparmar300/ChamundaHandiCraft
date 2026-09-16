@@ -1,6 +1,14 @@
 @model MenuGridItem
 @{
     ViewData["Title"] = "Menu Details";
+    var locBadgeClass = Model.Location switch
+    {
+        "MegaMenu" => "bg-primary",
+        "Header" => "bg-info text-dark",
+        "Footer" => "bg-secondary",
+        "Mobile" => "bg-dark",
+        _ => "bg-light text-muted border"
+    };
 }
 
 @section Header {
@@ -12,53 +20,204 @@
             <h2 class="page-title">Menu Details</h2>
         </div>
         <ul class="page-breadcrumb">
-            <li><a asp-controller="Menu" asp-action="Index" class="links">Menu Listing</a></li>
-            <li>Details</li>
+            <li><a asp-controller="Menu" asp-action="Index" class="links">Menus</a></li>
+            <li>@Model.Title</li>
         </ul>
     </div>
 }
 
 <main class="page-content">
 
+    <!-- Top Card -->
     <section class="form-section">
-        <div class="form-section-header d-flex justify-content-between align-items-center">
-            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Menu Information</h2>
-            <a asp-controller="Menu" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button">
-                <i class="fas fa-pen"></i> Edit
-            </a>
+        <div class="form-section-body">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-light rounded p-3 border d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="fas fa-bars font-24 text-primary"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <h2 class="fw-bold mb-0">@Model.Title</h2>
+                            <span class="badge @locBadgeClass font-12">@Model.Location</span>
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success font-12">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary font-12">Inactive</span>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Badge))
+                            {
+                                <span class="badge bg-danger font-12">@Model.Badge</span>
+                            }
+                        </div>
+                        <p class="text-muted mt-1 mb-0 font-14">
+                            Target: <span class="t-mono font-12 bg-light px-2 py-1 rounded border">@Model.Url</span>
+                            @if (Model.OpensInNewTab)
+                            {
+                                <span class="ms-1 text-muted">(Opens in new window)</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="Menu" asp-action="Index" class="custom_button secondary_button">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Listing
+                    </a>
+                    <a asp-controller="Menu" asp-action="Add" asp-route-parentId="@Model.Id" class="custom_button secondary_button">
+                        <i class="fas fa-plus me-1"></i> Add Sub-Item
+                    </a>
+                    <a asp-controller="Menu" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button primary_button">
+                        <i class="fas fa-pen me-1"></i> Edit Menu Item
+                    </a>
+                </div>
+            </div>
+
+            <!-- KPI Row -->
+            <div class="row g-3 mt-3">
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="status-card p-3 border rounded bg-white shadow-sm">
+                        <span class="font-12 text-muted text-uppercase fw-semibold">Sub-Items</span>
+                        <h4 class="mt-1 mb-0 fw-bold text-primary">@Model.ChildCount</h4>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="status-card p-3 border rounded bg-white shadow-sm">
+                        <span class="font-12 text-muted text-uppercase fw-semibold">Display Order</span>
+                        <h4 class="mt-1 mb-0 fw-bold text-secondary">@Model.SortOrder</h4>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="status-card p-3 border rounded bg-white shadow-sm">
+                        <span class="font-12 text-muted text-uppercase fw-semibold">Created Date</span>
+                        <h4 class="mt-1 mb-0 fw-bold text-muted font-16">@Money.LongDate(Model.CreatedOn)</h4>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="status-card p-3 border rounded bg-white shadow-sm">
+                        <span class="font-12 text-muted text-uppercase fw-semibold">Target Tab</span>
+                        <h4 class="mt-1 mb-0 fw-bold text-info font-16">@(Model.OpensInNewTab ? "New Tab (_blank)" : "Same Tab (_self)")</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Information -->
+    <section class="form-section">
+        <div class="form-section-header">
+            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Menu Details</h2>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Menu</label>
-                        <p class="detail-value">@Model.Title</p>
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label-custom">Menu Title</label>
+                    <p class="detail-value fw-semibold">@Model.Title</p>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label-custom">Location</label>
+                    <p class="detail-value">@Model.Location</p>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label-custom">Parent Menu</label>
+                    <p class="detail-value">@(string.IsNullOrEmpty(Model.ParentTitle) ? "None (Top level)" : Model.ParentTitle)</p>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <label class="form-label-custom">Target URL</label>
+                    <p class="detail-value t-mono">
+                        @Model.Url 
+                        @if (!string.IsNullOrEmpty(Model.Url))
+                        {
+                            <a href="@Model.Url" target="_blank" rel="noopener" class="ms-2 font-12"><i class="fas fa-external-link-alt"></i> Test Link</a>
+                        }
+                    </p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Link Type</label>
+                    <p class="detail-value">@(string.IsNullOrEmpty(Model.LinkType) ? "Custom" : Model.LinkType)</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Ribbon Badge</label>
+                    <p class="detail-value">@(string.IsNullOrEmpty(Model.Badge) ? "—" : Model.Badge)</p>
+                </div>
+                <div class="col-12">
+                    <label class="form-label-custom">Internal Notes / Description</label>
+                    <div class="p-3 bg-light rounded border text-secondary">
+                        @(string.IsNullOrEmpty(Model.Description) ? "No notes recorded." : Model.Description)
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Location</label>
-                        <p class="detail-value">@Model.Location</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Items</label>
-                        <p class="detail-value">@Model.ChildCount</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Sort Order</label>
-                        <p class="detail-value">@Model.SortOrder</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Description</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Created At</label>
-                        <p class="detail-value">@Money.LongDate(Model.CreatedOn)</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <p class="detail-value">@(Model.IsActive ? "Active" : "Inactive")</p>
-                    </div>
+                </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Nested Sub-Items -->
+    <section class="form-section">
+        <div class="form-section-header d-flex align-items-center justify-content-between">
+            <h2><i class="fas fa-sitemap" style="color:var(--accent);margin-right:8px;"></i>Nested Sub-Items (@Model.ChildCount)</h2>
+            <a asp-controller="Menu" asp-action="Add" asp-route-parentId="@Model.Id" class="btn btn-sm btn-outline-primary font-12">
+                <i class="fas fa-plus me-1"></i> Add Sub-Item
+            </a>
+        </div>
+
+        <div class="form-section-body p-0">
+            @{
+                var children = ViewBag.Children as List<MenuGridItem> ?? new List<MenuGridItem>();
+            }
+            @if (children.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 font-13">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sub-Item Title</th>
+                                <th>Target URL</th>
+                                <th>Link Type</th>
+                                <th class="text-center">Order</th>
+                                <th>Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var child in children)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">
+                                        <i class="fas fa-level-up-alt fa-rotate-90 text-muted me-1"></i>
+                                        <a asp-action="Details" asp-route-id="@child.Id" class="text-dark">@child.Title</a>
+                                        @if (!string.IsNullOrEmpty(child.Badge))
+                                        {
+                                            <span class="badge bg-danger font-10 ms-1">@child.Badge</span>
+                                        }
+                                    </td>
+                                    <td class="t-mono font-12 text-secondary">@child.Url</td>
+                                    <td>@(string.IsNullOrEmpty(child.LinkType) ? "Custom" : child.LinkType)</td>
+                                    <td class="text-center">@child.SortOrder</td>
+                                    <td>@await Html.PartialAsync("_StatusPill", child.IsActive)</td>
+                                    <td class="text-center">
+                                        <a asp-action="Edit" asp-route-id="@child.Id" title="Edit" class="text-primary"><i class="fas fa-pen"></i></a>
+                                        <a asp-action="Details" asp-route-id="@child.Id" title="View Details" class="ms-2 text-info"><i class="fas fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-4 text-center text-muted">
+                    <i class="fas fa-folder-open font-28 text-secondary mb-2 d-block"></i>
+                    <p class="mb-1 fw-semibold">No nested sub-items created yet</p>
+                    <p class="font-12 mb-3">Sub-items appear as dropdown links under <strong>@Model.Title</strong> in the navigation menu.</p>
+                    <a asp-controller="Menu" asp-action="Add" asp-route-parentId="@Model.Id" class="custom_button primary_button btn-sm font-12">
+                        <i class="fas fa-plus me-1"></i> Add First Sub-Item
+                    </a>
+                </div>
+            }
         </div>
     </section>
 

@@ -1,5 +1,6 @@
 using System.Text;
 using Catalog.Application.Extentions;
+using Categories.Application.Extentions;
 using Identity.Application.Extentions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -13,7 +14,12 @@ builder.Host.UseSerilog((context, configuration) => configuration
 
 #region Services
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new ChamundaHandicraft.Helper.CommonMethod.SafeDateTimeConverter());
+        options.JsonSerializerOptions.Converters.Add(new ChamundaHandicraft.Helper.CommonMethod.SafeNullableDateTimeConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
@@ -23,6 +29,7 @@ builder.Services.AddMemoryCache();
 // Identity & Infrastructure Services
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddCatalogModule(builder.Configuration);
+builder.Services.AddCategoriesModule(builder.Configuration);
 builder.Services.AddScoped<ChamundaHandicraft.API.Services.Email.IEmailTemplateService, ChamundaHandicraft.API.Services.Email.EmailTemplateService>();
 builder.Services.AddScoped<ChamundaHandicraft.API.Services.Email.IEmailService, ChamundaHandicraft.API.Services.Email.SmtpEmailService>();
 

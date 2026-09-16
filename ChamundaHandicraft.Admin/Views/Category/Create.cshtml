@@ -1,8 +1,9 @@
 @model CategorySaveRequest
 @{
-    ViewData["Title"] = "Category";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var isEdit = Model.Id > 0;
     var heading = isEdit ? "Edit Category" : "Add Category";
+    ViewData["Title"] = heading;
+    var parents = ViewBag.Parents as List<IdNamePair> ?? new List<IdNamePair>();
 }
 
 @section Header {
@@ -22,9 +23,10 @@
 
 <main class="page-content">
 
-    <form method="post" id="categoryForm" enctype="multipart/form-data">
-
-        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+    <form asp-controller="Category" asp-action="Save" method="post" id="categoryForm" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ImageUrl" id="ImageUrl" />
 
         <section class="form-section">
             <div class="form-section-header">
@@ -36,72 +38,111 @@
 
                     <div class="col-lg-3 col-md-12">
                         <label class="form-label-custom">Category Image</label>
-                        <div class="profile-pic-box" id="uploadBox">
-                            <img id="ImagePreview" src="~/assets/images/default-profile.png" class="pic-preview clickable-img" alt="category" />
-                            <label class="upload-btn-custom" for="Photo"><i class="fas fa-camera"></i> Upload</label>
-                            <input type="file" id="Photo" name="Photo" accept="image/*" class="d-none" onchange="previewUpload(this)" />
-                            <p class="upload-note">JPG, PNG (Max 5MB)</p>
+                        <div class="profile-pic-box" id="uploadBox" style="position:relative; width:160px; height:160px; border:2px dashed #ddd; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; background:#fafafa; margin-bottom:8px;">
+                            <img id="ImagePreview" 
+                                 src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/assets/images/default-profile.png" : Model.ImageUrl)" 
+                                 class="pic-preview clickable-img" 
+                                 alt="category" 
+                                 style="width:100%; height:100%; object-fit:cover;" />
+                            <label class="upload-btn-custom" for="Photo" style="position:absolute; bottom:8px; background:rgba(0,0,0,0.65); color:#fff; padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer;">
+                                <i class="fas fa-camera me-1"></i> Upload
+                            </label>
+                            <input type="file" id="Photo" name="Photo" accept="image/*" class="d-none" onchange="uploadCategoryImage(this)" />
+                        </div>
+                        <p class="upload-note text-muted font-12">JPG, PNG, WebP (Max 5MB)</p>
+                    </div>
+
+                    <div class="col-lg-9 col-md-12">
+                        <div class="row g-3">
+
+                            <div class="col-lg-6 col-md-6">
+                                <label class="form-label-custom">Category Name <span class="req">*</span></label>
+                                <input asp-for="Name" class="form-control-custom" placeholder="e.g. Brass & Metalware" onkeyup="buildSlug()" required />
+                                <span class="text-danger font-12" asp-validation-for="Name"></span>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6">
+                                <label class="form-label-custom">Slug (SEO URL) <span class="req">*</span></label>
+                                <input asp-for="Slug" class="form-control-custom" placeholder="e.g. brass-metalware" required />
+                                <span class="text-danger font-12" asp-validation-for="Slug"></span>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6">
+                                <label class="form-label-custom">Parent Category</label>
+                                <select asp-for="ParentId" class="form-control-custom select2-single">
+                                    <option value="">None (Top Level Root Category)</option>
+                                    @foreach (var parent in parents)
+                                    {
+                                        <option value="@parent.Id">@parent.Name</option>
+                                    }
+                                </select>
+                                <small class="text-muted font-11 d-block mt-1">
+                                    <i class="fas fa-info-circle me-1 text-primary"></i>
+                                    Leave as <strong>"None"</strong> to create a main parent category (e.g. Brass, Wood), or choose a parent to make this a subcategory.
+                                </small>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6">
+                                <label class="form-label-custom">Display Order</label>
+                                <input asp-for="SortOrder" type="number" class="form-control-custom" placeholder="0" />
+                            </div>
+
+                            <div class="col-lg-6 col-md-6">
+                                <label class="form-label-custom">Show in Mega Menu</label>
+                                <select asp-for="ShowInMegaMenu" class="form-control-custom">
+                                    <option value="true">Yes (Display in Navigation)</option>
+                                    <option value="false">No (Hidden from Menu)</option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6">
+                                <label class="form-label-custom">Feature on Homepage</label>
+                                <select asp-for="IsFeaturedOnHome" class="form-control-custom">
+                                    <option value="false">No</option>
+                                    <option value="true">Yes (Display in Featured Grid)</option>
+                                </select>
+                            </div>
+
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Category Name <span class="req">*</span></label>
-                        <input id="Name" name="Name" class="form-control-custom" placeholder="Enter category name" onkeyup="buildSlug()" / value="@Model.Name" >
-                        <span class="error-msg" data-valmsg-for="Name"></span>
-                    </div>
-
-                    <div class="col-lg-5 col-md-6">
-                        <label class="form-label-custom">Slug <span class="req">*</span></label>
-                        <input id="Slug" name="Slug" class="form-control-custom" placeholder="auto-generated-from-name" / value="@Model.Slug" >
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Parent Category</label>
-                        <select id="ParentId" name="ParentId" class="form-control-custom select2-single">
-                            <option value="">None (top level)</option>
-                        </select>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Sort Order</label>
-                        <input type="number" id="SortOrder" name="SortOrder" class="form-control-custom" placeholder="0" / value="@Model.SortOrder" >
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Show in Menu</label>
-                        <select id="ShowInMenu" name="ShowInMenu" class="form-control-custom">
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
-                        </select>
+                    <div class="col-12">
+                        <label class="form-label-custom">Short Summary</label>
+                        <textarea asp-for="Description" class="form-control-custom" rows="2" placeholder="Brief summary of this craft category"></textarea>
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label-custom">Description</label>
-                        <textarea id="Description" name="Description" class="form-control-custom" rows="3" placeholder="Enter description">@Model.Description</textarea>
+                        <label class="form-label-custom">Editorial Intro Copy (PLP Rich Text / SEO)</label>
+                        <textarea asp-for="IntroCopy" class="form-control-custom" rows="4" placeholder="80-150 words describing artisan heritage, history, and craft lineage displayed on category page"></textarea>
                     </div>
 
                 </div>
             </div>
         </section>
 
+        <!-- ============ SEO SECTION ============ -->
         <section class="form-section">
             <div class="form-section-header">
-                <h2><i class="fas fa-magnifying-glass" style="color:var(--accent);margin-right:8px;"></i>SEO</h2>
+                <h2><i class="fas fa-magnifying-glass" style="color:var(--accent);margin-right:8px;"></i>Search Engine Optimization (SEO)</h2>
             </div>
 
             <div class="form-section-body">
                 <div class="row g-3">
                     <div class="col-lg-6">
                         <label class="form-label-custom">SEO Title</label>
-                        <input id="SeoTitle" name="SeoTitle" class="form-control-custom" maxlength="60" />
+                        <input asp-for="Seo.MetaTitle" class="form-control-custom" maxlength="100" placeholder="Meta title for Google search" />
                     </div>
                     <div class="col-lg-6">
                         <label class="form-label-custom">Meta Keywords</label>
-                        <input id="MetaKeywords" name="MetaKeywords" class="form-control-custom" placeholder="Comma separated" />
+                        <input asp-for="Seo.MetaKeywords" class="form-control-custom" placeholder="handicrafts, brass idols, artisan" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label-custom">Canonical URL</label>
+                        <input asp-for="Seo.CanonicalUrl" class="form-control-custom" placeholder="Optional canonical override" />
                     </div>
                     <div class="col-12">
                         <label class="form-label-custom">Meta Description</label>
-                        <textarea id="MetaDescription" name="MetaDescription" class="form-control-custom" rows="2" maxlength="160"></textarea>
+                        <textarea asp-for="Seo.MetaDescription" class="form-control-custom" rows="2" maxlength="300" placeholder="150-160 characters summary for search engine snippets"></textarea>
                     </div>
                 </div>
             </div>
@@ -110,19 +151,19 @@
         <div class="form-action-bar">
             <div class="is-active-row" id="isActiveRow">
                 <div class="is-toggle-item" id="isToggleItem">
-                    <span class="ia-label">Is Active</span>
+                    <span class="ia-label">Status</span>
                     <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <input type="checkbox" asp-for="IsActive" id="IsActiveCheckbox" />
                         <span class="ia-slider"></span>
                     </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
+                    <span class="ia-status" id="isActiveStatus">@(Model.IsActive ? "Active" : "Inactive")</span>
                 </div>
             </div>
 
-            <div>
-                <a asp-controller="Category" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save">
-                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+            <div class="d-flex gap-2">
+                <a asp-controller="Category" asp-action="Index" class="custom_button secondary_button">Cancel</a>
+                <button type="submit" class="custom_button primary_button" id="btnSubmit">
+                    <i class="fas fa-save me-1"></i> @(isEdit ? "Update Category" : "Save Category")
                 </button>
             </div>
         </div>
@@ -132,24 +173,67 @@
 </main>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Category"); }
-            $('#uploadBox').click(function () { $('#Photo').click(); });
-            $('#Slug').on('input', function () { $(this).data('touched', true); });
+
+            $('#uploadBox').click(function (e) {
+                if (e.target.id !== 'Photo') {
+                    $('#Photo').click();
+                }
+            });
+
+            $('#Slug').on('input', function () {
+                $(this).data('touched', true);
+            });
+
+            $('#IsActiveCheckbox').change(function () {
+                $('#isActiveStatus').text(this.checked ? 'Active' : 'Inactive');
+            });
         });
 
-        function previewUpload(input) {
+        function uploadCategoryImage(input) {
             if (!input.files || !input.files[0]) return;
+            var file = input.files[0];
+
+            // Immediate local preview
             var reader = new FileReader();
-            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
-            reader.readAsDataURL(input.files[0]);
+            reader.onload = function (e) {
+                document.getElementById('ImagePreview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            // AJAX upload to folder storage
+            var formData = new FormData();
+            formData.append('file', file);
+
+            $.ajax({
+                url: '/Category/UploadImage',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.success && res.url) {
+                        $('#ImageUrl').val(res.url);
+                    }
+                },
+                error: function () {
+                    console.warn('AJAX image upload failed; will upload on form submission.');
+                }
+            });
         }
 
         function buildSlug() {
             if ($('#Slug').data('touched')) return;
             var name = $('#Name').val() || '';
-            $('#Slug').val(name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+            var slug = name.toLowerCase()
+                .trim()
+                .replace(/&/g, 'and')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+            $('#Slug').val(slug);
         }
     </script>
 }

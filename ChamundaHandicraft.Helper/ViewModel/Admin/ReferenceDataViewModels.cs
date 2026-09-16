@@ -199,6 +199,11 @@ public class MenuGridItem : AuditableViewModel, IAdminGridRow
     public string Location { get; set; } = "Header";
 
     public string? Url { get; set; }
+    public string? LinkType { get; set; }
+    public int? LinkEntityId { get; set; }
+    public string? IconName { get; set; }
+    public string? Badge { get; set; }
+    public string? Description { get; set; }
     public int? ParentId { get; set; }
     public string? ParentTitle { get; set; }
     public int SortOrder { get; set; }

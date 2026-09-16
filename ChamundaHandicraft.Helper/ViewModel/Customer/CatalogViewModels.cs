@@ -184,10 +184,20 @@ public class CategoryViewModel
     public int Id { get; set; }
     public string Slug { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
     public string? ImageUrl { get; set; }
+    public string? IconName { get; set; }
     public string? IntroCopy { get; set; }
     public int ProductCount { get; set; }
+    public int SubCategoryCount { get; set; }
+    public int SortOrder { get; set; }
+    public bool ShowInMegaMenu { get; set; } = true;
+    public bool IsFeaturedOnHome { get; set; }
+    public int Depth { get; set; }
+    public bool IsActive { get; set; } = true;
     public int? ParentId { get; set; }
+    public string? ParentName { get; set; }
+    public DateTime CreatedAt { get; set; }
     public List<CategoryViewModel> Children { get; set; } = new();
     public string Url => $"/c/{Slug}";
 }

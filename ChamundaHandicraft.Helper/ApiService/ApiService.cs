@@ -27,7 +27,8 @@ public class ApiService : IApiService
     private static readonly JsonSerializerSettings JsonSettings = new()
     {
         NullValueHandling = NullValueHandling.Ignore,
-        DateTimeZoneHandling = DateTimeZoneHandling.Local
+        DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind,
+        DateFormatHandling = DateFormatHandling.IsoDateFormat
     };
 
     public ApiService(HttpClient http, IHttpContextAccessor context, ILogger<ApiService> logger)
@@ -146,6 +147,27 @@ public class ApiService : IApiService
                     var envelope = JsonConvert.DeserializeObject<ResponseViewModel<T>>(body);
                     if (envelope is not null)
                     {
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            envelope.IsSuccess = false;
+                            envelope.StatusCode = (ApiStatusCode)(int)response.StatusCode;
+                            if (string.IsNullOrWhiteSpace(envelope.Message))
+                            {
+                                try
+                                {
+                                    var jobj = Newtonsoft.Json.Linq.JObject.Parse(body);
+                                    var title = jobj["title"]?.ToString() ?? jobj["detail"]?.ToString() ?? jobj["message"]?.ToString();
+                                    envelope.Message = !string.IsNullOrWhiteSpace(title)
+                                        ? title
+                                        : $"HTTP {(int)response.StatusCode}: {response.ReasonPhrase}";
+                                }
+                                catch
+                                {
+                                    envelope.Message = $"HTTP {(int)response.StatusCode}: {response.ReasonPhrase}";
+                                }
+                            }
+                            _logger.LogWarning("API request to {Url} failed ({StatusCode}): {Message}", request.RequestUri, (int)response.StatusCode, envelope.Message);
+                        }
                         return envelope;
                     }
                 }
@@ -157,8 +179,12 @@ public class ApiService : IApiService
                 }
             }
 
+            var errText = !response.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(response.ReasonPhrase)
+                ? $"HTTP {(int)response.StatusCode}: {response.ReasonPhrase}"
+                : MessageConstant.ServiceUnavailable;
+
             return ResponseViewModel<T>.Fail(
-                MessageConstant.ServiceUnavailable,
+                errText,
                 (ApiStatusCode)(int)response.StatusCode);
         }
         catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)

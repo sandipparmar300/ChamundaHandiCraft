@@ -1,6 +1,8 @@
-@model CategoryViewModel
+@model CategorySaveRequest
 @{
     ViewData["Title"] = "Category Details";
+    var storefrontBase = Configuration["StorefrontBaseUrl"] ?? "https://localhost:7141";
+    var image = string.IsNullOrEmpty(Model.ImageUrl) ? "/assets/images/default-profile.png" : Model.ImageUrl;
 }
 
 @section Header {
@@ -13,56 +15,174 @@
         </div>
         <ul class="page-breadcrumb">
             <li><a asp-controller="Category" asp-action="Index" class="links">Category Tree</a></li>
-            <li>Details</li>
+            <li>@Model.Name</li>
         </ul>
     </div>
 }
 
 <main class="page-content">
 
+    <!-- Top Category Profile Card -->
     <section class="form-section">
-        <div class="form-section-header d-flex justify-content-between align-items-center">
-            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Category Information</h2>
-            <a asp-controller="Category" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button">
-                <i class="fas fa-pen"></i> Edit
-            </a>
+        <div class="form-section-body">
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+                <img src="@image" alt="@Model.Name" 
+                     style="width:96px; height:96px; border-radius:12px; object-fit:cover; border:1px solid #e0e0e0;" />
+
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h2 class="fw-bold mb-0">@Model.Name</h2>
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success font-12">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary font-12">Inactive</span>
+                        }
+                        @if (Model.ShowInMegaMenu)
+                        {
+                            <span class="badge bg-info font-12">In Mega Menu</span>
+                        }
+                        @if (Model.IsFeaturedOnHome)
+                        {
+                            <span class="badge bg-warning text-dark font-12">Featured on Home</span>
+                        }
+                    </div>
+                    <p class="text-muted mt-1 mb-0 font-14">
+                        <span class="t-mono font-12 bg-light px-2 py-1 rounded border">/c/@Model.Slug</span>
+                        @if (!string.IsNullOrEmpty(Model.ParentName))
+                        {
+                            <span class="ms-2"><i class="fas fa-level-up-alt fa-rotate-90 text-muted me-1"></i> Subcategory of <strong>@Model.ParentName</strong></span>
+                        }
+                        else
+                        {
+                            <span class="ms-2"><i class="fas fa-folder text-warning me-1"></i> Root Level Category</span>
+                        }
+                    </p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="Category" asp-action="Index" class="custom_button secondary_button">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Tree
+                    </a>
+                    <a asp-controller="Category" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button primary_button">
+                        <i class="fas fa-pen me-1"></i> Edit Category
+                    </a>
+                    <a href="@storefrontBase/c/@Model.Slug" target="_blank" rel="noopener" class="custom_button secondary_button">
+                        <i class="fas fa-external-link-alt me-1"></i> View on Storefront
+                    </a>
+                </div>
+            </div>
+
+            <!-- KPI Row -->
+            <div class="row g-3 mt-3">
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="status-card p-3 border rounded bg-white shadow-sm">
+                        <span class="font-12 text-muted text-uppercase fw-semibold">Assigned Products</span>
+                        <h4 class="mt-1 mb-0 fw-bold text-success">@Model.ProductCount</h4>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="status-card p-3 border rounded bg-white shadow-sm">
+                        <span class="font-12 text-muted text-uppercase fw-semibold">Sub-Categories</span>
+                        <h4 class="mt-1 mb-0 fw-bold text-primary">@Model.SubCategoryCount</h4>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="status-card p-3 border rounded bg-white shadow-sm">
+                        <span class="font-12 text-muted text-uppercase fw-semibold">Menu Display Order</span>
+                        <h4 class="mt-1 mb-0 fw-bold text-secondary">@Model.SortOrder</h4>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="status-card p-3 border rounded bg-white shadow-sm">
+                        <span class="font-12 text-muted text-uppercase fw-semibold">Hierarchy Depth</span>
+                        <h4 class="mt-1 mb-0 fw-bold text-muted">Level @(Model.Depth + 1)</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Specifications -->
+    <section class="form-section">
+        <div class="form-section-header">
+            <h2><i class="fas fa-info-circle" style="color:var(--accent);margin-right:8px;"></i>Category Information</h2>
         </div>
 
         <div class="form-section-body">
             <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Category</label>
-                        <p class="detail-value">@Model.Name</p>
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label-custom">Category Name</label>
+                    <p class="detail-value fw-semibold">@Model.Name</p>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label-custom">SEO URL Slug</label>
+                    <p class="detail-value t-mono">@Model.Slug</p>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label-custom">Parent Category</label>
+                    <p class="detail-value">@(string.IsNullOrEmpty(Model.ParentName) ? "None (Top level)" : Model.ParentName)</p>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label-custom">Short Summary</label>
+                    <div class="p-3 bg-light rounded border text-secondary" style="white-space: pre-line;">
+                        @(string.IsNullOrEmpty(Model.Description) ? "No short summary recorded." : Model.Description)
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Slug</label>
-                        <p class="detail-value">@Model.Slug</p>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label-custom">Editorial Intro Copy (PLP Landing)</label>
+                    <div class="p-3 bg-light rounded border text-secondary" style="white-space: pre-line;">
+                        @(string.IsNullOrEmpty(Model.IntroCopy) ? "No editorial intro copy provided." : Model.IntroCopy)
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Parent Category</label>
-                        <p class="detail-value">@(Model.ParentId is null ? "Top level" : Model.ParentId.ToString())</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Sort Order</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Show in Menu</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Products</label>
-                        <p class="detail-value">@Model.ProductCount</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">SEO Title</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
+                </div>
             </div>
+        </div>
+    </section>
+
+    <!-- SEO Metadata -->
+    <section class="form-section">
+        <div class="form-section-header">
+            <h2><i class="fas fa-magnifying-glass" style="color:var(--accent);margin-right:8px;"></i>Search Engine Optimization (SEO)</h2>
+        </div>
+
+        <div class="form-section-body">
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <label class="form-label-custom">Meta Title</label>
+                    <p class="detail-value">@(string.IsNullOrEmpty(Model.Seo?.MetaTitle) ? "—" : Model.Seo.MetaTitle)</p>
+                </div>
+                <div class="col-lg-6">
+                    <label class="form-label-custom">Meta Keywords</label>
+                    <p class="detail-value">@(string.IsNullOrEmpty(Model.Seo?.MetaKeywords) ? "—" : Model.Seo.MetaKeywords)</p>
+                </div>
+                <div class="col-12">
+                    <label class="form-label-custom">Canonical URL</label>
+                    <p class="detail-value">@(string.IsNullOrEmpty(Model.Seo?.CanonicalUrl) ? "—" : Model.Seo.CanonicalUrl)</p>
+                </div>
+                <div class="col-12">
+                    <label class="form-label-custom">Meta Description</label>
+                    <div class="p-3 bg-light rounded border text-secondary">
+                        @(string.IsNullOrEmpty(Model.Seo?.MetaDescription) ? "No meta description defined." : Model.Seo.MetaDescription)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Navigation to Assigned Products -->
+    <section class="form-section">
+        <div class="form-section-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h4 class="mb-1 fw-bold"><i class="fas fa-boxes-stacked text-primary me-2"></i>Catalog Products in this Category</h4>
+                <p class="text-muted mb-0 font-13">View, filter, or manage all products assigned under @Model.Name.</p>
+            </div>
+            <a asp-controller="Product" asp-action="Index" class="custom_button primary_button">
+                <i class="fas fa-eye me-1"></i> View All Products (@Model.ProductCount)
+            </a>
         </div>
     </section>
 

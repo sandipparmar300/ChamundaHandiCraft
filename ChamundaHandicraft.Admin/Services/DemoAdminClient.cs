@@ -310,8 +310,26 @@ public class DemoAdminClient : IAdminClient
             new() { Id = 6, Slug = "gifting", Name = "Gifting", ProductCount = 158 }
         }));
 
+    public Task<ResponseViewModel<CategorySaveRequest>> GetCategoryAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(Ok(new CategorySaveRequest { Id = id, Name = "Home Décor", Slug = "home-decor" }));
+
     public Task<ResponseViewModel<int>> SaveCategoryAsync(CategorySaveRequest request, CancellationToken ct = default) =>
         Task.FromResult(ResponseViewModel<int>.Success(request.Id == 0 ? 7 : request.Id, "Saved successfully."));
+
+    public Task<ResponseViewModel<bool>> DeleteCategoryAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(Ok(true));
+
+    public Task<ResponseViewModel<bool>> UpdateCategoryStatusAsync(UpdateStatusRequest request, CancellationToken ct = default) =>
+        Task.FromResult(Ok(true));
+
+    public Task<ResponseViewModel<List<IdNamePair>>> GetCategoryLookupAsync(CancellationToken ct = default) =>
+        Task.FromResult(Ok(new List<IdNamePair>
+        {
+            new() { Id = 1, Name = "Home Décor" },
+            new() { Id = 2, Name = "Pottery & Ceramics" },
+            new() { Id = 3, Name = "Textiles" },
+            new() { Id = 4, Name = "Brass & Metal" }
+        }));
 
     public Task<ResponseViewModel<PagedResult<StockGridItem>>> GetStockAsync(
         DataTableRequest request, CancellationToken ct = default)
