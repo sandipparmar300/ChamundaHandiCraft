@@ -701,7 +701,7 @@
                         reindexMedia();
                     } else {
                         $('#' + tempId).remove();
-                        alert('Upload failed: ' + (data && data.message ? data.message : 'Error uploading image'));
+                        toastr.error('Upload failed: ' + (data && data.message ? data.message : 'Error uploading image'), 'Upload Error');
                     }
                 })
                 .catch(function (err) {

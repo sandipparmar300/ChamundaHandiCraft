@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using ChamundaHandicraft.Helper.Enums;
 using ChamundaHandicraft.Helper.ViewModel.Common;
 
@@ -335,6 +336,78 @@ public class RoleGridItem : AuditableViewModel, IAdminGridRow
     public string DisplayName => RoleName;
 }
 
+public class AdminUserSaveRequest : AuditableViewModel
+{
+    public int Id { get; set; }
+
+    [Required(ErrorMessage = "First name is required")]
+    [StringLength(100, ErrorMessage = "First name cannot exceed 100 characters")]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Last name is required")]
+    [StringLength(100, ErrorMessage = "Last name cannot exceed 100 characters")]
+    public string LastName { get; set; } = string.Empty;
+
+    public string FullName { get; set; } = string.Empty;
+
+    public string? EmployeeId { get; set; }
+
+    public string AutoEmployeeId => !string.IsNullOrWhiteSpace(EmployeeId) 
+        ? EmployeeId 
+        : (Id > 0 ? $"EMP-{Id:D4}" : "EMP-AUTO");
+
+    public string? Username { get; set; }
+
+    [Required(ErrorMessage = "Email address is required")]
+    [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+    [StringLength(256, ErrorMessage = "Email cannot exceed 256 characters")]
+    public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Mobile number is required")]
+    [RegularExpression(@"^[0-9+\-\s]{7,15}$", ErrorMessage = "Please enter a valid mobile number (7-15 digits)")]
+    public string Mobile { get; set; } = string.Empty;
+
+    public string? Password { get; set; }
+
+    public string? ConfirmPassword { get; set; }
+
+    [Required(ErrorMessage = "Please select a role")]
+    [Range(1, int.MaxValue, ErrorMessage = "Please select a role")]
+    public int RoleId { get; set; }
+
+    public string? RoleName { get; set; }
+    public string? Department { get; set; }
+    public string? Designation { get; set; }
+    public string? TimeZone { get; set; } = "Asia/Kolkata";
+    public string? Language { get; set; } = "en-IN";
+    public string? PhotoUrl { get; set; }
+    public DateTime? LastLoginOn { get; set; }
+    public bool TwoFactorEnabled { get; set; }
+    public bool IsLocked { get; set; }
+    public bool IsActive { get; set; } = true;
+}
+
+public class AdminUserChangePasswordRequest
+{
+    public int Id { get; set; }
+    public string NewPassword { get; set; } = string.Empty;
+    public string ConfirmPassword { get; set; } = string.Empty;
+}
+
+public class RoleSaveRequest : AuditableViewModel
+{
+    public int Id { get; set; }
+    public string RoleName { get; set; } = string.Empty;
+    public string? RoleKey { get; set; }
+    public string? Description { get; set; }
+    public int SortOrder { get; set; } = 10;
+    public bool IsActive { get; set; } = true;
+    public bool IsSystem { get; set; }
+    public int UserCount { get; set; }
+    public int PermissionCount { get; set; }
+    public List<int> PermissionIds { get; set; } = new();
+}
+
 public class CustomerGridItem : AuditableViewModel, IAdminGridRow
 {
     public int Id { get; set; }
@@ -476,12 +549,18 @@ public class SettingsHistoryItem
 /// <summary>One permission key and whether the role being edited holds it.</summary>
 public class PermissionMatrixItem
 {
+    public int Id { get; set; }
     public string Module { get; set; } = string.Empty;
     public string Entity { get; set; } = string.Empty;
     public string Action { get; set; } = string.Empty;
 
+    private string _key = string.Empty;
     /// <summary>Format is <c>module.entity.action</c>, e.g. <c>catalog.product.create</c>.</summary>
-    public string Key => $"{Module}.{Entity}.{Action}".ToLowerInvariant();
+    public string Key
+    {
+        get => !string.IsNullOrEmpty(_key) ? _key : $"{Module}.{Entity}.{Action}".ToLowerInvariant();
+        set => _key = value;
+    }
 
     public string Description { get; set; } = string.Empty;
     public bool IsGranted { get; set; }

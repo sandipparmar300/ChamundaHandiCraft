@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="subject" content="Welcome to {{CompanyName}} Admin Portal — Your Account Credentials" />
+    <title>Welcome to {{CompanyName}} Admin Portal</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            color: #334155;
+        }
+        .wrapper {
+            width: 100%;
+            background-color: #f4f6f8;
+            padding: 40px 0;
+        }
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+        .brand-header {
+            background-color: #8E1F2F;
+            padding: 32px 24px;
+            text-align: center;
+        }
+        .brand-logo-text {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        .brand-logo-sub {
+            color: #F3C969;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+        .content-body {
+            padding: 40px 36px;
+            line-height: 1.65;
+            font-size: 15px;
+            color: #334155;
+        }
+        .greeting {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 16px;
+        }
+        .credentials-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+        .btn-container {
+            text-align: center;
+            margin: 32px 0;
+        }
+        .action-button {
+            background-color: #8E1F2F;
+            color: #ffffff !important;
+            padding: 14px 34px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(142, 31, 47, 0.25);
+        }
+        .security-notice {
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 14px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #166534;
+            margin-top: 28px;
+            line-height: 1.5;
+        }
+        .footer {
+            background-color: #f8fafc;
+            padding: 24px 36px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="main-container">
+            <div class="brand-header">
+                <div class="brand-logo-text">{{CompanyName}}</div>
+                <div class="brand-logo-sub">Admin Portal</div>
+            </div>
+
+            <div class="content-body">
+                <div class="greeting">Hello {{RecipientName}},</div>
+                
+                <p>Welcome to <strong>{{CompanyName}}</strong>! An administrator account has been created for you to access the management portal.</p>
+                
+                <p>Below are your initial login credentials:</p>
+
+                <div class="credentials-card">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px dashed #e2e8f0;">
+                            <td style="padding: 8px 0; font-weight: 600; color: #64748b; font-size: 13px;">Login Email:</td>
+                            <td style="padding: 8px 0; font-weight: 700; color: #0f172a; font-size: 14px; text-align: right;">{{Email}}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px dashed #e2e8f0;">
+                            <td style="padding: 8px 0; font-weight: 600; color: #64748b; font-size: 13px;">Temporary Password:</td>
+                            <td style="padding: 8px 0; font-weight: 700; color: #8E1F2F; font-size: 15px; text-align: right; font-family: Consolas, Monaco, monospace;">{{Password}}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; font-weight: 600; color: #64748b; font-size: 13px;">Assigned Role:</td>
+                            <td style="padding: 8px 0; font-weight: 700; color: #0f172a; font-size: 14px; text-align: right;">{{RoleName}}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="btn-container">
+                    <a href="{{AdminPortalUrl}}/Auth/Login" class="action-button" target="_blank" rel="noopener noreferrer">Log In to Admin Portal</a>
+                </div>
+
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 6px;">Portal URL: <a href="{{AdminPortalUrl}}/Auth/Login" style="color: #8E1F2F;">{{AdminPortalUrl}}/Auth/Login</a></p>
+
+                <div class="security-notice">
+                    <strong>Security Recommendation:</strong> Please log in and change your temporary password immediately upon your first login to keep your account secure. Never share your password with anyone.
+                </div>
+            </div>
+
+            <div class="footer">
+                &copy; {{CurrentYear}} {{CompanyName}}. All rights reserved.<br />
+                This is an automated system email. For support, contact <a href="mailto:{{SupportEmail}}" style="color: #64748b;">{{SupportEmail}}</a>.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

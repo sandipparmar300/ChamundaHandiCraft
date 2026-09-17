@@ -145,6 +145,12 @@ public interface IAdminClient
     Task<ResponseViewModel<List<PermissionMatrixItem>>> GetPermissionMatrixAsync(
         int? roleId, CancellationToken ct = default);
 
+    Task<ResponseViewModel<bool>> SaveRolePermissionsAsync(
+        int roleId, List<int> permissionIds, CancellationToken ct = default);
+
+    Task<ResponseViewModel<bool>> ChangeAdminUserPasswordAsync(
+        AdminUserChangePasswordRequest request, CancellationToken ct = default);
+
     Task<ResponseViewModel<AdminProfileViewModel>> GetProfileAsync(CancellationToken ct = default);
 
     /// <summary>

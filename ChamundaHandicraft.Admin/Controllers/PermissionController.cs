@@ -35,4 +35,12 @@ public class PermissionController : Controller
 
         return View(response.Data ?? new List<PermissionMatrixItem>());
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveRolePermissions(int roleId, [FromBody] List<int> permissionIds, CancellationToken ct = default)
+    {
+        var response = await _client.SaveRolePermissionsAsync(roleId, permissionIds ?? new List<int>(), ct);
+        return Json(new { success = response.IsSuccess, message = response.Message });
+    }
 }

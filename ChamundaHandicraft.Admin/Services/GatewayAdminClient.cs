@@ -170,8 +170,17 @@ public class GatewayAdminClient : IAdminClient
 
     public Task<ResponseViewModel<List<PermissionMatrixItem>>> GetPermissionMatrixAsync(
         int? roleId, CancellationToken ct = default) =>
-        _api.GetAsync<List<PermissionMatrixItem>>(ApiEndPoint.Auth.AdminPermissionKeys,
+        _api.GetAsync<List<PermissionMatrixItem>>(ApiEndPoint.Permission.Matrix,
             new Dictionary<string, string?> { ["roleId"] = roleId?.ToString() }, ct);
+
+    public Task<ResponseViewModel<bool>> SaveRolePermissionsAsync(
+        int roleId, List<int> permissionIds, CancellationToken ct = default) =>
+        _api.PostAsync<bool>(ApiEndPoint.Permission.SaveRolePermissions,
+            new { RoleId = roleId, PermissionIds = permissionIds }, ct);
+
+    public Task<ResponseViewModel<bool>> ChangeAdminUserPasswordAsync(
+        AdminUserChangePasswordRequest request, CancellationToken ct = default) =>
+        _api.PostAsync<bool>($"{ApiEndPoint.AdminPrefix}AdminUser/ChangePassword", request, ct);
 
     public Task<ResponseViewModel<AdminProfileViewModel>> GetProfileAsync(CancellationToken ct = default) =>
         _api.GetAsync<AdminProfileViewModel>(ApiEndPoint.Auth.AdminProfileGet, null, ct);

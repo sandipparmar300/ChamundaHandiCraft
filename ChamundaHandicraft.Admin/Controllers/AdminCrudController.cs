@@ -48,7 +48,7 @@ public abstract class AdminCrudController<TGrid, TSave> : Controller
         return View(response.Data ?? PagedResult<TGrid>.Empty(PageSize));
     }
 
-    public virtual IActionResult Add() => View("Create", new TSave());
+    public virtual Task<IActionResult> Add() => Task.FromResult<IActionResult>(View("Create", new TSave()));
 
     public virtual async Task<IActionResult> Edit(int id, CancellationToken ct = default)
     {

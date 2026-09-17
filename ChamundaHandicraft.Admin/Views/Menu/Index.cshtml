@@ -212,24 +212,14 @@
                             if (menuDataTable) menuDataTable.row(this).remove().draw(false);
                         });
                     } else {
-                        if (typeof showErrorMessage === 'function') {
-                            showErrorMessage(res.message || 'Failed to delete menu item.');
-                        } else if (typeof Swal !== 'undefined') {
-                            Swal.fire({ icon: 'error', title: 'Error', text: res.message || 'Failed to delete menu item.' });
-                        } else {
-                            alert(res.message || 'Failed to delete menu item.');
-                        }
+                        toastr.error(res.message || 'Failed to delete menu item.', 'Error');
                     }
                 },
                 error: function (xhr) {
                     $('#menu-delete-confirm-modal').modal('hide');
                     $btn.prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Delete');
                     var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'An unexpected error occurred.';
-                    if (typeof showErrorMessage === 'function') {
-                        showErrorMessage(msg);
-                    } else {
-                        alert(msg);
-                    }
+                    toastr.error(msg, 'Error');
                 }
             });
         }

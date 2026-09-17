@@ -520,24 +520,14 @@
                             if (categoryDataTable) categoryDataTable.row(this).remove().draw(false);
                         });
                     } else {
-                        if (typeof showErrorMessage === 'function') {
-                            showErrorMessage(res.message || 'Failed to delete category.');
-                        } else if (typeof Swal !== 'undefined') {
-                            Swal.fire({ icon: 'error', title: 'Cannot Delete', text: res.message || 'Failed to delete category.' });
-                        } else {
-                            alert(res.message || 'Failed to delete category.');
-                        }
+                        toastr.error(res.message || 'Failed to delete category.', 'Error');
                     }
                 },
                 error: function (xhr) {
                     $('#category-delete-confirm-modal').modal('hide');
                     $btn.prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Delete');
                     var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'An unexpected error occurred while deleting.';
-                    if (typeof showErrorMessage === 'function') {
-                        showErrorMessage(msg);
-                    } else {
-                        alert(msg);
-                    }
+                    toastr.error(msg, 'Error');
                 }
             });
         }

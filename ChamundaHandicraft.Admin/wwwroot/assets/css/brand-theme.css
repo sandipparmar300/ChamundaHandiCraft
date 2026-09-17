@@ -533,3 +533,53 @@ input[type="radio"],
         width: 100% !important;
     }
 }
+
+/* ── Toastr Notification Enhancements & Bootstrap 5 Compatibility ────── */
+#toast-container > .toast {
+    opacity: 0.98 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+}
+#toast-container > .toast-success {
+    background-color: #198754 !important;
+    border: 1px solid #146c43 !important;
+}
+#toast-container > .toast-error {
+    background-color: #dc3545 !important;
+    border: 1px solid #b02a37 !important;
+}
+#toast-container > .toast-warning {
+    background-color: #e67e22 !important;
+    border: 1px solid #d35400 !important;
+}
+#toast-container > .toast-info {
+    background-color: #0d6efd !important;
+    border: 1px solid #0b5ed7 !important;
+}
+#toast-container .toast-title,
+#toast-container .toast-message {
+    color: #ffffff !important;
+    font-size: 13px !important;
+}
+#toast-container .toast-close-button {
+    color: #ffffff !important;
+    text-shadow: none !important;
+    opacity: 0.8 !important;
+}
+
+/* ── Modal Form Alignments (Change Password & Form Modals) ───────────── */
+.modal.common-modal .modal-content.form-modal-content,
+.modal.common-modal .modal-body.form-modal-body,
+#change-password-modal .modal-body {
+    text-align: left !important;
+}
+#change-password-modal .form-label-custom {
+    text-align: left !important;
+    display: block !important;
+    margin-bottom: 6px !important;
+}
+#change-password-modal .input-group {
+    text-align: left !important;
+}
+

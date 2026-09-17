@@ -76,6 +76,12 @@ public static class ApiEndPoint
         public const string MergeGuestCart = ShopPrefix + "Auth/MergeGuestCart";
     }
 
+    public static class Permission
+    {
+        public const string Matrix = AdminPrefix + "Permission/Matrix";
+        public const string SaveRolePermissions = AdminPrefix + "Permission/SaveRolePermissions";
+    }
+
     #endregion
 
     #region Product — Catalog module

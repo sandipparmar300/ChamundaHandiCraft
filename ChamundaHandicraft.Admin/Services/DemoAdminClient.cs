@@ -667,6 +667,14 @@ public class DemoAdminClient : IAdminClient
         int? roleId, CancellationToken ct = default) =>
         Task.FromResult(Ok(DemoData.PermissionMatrix()));
 
+    public Task<ResponseViewModel<bool>> SaveRolePermissionsAsync(
+        int roleId, List<int> permissionIds, CancellationToken ct = default) =>
+        Task.FromResult(Ok(true));
+
+    public Task<ResponseViewModel<bool>> ChangeAdminUserPasswordAsync(
+        AdminUserChangePasswordRequest request, CancellationToken ct = default) =>
+        Task.FromResult(Ok(true));
+
     public Task<ResponseViewModel<AdminProfileViewModel>> GetProfileAsync(CancellationToken ct = default) =>
         Task.FromResult(Ok(new AdminProfileViewModel
         {

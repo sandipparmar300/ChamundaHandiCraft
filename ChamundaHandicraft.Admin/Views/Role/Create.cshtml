@@ -1,23 +1,157 @@
-@model RoleGridItem
-@*
-    Module 02 - Create / Edit Role, including the permission matrix.
-    Spec: docs/Admin Flows/Users.txt - Role Assignment + Permission Management.
-*@
+@model ChamundaHandicraft.Helper.ViewModel.Admin.RoleSaveRequest
 @{
-    ViewData["Title"] = "Role";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var isEdit = Model.Id > 0;
     var heading = isEdit ? "Edit Role" : "Add Role";
-
-    var modules = new[]
-    {
-        "Dashboard", "Products", "Categories", "Inventory", "Orders", "Payments",
-        "Shipping", "Customers", "Coupons", "Offers", "Banners", "CMS", "Blog",
-        "Reviews", "Testimonials", "Newsletter", "Notifications", "Reports",
-        "SEO", "Settings", "Users", "Media", "Support", "Audit"
-    };
-
-    var actions = new[] { "View", "Create", "Edit", "Delete", "Export", "Import", "Print", "Approve", "Publish", "Unpublish", "Restore" };
+    ViewData["Title"] = heading;
+    var permissions = ViewBag.Permissions as List<PermissionMatrixItem> ?? new List<PermissionMatrixItem>();
+    var groupedByModule = permissions.GroupBy(p => p.Module).OrderBy(g => g.Key).ToList();
+    var assignedIds = Model.PermissionIds ?? new List<int>();
 }
+
+@functions {
+    public static string GetModuleIcon(string module)
+    {
+        return (module ?? "").ToLowerInvariant() switch
+        {
+            "audit" => "fa-clipboard-check",
+            "catalog" => "fa-boxes",
+            "category" => "fa-folder-open",
+            "content" => "fa-file-alt",
+            "customer" => "fa-users",
+            "dashboard" => "fa-chart-pie",
+            "identity" => "fa-id-card",
+            "inventory" => "fa-warehouse",
+            "marketing" => "fa-bullhorn",
+            "media" => "fa-images",
+            "notification" => "fa-bell",
+            "order" => "fa-shopping-bag",
+            "payment" => "fa-credit-card",
+            "promotion" => "fa-tags",
+            "report" => "fa-chart-line",
+            "review" => "fa-star",
+            "seo" => "fa-globe",
+            "settings" => "fa-cog",
+            "shipping" => "fa-shipping-fast",
+            "support" => "fa-headset",
+            _ => "fa-layer-group"
+        };
+    }
+
+    public static string FormatModuleName(string module)
+    {
+        if (string.IsNullOrWhiteSpace(module)) return "";
+        if (module.Equals("seo", StringComparison.OrdinalIgnoreCase)) return "SEO";
+        return char.ToUpper(module[0]) + module.Substring(1).ToLower();
+    }
+}
+
+<style>
+    .perm-module-nav {
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 8px;
+    }
+    .perm-nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 12px;
+        border-radius: 6px;
+        color: #495057;
+        text-decoration: none;
+        margin-bottom: 2px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.15s ease-in-out;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+    .perm-nav-item:hover {
+        background-color: #f1f3f7;
+        color: var(--brand-primary, #8E1F2F);
+    }
+    .perm-nav-item.active {
+        background-color: #ffffff;
+        color: var(--brand-primary, #8E1F2F);
+        font-weight: 600;
+        border-color: #dee2e6;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .perm-nav-item.active .mod-icon {
+        color: var(--brand-primary, #8E1F2F) !important;
+    }
+    .perm-nav-item.active .mod-counter-badge {
+        background-color: var(--brand-primary, #8E1F2F) !important;
+        color: #ffffff !important;
+        border-color: var(--brand-primary, #8E1F2F) !important;
+    }
+    .perm-nav-item.has-selected:not(.active) .mod-counter-badge {
+        background-color: #fff2e8 !important;
+        color: #d46b08 !important;
+        border-color: #ffd591 !important;
+    }
+    .perm-nav-item.all-selected:not(.active) .mod-counter-badge {
+        background-color: #e6f7ff !important;
+        color: #0958d9 !important;
+        border-color: #91caff !important;
+    }
+    .perm-module-pane {
+        display: none;
+    }
+    .perm-module-pane.active-pane {
+        display: block;
+    }
+    .entity-card {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: #ffffff;
+        overflow: hidden;
+    }
+    .entity-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .perm-card {
+        background: #ffffff;
+        cursor: pointer;
+        transition: all 0.12s ease-in-out;
+        border: 1px solid #e5e7eb !important;
+        min-height: 54px;
+        user-select: none;
+    }
+    .perm-card:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1 !important;
+    }
+    .perm-card.perm-card-checked {
+        background-color: #fdf2f2;
+        border-color: #fca5a5 !important;
+    }
+    .badge-action-create {
+        background-color: #def7ec;
+        color: #03543f;
+    }
+    .badge-action-read {
+        background-color: #e1effe;
+        color: #1e429f;
+    }
+    .badge-action-update {
+        background-color: #fef08a;
+        color: #713f12;
+    }
+    .badge-action-delete {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    .badge-action-export {
+        background-color: #ede9fe;
+        color: #5b21b6;
+    }
+    .badge-action-default {
+        background-color: #f3f4f6;
+        color: #374151;
+    }
+</style>
 
 @section Header {
     <div class="page-head commondetails-page-cls">
@@ -36,100 +170,236 @@
 
 <main class="page-content">
 
-    <form method="post" id="roleForm">
-
+    <form method="post" asp-action="Save" asp-controller="Role" id="roleForm">
+        @Html.AntiForgeryToken()
         <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+        <input type="hidden" id="saveAndNew" name="saveAndNew" value="false" />
 
+        <!-- Role Details -->
         <section class="form-section">
             <div class="form-section-header">
                 <h2><i class="fas fa-user-shield" style="color:var(--accent);margin-right:8px;"></i>Role Information</h2>
             </div>
-
             <div class="form-section-body">
+                <input type="hidden" id="RoleKey" name="RoleKey" value="@Model.RoleKey" />
                 <div class="row g-3">
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-6 col-md-6">
                         <label class="form-label-custom">Role Name <span class="req">*</span></label>
-                        <input id="Name" name="Name" class="form-control-custom" placeholder="Enter role name" />
-                        <span class="error-msg" data-valmsg-for="Name"></span>
+                        <input asp-for="RoleName" id="RoleName" class="form-control-custom" placeholder="e.g. Content Manager" required />
+                        <span asp-validation-for="RoleName" id="valRoleName" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-lg-8 col-md-6">
+                    <div class="col-lg-6 col-md-6">
                         <label class="form-label-custom">Description</label>
-                        <input id="Description" name="Description" class="form-control-custom" placeholder="Enter description" / value="@Model.Description" >
+                        <input asp-for="Description" id="Description" class="form-control-custom" placeholder="Brief description of role responsibilities" />
+                        <span asp-validation-for="Description" id="valDescription" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- Permission Matrix -->
         <section class="form-section">
-            <div class="form-section-header d-flex justify-content-between align-items-center">
-                <h2><i class="fas fa-shield-halved" style="color:var(--accent);margin-right:8px;"></i>Permission Matrix</h2>
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="checkAll" />
-                    <label class="form-check-label" for="checkAll">Select all</label>
+            <div class="form-section-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h2 class="mb-0"><i class="fas fa-shield-alt" style="color:var(--accent);margin-right:8px;"></i>Permission Matrix</h2>
+                    <p class="text-muted small mb-0 mt-1">Assign functional capabilities to this role across platform modules.</p>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-light text-dark border px-3 py-2 fs-6">
+                        Granted: <strong class="text-primary" id="grantedCounter">0</strong> / @permissions.Count
+                    </span>
+
+                    <div class="form-check form-switch mb-0">
+                        <input type="checkbox" class="form-check-input" role="switch" id="checkAllMatrix" onchange="toggleAllPermissions(this)" />
+                        <label class="form-check-label fw-semibold ms-1" for="checkAllMatrix">Select All</label>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-section-body">
-                <div class="table-main">
-                    <table class="custom-datatable listing-order-table permission-matrix">
-                        <thead>
-                            <tr>
-                                <th style="min-width:180px;">Module</th>
-                                @foreach (var a in actions)
-                                {
-                                    <th style="min-width:90px;" class="text-center">
-                                        @a
-                                        <br />
-                                        <input type="checkbox" class="check-column" data-action="@a" title="Select whole column" />
-                                    </th>
-                                }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var m in modules)
+            <!-- Search & Toolbar -->
+            <div class="p-3 border-bottom bg-light">
+                <div class="row align-items-center g-2">
+                    <div class="col-md-6 col-12">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" id="permFilter" class="form-control-custom border-start-0 ps-0" placeholder="Search permissions by keyword (e.g. create, product, export)..." onkeyup="filterPermissions(this)" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12 d-flex justify-content-md-end align-items-center gap-2">
+                        <span class="small text-muted" id="searchFeedback" style="display:none;"></span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="clearSearchBtn" onclick="clearSearch()" style="display:none;">
+                            <i class="fas fa-times me-1"></i>Clear Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2-Pane Module Body -->
+            <div class="form-section-body p-0">
+                <div class="row g-0">
+                    <!-- Left Sidebar: Module List -->
+                    <div class="col-lg-3 col-md-4 border-end bg-light-subtle" style="border-color:#e5e7eb!important;">
+                        <div class="p-2 fw-semibold text-muted small text-uppercase tracking-wider border-bottom d-flex justify-content-between">
+                            <span>Modules (@groupedByModule.Count)</span>
+                            <span class="small text-muted">Granted</span>
+                        </div>
+                        <div class="perm-module-nav" id="moduleNavList">
+                            @for (int i = 0; i < groupedByModule.Count; i++)
                             {
-                                <tr>
-                                    <td>
-                                        <label class="d-flex align-items-center gap-2 mb-0">
-                                            <input type="checkbox" class="check-row" data-module="@m" />
-                                            <strong>@m</strong>
-                                        </label>
-                                    </td>
-                                    @foreach (var a in actions)
-                                    {
-                                        <td class="text-center">
-                                            <input type="checkbox"
-                                                   class="perm-check"
-                                                   data-module="@m"
-                                                   data-action="@a"
-                                                   name="Permissions"
-                                                   value="@(m.ToLowerInvariant()).@(a.ToLowerInvariant())" />
-                                        </td>
-                                    }
-                                </tr>
+                                var group = groupedByModule[i];
+                                var modKey = group.Key;
+                                var modSlug = modKey.ToLowerInvariant();
+                                var modCount = group.Count();
+                                var iconClass = GetModuleIcon(modKey);
+                                var displayName = FormatModuleName(modKey);
+                                var isActive = i == 0;
+
+                                <a href="javascript:void(0);"
+                                   class="perm-nav-item @(isActive ? "active" : "")"
+                                   id="nav-item-@modSlug"
+                                   data-mod-slug="@modSlug"
+                                   onclick="switchModuleTab('@modSlug')">
+                                    <div class="d-flex align-items-center gap-2 text-truncate">
+                                        <i class="fas @iconClass mod-icon text-muted"></i>
+                                        <span class="mod-name text-truncate">@displayName</span>
+                                    </div>
+                                    <span class="badge rounded-pill bg-light text-dark border mod-counter-badge" id="badge-@modSlug">
+                                        <span class="badge-checked">0</span>/@modCount
+                                    </span>
+                                </a>
                             }
-                        </tbody>
-                    </table>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Permissions Container -->
+                    <div class="col-lg-9 col-md-8 p-3 p-md-4 bg-white" style="min-height: 520px;" id="permPanesContainer">
+                        @for (int i = 0; i < groupedByModule.Count; i++)
+                        {
+                            var group = groupedByModule[i];
+                            var modKey = group.Key;
+                            var modSlug = modKey.ToLowerInvariant();
+                            var modItems = group.OrderBy(p => p.Entity).ThenBy(p => p.Action).ToList();
+                            var entityGroups = modItems.GroupBy(p => p.Entity).OrderBy(eg => eg.Key).ToList();
+                            var iconClass = GetModuleIcon(modKey);
+                            var displayName = FormatModuleName(modKey);
+                            var isActive = i == 0;
+
+                            <div class="perm-module-pane @(isActive ? "active-pane" : "")" id="pane-@modSlug" data-mod-slug="@modSlug">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pb-3 mb-3 border-bottom">
+                                    <div>
+                                        <h4 class="mb-1 fw-bold text-dark d-flex align-items-center gap-2">
+                                            <i class="fas @iconClass text-primary"></i>
+                                            <span>@displayName Permissions</span>
+                                        </h4>
+                                        <p class="text-muted small mb-0">Total @modItems.Count permissions across @entityGroups.Count entities.</p>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleModulePerms('@modSlug', true)">
+                                            <i class="fas fa-check-double me-1"></i>Select All
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleModulePerms('@modSlug', false)">
+                                            <i class="fas fa-undo me-1"></i>Deselect All
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Entity Groupings -->
+                                <div class="entity-groups-wrapper">
+                                    @foreach (var eg in entityGroups)
+                                    {
+                                        var entityName = eg.Key;
+                                        var entSlug = $"{modSlug}-{entityName.ToLowerInvariant().Replace(" ", "-")}";
+                                        var entItems = eg.ToList();
+
+                                        <div class="entity-card mb-3 shadow-none" data-entity-name="@entityName.ToLowerInvariant()">
+                                            <div class="entity-header py-2 px-3 d-flex justify-content-between align-items-center">
+                                                <div class="fw-semibold text-dark d-flex align-items-center gap-2">
+                                                    <i class="fas fa-cube text-secondary font-12"></i>
+                                                    <span>@entityName</span>
+                                                    <span class="badge bg-white text-muted border font-11">@entItems.Count</span>
+                                                </div>
+                                                <div class="form-check form-check-inline mb-0">
+                                                    <input type="checkbox"
+                                                           class="form-check-input entity-select-all"
+                                                           id="ent-all-@entSlug"
+                                                           onchange="toggleEntityPerms('@entSlug', this)" />
+                                                    <label class="form-check-label small text-muted" for="ent-all-@entSlug">All</label>
+                                                </div>
+                                            </div>
+                                            <div class="entity-body p-3">
+                                                <div class="row g-2">
+                                                    @foreach (var p in entItems)
+                                                    {
+                                                        var isChecked = assignedIds.Contains(p.Id) || p.IsGranted;
+                                                        var actionLower = p.Action.ToLowerInvariant();
+                                                        var actionColorClass = actionLower switch {
+                                                            "create" or "add" => "badge-action-create",
+                                                            "read" or "view" or "list" or "detail" => "badge-action-read",
+                                                            "update" or "edit" => "badge-action-update",
+                                                            "delete" or "remove" => "badge-action-delete",
+                                                            "export" or "download" => "badge-action-export",
+                                                            _ => "badge-action-default"
+                                                        };
+
+                                                        <div class="col-xl-3 col-lg-4 col-sm-6 perm-item-col" data-text="@p.Key.ToLowerInvariant() @p.Description.ToLowerInvariant() @p.Action.ToLowerInvariant() @p.Entity.ToLowerInvariant() @modSlug">
+                                                            <label class="perm-card d-flex align-items-start gap-2 p-2 rounded @(isChecked ? "perm-card-checked" : "")" for="perm-@p.Id">
+                                                                <input type="checkbox"
+                                                                       name="PermissionIds"
+                                                                       value="@p.Id"
+                                                                       class="form-check-input mt-1 perm-checkbox mod-item-@modSlug ent-item-@entSlug"
+                                                                       id="perm-@p.Id"
+                                                                       data-mod="@modSlug"
+                                                                       data-ent="@entSlug"
+                                                                       @(isChecked ? "checked" : "")
+                                                                       onchange="onPermChanged(this, '@modSlug', '@entSlug')" />
+                                                                <div class="flex-grow-1 overflow-hidden">
+                                                                    <div class="d-flex align-items-center justify-content-between gap-1 mb-1">
+                                                                        <span class="fw-semibold text-dark text-truncate" style="font-size:0.82rem;">@p.Action</span>
+                                                                        <span class="badge @actionColorClass" style="font-size:0.68rem; padding: 2px 5px;">@p.Action</span>
+                                                                    </div>
+                                                                    <div class="small text-muted text-truncate" style="font-size:0.72rem; line-height:1.2;" title="@(string.IsNullOrWhiteSpace(p.Description) ? p.Key : p.Description)">
+                                                                        @(string.IsNullOrWhiteSpace(p.Description) ? p.Key : p.Description)
+                                                                    </div>
+                                                                </div>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- Action Bar -->
         <div class="form-action-bar">
             <div class="is-active-row" id="isActiveRow">
                 <div class="is-toggle-item" id="isToggleItem">
                     <span class="ia-label">Is Active</span>
                     <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" value="true" @(Model.IsActive ? "checked" : "") @(Model.IsSystem ? "disabled" : "") />
                         <span class="ia-slider"></span>
                     </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
+                    <span class="ia-status" id="isActiveStatus">@(Model.IsActive ? "Active" : "Inactive")</span>
                 </div>
             </div>
 
             <div>
-                <a asp-controller="Role" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save" onclick="saveRole(event)">
+                <a asp-controller="Role" asp-action="Index" class="btn btn-light me-2">Cancel</a>
+                @if (!isEdit)
+                {
+                    <button type="button" class="btn-save me-2" onclick="submitRoleForm(true)">
+                        <i class="fas fa-plus"></i> Save &amp; New
+                    </button>
+                }
+                <button type="button" class="btn-save" onclick="submitRoleForm(false)">
                     <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
                 </button>
             </div>
@@ -141,51 +411,171 @@
 
 @section Scripts {
     <script>
+        let currentSelectedMod = '@(groupedByModule.FirstOrDefault()?.Key.ToLowerInvariant() ?? "")';
+        let isSearching = false;
+
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-AdminUser"); }
 
-            $('#checkAll').on('change', function () {
-                var on = $(this).prop('checked');
-                $('.perm-check, .check-row, .check-column').prop('checked', on);
+            $('#RoleName').on('keyup change', function () {
+                var isSystem = @(Model.IsSystem ? "true" : "false");
+                if (!isSystem && !$('#Id').val()) {
+                    var val = $(this).val() || '';
+                    $('#RoleKey').val(val.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, ''));
+                }
             });
 
-            $('.check-row').on('change', function () {
-                var m = $(this).data('module');
-                $('.perm-check[data-module="' + m + '"]').prop('checked', $(this).prop('checked'));
-                syncHeaderBoxes();
+            $('#IsActiveCheckbox').on('change', function () {
+                $('#isActiveStatus').text($(this).is(':checked') ? 'Active' : 'Inactive');
             });
 
-            $('.check-column').on('change', function () {
-                var a = $(this).data('action');
-                $('.perm-check[data-action="' + a + '"]').prop('checked', $(this).prop('checked'));
-                syncRowBoxes();
-            });
-
-            $('.perm-check').on('change', function () {
-                syncRowBoxes();
-                syncHeaderBoxes();
-            });
+            updateCounters();
         });
 
-        function syncRowBoxes() {
-            $('.check-row').each(function () {
-                var m = $(this).data('module');
-                var all = $('.perm-check[data-module="' + m + '"]');
-                $(this).prop('checked', all.length === all.filter(':checked').length);
+        function switchModuleTab(modSlug) {
+            currentSelectedMod = modSlug;
+
+            if (isSearching) {
+                clearSearch();
+                return;
+            }
+
+            $('.perm-nav-item').removeClass('active');
+            $('#nav-item-' + modSlug).addClass('active');
+
+            $('.perm-module-pane').removeClass('active-pane');
+            $('#pane-' + modSlug).addClass('active-pane');
+        }
+
+        function onPermChanged(checkbox, modSlug, entSlug) {
+            $(checkbox).closest('.perm-card').toggleClass('perm-card-checked', $(checkbox).is(':checked'));
+            updateCounters();
+        }
+
+        function updateCounters() {
+            const total = $('.perm-checkbox').length;
+            const checked = $('.perm-checkbox:checked').length;
+            $('#grantedCounter').text(checked);
+            $('#checkAllMatrix').prop('checked', total > 0 && checked === total);
+
+            // Per module counters
+            $('.perm-nav-item').each(function () {
+                const modSlug = $(this).data('mod-slug');
+                const modTotal = $('.mod-item-' + modSlug).length;
+                const modChecked = $('.mod-item-' + modSlug + ':checked').length;
+
+                $('#badge-' + modSlug + ' .badge-checked').text(modChecked);
+
+                $(this).removeClass('has-selected all-selected');
+                if (modTotal > 0 && modChecked === modTotal) {
+                    $(this).addClass('all-selected');
+                } else if (modChecked > 0) {
+                    $(this).addClass('has-selected');
+                }
+            });
+
+            // Per entity select-all status
+            $('.entity-select-all').each(function () {
+                const entId = $(this).attr('id').replace('ent-all-', '');
+                const entTotal = $('.ent-item-' + entId).length;
+                const entChecked = $('.ent-item-' + entId + ':checked').length;
+                $(this).prop('checked', entTotal > 0 && entChecked === entTotal);
             });
         }
 
-        function syncHeaderBoxes() {
-            $('.check-column').each(function () {
-                var a = $(this).data('action');
-                var all = $('.perm-check[data-action="' + a + '"]');
-                $(this).prop('checked', all.length === all.filter(':checked').length);
-            });
+        function toggleAllPermissions(ctrl) {
+            const isChecked = $(ctrl).is(':checked');
+            $('.perm-checkbox').prop('checked', isChecked);
+            $('.perm-card').toggleClass('perm-card-checked', isChecked);
+            updateCounters();
         }
 
-        function saveRole(event) {
-            event.preventDefault();
-            // POSTs to Role/Save once the API is wired.
+        function toggleModulePerms(modSlug, checkState) {
+            $('.mod-item-' + modSlug).prop('checked', checkState);
+            $('.mod-item-' + modSlug).closest('.perm-card').toggleClass('perm-card-checked', checkState);
+            updateCounters();
+        }
+
+        function toggleEntityPerms(entSlug, ctrl) {
+            const isChecked = $(ctrl).is(':checked');
+            $('.ent-item-' + entSlug).prop('checked', isChecked);
+            $('.ent-item-' + entSlug).closest('.perm-card').toggleClass('perm-card-checked', isChecked);
+            updateCounters();
+        }
+
+        function filterPermissions(ctrl) {
+            const query = ($(ctrl).val() || '').toLowerCase().trim();
+
+            if (!query) {
+                clearSearch();
+                return;
+            }
+
+            isSearching = true;
+            $('#clearSearchBtn').show();
+
+            let matchCount = 0;
+
+            $('.perm-item-col').each(function () {
+                const text = $(this).data('text') || '';
+                const match = text.indexOf(query) !== -1;
+                $(this).toggle(match);
+                if (match) matchCount++;
+            });
+
+            $('.entity-card').each(function () {
+                const visibleItems = $(this).find('.perm-item-col:visible').length;
+                $(this).toggle(visibleItems > 0);
+            });
+
+            $('.perm-module-pane').each(function () {
+                const visibleItems = $(this).find('.perm-item-col:visible').length;
+                $(this).toggleClass('active-pane', visibleItems > 0);
+            });
+
+            $('#searchFeedback').text(matchCount + ' permission(s) found across modules.').show();
+        }
+
+        function clearSearch() {
+            isSearching = false;
+            $('#permFilter').val('');
+            $('#clearSearchBtn').hide();
+            $('#searchFeedback').hide();
+
+            $('.perm-item-col, .entity-card').show();
+            $('.perm-module-pane').removeClass('active-pane');
+            $('#pane-' + currentSelectedMod).addClass('active-pane');
+            $('.perm-nav-item').removeClass('active');
+            $('#nav-item-' + currentSelectedMod).addClass('active');
+        }
+
+        $(document).on('input change', '#RoleName', function () {
+            $('#valRoleName').text('');
+            $(this).removeClass('is-invalid');
+            var raw = $(this).val() || '';
+            var slug = raw.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            $('#RoleKey').val(slug);
+        });
+
+        function submitRoleForm(isSaveAndNew) {
+            $('#saveAndNew').val(isSaveAndNew ? "true" : "false");
+
+            $('#valRoleName').text('');
+            $('#RoleName').removeClass('is-invalid');
+
+            const name = ($('#RoleName').val() || '').trim();
+            if (!name) {
+                $('#valRoleName').text('Role name is required.');
+                $('#RoleName').addClass('is-invalid').focus();
+                return false;
+            }
+
+            if (!$('#RoleKey').val()) {
+                var slug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                $('#RoleKey').val(slug);
+            }
+
+            $('#roleForm').submit();
         }
     </script>
 }

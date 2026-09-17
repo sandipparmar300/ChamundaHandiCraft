@@ -19,6 +19,8 @@ public static class IdentityConfig
 
         // Repositories
         services.AddScoped<IAdminUserRepository>(_ => new AdminUserRepository(connectionString));
+        services.AddScoped<IRoleRepository>(_ => new RoleRepository(connectionString));
+        services.AddScoped<IPermissionRepository>(_ => new PermissionRepository(connectionString));
         services.AddScoped<IAdminSessionRepository>(_ => new AdminSessionRepository(connectionString));
         services.AddScoped<IPasswordResetRepository>(_ => new PasswordResetRepository(connectionString));
 
@@ -26,6 +28,9 @@ public static class IdentityConfig
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAdminAuthService, AdminAuthService>();
+        services.AddScoped<IAdminUserService, AdminUserService>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IPermissionService, PermissionService>();
 
         return services;
     }

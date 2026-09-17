@@ -24,4 +24,17 @@ public interface IAdminUserRepository
         string? userAgent,
         int maxFailedAttempts = 5,
         int lockoutMinutes = 15);
+
+    Task<ChamundaHandicraft.Helper.ViewModel.Common.PagedResult<ChamundaHandicraft.Helper.ViewModel.Admin.AdminUserGridItem>> GetGridAsync(
+        ChamundaHandicraft.Helper.ViewModel.Common.DataTableRequest request, CancellationToken ct = default);
+
+    Task<ChamundaHandicraft.Helper.ViewModel.Admin.AdminUserSaveRequest?> GetByIdAsync(int id, CancellationToken ct = default);
+
+    Task<int> SaveAsync(ChamundaHandicraft.Helper.ViewModel.Admin.AdminUserSaveRequest request, int? adminUserId = null, CancellationToken ct = default);
+
+    Task<bool> DeleteAsync(int id, int? adminUserId = null, CancellationToken ct = default);
+
+    Task<bool> UpdateStatusAsync(int id, bool isActive, int? adminUserId = null, CancellationToken ct = default);
+
+    Task<bool> ChangePasswordAsync(int id, string passwordHash, int? adminUserId = null, CancellationToken ct = default);
 }

@@ -1,13 +1,6 @@
-@*
-    Module 02 - Permission catalogue. Spec: docs/Admin Flows/Users.txt - Permission Management.
-
-    One row per `module.entity.action` key — the same keys the API checks. Showing them
-    grouped by module, for one role at a time, keeps the screen readable as the catalogue
-    grows and matches how the backend actually evaluates a request.
-*@
 @model List<PermissionMatrixItem>
 @{
-    ViewData["Title"] = "Permissions";
+    ViewData["Title"] = "Permissions Browser";
 
     var roles = ViewData["Roles"] as List<IdNamePair> ?? new List<IdNamePair>();
     var roleId = ViewData["RoleId"] as int?;
@@ -21,10 +14,127 @@
     var grantedCount = Model.Count(p => p.IsGranted);
 }
 
+@functions {
+    public static string GetModuleIcon(string module)
+    {
+        return (module ?? "").ToLowerInvariant() switch
+        {
+            "audit" => "fa-clipboard-check",
+            "catalog" => "fa-boxes",
+            "category" => "fa-folder-open",
+            "content" => "fa-file-alt",
+            "customer" => "fa-users",
+            "dashboard" => "fa-chart-pie",
+            "identity" => "fa-id-card",
+            "inventory" => "fa-warehouse",
+            "marketing" => "fa-bullhorn",
+            "media" => "fa-images",
+            "notification" => "fa-bell",
+            "order" => "fa-shopping-bag",
+            "payment" => "fa-credit-card",
+            "promotion" => "fa-tags",
+            "report" => "fa-chart-line",
+            "review" => "fa-star",
+            "seo" => "fa-globe",
+            "settings" => "fa-cog",
+            "shipping" => "fa-shipping-fast",
+            "support" => "fa-headset",
+            _ => "fa-layer-group"
+        };
+    }
+
+    public static string FormatModuleName(string module)
+    {
+        if (string.IsNullOrWhiteSpace(module)) return "";
+        if (module.Equals("seo", StringComparison.OrdinalIgnoreCase)) return "SEO";
+        return char.ToUpper(module[0]) + module.Substring(1).ToLower();
+    }
+}
+
+<style>
+    .perm-module-nav {
+        max-height: 620px;
+        overflow-y: auto;
+        padding: 8px;
+    }
+    .perm-nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 12px;
+        border-radius: 6px;
+        color: #495057;
+        text-decoration: none;
+        margin-bottom: 2px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.15s ease-in-out;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+    .perm-nav-item:hover {
+        background-color: #f1f3f7;
+        color: var(--brand-primary, #8E1F2F);
+    }
+    .perm-nav-item.active {
+        background-color: #ffffff;
+        color: var(--brand-primary, #8E1F2F);
+        font-weight: 600;
+        border-color: #dee2e6;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .perm-nav-item.active .mod-icon {
+        color: var(--brand-primary, #8E1F2F) !important;
+    }
+    .perm-nav-item.active .mod-counter-badge {
+        background-color: var(--brand-primary, #8E1F2F) !important;
+        color: #ffffff !important;
+        border-color: var(--brand-primary, #8E1F2F) !important;
+    }
+    .perm-nav-item.all-granted .mod-counter-badge {
+        background-color: #e6f7ff !important;
+        color: #0958d9 !important;
+        border-color: #91caff !important;
+    }
+    .perm-nav-item.partial-granted .mod-counter-badge {
+        background-color: #fff2e8 !important;
+        color: #d46b08 !important;
+        border-color: #ffd591 !important;
+    }
+    .perm-module-pane {
+        display: none;
+    }
+    .perm-module-pane.active-pane {
+        display: block;
+    }
+    .entity-card {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: #ffffff;
+        overflow: hidden;
+    }
+    .entity-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .perm-table-row {
+        transition: background-color 0.12s ease-in-out;
+    }
+    .perm-table-row:hover {
+        background-color: #fcfcfd;
+    }
+    .badge-action-create { background-color: #def7ec; color: #03543f; }
+    .badge-action-read { background-color: #e1effe; color: #1e429f; }
+    .badge-action-update { background-color: #fef08a; color: #713f12; }
+    .badge-action-delete { background-color: #fee2e2; color: #991b1b; }
+    .badge-action-export { background-color: #ede9fe; color: #5b21b6; }
+    .badge-action-default { background-color: #f3f4f6; color: #374151; }
+</style>
+
 @section Header {
     <div class="page-head">
         <div class="page-head-left">
-            <h2 class="page-title">Permissions</h2>
+            <h2 class="page-title">Permissions Directory</h2>
         </div>
         <ul class="page-breadcrumb">
             <li>User Management</li>
@@ -38,117 +148,310 @@
 }
 
 <section class="listing-section common-box">
-    <div class="latest-orders">
-        <div class="div-search-box-panel flex-ending-cls-here">
-            <div class="listing-search">
-                <div class="search-box">
-                    <span class="search-icon">
+    <!-- ================= SINGLE UNIFIED TOOLBAR ================= -->
+    <div class="p-3 border-bottom bg-white rounded-top">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 w-100">
+            <!-- Left: Search & Filter Controls -->
+            <div class="d-flex align-items-center gap-2 flex-wrap flex-grow-1" style="min-width: 280px;">
+                <!-- Search Box -->
+                <div class="position-relative" style="min-width: 240px; max-width: 340px; flex: 1 1 240px;">
+                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none;">
                         <img src="~/assets/images/search-icon.svg" width="16" height="16" alt="search">
                     </span>
-                    <input placeholder="Search module or permission key" id="txtSearch" onkeyup="filterMatrix(this);">
-                    <span class="clear-icon" id="clearSearch" onclick="clearSearch()" style="display:none; cursor:pointer;">&#10006;</span>
+                    <input placeholder="Search module, action, or key..." id="txtSearch" onkeyup="filterDirectory(this);"
+                           class="form-control rounded-pill ps-5 font-13"
+                           style="height: 40px; background: #F3F8FD; border: 1px solid #e2e8f0;">
+                    <span id="clearSearch" onclick="clearSearch()"
+                          style="display:none; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor:pointer; color: #888;">&#10006;</span>
                 </div>
-            </div>
 
-            <div class="d-flex gap-2 flex-wrap align-items-center">
-                <span class="text-muted" style="font-size:.8rem;">
-                    @grantedCount of @Model.Count granted
-                </span>
-                <form method="get" asp-controller="Permission" asp-action="Index" id="roleForm">
-                    <select name="roleId" class="form-control-custom" style="min-width:180px;"
-                            onchange="document.getElementById('roleForm').submit();">
-                        <option value="">Select a role&hellip;</option>
+                <!-- Inspect Role Select -->
+                <form method="get" asp-controller="Permission" asp-action="Index" id="roleForm" class="d-flex align-items-center gap-2 mb-0">
+                    <select name="roleId" class="form-select font-13 rounded-3" style="width: 210px; height: 40px; background-color: #fff; border: 1px solid #e2e8f0;" onchange="document.getElementById('roleForm').submit();">
+                        <option value="">All Platform Permissions...</option>
                         @foreach (var r in roles)
                         {
-                            <option value="@r.Id" selected="@(r.Id == roleId)">@r.Name</option>
+                            <option value="@r.Id" selected="@(r.Id == roleId)">Inspect: @r.Name</option>
                         }
                     </select>
                 </form>
-                <a asp-controller="Role" asp-action="Index" class="custom_button primary_button">Manage Roles</a>
+
+                @if (roleId.HasValue && roleId.Value > 0)
+                {
+                    <!-- Rights Filter -->
+                    <select id="filterGranted" class="form-select font-13 rounded-3" style="width: 140px; height: 40px; background-color: #fff; border: 1px solid #e2e8f0;" onchange="filterDirectory($('#txtSearch'))">
+                        <option value="">All Rights</option>
+                        <option value="granted">Granted Only</option>
+                        <option value="denied">Denied Only</option>
+                    </select>
+                }
+            </div>
+
+            <!-- Right: Action Buttons & Badges -->
+            <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+                <span class="small text-muted me-2" id="searchFeedback" style="display:none;"></span>
+
+                @if (roleId.HasValue && roleId.Value > 0)
+                {
+                    <span class="badge bg-primary px-3 py-2 text-white" style="font-size:0.85rem;">
+                        @grantedCount of @Model.Count granted
+                    </span>
+                    <a asp-controller="Role" asp-action="Edit" asp-route-id="@roleId.Value" class="custom_button primary_button text-nowrap">
+                        <i class="fas fa-pen me-1"></i> Edit This Role
+                    </a>
+                }
+                else
+                {
+                    <span class="badge bg-light text-dark border px-3 py-2" style="font-size:0.85rem;">
+                        Total @Model.Count capabilities
+                    </span>
+                    <a asp-controller="Role" asp-action="Index" class="custom_button secondary_button text-nowrap">
+                        <i class="fas fa-shield-alt me-1"></i> Manage Roles
+                    </a>
+                }
             </div>
         </div>
     </div>
 
-    <div class="table-main">
-        <table id="permission-grid" class="custom-datatable listing-order-table permission-matrix">
-            <thead>
-                <tr>
-                    <th style="min-width:150px;">Module</th>
-                    <th style="min-width:220px;">Permission key</th>
-                    <th style="min-width:280px;">What it allows</th>
-                    <th style="min-width:110px;" class="text-center">Granted</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
+    <!-- ================= 2-PANE EXPLORER ================= -->
+    <div class="row g-0">
+        <!-- Left Sidebar: Module Navigation -->
+        <div class="col-lg-3 col-md-4 border-end bg-light-subtle" style="border-color:#e5e7eb!important;">
+            <div class="p-2 fw-semibold text-muted small text-uppercase tracking-wider border-bottom d-flex justify-content-between">
+                <span>Modules (@grouped.Count)</span>
+                <span class="small text-muted">@(roleId.HasValue ? "Granted" : "Capabilities")</span>
+            </div>
+            <div class="perm-module-nav" id="moduleNavList">
+                @for (int i = 0; i < grouped.Count; i++)
                 {
-                    <tr>
-                        <td colspan="4" class="text-center text-muted py-4">
-                            No permissions to show. Pick a role above.
-                        </td>
-                    </tr>
-                }
-                else
-                {
-                    @foreach (var group in grouped)
+                    var group = grouped[i];
+                    var modKey = group.Key;
+                    var modSlug = modKey.ToLowerInvariant();
+                    var modCount = group.Count();
+                    var modGranted = group.Count(p => p.IsGranted);
+                    var iconClass = GetModuleIcon(modKey);
+                    var displayName = FormatModuleName(modKey);
+                    var isActive = i == 0;
+
+                    var grantStatusClass = "";
+                    if (roleId.HasValue)
                     {
-                        var first = true;
-                        @foreach (var p in group.OrderBy(x => x.Entity).ThenBy(x => x.Action))
-                        {
-                            <tr data-search="@($"{p.Module} {p.Key} {p.Description}".ToLowerInvariant())">
-                                <td>
-                                    @if (first)
-                                    {
-                                        <strong style="text-transform:capitalize;">@group.Key</strong>
-                                        <div class="text-muted" style="font-size:.72rem;">@group.Count() keys</div>
-                                        first = false;
-                                    }
-                                </td>
-                                <td><code>@p.Key</code></td>
-                                <td>@p.Description</td>
-                                <td class="text-center">
-                                    @if (p.IsGranted)
-                                    {
-                                        <span class="status-pill status-active">
-                                            <i class="fas fa-check"></i> Granted
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="status-pill status-inactive">
-                                            <i class="fas fa-minus"></i> Denied
-                                        </span>
-                                    }
-                                </td>
-                            </tr>
-                        }
+                        if (modGranted == modCount && modCount > 0) grantStatusClass = "all-granted";
+                        else if (modGranted > 0) grantStatusClass = "partial-granted";
                     }
+
+                    <a href="javascript:void(0);"
+                       class="perm-nav-item @(isActive ? "active" : "") @grantStatusClass"
+                       id="nav-item-@modSlug"
+                       data-mod-slug="@modSlug"
+                       onclick="switchModuleTab('@modSlug')">
+                        <div class="d-flex align-items-center gap-2 text-truncate">
+                            <i class="fas @iconClass mod-icon text-muted"></i>
+                            <span class="mod-name text-truncate">@displayName</span>
+                        </div>
+                        <span class="badge rounded-pill bg-light text-dark border mod-counter-badge" id="badge-@modSlug">
+                            @if (roleId.HasValue)
+                            {
+                                <span>@modGranted/@modCount</span>
+                            }
+                            else
+                            {
+                                <span>@modCount</span>
+                            }
+                        </span>
+                    </a>
                 }
-            </tbody>
-        </table>
+            </div>
+        </div>
+
+        <!-- Right Panel: Capabilities Detail -->
+        <div class="col-lg-9 col-md-8 p-3 p-md-4 bg-white" style="min-height: 540px;" id="permPanesContainer">
+            @for (int i = 0; i < grouped.Count; i++)
+            {
+                var group = grouped[i];
+                var modKey = group.Key;
+                var modSlug = modKey.ToLowerInvariant();
+                var modItems = group.OrderBy(p => p.Entity).ThenBy(p => p.Action).ToList();
+                var entityGroups = modItems.GroupBy(p => p.Entity).OrderBy(eg => eg.Key).ToList();
+                var iconClass = GetModuleIcon(modKey);
+                var displayName = FormatModuleName(modKey);
+                var modGranted = modItems.Count(p => p.IsGranted);
+                var isActive = i == 0;
+
+                <div class="perm-module-pane @(isActive ? "active-pane" : "")" id="pane-@modSlug" data-mod-slug="@modSlug">
+                    <!-- Module Header -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pb-3 mb-3 border-bottom">
+                        <div>
+                            <h4 class="mb-1 fw-bold text-dark d-flex align-items-center gap-2">
+                                <i class="fas @iconClass text-primary"></i>
+                                <span>@displayName Capabilities</span>
+                            </h4>
+                            <p class="text-muted small mb-0">Total @modItems.Count permissions across @entityGroups.Count functional entities.</p>
+                        </div>
+                        @if (roleId.HasValue)
+                        {
+                            <div>
+                                <span class="badge @(modGranted == modItems.Count ? "bg-success" : "bg-light text-dark border") px-3 py-2">
+                                    <i class="fas fa-check-circle me-1"></i> @modGranted / @modItems.Count Granted for @roleName
+                                </span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Entity Groups -->
+                    <div class="entity-groups-wrapper">
+                        @foreach (var eg in entityGroups)
+                        {
+                            var entityName = eg.Key;
+                            var entItems = eg.ToList();
+
+                            <div class="entity-card mb-3 shadow-none" data-entity-name="@entityName.ToLowerInvariant()">
+                                <div class="entity-header py-2 px-3 d-flex justify-content-between align-items-center">
+                                    <div class="fw-semibold text-dark d-flex align-items-center gap-2">
+                                        <i class="fas fa-cube text-secondary font-12"></i>
+                                        <span>@entityName</span>
+                                    </div>
+                                    <span class="badge bg-white text-muted border font-11">@entItems.Count capabilities</span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-borderless mb-0 align-middle">
+                                        <tbody>
+                                            @foreach (var p in entItems)
+                                            {
+                                                var actionLower = p.Action.ToLowerInvariant();
+                                                var actionColorClass = actionLower switch {
+                                                    "create" or "add" => "badge-action-create",
+                                                    "read" or "view" or "list" or "detail" => "badge-action-read",
+                                                    "update" or "edit" => "badge-action-update",
+                                                    "delete" or "remove" => "badge-action-delete",
+                                                    "export" or "download" => "badge-action-export",
+                                                    _ => "badge-action-default"
+                                                };
+
+                                                <tr class="perm-table-row border-bottom perm-item-row"
+                                                    data-search="@($"{p.Module} {p.Key} {p.Description} {p.Entity} {p.Action}".ToLowerInvariant())"
+                                                    data-granted="@(p.IsGranted ? "granted" : "denied")">
+                                                    <td style="width: 110px;" class="ps-3">
+                                                        <span class="badge @actionColorClass px-2 py-1">@p.Action</span>
+                                                    </td>
+                                                    <td style="width: 250px;">
+                                                        <code class="font-12 text-primary">@p.Key</code>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-muted small">@(string.IsNullOrWhiteSpace(p.Description) ? $"{p.Action} capability on {p.Entity}" : p.Description)</span>
+                                                    </td>
+                                                    <td style="width: 110px;" class="text-end pe-3">
+                                                        @if (roleId.HasValue && roleId.Value > 0)
+                                                        {
+                                                            if (p.IsGranted)
+                                                            {
+                                                                <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1">
+                                                                    <i class="fas fa-check-circle me-1"></i> Granted
+                                                                </span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge bg-light text-muted border px-2 py-1">
+                                                                    <i class="fas fa-times-circle me-1"></i> Denied
+                                                                </span>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-light text-secondary border px-2 py-1">
+                                                                <i class="fas fa-check me-1 text-success"></i> Active
+                                                            </span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 </section>
 
 @section Scripts {
     <script>
+        let currentSelectedMod = '@(grouped.FirstOrDefault()?.Key.ToLowerInvariant() ?? "")';
+        let isSearching = false;
+
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-AdminUser"); }
         });
 
-        function filterMatrix(ctrl) {
-            var term = ($(ctrl).val() || '').toLowerCase();
-            $("#clearSearch").toggle(term.length > 0);
+        function switchModuleTab(modSlug) {
+            currentSelectedMod = modSlug;
 
-            $('#permission-grid tbody tr').each(function () {
-                var hay = $(this).data('search') || '';
-                $(this).toggle(hay.indexOf(term) > -1);
+            if (isSearching) {
+                clearSearch();
+                return;
+            }
+
+            $('.perm-nav-item').removeClass('active');
+            $('#nav-item-' + modSlug).addClass('active');
+
+            $('.perm-module-pane').removeClass('active-pane');
+            $('#pane-' + modSlug).addClass('active-pane');
+        }
+
+        function filterDirectory(ctrl) {
+            const query = ($(ctrl).val() || '').toLowerCase().trim();
+            const grantedFilter = $('#filterGranted').val() || '';
+
+            if (!query && !grantedFilter) {
+                clearSearch();
+                return;
+            }
+
+            isSearching = true;
+            $('#clearSearch').show();
+
+            let matchCount = 0;
+
+            $('.perm-item-row').each(function () {
+                const text = $(this).data('search') || '';
+                const grantedState = $(this).data('granted') || '';
+
+                const matchesText = !query || text.indexOf(query) !== -1;
+                const matchesGranted = !grantedFilter || grantedState === grantedFilter;
+                const match = matchesText && matchesGranted;
+
+                $(this).toggle(match);
+                if (match) matchCount++;
             });
+
+            $('.entity-card').each(function () {
+                const visibleRows = $(this).find('.perm-item-row:visible').length;
+                $(this).toggle(visibleRows > 0);
+            });
+
+            $('.perm-module-pane').each(function () {
+                const visibleRows = $(this).find('.perm-item-row:visible').length;
+                $(this).toggleClass('active-pane', visibleRows > 0);
+            });
+
+            $('#searchFeedback').text(matchCount + ' permission(s) matched.').show();
         }
 
         function clearSearch() {
+            isSearching = false;
             $('#txtSearch').val('');
             $('#clearSearch').hide();
-            $('#permission-grid tbody tr').show();
+            $('#searchFeedback').hide();
+
+            $('.perm-item-row, .entity-card').show();
+            $('.perm-module-pane').removeClass('active-pane');
+            $('#pane-' + currentSelectedMod).addClass('active-pane');
+            $('.perm-nav-item').removeClass('active');
+            $('#nav-item-' + currentSelectedMod).addClass('active');
         }
     </script>
 }
+
