@@ -127,6 +127,16 @@ public class DemoAdminClient : IAdminClient
             var e when e.Contains("Artisan", StringComparison.OrdinalIgnoreCase) =>
                 DemoData.Artisans().Select(a => new IdNamePair { Id = a.Id, Name = a.Name }),
 
+            var e when e.Contains("Variant", StringComparison.OrdinalIgnoreCase) =>
+                new[]
+                {
+                    new IdNamePair { Id = 1, Name = "Small (CH-TEX-003-S)", ParentId = 3 },
+                    new IdNamePair { Id = 2, Name = "Large (CH-TEX-003-L)", ParentId = 3 }
+                }.AsEnumerable(),
+
+            var e when e.Contains("Product", StringComparison.OrdinalIgnoreCase) =>
+                ProductRows().Select(p => new IdNamePair { Id = p.Id, Name = $"{p.Name} ({p.Sku})" }),
+
             _ => Enumerable.Empty<IdNamePair>()
         };
 
@@ -690,6 +700,109 @@ public class DemoAdminClient : IAdminClient
     public Task<ResponseViewModel<bool>> SaveProfileAsync(
         AdminProfileViewModel request, CancellationToken ct = default) =>
         Task.FromResult(Ok(true));
+
+    #endregion
+
+    #region Inventory Management
+
+    public Task<ResponseViewModel<InventoryKpiSummaryViewModel>> GetInventoryKpisAsync(CancellationToken ct = default) =>
+        Task.FromResult(Ok(new InventoryKpiSummaryViewModel
+        {
+            TotalOnHandUnits = 1420,
+            TotalReservedUnits = 85,
+            TotalIncomingUnits = 210,
+            LowStockCount = 4,
+            OutOfStockCount = 1,
+            TotalValuation = 485000,
+            TotalSkus = 120,
+            InStockCount = 115
+        }));
+
+    public Task<ResponseViewModel<List<InventoryTransactionViewModel>>> GetInventoryLedgerAsync(int? productId = null, int? warehouseId = null, int maxRows = 100, CancellationToken ct = default) =>
+        Task.FromResult(Ok(new List<InventoryTransactionViewModel>()));
+
+    public Task<ResponseViewModel<InventoryDetailViewModel>> GetInventoryDetailAsync(long id, CancellationToken ct = default) =>
+        Task.FromResult(Ok(new InventoryDetailViewModel
+        {
+            Id = id,
+            ProductName = "Sample Handcrafted Item",
+            Sku = "CH-001",
+            WarehouseName = "Main Hub",
+            OnHand = 50,
+            LowStockThreshold = 10
+        }));
+
+    public Task<ResponseViewModel<long>> SaveStockAsync(StockSaveRequest request, CancellationToken ct = default) =>
+        Task.FromResult(ResponseViewModel<long>.Success(1, "Stock saved successfully."));
+
+    public Task<ResponseViewModel<bool>> DeleteStockAsync(long id, CancellationToken ct = default) =>
+        Task.FromResult(ResponseViewModel<bool>.Success(true, "Stock record deleted."));
+
+    public Task<ResponseViewModel<WarehouseDetailViewModel>> GetWarehouseDetailAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(Ok(new WarehouseDetailViewModel
+        {
+            Id = id,
+            WarehouseName = "Main Warehouse",
+            Code = "WH-MAIN",
+            City = "Ahmedabad",
+            StateName = "Gujarat"
+        }));
+
+    public Task<ResponseViewModel<SupplierDetailViewModel>> GetSupplierDetailAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(Ok(new SupplierDetailViewModel
+        {
+            Id = id,
+            SupplierName = "Rajasthan Crafts Co.",
+            ContactPerson = "Rajesh Sharma",
+            Email = "rajesh@craftsco.in"
+        }));
+
+    public Task<ResponseViewModel<PurchaseOrderDetailViewModel>> GetPurchaseDetailAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(Ok(new PurchaseOrderDetailViewModel
+        {
+            Id = id,
+            PoNumber = "PO-2026-0001",
+            SupplierName = "Rajasthan Crafts Co.",
+            WarehouseName = "Main Warehouse",
+            Status = "Ordered",
+            TotalAmount = 25000
+        }));
+
+    public Task<ResponseViewModel<bool>> ReceivePurchaseOrderAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(ResponseViewModel<bool>.Success(true, "Purchase order marked as received."));
+
+    public Task<ResponseViewModel<StockAdjustmentDetailViewModel>> GetStockAdjustmentDetailAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(Ok(new StockAdjustmentDetailViewModel
+        {
+            Id = id,
+            AdjustmentNumber = "ADJ-2026-0001",
+            WarehouseName = "Main Warehouse",
+            Reason = "Physical Count Reconciliation"
+        }));
+
+    public Task<ResponseViewModel<StockTransferDetailViewModel>> GetStockTransferDetailAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(Ok(new StockTransferDetailViewModel
+        {
+            Id = id,
+            TransferNumber = "TRF-2026-0001",
+            FromWarehouseName = "Main Hub",
+            ToWarehouseName = "Secondary Depot",
+            Status = "Draft"
+        }));
+
+    public Task<ResponseViewModel<StockRateDetailViewModel>> GetStockRateDetailAsync(int productId, int? variantId = null, CancellationToken ct = default) =>
+        Task.FromResult(Ok(new StockRateDetailViewModel
+        {
+            ProductId = productId,
+            ProductName = "Sample Handcrafted Item",
+            CostPrice = 250,
+            Price = 500,
+            Mrp = 600,
+            TotalOnHand = 50
+        }));
+
+    public Task<ResponseViewModel<bool>> SaveStockRateAsync(StockRateSaveRequest request, CancellationToken ct = default) =>
+        Task.FromResult(ResponseViewModel<bool>.Success(true, "Stock rate updated successfully."));
 
     #endregion
 }

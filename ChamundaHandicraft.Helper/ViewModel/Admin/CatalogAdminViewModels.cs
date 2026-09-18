@@ -107,6 +107,7 @@ public class ProductSaveRequest
     public decimal? WeightGrams { get; set; }
 
     // Inventory
+    public int? WarehouseId { get; set; }
     public int StockQuantity { get; set; } = 10;
     public bool TrackInventory { get; set; } = true;
     public int? LowStockThreshold { get; set; } = 5;
@@ -240,6 +241,7 @@ public class ArtisanSaveRequest
 /// <summary>Inventory row. The only source the storefront may quote stock from.</summary>
 public class StockGridItem
 {
+    public long Id { get; set; }
     public int ProductId { get; set; }
     public int? VariantId { get; set; }
     public string ProductName { get; set; } = string.Empty;
@@ -305,6 +307,7 @@ public class ProductLookupsViewModel
     public List<IdNamePair> TaxClasses { get; set; } = new();
     public List<IdNamePair> Attributes { get; set; } = new();
     public List<IdNamePair> Products { get; set; } = new();
+    public List<IdNamePair> Warehouses { get; set; } = new();
 }
 
 public class ProductRelationItem

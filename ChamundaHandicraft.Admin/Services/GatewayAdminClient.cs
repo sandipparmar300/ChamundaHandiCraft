@@ -98,6 +98,62 @@ public class GatewayAdminClient : IAdminClient
 
     #endregion
 
+    #region Inventory Management
+
+    public Task<ResponseViewModel<InventoryKpiSummaryViewModel>> GetInventoryKpisAsync(CancellationToken ct = default) =>
+        _api.GetAsync<InventoryKpiSummaryViewModel>(ApiEndPoint.Inventory.Kpis, null, ct);
+
+    public Task<ResponseViewModel<List<InventoryTransactionViewModel>>> GetInventoryLedgerAsync(int? productId = null, int? warehouseId = null, int maxRows = 100, CancellationToken ct = default)
+    {
+        var query = new Dictionary<string, string?>
+        {
+            ["maxRows"] = maxRows.ToString()
+        };
+        if (productId.HasValue) query["productId"] = productId.Value.ToString();
+        if (warehouseId.HasValue) query["warehouseId"] = warehouseId.Value.ToString();
+
+        return _api.GetAsync<List<InventoryTransactionViewModel>>(ApiEndPoint.Inventory.Ledger, query, ct);
+    }
+
+    public Task<ResponseViewModel<InventoryDetailViewModel>> GetInventoryDetailAsync(long id, CancellationToken ct = default) =>
+        _api.GetAsync<InventoryDetailViewModel>(ApiEndPoint.Inventory.Details, new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
+    public Task<ResponseViewModel<long>> SaveStockAsync(StockSaveRequest request, CancellationToken ct = default) =>
+        _api.PostAsync<long>(ApiEndPoint.Inventory.Save, request, ct);
+
+    public Task<ResponseViewModel<bool>> DeleteStockAsync(long id, CancellationToken ct = default) =>
+        _api.DeleteAsync<bool>(ApiEndPoint.Inventory.Delete, new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
+    public Task<ResponseViewModel<WarehouseDetailViewModel>> GetWarehouseDetailAsync(int id, CancellationToken ct = default) =>
+        _api.GetAsync<WarehouseDetailViewModel>(ApiEndPoint.Warehouse.GridList.Replace("GridList", "Details"), new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
+    public Task<ResponseViewModel<SupplierDetailViewModel>> GetSupplierDetailAsync(int id, CancellationToken ct = default) =>
+        _api.GetAsync<SupplierDetailViewModel>(ApiEndPoint.Supplier.GridList.Replace("GridList", "Details"), new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
+    public Task<ResponseViewModel<PurchaseOrderDetailViewModel>> GetPurchaseDetailAsync(int id, CancellationToken ct = default) =>
+        _api.GetAsync<PurchaseOrderDetailViewModel>(ApiEndPoint.Purchase.GetById, new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
+    public Task<ResponseViewModel<bool>> ReceivePurchaseOrderAsync(int id, CancellationToken ct = default) =>
+        _api.PostAsync<bool>($"{ApiEndPoint.Purchase.ReceiveStock}?id={id}", null, ct);
+
+    public Task<ResponseViewModel<StockAdjustmentDetailViewModel>> GetStockAdjustmentDetailAsync(int id, CancellationToken ct = default) =>
+        _api.GetAsync<StockAdjustmentDetailViewModel>(ApiEndPoint.StockAdjustment.GetById, new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
+    public Task<ResponseViewModel<StockTransferDetailViewModel>> GetStockTransferDetailAsync(int id, CancellationToken ct = default) =>
+        _api.GetAsync<StockTransferDetailViewModel>(ApiEndPoint.StockTransfer.GetById, new Dictionary<string, string?> { ["id"] = id.ToString() }, ct);
+
+    public Task<ResponseViewModel<StockRateDetailViewModel>> GetStockRateDetailAsync(int productId, int? variantId = null, CancellationToken ct = default)
+    {
+        var query = new Dictionary<string, string?> { ["productId"] = productId.ToString() };
+        if (variantId.HasValue) query["variantId"] = variantId.Value.ToString();
+        return _api.GetAsync<StockRateDetailViewModel>(ApiEndPoint.StockRate.GetById, query, ct);
+    }
+
+    public Task<ResponseViewModel<bool>> SaveStockRateAsync(StockRateSaveRequest request, CancellationToken ct = default) =>
+        _api.PostAsync<bool>(ApiEndPoint.StockRate.Save, request, ct);
+
+    #endregion
+
     #region Orders
 
     public Task<ResponseViewModel<PagedResult<OrderGridItem>>> GetOrdersAsync(

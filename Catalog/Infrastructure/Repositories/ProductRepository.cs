@@ -189,7 +189,8 @@ public class ProductRepository : IProductRepository
                 MediaJson = mediaJson,
                 VariantsJson = variantsJson,
                 RelatedJson = relatedJson,
-                AdminUserId = adminUserId
+                AdminUserId = adminUserId,
+                WarehouseId = request.WarehouseId
             },
             commandType: CommandType.StoredProcedure);
     }
@@ -230,5 +231,28 @@ public class ProductRepository : IProductRepository
         };
 
         return lookups;
+    }
+
+    public async Task<List<IdNamePair>> GetLookupAsync(CancellationToken ct = default)
+    {
+        using var connection = CreateConnection();
+        var sql = @"SELECT Id, CONCAT(Name, ' (', ISNULL(Sku, 'No SKU'), ')') AS Name 
+                    FROM dbo.Products 
+                    WHERE IsDeleted = 0 
+                    ORDER BY Name";
+        var items = await connection.QueryAsync<IdNamePair>(sql);
+        return items.AsList();
+    }
+
+    public async Task<List<IdNamePair>> GetVariantsLookupAsync(int? productId = null, CancellationToken ct = default)
+    {
+        using var connection = CreateConnection();
+        var sql = @"SELECT Id, ProductId AS ParentId, CONCAT(ISNULL(VariantSummary, Sku), ' (', Sku, ')') AS Name 
+                    FROM dbo.ProductVariants 
+                    WHERE IsDeleted = 0 
+                      AND (@ProductId IS NULL OR ProductId = @ProductId)
+                    ORDER BY Id";
+        var items = await connection.QueryAsync<IdNamePair>(sql, new { ProductId = productId });
+        return items.AsList();
     }
 }

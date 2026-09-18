@@ -209,13 +209,17 @@ public class StockTakeGridItem : AuditableViewModel, IAdminGridRow
 {
     public int Id { get; set; }
     public string StockTakeNumber { get; set; } = string.Empty;
+    public int WarehouseId { get; set; }
     public string WarehouseName { get; set; } = string.Empty;
-    public DateTime StartedOn { get; set; }
+    public DateTime StartedOn { get; set; } = DateTime.UtcNow;
     public DateTime? CompletedOn { get; set; }
     public int SkusCounted { get; set; }
     public int DiscrepancyCount { get; set; }
     public decimal DiscrepancyValue { get; set; }
     public string Status { get; set; } = "In Progress";
+    public string? Note { get; set; }
+    public string? Remarks { get => Note; set => Note = value; }
+    public string? CountType { get; set; }
 
     public bool IsActive => Status != "Cancelled";
     public string DisplayName => StockTakeNumber;

@@ -11,4 +11,6 @@ public interface IProductService
     Task<ResponseViewModel<bool>> DeleteAsync(int id, int? adminUserId = null, CancellationToken ct = default);
     Task<ResponseViewModel<bool>> UpdateStatusAsync(UpdateStatusRequest request, int? adminUserId = null, CancellationToken ct = default);
     Task<ResponseViewModel<ProductLookupsViewModel>> GetLookupsAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<List<IdNamePair>>> GetLookupAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<List<IdNamePair>>> GetVariantsLookupAsync(int? productId = null, CancellationToken ct = default);
 }

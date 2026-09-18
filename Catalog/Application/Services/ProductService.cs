@@ -127,4 +127,32 @@ public class ProductService : IProductService
             return ResponseViewModel<ProductLookupsViewModel>.Fail("An error occurred while fetching product lookups.");
         }
     }
+
+    public async Task<ResponseViewModel<List<IdNamePair>>> GetLookupAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            var data = await _repository.GetLookupAsync(ct);
+            return ResponseViewModel<List<IdNamePair>>.Success(data);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving product lookup.");
+            return ResponseViewModel<List<IdNamePair>>.Fail("An error occurred while fetching product list.");
+        }
+    }
+
+    public async Task<ResponseViewModel<List<IdNamePair>>> GetVariantsLookupAsync(int? productId = null, CancellationToken ct = default)
+    {
+        try
+        {
+            var data = await _repository.GetVariantsLookupAsync(productId, ct);
+            return ResponseViewModel<List<IdNamePair>>.Success(data);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving product variants lookup.");
+            return ResponseViewModel<List<IdNamePair>>.Fail("An error occurred while fetching product variants.");
+        }
+    }
 }

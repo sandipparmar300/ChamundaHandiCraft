@@ -1,6 +1,6 @@
-@model WarehouseGridItem
+﻿@model ChamundaHandicraft.Helper.ViewModel.Admin.WarehouseDetailViewModel
 @{
-    ViewData["Title"] = "Warehouse Details";
+    ViewData["Title"] = $"Warehouse: {Model.WarehouseName}";
 }
 
 @section Header {
@@ -13,89 +13,112 @@
         </div>
         <ul class="page-breadcrumb">
             <li><a asp-controller="Warehouse" asp-action="Index" class="links">Warehouses Listing</a></li>
-            <li>Details</li>
+            <li>@Model.WarehouseName</li>
         </ul>
     </div>
 }
 
 <main class="page-content">
+    <div class="row g-4">
+        <!-- Summary Card -->
+        <div class="col-lg-4 col-md-12">
+            <div class="common-box p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width:56px; height:56px; color:var(--accent);">
+                        <i class="fas fa-warehouse fa-2x"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold">@Model.WarehouseName</h4>
+                        <span class="badge bg-secondary font-12">@Model.Code</span>
+                        @if (Model.IsDefault)
+                        {
+                            <span class="badge bg-primary font-12 ms-1">Default Warehouse</span>
+                        }
+                    </div>
+                </div>
 
-    <section class="form-section">
-        <div class="form-section-header d-flex justify-content-between align-items-center">
-            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Warehouse Information</h2>
-            <a asp-controller="Warehouse" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
-        </div>
+                <hr class="my-3" />
 
-        <div class="form-section-body">
-            <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Warehouse Code</label>
-                        <p class="detail-value">@Model.Code</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Warehouse Name</label>
-                        <p class="detail-value">@Model.WarehouseName</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Contact Person</label>
-                        <p class="detail-value">@(Model.ContactPerson ?? "—")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Phone</label>
-                        <p class="detail-value">@(Model.Phone ?? "—")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Email</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Address</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">City</label>
-                        <p class="detail-value">@Model.City</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">State</label>
-                        <p class="detail-value">@Model.State</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Country</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Postal Code</label>
-                        <p class="detail-value">@Model.Pincode</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Total Products</label>
-                        <p class="detail-value">@Model.SkuCount</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Stock Value</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Low Stock</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Reserved Stock</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Pending Purchase</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <p class="detail-value">@(Model.IsActive ? "Active" : "Inactive")</p>
-                    </div>
+                <div class="mb-2">
+                    <span class="text-muted font-12 d-block">Status</span>
+                    @await Html.PartialAsync("_StatusPill", Model.IsActive)
+                </div>
+
+                <div class="mb-2">
+                    <span class="text-muted font-12 d-block">Total Products / SKUs</span>
+                    <strong class="fs-5">@Model.TotalStockItems</strong>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted font-12 d-block">Total On-Hand Units</span>
+                    <strong class="fs-5 text-success">@Model.TotalOnHandUnits.ToString("N0")</strong>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a asp-controller="Warehouse" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button primary_button text-center">
+                        <i class="fas fa-pen me-1"></i> Edit Warehouse
+                    </a>
+                    <a asp-controller="Inventory" asp-action="Index" asp-route-warehouseId="@Model.Id" class="btn btn-outline-secondary">
+                        <i class="fas fa-boxes me-1"></i> View Stock In Warehouse
+                    </a>
+                </div>
             </div>
         </div>
-    </section>
 
+        <!-- Details Card -->
+        <div class="col-lg-8 col-md-12">
+            <div class="common-box p-4">
+                <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="fas fa-info-circle me-2" style="color:var(--accent);"></i>Contact &amp; Location Information</h5>
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="text-muted font-12 d-block">Contact Person</label>
+                        <span class="fw-semibold">@(Model.ContactPerson ?? "—")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted font-12 d-block">Phone</label>
+                        <span class="fw-semibold">@(Model.Phone ?? "—")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted font-12 d-block">Email</label>
+                        <span class="fw-semibold">@(Model.Email ?? "—")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted font-12 d-block">Pincode</label>
+                        <span class="fw-semibold">@(Model.Pincode ?? "—")</span>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="text-muted font-12 d-block">Address</label>
+                        <span class="fw-semibold">@(Model.AddressLine1 ?? "—")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted font-12 d-block">City</label>
+                        <span class="fw-semibold">@(Model.City ?? "—")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted font-12 d-block">State</label>
+                        <span class="fw-semibold">@(Model.StateName ?? "—")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted font-12 d-block">Created On</label>
+                        <span class="fw-semibold">@Model.CreatedOn.ToString("dd MMM yyyy, hh:mm tt")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted font-12 d-block">Last Updated</label>
+                        <span class="fw-semibold">@(Model.UpdatedOn?.ToString("dd MMM yyyy, hh:mm tt") ?? "—")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
 @section Scripts {

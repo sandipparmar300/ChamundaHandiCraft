@@ -127,9 +127,9 @@ BEGIN
     );
 
     CREATE UNIQUE INDEX UX_InventoryStocks_WithVariant ON dbo.InventoryStocks (ProductId, VariantId, WarehouseId)
-        WHERE VariantId IS NOT NULL;
+        WHERE VariantId IS NOT NULL AND IsDeleted = 0;
     CREATE UNIQUE INDEX UX_InventoryStocks_NoVariant ON dbo.InventoryStocks (ProductId, WarehouseId)
-        WHERE VariantId IS NULL;
+        WHERE VariantId IS NULL AND IsDeleted = 0;
     CREATE INDEX IX_InventoryStocks_Product ON dbo.InventoryStocks (ProductId) INCLUDE (OnHand, Reserved, LowStockThreshold);
 END
 GO

@@ -1,8 +1,12 @@
-@model StockAdjustmentGridItem
+@model ChamundaHandicraft.Helper.ViewModel.Admin.StockAdjustmentSaveRequest
 @{
-    ViewData["Title"] = "Stock Adjustment";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
-    var heading = isEdit ? "Edit Stock Adjustment" : "Add Stock Adjustment";
+    var isEdit = Model.Id > 0;
+    var heading = isEdit ? "Edit Stock Adjustment" : "Record Stock Adjustment";
+    ViewData["Title"] = heading;
+    var warehouses = ViewBag.Warehouses as List<IdNamePair> ?? new List<IdNamePair>();
+    var reasons = ViewBag.ReasonCodes as List<IdNamePair> ?? new List<IdNamePair>();
+    var products = ViewBag.Products as List<IdNamePair> ?? new List<IdNamePair>();
+    var variants = ViewBag.Variants as List<IdNamePair> ?? new List<IdNamePair>();
 }
 
 @section Header {
@@ -14,7 +18,7 @@
             <h2 class="page-title">@heading</h2>
         </div>
         <ul class="page-breadcrumb">
-            <li><a asp-controller="StockAdjustment" asp-action="Index" class="links">Stock Adjustments Listing</a></li>
+            <li><a asp-controller="StockAdjustment" asp-action="Index" class="links">Stock Adjustments</a></li>
             <li>@heading</li>
         </ul>
     </div>
@@ -22,104 +26,99 @@
 
 <main class="page-content">
 
-    <form method="post" id="stockadjustmentForm" enctype="multipart/form-data">
-
-        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+    <form method="post" asp-action="Save" asp-controller="StockAdjustment" id="stockAdjustmentForm" novalidate>
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
 
         <section class="form-section">
             <div class="form-section-header">
-                <h2><i class="fas fa-pen-to-square" style="color:var(--accent);margin-right:8px;"></i>Adjustment Information</h2>
+                <h2><i class="fas fa-sliders-h" style="color:var(--accent);margin-right:8px;"></i>Stock Adjustment Details</h2>
             </div>
 
             <div class="form-section-body">
                 <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Adjustment Number <span class="req">*</span></label>
-                        <input id="AdjustmentNumber" name="AdjustmentNumber" class="form-control-custom" placeholder="Enter adjustment number" / value="@Model.AdjustmentNumber" >
-                        <span class="error-msg" data-valmsg-for="AdjustmentNumber"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Date <span class="req">*</span></label>
-                        <input type="date" id="Date" name="Date" class="form-control-custom" />
-                        <span class="error-msg" data-valmsg-for="Date"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Product <span class="req">*</span></label>
-                        <select id="Product" name="Product" class="form-control-custom select2-single">
-                            <option value="">Select product</option>
-                            <option>Select from catalog</option>
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="WarehouseId" class="form-label-custom">Warehouse <span class="req">*</span></label>
+                        <select asp-for="WarehouseId" class="form-control-custom select2-single" id="ddlWarehouse" required>
+                            <option value="">-- Select Warehouse --</option>
+                            @foreach (var wh in warehouses)
+                            {
+                                <option value="@wh.Id" selected="@(Model.WarehouseId == wh.Id ? "selected" : null)">@wh.Name</option>
+                            }
                         </select>
-                        <span class="error-msg" data-valmsg-for="Product"></span>
+                        <span asp-validation-for="WarehouseId" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Warehouse <span class="req">*</span></label>
-                        <select id="Warehouse" name="Warehouse" class="form-control-custom select2-single">
-                            <option value="">Select warehouse</option>
-                            <option>Select from master</option>
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="ProductId" class="form-label-custom">Select Product <span class="req">*</span></label>
+                        <select asp-for="ProductId" class="form-control-custom select2-single" id="ddlProduct" required>
+                            <option value="">-- Search &amp; Select Product --</option>
+                            @foreach (var prod in products)
+                            {
+                                <option value="@prod.Id" selected="@(Model.ProductId == prod.Id ? "selected" : null)">@prod.Name</option>
+                            }
                         </select>
-                        <span class="error-msg" data-valmsg-for="Warehouse"></span>
+                        <span asp-validation-for="ProductId" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Previous Quantity</label>
-                        <input type="number" id="PreviousQuantity" name="PreviousQuantity" class="form-control-custom" placeholder="0" />
-                        <span class="error-msg" data-valmsg-for="PreviousQuantity"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">New Quantity <span class="req">*</span></label>
-                        <input type="number" id="NewQuantity" name="NewQuantity" class="form-control-custom" placeholder="0" />
-                        <span class="error-msg" data-valmsg-for="NewQuantity"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Difference</label>
-                        <input type="number" id="Difference" name="Difference" class="form-control-custom" placeholder="0" />
-                        <span class="error-msg" data-valmsg-for="Difference"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Reason <span class="req">*</span></label>
-                        <select id="Reason" name="Reason" class="form-control-custom select2-single">
-                            <option value="">Select reason</option>
-                            <option>Manual Correction</option>
-                            <option>Physical Verification</option>
-                            <option>Counting Error</option>
-                            <option>Lost Stock</option>
-                            <option>Extra Stock</option>
-                            <option>System Correction</option>
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="VariantId" class="form-label-custom">Product Variant (Optional)</label>
+                        <select asp-for="VariantId" class="form-control-custom select2-single" id="ddlVariant">
+                            <option value="">-- Base Product / No Variant --</option>
+                            @foreach (var v in variants)
+                            {
+                                <option value="@v.Id" data-product-id="@v.ParentId" selected="@(Model.VariantId == v.Id ? "selected" : null)">@v.Name</option>
+                            }
                         </select>
-                        <span class="error-msg" data-valmsg-for="Reason"></span>
+                        <span asp-validation-for="VariantId" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-lg-12 col-md-6">
-                        <label class="form-label-custom">Remarks</label>
-                        <textarea id="Remarks" name="Remarks" class="form-control-custom" rows="3" placeholder="Enter remarks"></textarea>
-                        <span class="error-msg" data-valmsg-for="Remarks"></span>
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="QuantityBefore" class="form-label-custom">System / Expected Quantity</label>
+                        <input asp-for="QuantityBefore" type="number" class="form-control-custom" id="qtyBefore" placeholder="0" oninput="onQtyBeforeChange()" />
+                        <span asp-validation-for="QuantityBefore" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="QuantityAfter" class="form-label-custom">Physical Count / New Quantity <span class="req">*</span></label>
+                        <input asp-for="QuantityAfter" type="number" class="form-control-custom" id="qtyAfter" placeholder="0" oninput="onQtyAfterChange()" required />
+                        <span asp-validation-for="QuantityAfter" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="QuantityChange" class="form-label-custom">Quantity Change (+ / -) <span class="req">*</span></label>
+                        <input asp-for="QuantityChange" type="number" class="form-control-custom fw-bold" id="qtyChange" placeholder="e.g. +5 or -2" oninput="onQtyChangeInput()" required />
+                        <span asp-validation-for="QuantityChange" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label asp-for="ReasonCodeId" class="form-label-custom">Adjustment Reason <span class="req">*</span></label>
+                        <select asp-for="ReasonCodeId" class="form-control-custom select2-single" id="ddlReasonCode" required>
+                            <option value="">-- Select Adjustment Reason --</option>
+                            @foreach (var r in reasons)
+                            {
+                                <option value="@r.Id" selected="@(Model.ReasonCodeId == r.Id ? "selected" : null)">@r.Name</option>
+                            }
+                        </select>
+                        <input type="hidden" asp-for="Reason" id="hdnReason" />
+                        <span asp-validation-for="ReasonCodeId" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-12">
+                        <label asp-for="Note" class="form-label-custom">Remarks / Explanation</label>
+                        <input asp-for="Note" class="form-control-custom" placeholder="Optional audit notes..." />
+                        <span asp-validation-for="Note" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
                 </div>
             </div>
         </section>
 
         <div class="form-action-bar">
-            <div class="is-active-row" id="isActiveRow">
-                <div class="is-toggle-item" id="isToggleItem">
-                    <span class="ia-label">Is Active</span>
-                    <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
-                        <span class="ia-slider"></span>
-                    </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
-                </div>
-            </div>
-
+            <div></div>
             <div>
                 <a asp-controller="StockAdjustment" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save">
-                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> Post Adjustment
                 </button>
             </div>
         </div>
@@ -129,17 +128,117 @@
 </main>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
-            $('#uploadBox').click(function () { $('#Photo').click(); });
+            onQtyAfterChange();
+
+            $('#ddlWarehouse, #ddlProduct, #ddlVariant').on('change', function () {
+                var whId = $('#ddlWarehouse').val();
+                var prodId = $('#ddlProduct').val();
+                var varId = $('#ddlVariant').val();
+
+                if ($(this).attr('id') === 'ddlProduct') {
+                    filterVariants(prodId);
+                }
+
+                if (whId && prodId) {
+                    fetchCurrentStock(whId, prodId, varId);
+                }
+            });
+
+            $('#ddlReasonCode').on('change', function () {
+                var txt = $(this).find('option:selected').text();
+                if ($(this).val()) {
+                    $('#hdnReason').val(txt);
+                } else {
+                    $('#hdnReason').val('');
+                }
+            });
+
+            var initReason = $('#ddlReasonCode').val();
+            if (initReason) {
+                $('#hdnReason').val($('#ddlReasonCode option:selected').text());
+            }
+
+            var initProdId = $('#ddlProduct').val();
+            if (initProdId) {
+                filterVariants(initProdId);
+                var initWhId = $('#ddlWarehouse').val();
+                if (initWhId) {
+                    fetchCurrentStock(initWhId, initProdId, $('#ddlVariant').val());
+                }
+            }
         });
 
-        function previewUpload(input) {
-            if (!input.files || !input.files[0]) return;
-            var reader = new FileReader();
-            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
-            reader.readAsDataURL(input.files[0]);
+        function fetchCurrentStock(warehouseId, productId, variantId) {
+            $.get('@Url.Action("GetStockOnHand", "StockAdjustment")', {
+                warehouseId: warehouseId,
+                productId: productId,
+                variantId: variantId || null
+            }, function (res) {
+                if (res && res.success) {
+                    $('#qtyBefore').val(res.onHand);
+                    var changeVal = $('#qtyChange').val();
+                    if (changeVal !== '' && changeVal !== '0') {
+                        onQtyChangeInput();
+                    } else {
+                        onQtyAfterChange();
+                    }
+                }
+            });
+        }
+
+        function filterVariants(productId) {
+            var $varSelect = $('#ddlVariant');
+            $varSelect.find('option').each(function () {
+                var pId = $(this).data('product-id');
+                if (!pId || !productId || pId == productId) {
+                    $(this).removeAttr('disabled');
+                } else {
+                    $(this).attr('disabled', 'disabled');
+                }
+            });
+            if ($varSelect.hasClass('select2-hidden-accessible')) {
+                $varSelect.select2({ allowClear: true, width: '100%' });
+            }
+        }
+
+        function onQtyBeforeChange() {
+            var before = parseInt($('#qtyBefore').val()) || 0;
+            var change = parseInt($('#qtyChange').val()) || 0;
+            if (change !== 0) {
+                $('#qtyAfter').val(before + change);
+            } else {
+                onQtyAfterChange();
+            }
+        }
+
+        function onQtyAfterChange() {
+            var before = parseInt($('#qtyBefore').val()) || 0;
+            var after = parseInt($('#qtyAfter').val()) || 0;
+            var diff = after - before;
+            $('#qtyChange').val(diff);
+            updateColor(diff);
+        }
+
+        function onQtyChangeInput() {
+            var before = parseInt($('#qtyBefore').val()) || 0;
+            var diff = parseInt($('#qtyChange').val()) || 0;
+            var after = before + diff;
+            $('#qtyAfter').val(after);
+            updateColor(diff);
+        }
+
+        function updateColor(diff) {
+            if (diff > 0) {
+                $('#qtyChange').removeClass('text-danger').addClass('text-success');
+            } else if (diff < 0) {
+                $('#qtyChange').removeClass('text-success').addClass('text-danger');
+            } else {
+                $('#qtyChange').removeClass('text-success text-danger');
+            }
         }
     </script>
 }

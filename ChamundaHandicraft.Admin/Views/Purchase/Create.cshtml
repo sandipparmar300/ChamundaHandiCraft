@@ -1,8 +1,12 @@
-@model PurchaseOrderGridItem
+@model ChamundaHandicraft.Helper.ViewModel.Admin.PurchaseOrderSaveRequest
 @{
-    ViewData["Title"] = "Purchase Entry";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
-    var heading = isEdit ? "Edit Purchase Entry" : "Add Purchase Entry";
+    var isEdit = Model.Id > 0;
+    var heading = isEdit ? "Edit Purchase Order" : "Raise Purchase Order";
+    ViewData["Title"] = heading;
+    var suppliers = ViewBag.Suppliers as List<IdNamePair> ?? new List<IdNamePair>();
+    var warehouses = ViewBag.Warehouses as List<IdNamePair> ?? new List<IdNamePair>();
+    var products = ViewBag.Products as List<IdNamePair> ?? new List<IdNamePair>();
+    var variants = ViewBag.Variants as List<IdNamePair> ?? new List<IdNamePair>();
 }
 
 @section Header {
@@ -14,7 +18,7 @@
             <h2 class="page-title">@heading</h2>
         </div>
         <ul class="page-breadcrumb">
-            <li><a asp-controller="Purchase" asp-action="Index" class="links">Purchase Entries Listing</a></li>
+            <li><a asp-controller="Purchase" asp-action="Index" class="links">Purchase Orders</a></li>
             <li>@heading</li>
         </ul>
     </div>
@@ -22,134 +26,192 @@
 
 <main class="page-content">
 
-    <form method="post" id="purchaseForm" enctype="multipart/form-data">
+    <form method="post" asp-action="Save" asp-controller="Purchase" id="poForm" novalidate>
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Status" />
 
-        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
-
+        <!-- 1. PO HEADER -->
         <section class="form-section">
             <div class="form-section-header">
-                <h2><i class="fas fa-cart-plus" style="color:var(--accent);margin-right:8px;"></i>Purchase Information</h2>
+                <h2><i class="fas fa-file-invoice" style="color:var(--accent);margin-right:8px;"></i>Order Header</h2>
             </div>
 
             <div class="form-section-body">
                 <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Purchase Number <span class="req">*</span></label>
-                        <input id="PurchaseNumber" name="PurchaseNumber" class="form-control-custom" placeholder="Enter purchase number" />
-                        <span class="error-msg" data-valmsg-for="PurchaseNumber"></span>
+                        <label asp-for="PoNumber" class="form-label-custom">PO Number</label>
+                        <input asp-for="PoNumber" class="form-control-custom" placeholder="Auto-generated if empty" readonly="@(isEdit ? "readonly" : null)" />
+                        <span asp-validation-for="PoNumber" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Purchase Date <span class="req">*</span></label>
-                        <input type="date" id="PurchaseDate" name="PurchaseDate" class="form-control-custom" />
-                        <span class="error-msg" data-valmsg-for="PurchaseDate"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Supplier <span class="req">*</span></label>
-                        <select id="Supplier" name="Supplier" class="form-control-custom select2-single">
-                            <option value="">Select supplier</option>
-                            <option>Select from master</option>
+                        <label asp-for="SupplierId" class="form-label-custom">Supplier / Artisan <span class="req">*</span></label>
+                        <select asp-for="SupplierId" class="form-control-custom select2-single" required>
+                            <option value="">-- Select Supplier --</option>
+                            @foreach (var s in suppliers)
+                            {
+                                <option value="@s.Id">@s.Name</option>
+                            }
                         </select>
-                        <span class="error-msg" data-valmsg-for="Supplier"></span>
+                        <span asp-validation-for="SupplierId" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Warehouse <span class="req">*</span></label>
-                        <select id="Warehouse" name="Warehouse" class="form-control-custom select2-single">
-                            <option value="">Select warehouse</option>
-                            <option>Select from master</option>
+                        <label asp-for="WarehouseId" class="form-label-custom">Destination Warehouse <span class="req">*</span></label>
+                        <select asp-for="WarehouseId" class="form-control-custom select2-single" required>
+                            <option value="">-- Select Warehouse --</option>
+                            @foreach (var w in warehouses)
+                            {
+                                <option value="@w.Id">@w.Name</option>
+                            }
                         </select>
-                        <span class="error-msg" data-valmsg-for="Warehouse"></span>
+                        <span asp-validation-for="WarehouseId" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Invoice Number</label>
-                        <input id="InvoiceNumber" name="InvoiceNumber" class="form-control-custom" placeholder="Enter invoice number" />
-                        <span class="error-msg" data-valmsg-for="InvoiceNumber"></span>
+                        <label asp-for="OrderDate" class="form-label-custom">Order Date <span class="req">*</span></label>
+                        <input asp-for="OrderDate" type="date" class="form-control-custom" required />
+                        <span asp-validation-for="OrderDate" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Payment Status</label>
-                        <select id="PaymentStatus" name="PaymentStatus" class="form-control-custom select2-single">
-                            <option value="">Select payment status</option>
-                            <option>Unpaid</option>
-                            <option>Partially Paid</option>
-                            <option>Paid</option>
-                        </select>
-                        <span class="error-msg" data-valmsg-for="PaymentStatus"></span>
+                        <label asp-for="ExpectedDate" class="form-label-custom">Expected Delivery Date</label>
+                        <input asp-for="ExpectedDate" type="date" class="form-control-custom" />
+                        <span asp-validation-for="ExpectedDate" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <select id="Status" name="Status" class="form-control-custom select2-single">
-                            <option value="">Select status</option>
-                            <option>Draft</option>
-                            <option>Received</option>
-                            <option>Approved</option>
-                            <option>Cancelled</option>
-                        </select>
-                        <span class="error-msg" data-valmsg-for="Status"></span>
+                        <label asp-for="PaymentTerms" class="form-label-custom">Payment Terms</label>
+                        <input asp-for="PaymentTerms" class="form-control-custom" placeholder="e.g. Net 30, 50% Advance" />
+                        <span asp-validation-for="PaymentTerms" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-12">
+                        <label asp-for="Notes" class="form-label-custom">Notes / Instructions</label>
+                        <input asp-for="Notes" class="form-control-custom" placeholder="Optional purchase order remarks..." />
+                        <span asp-validation-for="Notes" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- 2. LINE ITEMS -->
         <section class="form-section">
-            <div class="form-section-header">
-                <h2><i class="fas fa-receipt" style="color:var(--accent);margin-right:8px;"></i>Totals</h2>
+            <div class="form-section-header d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-list" style="color:var(--accent);margin-right:8px;"></i>Order Line Items</h2>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="addLineRow()">
+                    <i class="fas fa-plus me-1"></i> Add Product Line
+                </button>
             </div>
 
             <div class="form-section-body">
-                <div class="row g-3">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle mb-0" id="poLinesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="min-width:240px;">Product <span class="text-danger">*</span></th>
+                                <th style="min-width:180px;">Variant</th>
+                                <th style="min-width:120px;">SKU</th>
+                                <th style="width:110px;" class="text-end">Quantity <span class="text-danger">*</span></th>
+                                <th style="width:130px;" class="text-end">Unit Cost (₹) <span class="text-danger">*</span></th>
+                                <th style="width:100px;" class="text-end">Tax (%)</th>
+                                <th style="width:120px;" class="text-end">Line Total (₹)</th>
+                                <th style="width:40px;" class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="poLinesBody">
+                            @for (int i = 0; i < Model.Lines.Count; i++)
+                            {
+                                var line = Model.Lines[i];
+                                <tr class="line-row">
+                                    <td>
+                                        <select name="Lines[@i].ProductId" class="form-control form-control-sm item-prod-select" required onchange="onPoProductChange(this)">
+                                            <option value="">-- Select Product --</option>
+                                            @foreach (var p in products)
+                                            {
+                                                <option value="@p.Id" selected="@(p.Id == line.ProductId ? "selected" : null)" data-name="@p.Name">@p.Name</option>
+                                            }
+                                        </select>
+                                        <input type="hidden" name="Lines[@i].ProductName" class="item-name" value="@line.ProductName" />
+                                        <span class="text-danger font-12 mt-1 d-block line-product-error"></span>
+                                    </td>
+                                    <td>
+                                        <select name="Lines[@i].VariantId" class="form-control form-control-sm item-var-select" onchange="onPoVariantChange(this)">
+                                            <option value="">-- Standard / No Variant --</option>
+                                            @foreach (var v in variants)
+                                            {
+                                                <option value="@v.Id" data-product-id="@v.ParentId" data-name="@v.Name" selected="@(v.Id == line.VariantId ? "selected" : null)">@v.Name</option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="Lines[@i].Sku" value="@line.Sku" class="form-control form-control-sm item-sku" placeholder="SKU code" />
+                                    </td>
+                                    <td>
+                                        <input type="number" step="1" min="1" name="Lines[@i].OrderedQuantity" value="@(line.OrderedQuantity > 0 ? line.OrderedQuantity : 1)" class="form-control form-control-sm text-end item-qty" oninput="calcTotals()" required />
+                                        <span class="text-danger font-12 mt-1 d-block line-qty-error"></span>
+                                    </td>
+                                    <td>
+                                        <input type="number" step="any" min="0.01" name="Lines[@i].UnitCost" value="@(line.UnitCost > 0 ? line.UnitCost.ToString("0.00") : "")" placeholder="0.00" class="form-control form-control-sm text-end item-cost" oninput="calcTotals()" required />
+                                        <span class="text-danger font-12 mt-1 d-block line-cost-error"></span>
+                                    </td>
+                                    <td>
+                                        <input type="number" step="any" min="0" max="100" name="Lines[@i].TaxPercent" value="@line.TaxPercent" class="form-control form-control-sm text-end item-tax" oninput="calcTotals()" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="Lines[@i].LineTotal" value="@line.LineTotal.ToString("0.00")" class="form-control form-control-sm text-end item-total bg-light" readonly tabindex="-1" style="pointer-events:none; cursor:not-allowed;" />
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm text-danger p-0" onclick="removeRow(this)"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <span class="text-danger font-12" id="linesError"></span>
+            </div>
+        </section>
+
+        <!-- 3. FINANCIAL SUMMARY -->
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-calculator" style="color:var(--accent);margin-right:8px;"></i>Order Financials</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3 justify-content-end">
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Sub Total</label>
-                        <input id="SubTotal" name="SubTotal" class="form-control-custom" placeholder="0.00" />
-                        <span class="error-msg" data-valmsg-for="SubTotal"></span>
+                        <label asp-for="SubTotal" class="form-label-custom">Sub Total (₹)</label>
+                        <input asp-for="SubTotal" type="text" class="form-control-custom bg-light" readonly tabindex="-1" style="pointer-events:none; cursor:not-allowed; background-color:#f8fafc !important;" id="subTotalInput" />
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Discount</label>
-                        <input id="Discount" name="Discount" class="form-control-custom" placeholder="0.00" />
-                        <span class="error-msg" data-valmsg-for="Discount"></span>
+                        <label asp-for="TaxAmount" class="form-label-custom">Total Tax (₹)</label>
+                        <input asp-for="TaxAmount" type="text" class="form-control-custom bg-light" readonly tabindex="-1" style="pointer-events:none; cursor:not-allowed; background-color:#f8fafc !important;" id="taxAmountInput" />
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">GST</label>
-                        <input id="GST" name="GST" class="form-control-custom" placeholder="0.00" />
-                        <span class="error-msg" data-valmsg-for="GST"></span>
+                        <label asp-for="ShippingAmount" class="form-label-custom">Shipping / Freight (₹)</label>
+                        <input asp-for="ShippingAmount" type="number" step="any" min="0" class="form-control-custom" id="shippingInput" oninput="calcTotals()" />
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Total Amount</label>
-                        <input id="TotalAmount" name="TotalAmount" class="form-control-custom" placeholder="0.00" />
-                        <span class="error-msg" data-valmsg-for="TotalAmount"></span>
-                    </div>
-
-                    <div class="col-lg-12 col-md-6">
-                        <label class="form-label-custom">Remarks</label>
-                        <textarea id="Remarks" name="Remarks" class="form-control-custom" rows="3" placeholder="Enter remarks"></textarea>
-                        <span class="error-msg" data-valmsg-for="Remarks"></span>
+                        <label asp-for="TotalAmount" class="form-label-custom fw-bold">Grand Total (₹)</label>
+                        <input asp-for="TotalAmount" type="text" class="form-control-custom bg-light fw-bold fs-5 text-primary" readonly tabindex="-1" style="pointer-events:none; cursor:not-allowed; background-color:#f8fafc !important;" id="totalAmountInput" />
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- ACTION BAR -->
         <div class="form-action-bar">
-            <div class="is-active-row" id="isActiveRow">
-                <div class="is-toggle-item" id="isToggleItem">
-                    <span class="ia-label">Is Active</span>
-                    <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
-                        <span class="ia-slider"></span>
-                    </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
-                </div>
-            </div>
-
+            <div></div>
             <div>
                 <a asp-controller="Purchase" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save">
-                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Purchase Order" : "Save Purchase Order")
                 </button>
             </div>
         </div>
@@ -159,17 +221,214 @@
 </main>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
-            $('#uploadBox').click(function () { $('#Photo').click(); });
+            calcTotals();
+
+            $('#poLinesBody tr').each(function () {
+                filterPoRowVariants(this);
+            });
+
+            // Live clear inline errors and invalid classes
+            $(document).on('change', '.item-prod-select', function () {
+                if ($(this).val()) {
+                    $(this).removeClass('is-invalid');
+                    $(this).closest('tr').find('.line-product-error').text('');
+                }
+            });
+
+            $(document).on('input', '.item-qty', function () {
+                const v = parseInt($(this).val(), 10);
+                if (!isNaN(v) && v > 0) {
+                    $(this).removeClass('is-invalid');
+                    $(this).closest('tr').find('.line-qty-error').text('');
+                } else {
+                    $(this).addClass('is-invalid');
+                    $(this).closest('tr').find('.line-qty-error').text('Quantity must be at least 1.');
+                }
+                calcTotals();
+            });
+
+            $(document).on('input', '.item-cost', function () {
+                const v = parseFloat($(this).val());
+                if (!isNaN(v) && v > 0) {
+                    $(this).removeClass('is-invalid');
+                    $(this).closest('tr').find('.line-cost-error').text('');
+                } else {
+                    $(this).addClass('is-invalid');
+                    $(this).closest('tr').find('.line-cost-error').text('Unit cost must be greater than 0.');
+                }
+                calcTotals();
+            });
+
+            $(document).on('input', '.item-tax', function () {
+                $(this).removeClass('is-invalid');
+                calcTotals();
+            });
+
+            $('#poForm').on('submit', function (e) {
+                let isValid = true;
+                const $rows = $('#poLinesBody tr');
+
+                if ($rows.length === 0) {
+                    if (typeof showErrorMessage === 'function') {
+                        showErrorMessage('Please add at least one product line.');
+                    }
+                    e.preventDefault();
+                    return false;
+                }
+
+                $rows.each(function () {
+                    const $row = $(this);
+                    const prod = $row.find('.item-prod-select').val();
+                    const qtyStr = $row.find('.item-qty').val();
+                    const qty = parseInt(qtyStr, 10);
+                    const costStr = $row.find('.item-cost').val();
+                    const cost = parseFloat(costStr);
+
+                    const $prodErr = $row.find('.line-product-error');
+                    const $qtyErr = $row.find('.line-qty-error');
+                    const $costErr = $row.find('.line-cost-error');
+
+                    $prodErr.text('');
+                    $qtyErr.text('');
+                    $costErr.text('');
+                    $row.find('input, select').removeClass('is-invalid');
+
+                    if (!prod || parseInt(prod, 10) <= 0) {
+                        $prodErr.text('Product is required.');
+                        $row.find('.item-prod-select').addClass('is-invalid');
+                        isValid = false;
+                    }
+                    if (!qtyStr || isNaN(qty) || qty <= 0) {
+                        $qtyErr.text('Quantity must be at least 1.');
+                        $row.find('.item-qty').addClass('is-invalid');
+                        isValid = false;
+                    }
+                    if (costStr === '' || isNaN(cost) || cost <= 0) {
+                        $costErr.text('Unit cost must be greater than 0.');
+                        $row.find('.item-cost').addClass('is-invalid');
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    if (typeof showErrorMessage === 'function') {
+                        showErrorMessage('Please correct the highlighted line item errors before saving.');
+                    }
+                    return false;
+                }
+            });
         });
 
-        function previewUpload(input) {
-            if (!input.files || !input.files[0]) return;
-            var reader = new FileReader();
-            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
-            reader.readAsDataURL(input.files[0]);
+        function onPoProductChange(ctrl) {
+            const $row = $(ctrl).closest('tr');
+            const prodId = $(ctrl).val();
+            const prodText = $(ctrl).find('option:selected').text();
+            $row.find('.line-product-error').text('');
+            $row.find('.item-prod-select').removeClass('is-invalid');
+            $row.find('.item-name').val(prodText);
+
+            const skuMatch = prodText.match(/\(([^)]+)\)$/);
+            if (skuMatch && skuMatch[1]) {
+                $row.find('.item-sku').val(skuMatch[1]);
+            }
+
+            filterPoRowVariants($row);
+            $row.find('.item-var-select').val('');
+        }
+
+        function onPoVariantChange(ctrl) {
+            const $row = $(ctrl).closest('tr');
+            const varText = $(ctrl).find('option:selected').text();
+            const skuMatch = varText.match(/\(([^)]+)\)$/);
+            if (skuMatch && skuMatch[1]) {
+                $row.find('.item-sku').val(skuMatch[1]);
+            }
+        }
+
+        function filterPoRowVariants(rowCtrl) {
+            const $row = $(rowCtrl);
+            const prodId = $row.find('.item-prod-select').val();
+            $row.find('.item-var-select option').each(function () {
+                const pId = $(this).attr('data-product-id');
+                if (!pId || !prodId || pId === prodId) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        function addLineRow() {
+            const $body = $('#poLinesBody');
+            const $clone = $body.find('tr').first().clone();
+            $clone.find('input').val('').removeClass('is-invalid');
+            $clone.find('.item-sku').val('');
+            $clone.find('.item-qty').val(1);
+            $clone.find('.item-cost').val('');
+            $clone.find('.item-tax').val('0.00');
+            $clone.find('.item-total').val('0.00');
+            $clone.find('.item-prod-select').val('').removeClass('is-invalid');
+            $clone.find('.item-var-select').val('');
+            $clone.find('.line-product-error, .line-qty-error, .line-cost-error').text('');
+            $clone.find('.item-var-select option').show();
+            $body.append($clone);
+            reindexRows();
+            calcTotals();
+        }
+
+        function removeRow(btn) {
+            if ($('#poLinesBody tr').length <= 1) {
+                if (typeof showErrorMessage === 'function') {
+                    showErrorMessage('A purchase order must have at least one line item.');
+                }
+                return;
+            }
+            $(btn).closest('tr').remove();
+            reindexRows();
+            calcTotals();
+        }
+
+        function reindexRows() {
+            $('#poLinesBody tr').each(function(idx, tr) {
+                $(tr).find('input, select').each(function() {
+                    var name = $(this).attr('name');
+                    if (name) {
+                        $(this).attr('name', name.replace(/Lines\[\d+\]/, `Lines[${idx}]`));
+                    }
+                });
+            });
+        }
+
+        function calcTotals() {
+            var subTotal = 0;
+            var totalTax = 0;
+
+            $('#poLinesBody tr').each(function() {
+                var qty = parseFloat($(this).find('.item-qty').val()) || 0;
+                var cost = parseFloat($(this).find('.item-cost').val()) || 0;
+                var taxRate = parseFloat($(this).find('.item-tax').val()) || 0;
+
+                var rawTotal = qty * cost;
+                var tax = rawTotal * (taxRate / 100.0);
+                var lineTotal = rawTotal + tax;
+
+                $(this).find('.item-total').val(lineTotal.toFixed(2));
+
+                subTotal += rawTotal;
+                totalTax += tax;
+            });
+
+            var shipping = parseFloat($('#shippingInput').val()) || 0;
+            var grandTotal = subTotal + totalTax + shipping;
+
+            $('#subTotalInput').val(subTotal.toFixed(2));
+            $('#taxAmountInput').val(totalTax.toFixed(2));
+            $('#totalAmountInput').val(grandTotal.toFixed(2));
         }
     </script>
 }

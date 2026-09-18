@@ -1,0 +1,161 @@
+@model ChamundaHandicraft.Helper.ViewModel.Admin.StockSaveRequest
+@{
+    var isEdit = Model.Id > 0;
+    var heading = isEdit ? "Update Stock Position" : "Add Initial Stock";
+    ViewData["Title"] = heading;
+    var warehouses = ViewBag.Warehouses as List<IdNamePair> ?? new List<IdNamePair>();
+    var products = ViewBag.Products as List<IdNamePair> ?? new List<IdNamePair>();
+    var variants = ViewBag.Variants as List<IdNamePair> ?? new List<IdNamePair>();
+}
+
+@section Header {
+    <div class="page-head commondetails-page-cls">
+        <div class="page-head-left">
+            <a asp-controller="Inventory" asp-action="Index">
+                <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
+            </a>
+            <h2 class="page-title">@heading</h2>
+        </div>
+        <ul class="page-breadcrumb">
+            <li><a asp-controller="Inventory" asp-action="Index" class="links">Inventory Stock</a></li>
+            <li>@heading</li>
+        </ul>
+    </div>
+}
+
+<main class="page-content">
+
+    <form method="post" asp-action="Save" asp-controller="Inventory" id="stockForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-boxes" style="color:var(--accent);margin-right:8px;"></i>Stock Information</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-6 col-md-6">
+                        <label asp-for="ProductId" class="form-label-custom">Select Product <span class="req">*</span></label>
+                        <select asp-for="ProductId" class="form-control-custom select2-single" id="ddlProduct" required>
+                            <option value="">-- Search &amp; Select Product --</option>
+                            @foreach (var prod in products)
+                            {
+                                <option value="@prod.Id" selected="@(Model.ProductId == prod.Id ? "selected" : null)">@prod.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ProductId" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label asp-for="VariantId" class="form-label-custom">Product Variant (Optional)</label>
+                        <select asp-for="VariantId" class="form-control-custom select2-single" id="ddlVariant">
+                            <option value="">-- Standard / Base Product (No Variant) --</option>
+                            @foreach (var v in variants)
+                            {
+                                <option value="@v.Id" data-product-id="@v.ParentId" selected="@(Model.VariantId == v.Id ? "selected" : null)">@v.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="VariantId" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label asp-for="WarehouseId" class="form-label-custom">Warehouse <span class="req">*</span></label>
+                        <select asp-for="WarehouseId" class="form-control-custom select2-single" required>
+                            <option value="">-- Select Destination Warehouse --</option>
+                            @foreach (var wh in warehouses)
+                            {
+                                <option value="@wh.Id" selected="@(Model.WarehouseId == wh.Id ? "selected" : null)">@wh.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="WarehouseId" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label asp-for="OnHand" class="form-label-custom">On Hand Quantity <span class="req">*</span></label>
+                        <input asp-for="OnHand" type="number" min="0" class="form-control-custom" placeholder="0" />
+                        <span asp-validation-for="OnHand" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label asp-for="LowStockThreshold" class="form-label-custom">Low Stock Alert Threshold</label>
+                        <input asp-for="LowStockThreshold" type="number" min="0" class="form-control-custom" placeholder="5" />
+                        <span asp-validation-for="LowStockThreshold" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6">
+                        <label asp-for="BinLocation" class="form-label-custom">Bin / Rack Location</label>
+                        <input asp-for="BinLocation" class="form-control-custom" placeholder="e.g. A-12-04" />
+                        <span asp-validation-for="BinLocation" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Notes" class="form-label-custom">Notes / Movement Reason</label>
+                        <textarea asp-for="Notes" rows="3" class="form-control-custom" placeholder="Reason for updating stock position..."></textarea>
+                        <span asp-validation-for="Notes" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-action-bar">
+            <div></div>
+            <div>
+                <a asp-controller="Inventory" asp-action="Index" class="btn btn-light">Cancel</a>
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> @(isEdit ? "Update Stock" : "Save Stock")
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
+
+            var selectedVariantId = '@(Model.VariantId.HasValue ? Model.VariantId.Value.ToString() : "")';
+
+            function filterVariants(productId, isInitial) {
+                var $varSelect = $('#ddlVariant');
+                var currentVal = (isInitial && selectedVariantId) ? selectedVariantId : $varSelect.val();
+
+                $varSelect.find('option').each(function () {
+                    var $opt = $(this);
+                    var pId = $opt.data('product-id');
+                    if (!pId || !productId || String(pId) === String(productId)) {
+                        $opt.removeAttr('disabled').show();
+                    } else {
+                        $opt.attr('disabled', 'disabled').hide();
+                    }
+                });
+
+                if ($varSelect.hasClass('select2-hidden-accessible')) {
+                    $varSelect.select2('destroy');
+                }
+                $varSelect.select2({ allowClear: true, width: '100%' });
+
+                if (currentVal && $varSelect.find('option[value="' + currentVal + '"]:not(:disabled)').length > 0) {
+                    $varSelect.val(currentVal).trigger('change.select2');
+                } else if (!isInitial) {
+                    $varSelect.val('').trigger('change.select2');
+                }
+            }
+
+            $('#ddlProduct').on('change', function () {
+                var prodId = $(this).val();
+                filterVariants(prodId, false);
+            });
+
+            var initProdId = $('#ddlProduct').val();
+            if (initProdId) {
+                filterVariants(initProdId, true);
+            }
+        });
+    </script>
+}

@@ -1,6 +1,6 @@
-@model StockGridItem
+﻿@model ChamundaHandicraft.Helper.ViewModel.Admin.InventoryDetailViewModel
 @{
-    ViewData["Title"] = "Stock Details";
+    ViewData["Title"] = $"Stock Details: {Model.ProductName}";
 }
 
 @section Header {
@@ -9,72 +9,141 @@
             <a asp-controller="Inventory" asp-action="Index">
                 <picture><img src="~/assets/images/small-left-arrow.svg" alt="back" width="18" height="18" /></picture>
             </a>
-            <h2 class="page-title">Stock Details</h2>
+            <h2 class="page-title">Stock Position &amp; Ledger</h2>
         </div>
         <ul class="page-breadcrumb">
-            <li><a asp-controller="Inventory" asp-action="Index" class="links">Inventory</a></li>
-            <li>Stock Details</li>
+            <li><a asp-controller="Inventory" asp-action="Index" class="links">Inventory Stock</a></li>
+            <li>@Model.ProductName</li>
         </ul>
     </div>
 }
 
 <main class="page-content">
+    <div class="row g-4">
+        <!-- Stock Details Card -->
+        <div class="col-lg-4 col-md-12">
+            <div class="common-box p-4">
+                <h5 class="fw-bold mb-3"><i class="fas fa-boxes me-2" style="color:var(--accent);"></i>@Model.ProductName</h5>
+                <p class="text-muted mb-3 font-12">SKU: <code>@Model.Sku</code> @(string.IsNullOrEmpty(Model.Barcode) ? "" : $"| Barcode: {Model.Barcode}")</p>
 
-    <section class="form-section">
-        <div class="form-section-header">
-            <h2><i class="fas fa-cube" style="color:var(--accent);margin-right:8px;"></i>Stock Information</h2>
-        </div>
-        <div class="form-section-body">
-            <div class="row g-3">
-                @foreach (var f in new[] { "Product", "SKU", "Barcode", "Category", "Warehouse", "Current Stock", "Reserved Stock", "Available Stock", "Low Stock Level", "Reorder Level", "Stock Status", "Last Updated" })
-                {
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">@f</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                }
+                <hr class="my-3" />
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted font-12">Warehouse</span>
+                    <strong>@Model.WarehouseName</strong>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted font-12">On-Hand Stock</span>
+                    <strong class="fs-5 text-success">@Model.OnHand</strong>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted font-12">Reserved for Orders</span>
+                    <strong class="fs-6 text-muted">@Model.Reserved</strong>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted font-12">Available to Sell</span>
+                    <strong class="fs-5 @(Model.Available <= 0 ? "text-danger" : (Model.Available <= Model.LowStockThreshold ? "text-warning" : "text-primary"))">
+                        @Model.Available
+                    </strong>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted font-12">Threshold Alert</span>
+                    <span>@Model.LowStockThreshold units</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted font-12">Bin / Shelf</span>
+                    <span>@(Model.BinLocation ?? "—")</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted font-12">Cost Price</span>
+                    <span>@Money.Inr(Model.CostPrice)</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted font-12">Selling Price</span>
+                    <span>@Money.Inr(Model.Price)</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-3 border-top pt-2">
+                    <span class="text-muted font-12">Current Valuation</span>
+                    <strong class="text-dark">@Money.Inr(Model.Valuation)</strong>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a asp-controller="Inventory" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button primary_button text-center">
+                        <i class="fas fa-pen me-1"></i> Update Threshold &amp; Bin
+                    </a>
+                </div>
             </div>
         </div>
-    </section>
 
-    <section class="listing-section common-box">
-        <div class="latest-orders">
-            <div class="div-search-box-panel flex-ending-cls-here">
-                <h3 class="section-heading">Stock Movement History</h3>
-                <button type="button" class="custom_button secondary_button"><i class="fas fa-barcode"></i> Print Barcode</button>
+        <!-- Transaction Ledger Card -->
+        <div class="col-lg-8 col-md-12">
+            <div class="common-box p-4">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">
+                    <i class="fas fa-history me-2" style="color:var(--accent);"></i>Stock Movement Ledger (Audit Trail)
+                </h5>
+
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle font-13">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date &amp; Time</th>
+                                <th>Txn Type</th>
+                                <th class="text-end">Qty Change</th>
+                                <th class="text-end">Qty After</th>
+                                <th>Reference</th>
+                                <th>Logged By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var txn in Model.Ledger)
+                            {
+                                <tr>
+                                    <td>@txn.CreatedOn.ToString("dd MMM yyyy, hh:mm tt")</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">@txn.TransactionType</span>
+                                    </td>
+                                    <td class="text-end fw-bold @(txn.QuantityChange > 0 ? "text-success" : (txn.QuantityChange < 0 ? "text-danger" : "text-muted"))">
+                                        @(txn.QuantityChange > 0 ? "+" : "")@txn.QuantityChange
+                                    </td>
+                                    <td class="text-end">@txn.QuantityAfter</td>
+                                    <td>
+                                        <code>@(txn.ReferenceNumber ?? "—")</code>
+                                        @if (!string.IsNullOrEmpty(txn.Notes))
+                                        {
+                                            <small class="text-muted d-block font-11">@txn.Notes</small>
+                                        }
+                                    </td>
+                                    <td>@(txn.CreatedByName ?? "System")</td>
+                                </tr>
+                            }
+                            @if (!Model.Ledger.Any())
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        No transaction movements logged for this stock position yet.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <div class="table-main">
-            <table id="stock-history-grid" class="custom-datatable listing-order-table">
-                <thead>
-                    <tr>
-                        <th style="min-width:140px;">Date</th>
-                        <th style="min-width:150px;">Transaction Type</th>
-                        <th style="min-width:130px;">Opening</th>
-                        <th style="min-width:120px;">Qty In</th>
-                        <th style="min-width:120px;">Qty Out</th>
-                        <th style="min-width:130px;">Closing</th>
-                        <th style="min-width:160px;">Reference</th>
-                        <th style="min-width:150px;">User</th>
-                    </tr>
-                </thead>
-                <tbody><tr><td colspan="10" class="text-center py-4">No movements recorded for this SKU yet.</td></tr></tbody>
-            </table>
-        </div>
-    </section>
-
+    </div>
 </main>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
-
-            $('#stock-history-grid').DataTable({
-                paging: true, ordering: true, filter: false,
-                bLengthChange: false, pageLength: 10, scrollX: true, autoWidth: false,
-                language: { emptyTable: "No stock movements recorded yet" }
-            });
         });
     </script>
 }

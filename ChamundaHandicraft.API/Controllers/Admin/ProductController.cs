@@ -58,4 +58,18 @@ public class ProductController : ControllerBase
         var response = await _productService.GetLookupsAsync(ct);
         return Ok(response);
     }
+
+    [HttpGet("Lookup")]
+    public async Task<ActionResult<ResponseViewModel<List<IdNamePair>>>> Lookup(CancellationToken ct)
+    {
+        var response = await _productService.GetLookupAsync(ct);
+        return Ok(response);
+    }
+
+    [HttpGet("VariantLookup")]
+    public async Task<ActionResult<ResponseViewModel<List<IdNamePair>>>> VariantLookup([FromQuery] int? productId, CancellationToken ct)
+    {
+        var response = await _productService.GetVariantsLookupAsync(productId, ct);
+        return Ok(response);
+    }
 }

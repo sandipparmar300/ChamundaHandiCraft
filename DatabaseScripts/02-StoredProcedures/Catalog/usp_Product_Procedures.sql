@@ -73,7 +73,9 @@ BEGIN
             p.UpdatedBy,
             CategoryName = c.Name,
             BrandName    = b.BrandName,
-            ArtisanName  = a.Name
+            ArtisanName  = a.Name,
+            StockQuantity = ISNULL((SELECT SUM(s.OnHand - s.Reserved) FROM dbo.InventoryStocks s WHERE s.ProductId = p.Id AND s.VariantId IS NULL AND s.IsDeleted = 0), 0),
+            WarehouseId   = (SELECT TOP 1 s.WarehouseId FROM dbo.InventoryStocks s WHERE s.ProductId = p.Id AND s.VariantId IS NULL AND s.IsDeleted = 0)
     FROM    dbo.Products AS p
     LEFT JOIN dbo.Categories AS c ON c.Id = p.CategoryId
     LEFT JOIN dbo.Brands     AS b ON b.Id = p.BrandId
@@ -196,7 +198,8 @@ CREATE OR ALTER PROCEDURE dbo.usp_Product_Save
     @MediaJson           NVARCHAR(MAX)   = NULL,  -- [{"Url":"...","AltText":"...","IsPrimary":true,"MediaType":0,"SortOrder":0}]
     @VariantsJson        NVARCHAR(MAX)   = NULL,  -- [{"Id":0,"Sku":"...","Price":100,"Mrp":120,"StockQuantity":10,"IsDefault":true,"ImageUrl":"..."}]
     @RelatedJson         NVARCHAR(MAX)   = NULL,  -- [{"RelatedProductId":2,"RelationType":"Related","SortOrder":0}]
-    @AdminUserId         INT             = NULL
+    @AdminUserId         INT             = NULL,
+    @WarehouseId         INT             = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -334,13 +337,14 @@ BEGIN
         DROP TABLE #IncomingMedia;
     END
 
-    -- 1. Sync Base Product Stock in InventoryStocks (WarehouseId 1)
+    -- 1. Sync Base Product Stock in InventoryStocks
+    DECLARE @TargetWarehouseId INT = ISNULL(@WarehouseId, 1);
     IF @TrackInventory = 1
     BEGIN
-        IF NOT EXISTS (SELECT 1 FROM dbo.InventoryStocks WHERE ProductId = @Id AND VariantId IS NULL AND IsDeleted = 0)
+        IF NOT EXISTS (SELECT 1 FROM dbo.InventoryStocks WHERE ProductId = @Id AND VariantId IS NULL AND WarehouseId = @TargetWarehouseId AND IsDeleted = 0)
         BEGIN
             INSERT INTO dbo.InventoryStocks (ProductId, VariantId, WarehouseId, OnHand, Reserved, Incoming, LowStockThreshold, CreatedAt, CreatedBy, IsActive, IsDeleted)
-            VALUES (@Id, NULL, 1, ISNULL(@StockQuantity, 0), 0, 0, ISNULL(@LowStockThreshold, 5), SYSUTCDATETIME(), @AdminUserId, 1, 0);
+            VALUES (@Id, NULL, @TargetWarehouseId, ISNULL(@StockQuantity, 0), 0, 0, ISNULL(@LowStockThreshold, 5), SYSUTCDATETIME(), @AdminUserId, 1, 0);
         END
         ELSE
         BEGIN
@@ -349,7 +353,7 @@ BEGIN
                    LowStockThreshold = ISNULL(@LowStockThreshold, 5),
                    UpdatedAt = SYSUTCDATETIME(),
                    UpdatedBy = @AdminUserId
-            WHERE  ProductId = @Id AND VariantId IS NULL AND IsDeleted = 0;
+            WHERE  ProductId = @Id AND VariantId IS NULL AND WarehouseId = @TargetWarehouseId AND IsDeleted = 0;
         END
     END
 
@@ -402,12 +406,12 @@ BEGIN
             JOIN   #IncomingVariants iv ON iv.VarSku = v.Sku
             WHERE  v.ProductId = @Id AND v.IsDeleted = 0
         ) AS source
-        ON (target.ProductId = @Id AND target.VariantId = source.VariantId AND target.IsDeleted = 0)
+        ON (target.ProductId = @Id AND target.VariantId = source.VariantId AND target.WarehouseId = @TargetWarehouseId AND target.IsDeleted = 0)
         WHEN MATCHED THEN
             UPDATE SET target.OnHand = source.VarStockQty, target.UpdatedAt = SYSUTCDATETIME(), target.UpdatedBy = @AdminUserId
         WHEN NOT MATCHED THEN
             INSERT (ProductId, VariantId, WarehouseId, OnHand, Reserved, Incoming, LowStockThreshold, CreatedAt, CreatedBy, IsActive, IsDeleted)
-            VALUES (@Id, source.VariantId, 1, source.VarStockQty, 0, 0, ISNULL(@LowStockThreshold, 5), SYSUTCDATETIME(), @AdminUserId, 1, 0);
+            VALUES (@Id, source.VariantId, @TargetWarehouseId, source.VarStockQty, 0, 0, ISNULL(@LowStockThreshold, 5), SYSUTCDATETIME(), @AdminUserId, 1, 0);
 
         DROP TABLE #IncomingVariants;
     END

@@ -132,6 +132,12 @@
     <script src="@Url.Content("~/assets/js/moment.js")"></script>
     <script src="@Url.Content("~/assets/js/dropdown-helper.js")"></script>
     <script src="https://cdn.datatables.net/v/dt/dt-2.1.2/datatables.min.js"></script>
+    <script>
+        // Suppress DataTables alert popups globally across the entire admin panel
+        if (window.$ && $.fn && $.fn.dataTable) {
+            $.fn.dataTable.ext.errMode = 'none';
+        }
+    </script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js"></script>
 
@@ -148,17 +154,75 @@
                 } catch (e) { }
             })();
 
-            $('.select2-single').select2({ allowClear: true, width: '100%' });
+            window.initSelect2 = function (context) {
+                var $ctx = context ? $(context) : $(document);
+                $ctx.find('.select2-single').each(function () {
+                    var $s = $(this);
+                    if ($s.hasClass('select2-hidden-accessible')) {
+                        return;
+                    }
+                    var placeholderText = $s.attr('data-placeholder') ||
+                        ($s.find('option[value=""]').first().text().trim()) ||
+                        '-- Select --';
 
-            $('.select2-multiple').select2({
-                allowClear: true,
-                width: '100%',
-                closeOnSelect: false,
-                minimumResultsForSearch: 0
+                    $s.select2({
+                        allowClear: true,
+                        width: '100%',
+                        placeholder: {
+                            id: '',
+                            text: placeholderText
+                        }
+                    });
+                });
+
+                $ctx.find('.select2-multiple').each(function () {
+                    var $s = $(this);
+                    if ($s.hasClass('select2-hidden-accessible')) {
+                        return;
+                    }
+                    $s.select2({
+                        allowClear: true,
+                        width: '100%',
+                        closeOnSelect: false,
+                        minimumResultsForSearch: 0
+                    });
+                });
+            };
+
+            window.initSelect2();
+
+            // Global Select2 clear handler: resets to the default option and triggers change to refresh dependent controls
+            $(document).on('select2:unselecting select2:clear', 'select', function () {
+                var $select = $(this);
+                setTimeout(function () {
+                    var $emptyOpt = $select.find('option[value=""]');
+                    if ($emptyOpt.length > 0) {
+                        $select.val('');
+                    } else {
+                        $select.val($select.find('option').first().val() || '');
+                    }
+                    $select.trigger('change');
+                }, 10);
             });
 
-            var success = '@ViewData["SuccessMessage"]';
-            var error = '@ViewData["ErrorMessage"]';
+            $(document).on('click', '.select2-selection__clear', function () {
+                var $container = $(this).closest('.select2-container');
+                var $select = $container.prev('select');
+                if ($select.length) {
+                    setTimeout(function () {
+                        var $emptyOpt = $select.find('option[value=""]');
+                        if ($emptyOpt.length > 0) {
+                            $select.val('');
+                        } else {
+                            $select.val($select.find('option').first().val() || '');
+                        }
+                        $select.trigger('change');
+                    }, 10);
+                }
+            });
+
+            var success = '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode((ViewData["SuccessMessage"] ?? TempData["SuccessMessage"])?.ToString() ?? ""))';
+            var error = '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode((ViewData["ErrorMessage"] ?? TempData["ErrorMessage"])?.ToString() ?? ""))';
 
             if (success && success.trim() !== "" && typeof showSuccessMessage === 'function') {
                 showSuccessMessage(success);
@@ -244,20 +308,6 @@
                 window.location.href = '@Url.Action("Logout", "Auth")';
             }
         });
-
-        // Global Toastr notification triggers
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <text>toastr.success('@Html.Raw(TempData["SuccessMessage"])', 'Success');</text>
-        }
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <text>toastr.error('@Html.Raw(TempData["ErrorMessage"])', 'Error');</text>
-        }
-        @if (TempData["WarningMessage"] != null)
-        {
-            <text>toastr.warning('@Html.Raw(TempData["WarningMessage"])', 'Warning');</text>
-        }
     </script>
 
     @await RenderSectionAsync("BodyAppend", required: false)

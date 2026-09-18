@@ -1,8 +1,11 @@
-@model StockTransferGridItem
+@model ChamundaHandicraft.Helper.ViewModel.Admin.StockTransferSaveRequest
 @{
-    ViewData["Title"] = "Stock Transfer";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
-    var heading = isEdit ? "Edit Stock Transfer" : "Add Stock Transfer";
+    var isEdit = Model.Id > 0;
+    var heading = isEdit ? "Edit Stock Transfer" : "Initiate Stock Transfer";
+    ViewData["Title"] = heading;
+    var warehouses = ViewBag.Warehouses as List<IdNamePair> ?? new List<IdNamePair>();
+    var products = ViewBag.Products as List<IdNamePair> ?? new List<IdNamePair>();
+    var variants = ViewBag.Variants as List<IdNamePair> ?? new List<IdNamePair>();
 }
 
 @section Header {
@@ -14,7 +17,7 @@
             <h2 class="page-title">@heading</h2>
         </div>
         <ul class="page-breadcrumb">
-            <li><a asp-controller="StockTransfer" asp-action="Index" class="links">Stock Transfers Listing</a></li>
+            <li><a asp-controller="StockTransfer" asp-action="Index" class="links">Stock Transfers</a></li>
             <li>@heading</li>
         </ul>
     </div>
@@ -22,99 +25,147 @@
 
 <main class="page-content">
 
-    <form method="post" id="stocktransferForm" enctype="multipart/form-data">
+    <form method="post" asp-action="Save" asp-controller="StockTransfer" id="transferForm" novalidate>
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Status" />
 
-        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
-
+        <!-- 1. TRANSFER HEADER -->
         <section class="form-section">
             <div class="form-section-header">
-                <h2><i class="fas fa-arrow-right-arrow-left" style="color:var(--accent);margin-right:8px;"></i>Transfer Information</h2>
+                <h2><i class="fas fa-exchange-alt" style="color:var(--accent);margin-right:8px;"></i>Transfer Header</h2>
             </div>
 
             <div class="form-section-body">
                 <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Transfer Number <span class="req">*</span></label>
-                        <input id="TransferNumber" name="TransferNumber" class="form-control-custom" placeholder="Enter transfer number" / value="@Model.TransferNumber" >
-                        <span class="error-msg" data-valmsg-for="TransferNumber"></span>
+                        <label asp-for="TransferNumber" class="form-label-custom">Transfer Number</label>
+                        <input asp-for="TransferNumber" class="form-control-custom" placeholder="Auto-generated if empty" readonly="@(isEdit ? "readonly" : null)" />
+                        <span asp-validation-for="TransferNumber" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Transfer Date <span class="req">*</span></label>
-                        <input type="date" id="TransferDate" name="TransferDate" class="form-control-custom" />
-                        <span class="error-msg" data-valmsg-for="TransferDate"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Source Warehouse <span class="req">*</span></label>
-                        <select id="SourceWarehouse" name="SourceWarehouse" class="form-control-custom select2-single">
-                            <option value="">Select source warehouse</option>
-                            <option>Select from master</option>
+                        <label asp-for="FromWarehouseId" class="form-label-custom">From (Source) Warehouse <span class="req">*</span></label>
+                        <select asp-for="FromWarehouseId" class="form-control-custom select2-single" required>
+                            <option value="">-- Select Source --</option>
+                            @foreach (var wh in warehouses)
+                            {
+                                <option value="@wh.Id" selected="@(Model.FromWarehouseId == wh.Id ? "selected" : null)">@wh.Name</option>
+                            }
                         </select>
-                        <span class="error-msg" data-valmsg-for="SourceWarehouse"></span>
+                        <span asp-validation-for="FromWarehouseId" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Destination Warehouse <span class="req">*</span></label>
-                        <select id="DestinationWarehouse" name="DestinationWarehouse" class="form-control-custom select2-single">
-                            <option value="">Select destination warehouse</option>
-                            <option>Select from master</option>
+                        <label asp-for="ToWarehouseId" class="form-label-custom">To (Destination) Warehouse <span class="req">*</span></label>
+                        <select asp-for="ToWarehouseId" class="form-control-custom select2-single" required>
+                            <option value="">-- Select Destination --</option>
+                            @foreach (var wh in warehouses)
+                            {
+                                <option value="@wh.Id" selected="@(Model.ToWarehouseId == wh.Id ? "selected" : null)">@wh.Name</option>
+                            }
                         </select>
-                        <span class="error-msg" data-valmsg-for="DestinationWarehouse"></span>
+                        <span asp-validation-for="ToWarehouseId" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Product <span class="req">*</span></label>
-                        <select id="Product" name="Product" class="form-control-custom select2-single">
-                            <option value="">Select product</option>
-                            <option>Select from catalog</option>
-                        </select>
-                        <span class="error-msg" data-valmsg-for="Product"></span>
+                        <label asp-for="TransferDate" class="form-label-custom">Transfer Date <span class="req">*</span></label>
+                        <input asp-for="TransferDate" type="date" class="form-control-custom" value="@Model.TransferDate.ToString("yyyy-MM-dd")" required />
+                        <span asp-validation-for="TransferDate" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Quantity <span class="req">*</span></label>
-                        <input type="number" id="Quantity" name="Quantity" class="form-control-custom" placeholder="0" />
-                        <span class="error-msg" data-valmsg-for="Quantity"></span>
+                        <label asp-for="Carrier" class="form-label-custom">Logistics / Carrier</label>
+                        <input asp-for="Carrier" class="form-control-custom" placeholder="e.g. BlueDart, Delhivery" />
+                        <span asp-validation-for="Carrier" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <select id="Status" name="Status" class="form-control-custom select2-single">
-                            <option value="">Select status</option>
-                            <option>Pending</option>
-                            <option>Approved</option>
-                            <option>Completed</option>
-                            <option>Cancelled</option>
-                        </select>
-                        <span class="error-msg" data-valmsg-for="Status"></span>
+                        <label asp-for="TrackingNumber" class="form-label-custom">Tracking / AWB Number</label>
+                        <input asp-for="TrackingNumber" class="form-control-custom" placeholder="e.g. TRK-892348" />
+                        <span asp-validation-for="TrackingNumber" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-lg-12 col-md-6">
-                        <label class="form-label-custom">Remarks</label>
-                        <textarea id="Remarks" name="Remarks" class="form-control-custom" rows="3" placeholder="Enter remarks"></textarea>
-                        <span class="error-msg" data-valmsg-for="Remarks"></span>
+                    <div class="col-lg-6 col-md-12">
+                        <label asp-for="Notes" class="form-label-custom">Notes / Instructions</label>
+                        <input asp-for="Notes" class="form-control-custom" placeholder="Optional transfer notes..." />
+                        <span asp-validation-for="Notes" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <div class="form-action-bar">
-            <div class="is-active-row" id="isActiveRow">
-                <div class="is-toggle-item" id="isToggleItem">
-                    <span class="ia-label">Is Active</span>
-                    <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
-                        <span class="ia-slider"></span>
-                    </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
-                </div>
+        <!-- 2. TRANSFER LINE ITEMS -->
+        <section class="form-section">
+            <div class="form-section-header d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-boxes" style="color:var(--accent);margin-right:8px;"></i>Items to Transfer</h2>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTransferRow()">
+                    <i class="fas fa-plus me-1"></i> Add Product Item
+                </button>
             </div>
 
+            <div class="form-section-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm align-middle font-13" id="transferTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="min-width:260px;">Product <span class="req">*</span></th>
+                                <th style="min-width:220px;">Variant</th>
+                                <th style="width:160px;">SKU</th>
+                                <th style="width:120px;" class="text-end">Quantity <span class="req">*</span></th>
+                                <th style="width:50px;" class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transferLinesBody">
+                            @for (int i = 0; i < Model.Lines.Count; i++)
+                            {
+                                var line = Model.Lines[i];
+                                <tr class="transfer-row">
+                                    <td>
+                                        <select name="Lines[@i].ProductId" class="form-control form-control-sm item-product-select" required onchange="onRowProductChange(this)">
+                                            <option value="">-- Select Product --</option>
+                                            @foreach (var p in products)
+                                            {
+                                                <option value="@p.Id" selected="@(p.Id == line.ProductId ? "selected" : null)" data-name="@p.Name">@p.Name</option>
+                                            }
+                                        </select>
+                                        <input type="hidden" name="Lines[@i].ProductName" class="item-prod-name" value="@line.ProductName" />
+                                        <span class="text-danger font-12 mt-1 d-block line-product-error"></span>
+                                    </td>
+                                    <td>
+                                        <select name="Lines[@i].VariantId" class="form-control form-control-sm item-variant-select" onchange="onRowVariantChange(this)">
+                                            <option value="">-- Standard / No Variant --</option>
+                                            @foreach (var v in variants)
+                                            {
+                                                <option value="@v.Id" data-product-id="@v.ParentId" data-name="@v.Name" selected="@(v.Id == line.VariantId ? "selected" : null)">@v.Name</option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="Lines[@i].Sku" value="@line.Sku" class="form-control form-control-sm item-sku" placeholder="SKU code" />
+                                    </td>
+                                    <td>
+                                        <input type="number" name="Lines[@i].Quantity" value="@line.Quantity" class="form-control form-control-sm text-end item-quantity" min="1" required oninput="onRowQtyChange(this)" />
+                                        <span class="text-danger font-12 mt-1 d-block line-qty-error"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm text-danger p-0" onclick="removeTransferRow(this)"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACTION BAR -->
+        <div class="form-action-bar">
+            <div></div>
             <div>
                 <a asp-controller="StockTransfer" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save">
-                    <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> Initiate Transfer
                 </button>
             </div>
         </div>
@@ -124,17 +175,137 @@
 </main>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
-            $('#uploadBox').click(function () { $('#Photo').click(); });
+
+            $('#transferLinesBody tr').each(function () {
+                filterRowVariants(this);
+            });
+
+            $('#transferForm').on('submit', function (e) {
+                let isValid = true;
+                const sourceWh = $('#FromWarehouseId').val();
+                const destWh = $('#ToWarehouseId').val();
+
+                if (sourceWh && destWh && sourceWh === destWh) {
+                    if (typeof showErrorMessage === 'function') {
+                        showErrorMessage('Source and destination warehouses cannot be the same.');
+                    }
+                    isValid = false;
+                }
+
+                $('#transferLinesBody tr').each(function () {
+                    const prod = $(this).find('.item-product-select').val();
+                    const qty = parseInt($(this).find('.item-quantity').val()) || 0;
+                    const $prodErr = $(this).find('.line-product-error');
+                    const $qtyErr = $(this).find('.line-qty-error');
+
+                    $prodErr.text('');
+                    $qtyErr.text('');
+
+                    if (!prod || parseInt(prod) <= 0) {
+                        $prodErr.text('Please select a product.');
+                        isValid = false;
+                    }
+                    if (qty <= 0) {
+                        $qtyErr.text('Quantity must be at least 1.');
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
         });
 
-        function previewUpload(input) {
-            if (!input.files || !input.files[0]) return;
-            var reader = new FileReader();
-            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
-            reader.readAsDataURL(input.files[0]);
+        function onRowProductChange(ctrl) {
+            const $row = $(ctrl).closest('tr');
+            const prodId = $(ctrl).val();
+            const prodText = $(ctrl).find('option:selected').text();
+            $row.find('.line-product-error').text('');
+            $row.find('.item-prod-name').val(prodText);
+
+            const skuMatch = prodText.match(/\(([^)]+)\)$/);
+            if (skuMatch && skuMatch[1]) {
+                $row.find('.item-sku').val(skuMatch[1]);
+            }
+
+            filterRowVariants($row);
+            $row.find('.item-variant-select').val('');
+        }
+
+        function onRowQtyChange(ctrl) {
+            const $row = $(ctrl).closest('tr');
+            const qty = parseInt($(ctrl).val()) || 0;
+            const $qtyErr = $row.find('.line-qty-error');
+            if (qty > 0) {
+                $qtyErr.text('');
+            } else {
+                $qtyErr.text('Quantity must be at least 1.');
+            }
+        }
+
+        function onRowVariantChange(ctrl) {
+            const $row = $(ctrl).closest('tr');
+            const varText = $(ctrl).find('option:selected').text();
+            const skuMatch = varText.match(/\(([^)]+)\)$/);
+            if (skuMatch && skuMatch[1]) {
+                $row.find('.item-sku').val(skuMatch[1]);
+            }
+        }
+
+        function filterRowVariants(rowCtrl) {
+            const $row = $(rowCtrl);
+            const prodId = $row.find('.item-product-select').val();
+            $row.find('.item-variant-select option').each(function () {
+                const pId = $(this).attr('data-product-id');
+                if (!pId || !prodId || pId === prodId) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        function addTransferRow() {
+            const $body = $('#transferLinesBody');
+            const $clone = $body.find('tr').first().clone();
+            $clone.find('input').val('');
+            $clone.find('.item-sku').val('');
+            $clone.find('.item-quantity').val(1);
+            $clone.find('.item-product-select').val('');
+            $clone.find('.item-variant-select').val('');
+            $clone.find('.item-variant-select option').show();
+            $clone.find('.line-product-error').text('');
+            $clone.find('.line-qty-error').text('');
+            $body.append($clone);
+            reindexTransferRows();
+        }
+
+        function removeTransferRow(btn) {
+            if ($('#transferLinesBody tr').length <= 1) {
+                if (typeof showErrorMessage === 'function') {
+                    showErrorMessage('A stock transfer must contain at least one product item.');
+                }
+                return;
+            }
+            $(btn).closest('tr').remove();
+            reindexTransferRows();
+        }
+
+        function reindexTransferRows() {
+            $('#transferLinesBody tr').each(function(idx, tr) {
+                $(tr).find('input, select').each(function() {
+                    var name = $(this).attr('name');
+                    if (name) {
+                        $(this).attr('name', name.replace(/Lines\[\d+\]/, `Lines[${idx}]`));
+                    }
+                });
+            });
         }
     </script>
 }

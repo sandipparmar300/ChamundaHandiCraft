@@ -1,6 +1,6 @@
-@model StockTransferGridItem
+@model ChamundaHandicraft.Helper.ViewModel.Admin.StockTransferDetailViewModel
 @{
-    ViewData["Title"] = "Stock Transfer Details";
+    ViewData["Title"] = $"Transfer: {Model.TransferNumber}";
 }
 
 @section Header {
@@ -12,72 +12,195 @@
             <h2 class="page-title">Stock Transfer Details</h2>
         </div>
         <ul class="page-breadcrumb">
-            <li><a asp-controller="StockTransfer" asp-action="Index" class="links">Stock Transfers Listing</a></li>
-            <li>Details</li>
+            <li><a asp-controller="StockTransfer" asp-action="Index" class="links">Stock Transfers</a></li>
+            <li>@Model.TransferNumber</li>
         </ul>
     </div>
 }
 
 <main class="page-content">
+    <div class="row g-4">
+        <!-- Overview Card -->
+        <div class="col-lg-4 col-md-12">
+            <div class="common-box p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h4 class="mb-0 fw-bold">@Model.TransferNumber</h4>
+                    <span class="badge @(Model.Status == "Received" ? "bg-success" : (Model.Status == "In Transit" ? "bg-primary" : (Model.Status == "Cancelled" ? "bg-danger" : "bg-warning text-dark"))) fs-6">
+                        @Model.Status
+                    </span>
+                </div>
 
-    <section class="form-section">
-        <div class="form-section-header d-flex justify-content-between align-items-center">
-            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Stock Transfer Information</h2>
-            <a asp-controller="StockTransfer" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
-        </div>
+                <hr class="my-3" />
 
-        <div class="form-section-body">
-            <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Transfer Number</label>
-                        <p class="detail-value">@Model.TransferNumber</p>
+                <div class="mb-2">
+                    <span class="text-muted font-12 d-block">Source Warehouse</span>
+                    <strong class="text-danger"><i class="fas fa-arrow-up me-1"></i>@Model.FromWarehouseName</strong>
+                </div>
+
+                <div class="mb-2">
+                    <span class="text-muted font-12 d-block">Destination Warehouse</span>
+                    <strong class="text-success"><i class="fas fa-arrow-down me-1"></i>@Model.ToWarehouseName</strong>
+                </div>
+
+                <div class="mb-2">
+                    <span class="text-muted font-12 d-block">Transfer Initiated</span>
+                    <span>@Model.TransferDate.ToString("dd MMM yyyy, hh:mm tt")</span>
+                </div>
+
+                @if (Model.ShippedDate.HasValue)
+                {
+                    <div class="mb-2">
+                        <span class="text-muted font-12 d-block">Dispatched Date</span>
+                        <span>@Model.ShippedDate.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Transfer Date</label>
-                        <p class="detail-value">@Money.LongDate(Model.InitiatedOn)</p>
+                }
+
+                @if (Model.ReceivedDate.HasValue)
+                {
+                    <div class="mb-2">
+                        <span class="text-muted font-12 d-block">Received Date</span>
+                        <span>@Model.ReceivedDate.Value.ToString("dd MMM yyyy, hh:mm tt")</span>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Source Warehouse</label>
-                        <p class="detail-value">@Model.FromWarehouse</p>
+                }
+
+                <div class="mb-2">
+                    <span class="text-muted font-12 d-block">Total Items &amp; Quantity</span>
+                    <strong class="fs-6">@Model.LineCount items (@Model.TotalQuantity units)</strong>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Carrier))
+                {
+                    <div class="mb-2">
+                        <span class="text-muted font-12 d-block">Carrier</span>
+                        <span>@Model.Carrier @(string.IsNullOrEmpty(Model.TrackingNumber) ? "" : $"({Model.TrackingNumber})")</span>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Destination Warehouse</label>
-                        <p class="detail-value">@Model.ToWarehouse</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Product</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Quantity</label>
-                        <p class="detail-value">@Model.TotalQuantity</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <p class="detail-value">@Model.Status</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Remarks</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Created By</label>
-                        <p class="detail-value">@(Model.CreatedBy ?? "—")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Approved By</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
+                }
+
+                <hr class="my-3" />
+
+                <div class="d-grid gap-2">
+                    @if (Model.Status == "Draft")
+                    {
+                        <form method="post" asp-action="UpdateStatus" id="formDispatch">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="status" value="1" />
+                            <input type="hidden" name="reason" value="In Transit" />
+                            <button type="button" class="custom_button primary_button w-100 text-center" onclick="confirmTransferAction('dispatch')">
+                                <i class="fas fa-truck me-1"></i> Dispatch Transfer (Mark In Transit)
+                            </button>
+                        </form>
+                    }
+                    else if (Model.Status == "In Transit")
+                    {
+                        <form method="post" asp-action="UpdateStatus" id="formReceive">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="status" value="2" />
+                            <input type="hidden" name="reason" value="Received" />
+                            <button type="button" class="custom_button primary_button w-100 text-center bg-success border-success" onclick="confirmTransferAction('receive')">
+                                <i class="fas fa-check me-1"></i> Receive Into @Model.ToWarehouseName
+                            </button>
+                        </form>
+                    }
+                    else if (Model.Status == "Received")
+                    {
+                        <div class="alert alert-success py-2 font-12 text-center mb-0">
+                            <i class="fas fa-check-circle me-1"></i> Transfer successfully completed &amp; stock reconciled.
+                        </div>
+                    }
+                </div>
             </div>
         </div>
-    </section>
 
+        <!-- Line Items -->
+        <div class="col-lg-8 col-md-12">
+            <div class="common-box p-4">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">
+                    <i class="fas fa-boxes me-2" style="color:var(--accent);"></i>Transfer Manifest (@Model.Lines.Count items)
+                </h5>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm align-middle font-13">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product Name</th>
+                                <th>SKU</th>
+                                <th class="text-end">Transfer Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var line in Model.Lines)
+                            {
+                                <tr>
+                                    <td><strong>@line.ProductName</strong></td>
+                                    <td><code>@line.Sku</code></td>
+                                    <td class="text-end fw-bold">@line.Quantity units</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="mt-3 p-3 bg-light rounded">
+                        <span class="text-muted font-12 d-block fw-bold">Notes:</span>
+                        <p class="mb-0 font-13">@Model.Notes</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </main>
+
+<div class="modal delete-common-modal common-modal" id="transfer-action-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close-modal" data-bs-dismiss="modal" aria-label="Close">
+                    <picture><img src="~/assets/images/close-icon.svg" alt="close" width="24" height="24"></picture>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3 id="transferModalTitle">Confirmation</h3>
+                <p id="transferModalMessage"></p>
+                <div class="delete-edit-btn">
+                    <button type="button" class="custom_button secondary_button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btn-confirm-action" class="custom_button primary_button" onclick="executeTransferAction()">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
+        let pendingActionForm = null;
+
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
         });
+
+        function confirmTransferAction(action) {
+            if (action === 'dispatch') {
+                $('#transferModalTitle').text('Dispatch Confirmation');
+                $('#transferModalMessage').text('Are you sure you want to dispatch this transfer? This will deduct the units from @Model.FromWarehouseName and record the movement in ledger.');
+                pendingActionForm = document.getElementById('formDispatch');
+            } else if (action === 'receive') {
+                $('#transferModalTitle').text('Receive Confirmation');
+                $('#transferModalMessage').text('Are you sure you want to mark this transfer as received? This will add the units to @Model.ToWarehouseName and complete the transfer.');
+                pendingActionForm = document.getElementById('formReceive');
+            }
+            $('#transfer-action-modal').modal('show');
+        }
+
+        function executeTransferAction() {
+            if (pendingActionForm) {
+                $('#transfer-action-modal').modal('hide');
+                pendingActionForm.submit();
+            }
+        }
     </script>
 }
+

@@ -87,6 +87,25 @@ public interface IAdminClient
 
     #endregion
 
+    #region Inventory Management
+
+    Task<ResponseViewModel<InventoryKpiSummaryViewModel>> GetInventoryKpisAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<List<InventoryTransactionViewModel>>> GetInventoryLedgerAsync(int? productId = null, int? warehouseId = null, int maxRows = 100, CancellationToken ct = default);
+    Task<ResponseViewModel<InventoryDetailViewModel>> GetInventoryDetailAsync(long id, CancellationToken ct = default);
+    Task<ResponseViewModel<long>> SaveStockAsync(StockSaveRequest request, CancellationToken ct = default);
+    Task<ResponseViewModel<bool>> DeleteStockAsync(long id, CancellationToken ct = default);
+
+    Task<ResponseViewModel<WarehouseDetailViewModel>> GetWarehouseDetailAsync(int id, CancellationToken ct = default);
+    Task<ResponseViewModel<SupplierDetailViewModel>> GetSupplierDetailAsync(int id, CancellationToken ct = default);
+    Task<ResponseViewModel<PurchaseOrderDetailViewModel>> GetPurchaseDetailAsync(int id, CancellationToken ct = default);
+    Task<ResponseViewModel<bool>> ReceivePurchaseOrderAsync(int id, CancellationToken ct = default);
+    Task<ResponseViewModel<StockAdjustmentDetailViewModel>> GetStockAdjustmentDetailAsync(int id, CancellationToken ct = default);
+    Task<ResponseViewModel<StockTransferDetailViewModel>> GetStockTransferDetailAsync(int id, CancellationToken ct = default);
+    Task<ResponseViewModel<StockRateDetailViewModel>> GetStockRateDetailAsync(int productId, int? variantId = null, CancellationToken ct = default);
+    Task<ResponseViewModel<bool>> SaveStockRateAsync(StockRateSaveRequest request, CancellationToken ct = default);
+
+    #endregion
+
     #region Orders
 
     Task<ResponseViewModel<PagedResult<OrderGridItem>>> GetOrdersAsync(

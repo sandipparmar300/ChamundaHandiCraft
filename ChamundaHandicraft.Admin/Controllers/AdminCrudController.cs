@@ -75,7 +75,8 @@ public abstract class AdminCrudController<TGrid, TSave> : Controller
         if (!ModelState.IsValid)
         {
             var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
-            TempData["ErrorMessage"] = string.IsNullOrWhiteSpace(firstError) ? "Please fill in all required fields correctly." : firstError;
+            ViewData["ErrorMessage"] = string.IsNullOrWhiteSpace(firstError) ? "Please fill in all required fields correctly." : firstError;
+            TempData.Remove("ErrorMessage");
             return View("Create", request);
         }
 
@@ -93,7 +94,8 @@ public abstract class AdminCrudController<TGrid, TSave> : Controller
             {
                 msg = $"Failed to save (HTTP {(int)response.StatusCode}).";
             }
-            TempData["ErrorMessage"] = msg;
+            ViewData["ErrorMessage"] = msg;
+            TempData.Remove("ErrorMessage");
             return View("Create", request);
         }
 

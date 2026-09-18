@@ -22,8 +22,8 @@
 
 <main class="page-content">
 
-    <form method="post" id="stocktakeForm" enctype="multipart/form-data">
-
+    <form method="post" asp-action="Save" asp-controller="StockTake" id="stocktakeForm">
+        @Html.AntiForgeryToken()
         <input type="hidden" id="Id" name="Id" value="@Model.Id" />
 
         <section class="form-section">
@@ -34,33 +34,39 @@
             <div class="form-section-body">
                 <div class="row g-3">
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Stock Take Number <span class="req">*</span></label>
-                        <input id="StockTakeNumber" name="StockTakeNumber" class="form-control-custom" placeholder="Enter stock take number" / value="@Model.StockTakeNumber" >
+                        <label class="form-label-custom">Stock Take Number</label>
+                        <input id="StockTakeNumber" name="StockTakeNumber" class="form-control-custom" placeholder="Auto-generated if blank" value="@Model.StockTakeNumber" />
                         <span class="error-msg" data-valmsg-for="StockTakeNumber"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Scheduled Date <span class="req">*</span></label>
-                        <input type="date" id="ScheduledDate" name="ScheduledDate" class="form-control-custom" />
-                        <span class="error-msg" data-valmsg-for="ScheduledDate"></span>
+                        <label class="form-label-custom">Scheduled / Started Date <span class="req">*</span></label>
+                        <input type="date" id="StartedOn" name="StartedOn" class="form-control-custom" value="@(Model.StartedOn == default ? DateTime.Today.ToString("yyyy-MM-dd") : Model.StartedOn.ToString("yyyy-MM-dd"))" required />
+                        <span class="error-msg" data-valmsg-for="StartedOn"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Warehouse <span class="req">*</span></label>
-                        <select id="Warehouse" name="Warehouse" class="form-control-custom select2-single">
+                        <select id="WarehouseId" name="WarehouseId" class="form-control-custom select2-single" required>
                             <option value="">Select warehouse</option>
-                            <option>Select from master</option>
+                            @if (ViewBag.Warehouses is List<IdNamePair> whList)
+                            {
+                                foreach (var wh in whList)
+                                {
+                                    <option value="@wh.Id" selected="@(Model.WarehouseId == wh.Id ? "selected" : null)">@wh.Name</option>
+                                }
+                            }
                         </select>
-                        <span class="error-msg" data-valmsg-for="Warehouse"></span>
+                        <span class="error-msg" data-valmsg-for="WarehouseId"></span>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Count Type</label>
                         <select id="CountType" name="CountType" class="form-control-custom select2-single">
                             <option value="">Select count type</option>
-                            <option>Full Count</option>
-                            <option>Cycle Count</option>
-                            <option>Spot Check</option>
+                            <option value="Full Count" selected="@(Model.CountType == "Full Count" ? "selected" : null)">Full Count</option>
+                            <option value="Cycle Count" selected="@(Model.CountType == "Cycle Count" ? "selected" : null)">Cycle Count</option>
+                            <option value="Spot Check" selected="@(Model.CountType == "Spot Check" ? "selected" : null)">Spot Check</option>
                         </select>
                         <span class="error-msg" data-valmsg-for="CountType"></span>
                     </div>
@@ -68,39 +74,29 @@
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Status</label>
                         <select id="Status" name="Status" class="form-control-custom select2-single">
-                            <option value="">Select status</option>
-                            <option>Scheduled</option>
-                            <option>In Progress</option>
-                            <option>Completed</option>
-                            <option>Cancelled</option>
+                            <option value="Scheduled" selected="@(Model.Status == "Scheduled" ? "selected" : null)">Scheduled</option>
+                            <option value="In Progress" selected="@(Model.Status == "In Progress" ? "selected" : null)">In Progress</option>
+                            <option value="Completed" selected="@(Model.Status == "Completed" ? "selected" : null)">Completed</option>
+                            <option value="Cancelled" selected="@(Model.Status == "Cancelled" ? "selected" : null)">Cancelled</option>
                         </select>
                         <span class="error-msg" data-valmsg-for="Status"></span>
                     </div>
 
-                    <div class="col-lg-12 col-md-6">
-                        <label class="form-label-custom">Remarks</label>
-                        <textarea id="Remarks" name="Remarks" class="form-control-custom" rows="3" placeholder="Enter remarks"></textarea>
-                        <span class="error-msg" data-valmsg-for="Remarks"></span>
+                    <div class="col-lg-12 col-md-12">
+                        <label class="form-label-custom">Remarks / Note</label>
+                        <textarea id="Note" name="Note" class="form-control-custom" rows="3" placeholder="Enter remarks or instructions for stock take count...">@Model.Note</textarea>
+                        <span class="error-msg" data-valmsg-for="Note"></span>
                     </div>
                 </div>
             </div>
         </section>
 
         <div class="form-action-bar">
-            <div class="is-active-row" id="isActiveRow">
-                <div class="is-toggle-item" id="isToggleItem">
-                    <span class="ia-label">Is Active</span>
-                    <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
-                        <span class="ia-slider"></span>
-                    </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
-                </div>
-            </div>
+            <div></div>
 
             <div>
                 <a asp-controller="StockTake" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save">
+                <button type="submit" class="btn-save">
                     <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
                 </button>
             </div>

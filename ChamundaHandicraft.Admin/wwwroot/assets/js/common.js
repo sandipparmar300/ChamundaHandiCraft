@@ -1,4 +1,4 @@
-﻿const allowedImgExtensions = /(\.png|\.jpg|\.jpeg|\.svg|\.webp)$/i;
+const allowedImgExtensions = /(\.png|\.jpg|\.jpeg|\.svg|\.webp)$/i;
 const allowedVideoExtensions = /(\.mp4|\.mov|\.wmv|\.avi|\.avchd|\.flv|\.f4v|\.swf|\.mkv|\.webm|\.mpeg2)$/i;
 const phoneregx = /^(?:(?:(?:\+?234(?:\h1)?|01)\h*)?(?:\(\d{2}\)))(?:\W*\d{3})?\W*\d{5}(?!\d)/
 //const phoneregx = /(?:(?:(?:\+?234(?:\h1)?|01)\h*)?(?:\(\d{2}\)|\d{3})|\d{4})(?:\W*\d{3})?\W*\d{4}(?!\d)/gm
@@ -24,7 +24,7 @@ const showNotif = (notifMessage, notifType) => {
         "newestOnTop": false,
         "progressBar": false,
         "positionClass": "toast-top-right",
-        "preventDuplicates": false,
+        "preventDuplicates": true,
         "onclick": null,
         "showDuration": "300",
         "hideDuration": "1000",

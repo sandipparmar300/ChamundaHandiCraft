@@ -1,4 +1,5 @@
 using ChamundaHandicraft.Admin.Services;
+using ChamundaHandicraft.Helper.Constants;
 using ChamundaHandicraft.Helper.ViewModel.Admin;
 using ChamundaHandicraft.Helper.ViewModel.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -167,6 +168,12 @@ public class ProductController : Controller
     private async Task LoadLookupsAsync(CancellationToken ct)
     {
         var lookupsResponse = await _client.GetProductLookupsAsync(ct);
-        ViewBag.Lookups = lookupsResponse.Data ?? new ProductLookupsViewModel();
+        var lookups = lookupsResponse.Data ?? new ProductLookupsViewModel();
+        if (lookups.Warehouses.Count == 0)
+        {
+            var whRes = await _client.GetLookupAsync(ApiEndPoint.Warehouse.Lookup, null, ct);
+            lookups.Warehouses = whRes.Data ?? new List<IdNamePair>();
+        }
+        ViewBag.Lookups = lookups;
     }
 }

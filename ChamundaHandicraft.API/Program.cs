@@ -2,6 +2,7 @@ using System.Text;
 using Catalog.Application.Extentions;
 using Categories.Application.Extentions;
 using Identity.Application.Extentions;
+using Inventory.Application.Extentions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -30,6 +31,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddCatalogModule(builder.Configuration);
 builder.Services.AddCategoriesModule(builder.Configuration);
+builder.Services.AddInventoryModule(builder.Configuration);
 builder.Services.AddScoped<ChamundaHandicraft.API.Services.Email.IEmailTemplateService, ChamundaHandicraft.API.Services.Email.EmailTemplateService>();
 builder.Services.AddScoped<ChamundaHandicraft.API.Services.Email.IEmailService, ChamundaHandicraft.API.Services.Email.SmtpEmailService>();
 

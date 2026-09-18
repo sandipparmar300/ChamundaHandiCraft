@@ -1,8 +1,8 @@
-@model SupplierGridItem
+﻿@model ChamundaHandicraft.Helper.ViewModel.Admin.SupplierSaveRequest
 @{
-    ViewData["Title"] = "Supplier";
-    var isEdit = string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Edit", StringComparison.OrdinalIgnoreCase);
+    var isEdit = Model.Id > 0;
     var heading = isEdit ? "Edit Supplier" : "Add Supplier";
+    ViewData["Title"] = heading;
 }
 
 @section Header {
@@ -22,132 +22,142 @@
 
 <main class="page-content">
 
-    <form method="post" id="supplierForm" enctype="multipart/form-data">
+    <form method="post" asp-action="Save" asp-controller="Supplier" id="supplierForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
 
-        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
-
+        <!-- 1. SUPPLIER BASIC INFO -->
         <section class="form-section">
             <div class="form-section-header">
-                <h2><i class="fas fa-truck" style="color:var(--accent);margin-right:8px;"></i>Supplier Information</h2>
+                <h2><i class="fas fa-truck-loading" style="color:var(--accent);margin-right:8px;"></i>Supplier Information</h2>
             </div>
 
             <div class="form-section-body">
                 <div class="row g-3">
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Supplier Code <span class="req">*</span></label>
-                        <input id="SupplierCode" name="SupplierCode" class="form-control-custom" placeholder="Enter supplier code" />
-                        <span class="error-msg" data-valmsg-for="SupplierCode"></span>
+                    <div class="col-lg-6 col-md-6">
+                        <label asp-for="SupplierName" class="form-label-custom">Supplier / Vendor Name <span class="req">*</span></label>
+                        <input asp-for="SupplierName" class="form-control-custom" placeholder="e.g. Kutch Heritage Weavers" />
+                        <span asp-validation-for="SupplierName" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Supplier Name <span class="req">*</span></label>
-                        <input id="SupplierName" name="SupplierName" class="form-control-custom" placeholder="Enter supplier name" / value="@Model.SupplierName" >
-                        <span class="error-msg" data-valmsg-for="SupplierName"></span>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">GSTIN</label>
-                        <input id="GSTIN" name="GSTIN" class="form-control-custom" placeholder="Enter gstin" />
-                        <span class="error-msg" data-valmsg-for="GSTIN"></span>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Payment Terms</label>
-                        <select id="PaymentTerms" name="PaymentTerms" class="form-control-custom select2-single">
-                            <option value="">Select payment terms</option>
-                            <option>Advance</option>
-                            <option>Net 15</option>
-                            <option>Net 30</option>
-                            <option>Net 45</option>
-                            <option>Net 60</option>
-                        </select>
-                        <span class="error-msg" data-valmsg-for="PaymentTerms"></span>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Credit Limit</label>
-                        <input id="CreditLimit" name="CreditLimit" class="form-control-custom" placeholder="0.00" />
-                        <span class="error-msg" data-valmsg-for="CreditLimit"></span>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="form-section">
-            <div class="form-section-header">
-                <h2><i class="fas fa-address-book" style="color:var(--accent);margin-right:8px;"></i>Contact</h2>
-            </div>
-
-            <div class="form-section-body">
-                <div class="row g-3">
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Contact Person</label>
-                        <input id="ContactPerson" name="ContactPerson" class="form-control-custom" placeholder="Enter contact person" / value="@Model.ContactPerson" >
-                        <span class="error-msg" data-valmsg-for="ContactPerson"></span>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Phone</label>
-                        <input id="Phone" name="Phone" class="form-control-custom" placeholder="Enter phone" / value="@Model.Phone" >
-                        <span class="error-msg" data-valmsg-for="Phone"></span>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label-custom">Email</label>
-                        <input id="Email" name="Email" class="form-control-custom" placeholder="Enter email" / value="@Model.Email" >
-                        <span class="error-msg" data-valmsg-for="Email"></span>
-                    </div>
-
-                    <div class="col-lg-12 col-md-6">
-                        <label class="form-label-custom">Address</label>
-                        <textarea id="Address" name="Address" class="form-control-custom" rows="3" placeholder="Enter address"></textarea>
-                        <span class="error-msg" data-valmsg-for="Address"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">City</label>
-                        <input id="City" name="City" class="form-control-custom" placeholder="Enter city" / value="@Model.City" >
-                        <span class="error-msg" data-valmsg-for="City"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">State</label>
-                        <input id="State" name="State" class="form-control-custom" placeholder="Enter state" />
-                        <span class="error-msg" data-valmsg-for="State"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Country</label>
-                        <select id="Country" name="Country" class="form-control-custom select2-single">
-                            <option value="">Select country</option>
-                            <option>India</option>
-                        </select>
-                        <span class="error-msg" data-valmsg-for="Country"></span>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Postal Code</label>
-                        <input id="PostalCode" name="PostalCode" class="form-control-custom" placeholder="Enter postal code" />
-                        <span class="error-msg" data-valmsg-for="PostalCode"></span>
+                    <div class="col-lg-6 col-md-6">
+                        <label asp-for="Code" class="form-label-custom">Supplier Code <span class="req">*</span></label>
+                        <input asp-for="Code" class="form-control-custom" placeholder="e.g. SUP-001" style="text-transform:uppercase;" />
+                        <span asp-validation-for="Code" class="text-danger font-12 mt-1 d-block"></span>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- 2. CONTACT DETAILS -->
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-user-tie" style="color:var(--accent);margin-right:8px;"></i>Contact Details</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="ContactPerson" class="form-label-custom">Contact Person</label>
+                        <input asp-for="ContactPerson" class="form-control-custom" placeholder="e.g. Devjibhai Vankar" />
+                        <span asp-validation-for="ContactPerson" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="Phone" class="form-label-custom">Phone Number</label>
+                        <input asp-for="Phone" class="form-control-custom" placeholder="e.g. +91 98250 12345" />
+                        <span asp-validation-for="Phone" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="Email" class="form-label-custom">Email Address</label>
+                        <input asp-for="Email" type="email" class="form-control-custom" placeholder="e.g. contact@kutchweavers.com" />
+                        <span asp-validation-for="Email" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. TAX & COMMERCIAL -->
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-file-invoice" style="color:var(--accent);margin-right:8px;"></i>Tax &amp; Payment Terms</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="Gstin" class="form-label-custom">GSTIN</label>
+                        <input asp-for="Gstin" class="form-control-custom" placeholder="24AAAAA0000A1Z5" style="text-transform:uppercase;" />
+                        <span asp-validation-for="Gstin" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="Pan" class="form-label-custom">PAN Number</label>
+                        <input asp-for="Pan" class="form-control-custom" placeholder="AAAAA0000A" style="text-transform:uppercase;" />
+                        <span asp-validation-for="Pan" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="PaymentTermsDays" class="form-label-custom">Payment Terms (Days)</label>
+                        <input asp-for="PaymentTermsDays" type="number" min="0" max="365" class="form-control-custom" placeholder="30" />
+                        <span asp-validation-for="PaymentTermsDays" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. LOCATION -->
+        <section class="form-section">
+            <div class="form-section-header">
+                <h2><i class="fas fa-map-marker-alt" style="color:var(--accent);margin-right:8px;"></i>Address &amp; Location</h2>
+            </div>
+
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <div class="col-lg-12">
+                        <label asp-for="AddressLine1" class="form-label-custom">Address</label>
+                        <input asp-for="AddressLine1" class="form-control-custom" placeholder="Village / Workshop Street address" />
+                        <span asp-validation-for="AddressLine1" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="City" class="form-label-custom">City / Town</label>
+                        <input asp-for="City" class="form-control-custom" placeholder="e.g. Bhuj" />
+                        <span asp-validation-for="City" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="StateName" class="form-label-custom">State</label>
+                        <input asp-for="StateName" class="form-control-custom" placeholder="e.g. Gujarat" />
+                        <span asp-validation-for="StateName" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <label asp-for="Pincode" class="form-label-custom">Pincode</label>
+                        <input asp-for="Pincode" class="form-control-custom" placeholder="e.g. 370001" />
+                        <span asp-validation-for="Pincode" class="text-danger font-12 mt-1 d-block"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACTION BAR -->
         <div class="form-action-bar">
             <div class="is-active-row" id="isActiveRow">
                 <div class="is-toggle-item" id="isToggleItem">
                     <span class="ia-label">Is Active</span>
                     <label class="ia-switch">
-                        <input type="checkbox" id="IsActiveCheckbox" name="IsActive" checked />
+                        <input type="checkbox" asp-for="IsActive" id="IsActiveCheckbox" />
                         <span class="ia-slider"></span>
                     </label>
-                    <span class="ia-status" id="isActiveStatus">Active</span>
+                    <span class="ia-status" id="isActiveStatus">@(Model.IsActive ? "Active" : "Inactive")</span>
                 </div>
             </div>
 
             <div>
                 <a asp-controller="Supplier" asp-action="Index" class="btn btn-light">Cancel</a>
-                <button type="button" class="btn-save">
+                <button type="submit" class="btn-save">
                     <i class="fas fa-save"></i> @(isEdit ? "Update Changes" : "Save Changes")
                 </button>
             </div>
@@ -158,17 +168,10 @@
 </main>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             if (typeof fnSelectMenu === 'function') { fnSelectMenu("menu-Inventory"); }
-            $('#uploadBox').click(function () { $('#Photo').click(); });
         });
-
-        function previewUpload(input) {
-            if (!input.files || !input.files[0]) return;
-            var reader = new FileReader();
-            reader.onload = function (e) { document.getElementById('ImagePreview').src = e.target.result; };
-            reader.readAsDataURL(input.files[0]);
-        }
     </script>
 }

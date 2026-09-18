@@ -79,6 +79,16 @@ public class PagedResult<T>
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 24;
 
+    public PagedResult() { }
+
+    public PagedResult(List<T> items, int totalCount, int page = 1, int pageSize = 24)
+    {
+        Items = items;
+        TotalCount = totalCount;
+        Page = page;
+        PageSize = pageSize;
+    }
+
     public int TotalPages => PageSize <= 0 ? 0 : (int)Math.Ceiling(TotalCount / (double)PageSize);
     public bool HasPrevious => Page > 1;
     public bool HasNext => Page < TotalPages;
@@ -125,6 +135,11 @@ public class UpdateStatusRequest
     public int Id { get; set; }
     public int Status { get; set; }
     public string? Reason { get; set; }
+    public bool IsActive
+    {
+        get => Status == 1;
+        set => Status = value ? 1 : 0;
+    }
 }
 
 /// <summary>Common audit columns every admin grid displays.</summary>

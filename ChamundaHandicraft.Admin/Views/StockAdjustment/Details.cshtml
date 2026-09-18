@@ -1,6 +1,6 @@
-@model StockAdjustmentGridItem
+﻿@model ChamundaHandicraft.Helper.ViewModel.Admin.StockAdjustmentDetailViewModel
 @{
-    ViewData["Title"] = "Stock Adjustment Details";
+    ViewData["Title"] = $"Adjustment: {Model.AdjustmentNumber}";
 }
 
 @section Header {
@@ -12,66 +12,73 @@
             <h2 class="page-title">Stock Adjustment Details</h2>
         </div>
         <ul class="page-breadcrumb">
-            <li><a asp-controller="StockAdjustment" asp-action="Index" class="links">Stock Adjustments Listing</a></li>
-            <li>Details</li>
+            <li><a asp-controller="StockAdjustment" asp-action="Index" class="links">Stock Adjustments</a></li>
+            <li>@Model.AdjustmentNumber</li>
         </ul>
     </div>
 }
 
 <main class="page-content">
+    <div class="row g-4">
+        <div class="col-lg-6 col-md-12">
+            <div class="common-box p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0 fw-bold">@Model.AdjustmentNumber</h4>
+                    <span class="badge bg-light text-dark border">@Model.AdjustedOn.ToString("dd MMM yyyy, hh:mm tt")</span>
+                </div>
 
-    <section class="form-section">
-        <div class="form-section-header d-flex justify-content-between align-items-center">
-            <h2><i class="fas fa-circle-info" style="color:var(--accent);margin-right:8px;"></i>Stock Adjustment Information</h2>
-            <a asp-controller="StockAdjustment" asp-action="Edit" asp-route-id="@Model.Id" class="custom_button secondary_button"><i class="fas fa-pen"></i> Edit</a>
-        </div>
+                <hr class="my-3" />
 
-        <div class="form-section-body">
-            <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Adjustment Number</label>
-                        <p class="detail-value">@Model.AdjustmentNumber</p>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <span class="text-muted font-12 d-block">Warehouse</span>
+                        <strong>@Model.WarehouseName</strong>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Date</label>
-                        <p class="detail-value">@Money.LongDate(Model.AdjustedOn)</p>
+
+                    <div class="col-sm-6">
+                        <span class="text-muted font-12 d-block">Reason</span>
+                        <span class="badge bg-info text-dark">@Model.Reason</span>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Product</label>
-                        <p class="detail-value">@Model.ProductName</p>
+
+                    <div class="col-12">
+                        <span class="text-muted font-12 d-block">Product</span>
+                        <strong class="fs-6">@Model.ProductName</strong>
+                        <small class="text-muted d-block">SKU: <code>@Model.Sku</code></small>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Warehouse</label>
-                        <p class="detail-value">@Model.WarehouseName</p>
+
+                    <div class="col-sm-4">
+                        <span class="text-muted font-12 d-block">Quantity Before</span>
+                        <span class="fs-5">@Model.QuantityBefore</span>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Previous Quantity</label>
-                        <p class="detail-value">@Model.QuantityBefore</p>
+
+                    <div class="col-sm-4">
+                        <span class="text-muted font-12 d-block">Adjustment Difference</span>
+                        <strong class="fs-5 @(Model.QuantityChange > 0 ? "text-success" : "text-danger")">
+                            @(Model.QuantityChange > 0 ? "+" : "")@Model.QuantityChange
+                        </strong>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">New Quantity</label>
-                        <p class="detail-value">@Model.QuantityAfter</p>
+
+                    <div class="col-sm-4">
+                        <span class="text-muted font-12 d-block">Quantity After</span>
+                        <strong class="fs-5 text-primary">@Model.QuantityAfter</strong>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Difference</label>
-                        <p class="detail-value">@(Model.IsIncrease ? "+" : "")@Model.QuantityChange</p>
+
+                    <div class="col-12">
+                        <span class="text-muted font-12 d-block">Logged By</span>
+                        <span>@(Model.CreatedByName ?? "Admin")</span>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Reason</label>
-                        <p class="detail-value">@Model.Reason</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Remarks</label>
-                        <p class="detail-value">@(Model.Note ?? "—")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Adjusted By</label>
-                        <p class="detail-value">@(Model.CreatedBy ?? "—")</p>
-                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Note))
+                    {
+                        <div class="col-12">
+                            <span class="text-muted font-12 d-block">Remarks</span>
+                            <p class="mb-0 p-2 bg-light rounded font-13">@Model.Note</p>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
-    </section>
-
+    </div>
 </main>
 
 @section Scripts {

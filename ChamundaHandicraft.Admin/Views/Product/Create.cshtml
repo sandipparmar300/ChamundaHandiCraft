@@ -245,6 +245,18 @@
                             </div>
 
                             <div class="col-lg-3 col-md-6">
+                                <label class="form-label-custom">Warehouse</label>
+                                <select asp-for="WarehouseId" class="form-control-custom">
+                                    <option value="">-- Select Default Warehouse --</option>
+                                    @foreach (var w in lookups.Warehouses)
+                                    {
+                                        <option value="@w.Id" selected="@(Model.WarehouseId == w.Id || (!isEdit && w.Id == 1) ? "selected" : null)">@w.Name</option>
+                                    }
+                                </select>
+                                <span class="text-danger font-12" asp-validation-for="WarehouseId"></span>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6">
                                 <label class="form-label-custom">Low Stock Alert Threshold</label>
                                 <input asp-for="LowStockThreshold" type="number" class="form-control-custom" placeholder="5" min="1" />
                             </div>

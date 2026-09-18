@@ -103,6 +103,8 @@ public static class ApiEndPoint
         public const string BulkImport = AdminPrefix + "Product/BulkImport";
         public const string Export = AdminPrefix + "Product/Export";
         public const string ActivityHistory = AdminPrefix + "Product/ActivityHistory";
+        public const string Lookup = AdminPrefix + "Product/Lookup";
+        public const string VariantLookup = AdminPrefix + "Product/VariantLookup";
 
         // Storefront reads
         public const string ShopList = ShopPrefix + "Product/List";
@@ -171,14 +173,41 @@ public static class ApiEndPoint
 
     #region Inventory — Inventory module
 
+    public static class Warehouse
+    {
+        public const string GridList = AdminPrefix + "Warehouse/GridList";
+        public const string GetById = AdminPrefix + "Warehouse/GetById";
+        public const string Save = AdminPrefix + "Warehouse/Save";
+        public const string Delete = AdminPrefix + "Warehouse/Delete";
+        public const string UpdateStatus = AdminPrefix + "Warehouse/UpdateStatus";
+        public const string Lookup = AdminPrefix + "Warehouse/Lookup";
+    }
+
+    public static class Supplier
+    {
+        public const string GridList = AdminPrefix + "Supplier/GridList";
+        public const string GetById = AdminPrefix + "Supplier/GetById";
+        public const string Save = AdminPrefix + "Supplier/Save";
+        public const string Delete = AdminPrefix + "Supplier/Delete";
+        public const string UpdateStatus = AdminPrefix + "Supplier/UpdateStatus";
+        public const string Lookup = AdminPrefix + "Supplier/Lookup";
+    }
+
     public static class Inventory
     {
+        public const string GridList = AdminPrefix + "Inventory/GridList";
+        public const string GetById = AdminPrefix + "Inventory/GetById";
+        public const string Save = AdminPrefix + "Inventory/Save";
+        public const string Delete = AdminPrefix + "Inventory/Delete";
+        public const string Kpis = AdminPrefix + "Inventory/Kpis";
+        public const string Ledger = AdminPrefix + "Inventory/Ledger";
         public const string StockGridList = AdminPrefix + "Inventory/StockGridList";
         public const string StockLedger = AdminPrefix + "Inventory/StockLedger";
         public const string AdjustmentSave = AdminPrefix + "Inventory/AdjustmentSave";
         public const string TransferSave = AdminPrefix + "Inventory/TransferSave";
         public const string StockTakeSave = AdminPrefix + "Inventory/StockTakeSave";
         public const string PurchaseEntrySave = AdminPrefix + "Inventory/PurchaseEntrySave";
+        public const string Details = AdminPrefix + "Inventory/Details";
         public const string LowStockAlerts = AdminPrefix + "Inventory/LowStockAlerts";
         public const string WarehouseList = AdminPrefix + "Inventory/WarehouseList";
 
@@ -187,6 +216,40 @@ public static class ApiEndPoint
         /// storefront may quote — "Only 2 left" must never come from a cached list.
         /// </summary>
         public const string ShopAvailability = ShopPrefix + "Inventory/Availability";
+    }
+
+    public static class Purchase
+    {
+        public const string GridList = AdminPrefix + "Purchase/GridList";
+        public const string GetById = AdminPrefix + "Purchase/GetById";
+        public const string Save = AdminPrefix + "Purchase/Save";
+        public const string Delete = AdminPrefix + "Purchase/Delete";
+        public const string UpdateStatus = AdminPrefix + "Purchase/UpdateStatus";
+        public const string ReceiveStock = AdminPrefix + "Purchase/ReceiveStock";
+    }
+
+    public static class StockAdjustment
+    {
+        public const string GridList = AdminPrefix + "StockAdjustment/GridList";
+        public const string GetById = AdminPrefix + "StockAdjustment/GetById";
+        public const string Save = AdminPrefix + "StockAdjustment/Save";
+        public const string Delete = AdminPrefix + "StockAdjustment/Delete";
+    }
+
+    public static class StockTransfer
+    {
+        public const string GridList = AdminPrefix + "StockTransfer/GridList";
+        public const string GetById = AdminPrefix + "StockTransfer/GetById";
+        public const string Save = AdminPrefix + "StockTransfer/Save";
+        public const string UpdateStatus = AdminPrefix + "StockTransfer/UpdateStatus";
+        public const string Delete = AdminPrefix + "StockTransfer/Delete";
+    }
+
+    public static class StockRate
+    {
+        public const string GridList = AdminPrefix + "StockRate/GridList";
+        public const string GetById = AdminPrefix + "StockRate/GetById";
+        public const string Save = AdminPrefix + "StockRate/Save";
     }
 
     #endregion
