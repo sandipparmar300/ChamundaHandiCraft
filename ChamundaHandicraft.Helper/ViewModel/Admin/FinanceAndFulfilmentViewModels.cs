@@ -208,9 +208,9 @@ public class StockAdjustmentGridItem : AuditableViewModel, IAdminGridRow
 public class StockTakeGridItem : AuditableViewModel, IAdminGridRow
 {
     public int Id { get; set; }
-    public string StockTakeNumber { get; set; } = string.Empty;
+    public string? StockTakeNumber { get; set; }
     public int WarehouseId { get; set; }
-    public string WarehouseName { get; set; } = string.Empty;
+    public string? WarehouseName { get; set; }
     public DateTime StartedOn { get; set; } = DateTime.UtcNow;
     public DateTime? CompletedOn { get; set; }
     public int SkusCounted { get; set; }
@@ -222,7 +222,7 @@ public class StockTakeGridItem : AuditableViewModel, IAdminGridRow
     public string? CountType { get; set; }
 
     public bool IsActive => Status != "Cancelled";
-    public string DisplayName => StockTakeNumber;
+    public string DisplayName => string.IsNullOrWhiteSpace(StockTakeNumber) ? "New Stock Take" : StockTakeNumber;
 }
 
 public class StockTransferGridItem : AuditableViewModel, IAdminGridRow

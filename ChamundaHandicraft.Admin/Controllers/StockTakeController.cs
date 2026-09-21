@@ -36,6 +36,10 @@ public class StockTakeController : AdminCrudController<StockTakeGridItem, StockT
     [ValidateAntiForgeryToken]
     public override async Task<IActionResult> Save(StockTakeGridItem request, CancellationToken ct = default)
     {
+        ModelState.Remove(nameof(request.DisplayName));
+        ModelState.Remove(nameof(request.WarehouseName));
+        ModelState.Remove(nameof(request.StockTakeNumber));
+
         await LoadWarehousesAsync(ct);
         return await base.Save(request, ct);
     }
