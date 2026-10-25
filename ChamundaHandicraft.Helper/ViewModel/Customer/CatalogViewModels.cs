@@ -202,6 +202,20 @@ public class CategoryViewModel
     public string Url => $"/c/{Slug}";
 }
 
+/// <summary>Active Flash Sale offer for home and promotional banners.</summary>
+public class FlashSaleOfferViewModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string OfferType { get; set; } = "Flash Sale";
+    public string? Description { get; set; }
+    public int DiscountPercent { get; set; }
+    public DateTime StartsOn { get; set; }
+    public DateTime EndsOn { get; set; }
+    public string? BannerUrl { get; set; }
+    public bool IsLiveNow => StartsOn <= DateTime.Now && EndsOn > DateTime.Now;
+}
+
 /// <summary>One filter group on the PLP rail and the mobile filter sheet.</summary>
 public class FacetGroupViewModel
 {

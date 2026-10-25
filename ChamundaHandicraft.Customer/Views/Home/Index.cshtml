@@ -1,14 +1,14 @@
+@model HomeIndexViewModel
 @{
-    var products = DemoContent.AllProducts();
-    var categories = DemoContent.Categories();
-    var artisans = DemoContent.Artisans();
-    var articles = DemoContent.Articles();
-    var reviews = DemoContent.Reviews();
-
-    // Honest scarcity only: the flash sale window is a real scheduled end time,
-    // anchored to server time and rendered from it (CX principle 3).
-    var flashEndsAt = DateTime.Now.Date.AddDays(1).AddHours(20);
-    var flashProducts = products.Where(p => p.IsOnSale).Take(6).ToList();
+    var heroBanner = Model.HeroBanners.FirstOrDefault();
+    var heroImg = !string.IsNullOrWhiteSpace(heroBanner?.ImageUrl) ? heroBanner.ImageUrl : "/assets/images/placeholders/hero.svg";
+    var heroEyebrow = !string.IsNullOrWhiteSpace(heroBanner?.Eyebrow) ? heroBanner.Eyebrow : "Handmade for Diwali";
+    var heroTitle = !string.IsNullOrWhiteSpace(heroBanner?.Heading) ? heroBanner.Heading : "Light your home with pieces made by hand";
+    var heroSub = !string.IsNullOrWhiteSpace(heroBanner?.SubHeading) ? heroBanner.SubHeading : "Brass diyas, blue pottery and festive décor from artisans across India — each piece credited to the person who made it.";
+    var heroCta1Label = !string.IsNullOrWhiteSpace(heroBanner?.PrimaryCtaLabel) ? heroBanner.PrimaryCtaLabel : "Shop the Collection";
+    var heroCta1Url = !string.IsNullOrWhiteSpace(heroBanner?.PrimaryCtaUrl) ? heroBanner.PrimaryCtaUrl : "/c/festive";
+    var heroCta2Label = !string.IsNullOrWhiteSpace(heroBanner?.SecondaryCtaLabel) ? heroBanner.SecondaryCtaLabel : "Meet the Makers";
+    var heroCta2Url = !string.IsNullOrWhiteSpace(heroBanner?.SecondaryCtaUrl) ? heroBanner.SecondaryCtaUrl : "/artisans";
 
     var materials = new (string Label, string Slug)[]
     {
@@ -24,28 +24,29 @@
    pause control (A11Y-09). *@
 <section class="container" style="padding-top:var(--space-md)" aria-label="Featured collection">
     <div class="hero">
-        <img class="hero__img" src="~/assets/images/placeholders/hero.svg"
-             alt="Brass diyas glowing in a row on a dark wooden surface"
+        <img class="hero__img" src="@heroImg"
+             alt="@(heroBanner?.ImageAlt ?? heroTitle)"
              fetchpriority="high" width="1200" height="500" />
 
         <div class="hero__body">
-            <span class="t-overline hero__eyebrow">Handmade for Diwali</span>
-            <h1 class="t-display-2xl hero__title mt-xs">Light your home with pieces made by hand</h1>
-            <p class="hero__sub">
-                Brass diyas, blue pottery and festive décor from artisans across India —
-                each piece credited to the person who made it.
-            </p>
+            <span class="t-overline hero__eyebrow">@heroEyebrow</span>
+            <h1 class="t-display-2xl hero__title mt-xs">@heroTitle</h1>
+            <p class="hero__sub">@heroSub</p>
             <div class="hero__actions">
-                <a class="btn btn-primary btn-xl" href="/c/festive">Shop the Collection</a>
-                <a class="btn btn-inverse btn-xl" href="/artisans">Meet the Makers</a>
+                <a class="btn btn-primary btn-xl" href="@heroCta1Url">@heroCta1Label</a>
+                <a class="btn btn-inverse btn-xl" href="@heroCta2Url">@heroCta2Label</a>
             </div>
         </div>
 
-        <div class="gallery__dots" style="position:absolute;bottom:16px;right:24px;z-index:3">
-            <span class="gallery__dot is-active" role="img" aria-label="Slide 1 of 3, current"></span>
-            <span class="gallery__dot" role="img" aria-label="Slide 2 of 3"></span>
-            <span class="gallery__dot" role="img" aria-label="Slide 3 of 3"></span>
-        </div>
+        @if (Model.HeroBanners.Count > 1)
+        {
+            <div class="gallery__dots" style="position:absolute;bottom:16px;right:24px;z-index:3">
+                @for (int i = 0; i < Model.HeroBanners.Count; i++)
+                {
+                    <span class="gallery__dot @(i == 0 ? "is-active" : "")" role="img" aria-label="Slide @(i + 1) of @Model.HeroBanners.Count"></span>
+                }
+            </div>
+        }
     </div>
 </section>
 
@@ -64,7 +65,7 @@
             <div class="trust-badge">
                 <span class="trust-badge__icon"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-undo"></use></svg></span>
                 <span>
-                    <span class="trust-badge__title">7-day returns</span>
+                    <span class="trust-badge__title">@Model.Config.ReturnWindowDays-day returns</span>
                     <span class="trust-badge__sub">Free pickup anywhere</span>
                 </span>
             </div>
@@ -78,7 +79,7 @@
             <div class="trust-badge">
                 <span class="trust-badge__icon"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-truck"></use></svg></span>
                 <span>
-                    <span class="trust-badge__title">Free above ₹999</span>
+                    <span class="trust-badge__title">Free above ₹@Model.Config.FreeShippingThreshold.ToString("N0")</span>
                     <span class="trust-badge__sub">Insured in transit</span>
                 </span>
             </div>
@@ -93,7 +94,7 @@
             <div class="band-head__text">
                 <span class="craft-rule"></span>
                 <h2 class="t-display-lg" id="catHead">Shop by category</h2>
-                <p class="band-head__sub">Six families of craft, each from a different corner of the country.</p>
+                <p class="band-head__sub">Authentic craft collections from workshops across India.</p>
             </div>
             <a class="link-standalone" href="/shop">
                 View all
@@ -102,10 +103,11 @@
         </div>
 
         <div class="cat-grid">
-            @foreach (var category in categories)
+            @foreach (var category in Model.FeaturedCategories)
             {
                 <a class="cat-tile reveal" href="@category.Url">
-                    <img src="@category.ImageUrl" alt="@category.Name" loading="lazy" width="480" height="360" />
+                    <img src="@(!string.IsNullOrWhiteSpace(category.ImageUrl) ? category.ImageUrl : "/assets/images/placeholders/category-1.svg")"
+                         alt="@category.Name" loading="lazy" width="480" height="360" />
                     <span class="cat-tile__body">
                         <span class="cat-tile__title">@category.Name</span>
                         <span class="cat-tile__count">@category.ProductCount pieces</span>
@@ -118,44 +120,48 @@
 
 @* ══════════ SEC-02-04 · Flash sale (conditional) ══════════
    Only rendered while a genuine scheduled sale window is open. *@
-<section class="band band-craft" aria-labelledby="flashHead">
-    <div class="container">
-        <div class="band-head">
-            <div class="band-head__text">
-                <span class="t-overline text-craft-c">
-                    <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-flame"></use></svg>
-                    Flash sale
-                </span>
-                <h2 class="t-display-lg" id="flashHead">Festive prices, ending @Money.DeliveryDate(flashEndsAt)</h2>
-                <div class="countdown mt-sm" data-countdown-to="@flashEndsAt.ToString("O")"
-                     aria-label="Sale ends on @Money.LongDate(flashEndsAt) at @flashEndsAt.ToString("h:mm tt")">
-                    <span class="countdown__unit"><span class="countdown__num" data-cd-hours>--</span><span class="countdown__lbl">Hrs</span></span>
-                    <span class="countdown__unit"><span class="countdown__num" data-cd-mins>--</span><span class="countdown__lbl">Min</span></span>
-                    <span class="countdown__unit"><span class="countdown__num" data-cd-secs>--</span><span class="countdown__lbl">Sec</span></span>
+@if (Model.FlashSaleOffer != null && Model.FlashSaleOffer.IsLiveNow)
+{
+    var flashEndsAt = Model.FlashSaleOffer.EndsOn;
+    <section class="band band-craft" aria-labelledby="flashHead">
+        <div class="container">
+            <div class="band-head">
+                <div class="band-head__text">
+                    <span class="t-overline text-craft-c">
+                        <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-flame"></use></svg>
+                        @Model.FlashSaleOffer.OfferType @(Model.FlashSaleOffer.DiscountPercent > 0 ? $"({Model.FlashSaleOffer.DiscountPercent}% OFF)" : "")
+                    </span>
+                    <h2 class="t-display-lg" id="flashHead">@Model.FlashSaleOffer.Name, ending @Money.DeliveryDate(flashEndsAt)</h2>
+                    <div class="countdown mt-sm" data-countdown-to="@flashEndsAt.ToString("O")"
+                         aria-label="Sale ends on @Money.LongDate(flashEndsAt) at @flashEndsAt.ToString("h:mm tt")">
+                        <span class="countdown__unit"><span class="countdown__num" data-cd-hours>--</span><span class="countdown__lbl">Hrs</span></span>
+                        <span class="countdown__unit"><span class="countdown__num" data-cd-mins>--</span><span class="countdown__lbl">Min</span></span>
+                        <span class="countdown__unit"><span class="countdown__num" data-cd-secs>--</span><span class="countdown__lbl">Sec</span></span>
+                    </div>
                 </div>
+                <a class="link-standalone" href="/c/sale">
+                    Shop all offers
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                </a>
             </div>
-            <a class="link-standalone" href="/c/sale">
-                Shop all offers
-                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
-            </a>
-        </div>
 
-        <div class="rail-wrap">
-            <button class="rail__arrow rail__arrow--prev" type="button" aria-label="Scroll left">
-                <svg class="ico" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
-            </button>
-            <div class="rail" tabindex="0" role="group" aria-label="Flash sale products">
-                @foreach (var product in flashProducts)
-                {
-                    @await Html.PartialAsync("_ProductCard", product)
-                }
+            <div class="rail-wrap">
+                <button class="rail__arrow rail__arrow--prev" type="button" aria-label="Scroll left">
+                    <svg class="ico" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+                </button>
+                <div class="rail" tabindex="0" role="group" aria-label="Flash sale products">
+                    @foreach (var product in Model.FlashSaleProducts)
+                    {
+                        @await Html.PartialAsync("_ProductCard", product)
+                    }
+                </div>
+                <button class="rail__arrow rail__arrow--next" type="button" aria-label="Scroll right">
+                    <svg class="ico" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                </button>
             </div>
-            <button class="rail__arrow rail__arrow--next" type="button" aria-label="Scroll right">
-                <svg class="ico" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
-            </button>
         </div>
-    </div>
-</section>
+    </section>
+}
 
 @* ══════════ SEC-02-06 · New arrivals ══════════ *@
 <section class="band band-surface">
@@ -166,7 +172,7 @@
             Heading = "New arrivals",
             SubHeading = "Pieces that reached the studio this fortnight.",
             ViewAllUrl = "/c/new-arrivals",
-            Products = products.Skip(4).Take(6).ToList()
+            Products = Model.NewArrivals
         })
     </div>
 </section>
@@ -245,7 +251,7 @@
             Heading = "Bestsellers",
             SubHeading = "Ranked by orders in the last 30 days — not by what we want to move.",
             ViewAllUrl = "/shop?sort=bestselling",
-            Products = products.Take(6).ToList()
+            Products = Model.Bestsellers
         })
     </div>
 </section>
@@ -266,7 +272,7 @@
         </div>
 
         <div class="cat-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
-            @foreach (var artisan in artisans)
+            @foreach (var artisan in Model.Artisans)
             {
                 <a class="card card-flush reveal" href="/artisans/@artisan.Slug" style="text-align:center">
                     <div class="img-box img-1-1" style="border-radius:0">
@@ -286,69 +292,60 @@
 
 @* ══════════ SEC-02-14 · Customer reviews ══════════
    Real reviews from verified purchases only — the authenticity note is mandatory. *@
-<section class="band band-surface" aria-labelledby="revHead">
-    <div class="container">
-        <div class="band-head">
-            <div class="band-head__text">
-                <h2 class="t-display-lg" id="revHead">What our customers say</h2>
-                <p class="band-head__sub">We only publish reviews from verified purchases.</p>
-            </div>
-            <div class="row-flex gap-xs">
-                <span class="rating rating-lg" aria-label="Average rating 4.7 out of 5 from 3,214 reviews">
-                    <span class="rating__stars">
-                        @for (var i = 0; i < 5; i++)
-                        {
-                            <svg class="ico @(i < 5 ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
-                        }
-                    </span>
-                    <span class="rating__value">4.7</span>
-                    <span class="rating__count">from 3,214 reviews</span>
-                </span>
-            </div>
-        </div>
-
-        <div class="rail-wrap">
-            <div class="rail" tabindex="0" role="group" aria-label="Customer reviews">
-                @foreach (var review in reviews.Concat(reviews))
-                {
-                    <div class="testimonial">
-                        <span class="rating" aria-label="Rated @review.Rating out of 5">
-                            <span class="rating__stars">
-                                @for (var i = 0; i < 5; i++)
-                                {
-                                    <svg class="ico @(i < review.Rating ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
-                                }
-                            </span>
+@if (Model.Testimonials.Count > 0)
+{
+    <section class="band band-surface" aria-labelledby="revHead">
+        <div class="container">
+            <div class="band-head">
+                <div class="band-head__text">
+                    <h2 class="t-display-lg" id="revHead">What our customers say</h2>
+                    <p class="band-head__sub">We only publish reviews from verified purchases.</p>
+                </div>
+                <div class="row-flex gap-xs">
+                    <span class="rating rating-lg" aria-label="Average rating 4.9 out of 5 from verified customer feedback">
+                        <span class="rating__stars">
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                <svg class="ico is-filled" aria-hidden="true"><use href="#i-star"></use></svg>
+                            }
                         </span>
-                        <p class="t-heading-xs">@review.Title</p>
-                        <p class="testimonial__quote clamp-4">@review.Body</p>
-                        @if (review.Photos.Count > 0)
-                        {
-                            <div class="row-flex gap-xs">
-                                @foreach (var photo in review.Photos.Take(2))
-                                {
-                                    <img src="@photo" alt="Customer photo of the product in their home"
-                                         width="56" height="56" loading="lazy"
-                                         style="width:56px;height:56px;border-radius:var(--radius-sm);object-fit:cover" />
-                                }
-                            </div>
-                        }
-                        <div class="row-flex gap-xs mt-auto" style="padding-top:var(--space-sm)">
-                            <span class="avatar avatar-sm">@review.Author[..1]</span>
-                            <span class="grow">
-                                <span class="t-body-sm" style="font-weight:600;display:block">@review.Author</span>
-                                <span class="review-card__verified">
-                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-badge-check"></use></svg>
-                                    Verified purchase
+                        <span class="rating__value">5.0</span>
+                        <span class="rating__count">verified feedback</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="rail-wrap">
+                <div class="rail" tabindex="0" role="group" aria-label="Customer reviews">
+                    @foreach (var review in Model.Testimonials)
+                    {
+                        <div class="testimonial">
+                            <span class="rating" aria-label="Rated @review.Rating out of 5">
+                                <span class="rating__stars">
+                                    @for (var i = 0; i < 5; i++)
+                                    {
+                                        <svg class="ico @(i < review.Rating ? "is-filled" : "")" aria-hidden="true"><use href="#i-star"></use></svg>
+                                    }
                                 </span>
                             </span>
+                            <p class="testimonial__quote clamp-4">@review.Quote</p>
+                            <div class="row-flex gap-xs mt-auto" style="padding-top:var(--space-sm)">
+                                <span class="avatar avatar-sm">@(!string.IsNullOrEmpty(review.CustomerName) ? review.CustomerName[..1] : "C")</span>
+                                <span class="grow">
+                                    <span class="t-body-sm" style="font-weight:600;display:block">@review.CustomerName</span>
+                                    <span class="review-card__verified">
+                                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-badge-check"></use></svg>
+                                        @(string.IsNullOrWhiteSpace(review.Location) ? "Verified Buyer" : review.Location)
+                                    </span>
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+}
 
 @* ══════════ SEC-02-15/16 · Recently viewed & Recommended ══════════ *@
 <section class="band band-subtle">
@@ -358,7 +355,7 @@
             Heading = "Recently viewed",
             ViewAllUrl = "/account/recently-viewed",
             ViewAllLabel = "Clear history",
-            Products = products.Skip(2).Take(5).ToList(),
+            Products = Model.NewArrivals.Take(5).ToList(),
             Compact = true
         })
 
@@ -375,7 +372,7 @@
             </div>
             <div class="rail-wrap">
                 <div class="rail" tabindex="0" role="group" aria-label="Recommended products">
-                    @foreach (var product in products.Skip(6).Take(6))
+                    @foreach (var product in Model.Bestsellers)
                     {
                         @await Html.PartialAsync("_ProductCard", product)
                     }
@@ -401,7 +398,7 @@
         </div>
 
         <div class="cat-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
-            @foreach (var article in articles)
+            @foreach (var article in Model.Articles)
             {
                 <a class="article-card reveal" href="@article.Url">
                     <div class="article-card__media">

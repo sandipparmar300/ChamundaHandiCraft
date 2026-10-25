@@ -34,7 +34,10 @@ public interface IStorefrontClient
         string railKey, int count, string? contextSlug = null, CancellationToken ct = default);
 
     Task<ResponseViewModel<List<CategoryViewModel>>> GetCategoriesAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<List<CategoryViewModel>>> GetMegaMenuAsync(CancellationToken ct = default);
     Task<ResponseViewModel<List<BannerViewModel>>> GetBannersAsync(string placement, CancellationToken ct = default);
+    Task<ResponseViewModel<FlashSaleOfferViewModel?>> GetFlashSaleOfferAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<List<ChamundaHandicraft.Helper.ViewModel.Admin.TestimonialGridItem>>> GetTestimonialsAsync(CancellationToken ct = default);
 
     // ---- Cart & checkout ---------------------------------------------------
     Task<ResponseViewModel<CartViewModel>> GetCartAsync(CancellationToken ct = default);

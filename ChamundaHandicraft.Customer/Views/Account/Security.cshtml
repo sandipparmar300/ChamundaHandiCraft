@@ -1,3 +1,4 @@
+@model ChamundaHandicraft.Helper.ViewModel.Customer.CustomerChangePasswordRequest
 @{
     Layout = "_AccountLayout";
 }
@@ -7,26 +8,42 @@
     <p class="page-head__sub">Your password, sign-in methods and the devices currently signed in.</p>
 </div>
 
+@if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+{
+    <div class="alert alert-danger mb-md" role="alert">
+        <svg class="ico" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+        <div>
+            <p class="alert__title">Please check the errors below</p>
+            @foreach (var error in ViewData.ModelState[string.Empty]!.Errors)
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        </div>
+    </div>
+}
+
 <section class="card">
     <h2 class="t-heading-md mb-md">Change password</h2>
-    <form data-validate style="max-width:420px">
+    <form method="post" action="/account/security" data-validate style="max-width:420px">
+        @Html.AntiForgeryToken()
         <div class="field">
             <label class="field__label" for="currentPw">Current password</label>
             <div class="input-group has-suffix">
-                <input class="input" id="currentPw" type="password" required autocomplete="current-password" style="padding-left:12px" />
+                <input class="input" id="currentPw" name="CurrentPassword" type="password" required autocomplete="current-password" style="padding-left:12px" />
                 <span class="input-group__suffix">
                     <button class="icon-btn icon-btn-sm pw-toggle" type="button" aria-label="Show password">
                         <svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"></use></svg>
                     </button>
                 </span>
             </div>
+            <span asp-validation-for="CurrentPassword" class="field__error" style="display:block"></span>
             <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
         </div>
 
         <div class="field">
             <label class="field__label" for="nextPw">New password</label>
             <div class="input-group has-suffix">
-                <input class="input" id="nextPw" type="password" required minlength="8" autocomplete="new-password"
+                <input class="input" id="nextPw" name="NewPassword" type="password" required minlength="8" autocomplete="new-password"
                        data-pw-strength="secPwMeter" style="padding-left:12px" />
                 <span class="input-group__suffix">
                     <button class="icon-btn icon-btn-sm pw-toggle" type="button" aria-label="Show password">
@@ -38,10 +55,24 @@
                 <span></span><span></span><span></span><span></span>
             </div>
             <p class="field__help">At least 8 characters with a letter and a number.</p>
+            <span asp-validation-for="NewPassword" class="field__error" style="display:block"></span>
+        </div>
+
+        <div class="field">
+            <label class="field__label" for="confPw">Confirm new password</label>
+            <div class="input-group has-suffix">
+                <input class="input" id="confPw" name="ConfirmPassword" type="password" required minlength="8" autocomplete="new-password" style="padding-left:12px" />
+                <span class="input-group__suffix">
+                    <button class="icon-btn icon-btn-sm pw-toggle" type="button" aria-label="Show password">
+                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"></use></svg>
+                    </button>
+                </span>
+            </div>
+            <span asp-validation-for="ConfirmPassword" class="field__error" style="display:block"></span>
         </div>
 
         <label class="check mt-md">
-            <input type="checkbox" checked />
+            <input type="checkbox" name="SignOutOthers" value="true" checked />
             <span class="check__label t-body-sm">Sign out of other devices</span>
         </label>
 
@@ -76,7 +107,7 @@
                 <svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg>
                 <span>
                     <span class="t-body-md" style="display:block">Password</span>
-                    <span class="t-body-xs text-tertiary-c">Last changed 4 months ago</span>
+                    <span class="t-body-xs text-tertiary-c">Active credentials</span>
                 </span>
             </span>
             <span class="tag tag-success">Active</span>
@@ -100,8 +131,7 @@
         @foreach (var (device, place, when, current) in new[]
         {
             ("Chrome on Windows", "Ahmedabad, India", "Right now", true),
-            ("Safari on iPhone", "Ahmedabad, India", "2 hours ago", false),
-            ("Chrome on Android", "Mumbai, India", "6 days ago", false)
+            ("Safari on iPhone", "Ahmedabad, India", "2 hours ago", false)
         })
         {
             <div class="row-flex wrap between gap-sm" style="padding-bottom:var(--space-sm);border-bottom:1px solid var(--color-border-subtle)">

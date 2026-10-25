@@ -50,6 +50,51 @@ public class SmtpEmailService : IEmailService
     }
 
     /// <summary>
+    /// Specialized helper to dispatch customer password reset emails using the "CustomerPasswordReset" template.
+    /// </summary>
+    public async Task<bool> SendCustomerPasswordResetEmailAsync(string recipientEmail, string recipientName, string resetToken)
+    {
+        var storefrontBaseUrl = _configuration["StorefrontBaseUrl"] ?? "https://localhost:7141";
+        var resetUrl = $"{storefrontBaseUrl.TrimEnd('/')}/reset-password?token={Uri.EscapeDataString(resetToken)}";
+
+        var tokens = new Dictionary<string, string>
+        {
+            ["RecipientName"] = recipientName,
+            ["RecipientEmail"] = recipientEmail,
+            ["ResetUrl"] = resetUrl,
+            ["ExpirationMinutes"] = "30"
+        };
+
+        _logger.LogInformation(
+            "[CUSTOMER AUTH DISPATCH] Customer Password Reset Link generated for {Email} ({Name}): {Url}",
+            recipientEmail, recipientName, resetUrl);
+
+        return await SendEmailWithTemplateAsync(recipientEmail, recipientName, "CustomerPasswordReset", tokens);
+    }
+
+    /// <summary>
+    /// Specialized helper to dispatch customer onboarding/welcome emails using the "CustomerWelcome" template.
+    /// </summary>
+    public async Task<bool> SendCustomerWelcomeEmailAsync(string recipientEmail, string recipientName, int rewardPoints = 50)
+    {
+        var storefrontBaseUrl = _configuration["StorefrontBaseUrl"] ?? "https://localhost:7141";
+
+        var tokens = new Dictionary<string, string>
+        {
+            ["RecipientName"] = recipientName,
+            ["RecipientEmail"] = recipientEmail,
+            ["RewardPoints"] = rewardPoints.ToString(),
+            ["StorefrontUrl"] = storefrontBaseUrl
+        };
+
+        _logger.LogInformation(
+            "[CUSTOMER WELCOME DISPATCH] Welcome email sending to {Email} ({Name}) with {Points} pts",
+            recipientEmail, recipientName, rewardPoints);
+
+        return await SendEmailWithTemplateAsync(recipientEmail, recipientName, "CustomerWelcome", tokens);
+    }
+
+    /// <summary>
     /// Renders the specified external HTML template and sends the resulting email via SMTP.
     /// </summary>
     public async Task<bool> SendEmailWithTemplateAsync(

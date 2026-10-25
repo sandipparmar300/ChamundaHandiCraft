@@ -18,12 +18,23 @@ public class DemoStorefrontClient : IStorefrontClient
     public Task<ShellViewModel> GetShellAsync(CancellationToken ct = default) =>
         Task.FromResult(new ShellViewModel
         {
-            IsSignedIn = true,
-            FirstName = "Ananya",
-            CartCount = 4,
-            WishlistCount = 6,
-            NotificationCount = 2,
-            RewardPoints = 1840
+            IsSignedIn = false,
+            FirstName = string.Empty,
+            CartCount = 0,
+            WishlistCount = 0,
+            NotificationCount = 0,
+            RewardPoints = 0,
+            Categories = DemoContent.Categories(),
+            Config = new StorefrontConfigViewModel
+            {
+                SupportPhone = "+91 98765 43210",
+                SupportEmail = "care@chamundahandicraft.com",
+                SupportWhatsApp = "919876543210",
+                SupportHours = "Mon–Sat, 10am–7pm IST",
+                Gstin = "08AABCK1234M1Z5",
+                LegalName = "Chamunda Handicraft Pvt. Ltd.",
+                FreeShippingThreshold = 999m
+            }
         });
 
     public Task<StorefrontConfigViewModel> GetConfigAsync(CancellationToken ct = default) =>
@@ -89,6 +100,9 @@ public class DemoStorefrontClient : IStorefrontClient
     public Task<ResponseViewModel<List<CategoryViewModel>>> GetCategoriesAsync(CancellationToken ct = default) =>
         Task.FromResult(Ok(DemoContent.Categories()));
 
+    public Task<ResponseViewModel<List<CategoryViewModel>>> GetMegaMenuAsync(CancellationToken ct = default) =>
+        Task.FromResult(Ok(DemoContent.Categories()));
+
     public Task<ResponseViewModel<List<BannerViewModel>>> GetBannersAsync(string placement, CancellationToken ct = default) =>
         Task.FromResult(Ok(new List<BannerViewModel>
         {
@@ -106,6 +120,32 @@ public class DemoStorefrontClient : IStorefrontClient
                 SecondaryCtaUrl = "/artisans"
             }
         }));
+
+    public Task<ResponseViewModel<FlashSaleOfferViewModel?>> GetFlashSaleOfferAsync(CancellationToken ct = default) =>
+        Task.FromResult(Ok<FlashSaleOfferViewModel?>(new FlashSaleOfferViewModel
+        {
+            Id = 1,
+            Name = "Diwali Flash Sale",
+            OfferType = "Flash Sale",
+            DiscountPercent = 20,
+            StartsOn = DateTime.Now.Date,
+            EndsOn = DateTime.Now.Date.AddDays(2).AddHours(20)
+        }));
+
+    public Task<ResponseViewModel<List<ChamundaHandicraft.Helper.ViewModel.Admin.TestimonialGridItem>>> GetTestimonialsAsync(CancellationToken ct = default)
+    {
+        var reviews = DemoContent.Reviews();
+        var items = reviews.Select(r => new ChamundaHandicraft.Helper.ViewModel.Admin.TestimonialGridItem
+        {
+            CustomerName = r.Author,
+            Location = "Jaipur",
+            Quote = r.Body,
+            Rating = r.Rating,
+            ShowOnHome = true
+        }).ToList();
+
+        return Task.FromResult(Ok(items));
+    }
 
     public Task<ResponseViewModel<CartViewModel>> GetCartAsync(CancellationToken ct = default)
     {

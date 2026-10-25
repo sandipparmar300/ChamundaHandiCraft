@@ -128,14 +128,14 @@ public class CouponSaveRequest
 
     /// <summary>Shown verbatim on the storefront coupon card.</summary>
     public string Title { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
 
     public DiscountType DiscountType { get; set; }
     public decimal DiscountValue { get; set; }
     public decimal? MaxDiscount { get; set; }
     public decimal? MinimumOrderValue { get; set; }
 
-    public DateTime StartsOn { get; set; }
+    public DateTime StartsOn { get; set; } = DateTime.UtcNow;
     public DateTime? ExpiresOn { get; set; }
 
     public int? TotalUsageLimit { get; set; }
@@ -148,7 +148,17 @@ public class CouponSaveRequest
     /// <summary>Hidden coupons never appear in "My Coupons" — they must be typed.</summary>
     public bool IsPublic { get; set; } = true;
 
-    public CouponStatus Status { get; set; } = CouponStatus.Draft;
+    public CouponStatus Status { get; set; } = CouponStatus.Active;
+    public bool IsActive { get; set; } = true;
+
+    // View form aliases
+    public string CouponCode { get => Code; set => Code = value; }
+    public string CouponName { get => Title; set => Title = value; }
+    public decimal? MaximumDiscount { get => MaxDiscount; set => MaxDiscount = value; }
+    public DateTime ValidFrom { get => StartsOn; set => StartsOn = value; }
+    public DateTime? ValidTo { get => ExpiresOn; set => ExpiresOn = value; }
+    public int? UsageLimit { get => TotalUsageLimit; set => TotalUsageLimit = value; }
+    public int? UsageLimitPerUser { get => PerCustomerLimit; set => PerCustomerLimit = value; }
 }
 
 /// <summary>
@@ -160,11 +170,22 @@ public class FlashSaleSaveRequest
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public DateTime StartsOn { get; set; }
-    public DateTime EndsOn { get; set; }
+    public DateTime StartsOn { get; set; } = DateTime.UtcNow;
+    public DateTime EndsOn { get; set; } = DateTime.UtcNow.AddDays(7);
     public int DiscountPercent { get; set; }
     public List<int> ProductIds { get; set; } = new();
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
+
+    // View form aliases
+    public string OfferName { get => Name; set => Name = value; }
+    public string OfferType { get; set; } = "Flash Sale";
+    public string? Description { get; set; }
+    public int? Priority { get; set; }
+    public decimal DiscountValue { get => DiscountPercent; set => DiscountPercent = (int)value; }
+    public DateTime ValidFrom { get => StartsOn; set => StartsOn = value; }
+    public DateTime ValidTo { get => EndsOn; set => EndsOn = value; }
+    public string? AppliesTo { get; set; }
+    public string? BannerUrl { get; set; }
 }
 
 public class BannerSaveRequest
@@ -175,13 +196,13 @@ public class BannerSaveRequest
     public string Heading { get; set; } = string.Empty;
     public string? SubHeading { get; set; }
 
-    public string ImageUrl { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
 
     /// <summary>A separate mobile crop. Never a scaled desktop image — see the perf budget.</summary>
     public string? MobileImageUrl { get; set; }
 
     /// <summary>Required. A banner without alt text cannot be published.</summary>
-    public string ImageAlt { get; set; } = string.Empty;
+    public string? ImageAlt { get; set; }
 
     public string? PrimaryCtaLabel { get; set; }
     public string? PrimaryCtaUrl { get; set; }
@@ -191,7 +212,21 @@ public class BannerSaveRequest
     public DateTime? StartsOn { get; set; }
     public DateTime? EndsOn { get; set; }
     public int SortOrder { get; set; }
-    public ContentStatus Status { get; set; } = ContentStatus.Draft;
+    public ContentStatus Status { get; set; } = ContentStatus.Published;
+    public bool IsActive { get; set; } = true;
+    public int ImpressionCount { get; set; }
+    public int ClickCount { get; set; }
+
+    // View form aliases
+    public string Title { get => Heading; set => Heading = value; }
+    public string? Subtitle { get => SubHeading; set => SubHeading = value; }
+    public string? Device { get; set; }
+    public string? LinkType { get; set; }
+    public string? LinkTarget { get => PrimaryCtaUrl; set => PrimaryCtaUrl = value; }
+    public string? ButtonText { get => PrimaryCtaLabel; set => PrimaryCtaLabel = value; }
+    public string? AltText { get => ImageAlt; set => ImageAlt = value; }
+    public DateTime? ValidFrom { get => StartsOn; set => StartsOn = value; }
+    public DateTime? ValidTo { get => EndsOn; set => EndsOn = value; }
 }
 
 #endregion
@@ -250,10 +285,7 @@ public class ReviewModerationItem
     public bool VerifiedPurchase { get; set; }
     public string? OrderNumber { get; set; }
     public ModerationStatus Status { get; set; }
-
-    /// <summary>Why it was rejected. Shown to the customer, so it must be a real reason.</summary>
     public string? RejectionReason { get; set; }
-
     public string? MerchantReply { get; set; }
 }
 
@@ -267,7 +299,16 @@ public class TestimonialSaveRequest
     public string? PhotoUrl { get; set; }
     public bool ShowOnHome { get; set; }
     public int SortOrder { get; set; }
-    public ContentStatus Status { get; set; } = ContentStatus.Draft;
+    public ContentStatus Status { get; set; } = ContentStatus.Published;
+    public bool IsActive { get; set; } = true;
+    public int ImpressionCount { get; set; }
+    public int ClickCount { get; set; }
+
+    // View form aliases
+    public string AuthorName { get => CustomerName; set => CustomerName = value; }
+    public string? Designation { get; set; }
+    public string Testimonial { get => Quote; set => Quote = value; }
+    public string? Placement { get => ShowOnHome ? "Home" : "None"; set => ShowOnHome = string.Equals(value, "Home", StringComparison.OrdinalIgnoreCase); }
 }
 
 #endregion

@@ -149,6 +149,11 @@ public class AuditableViewModel
     public string? CreatedBy { get; set; }
     public DateTime? ModifiedOn { get; set; }
     public string? ModifiedBy { get; set; }
+
+    // Audit aliases
+    public DateTime CreatedAt { get => CreatedOn; set => CreatedOn = value; }
+    public DateTime? UpdatedAt { get => ModifiedOn; set => ModifiedOn = value; }
+    public DateTime? UpdatedOn { get => ModifiedOn; set => ModifiedOn = value; }
 }
 
 /// <summary>

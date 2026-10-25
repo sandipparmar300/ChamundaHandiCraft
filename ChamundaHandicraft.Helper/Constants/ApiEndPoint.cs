@@ -36,6 +36,7 @@ public static class ApiEndPoint
     {
         public static string GridList(string module) => $"{AdminPrefix}{module}/GridList";
         public static string GetById(string module) => $"{AdminPrefix}{module}/GetById";
+        public static string Details(string module) => $"{AdminPrefix}{module}/Details";
         public static string Save(string module) => $"{AdminPrefix}{module}/Save";
         public static string Delete(string module) => $"{AdminPrefix}{module}/Delete";
         public static string UpdateStatus(string module) => $"{AdminPrefix}{module}/UpdateStatus";

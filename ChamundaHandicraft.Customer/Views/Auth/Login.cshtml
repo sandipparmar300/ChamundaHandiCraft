@@ -1,11 +1,26 @@
+@model ChamundaHandicraft.Helper.ViewModel.Customer.CustomerLoginRequest
 @{
     Layout = "_AuthLayout";
-    var returnUrl = ViewData["ReturnUrl"] as string ?? "/";
+    var returnUrl = ViewData["ReturnUrl"] as string ?? Model?.ReturnUrl ?? "/";
 }
 
 @* PG-01-01 · Sign In *@
 <h1 class="t-heading-xl">Welcome back</h1>
 <p class="t-body-md text-secondary-c mt-xs mb-lg">Sign in to continue shopping.</p>
+
+@if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+{
+    <div class="alert alert-danger mb-md" role="alert">
+        <svg class="ico" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+        <div>
+            <p class="alert__title">Please check the errors below</p>
+            @foreach (var error in ViewData.ModelState[string.Empty]!.Errors)
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        </div>
+    </div>
+}
 
 @* Method tabs — Password and OTP are equal-weight; neither is hidden behind the other. *@
 <div data-tabs-scope>
@@ -17,13 +32,16 @@
     @* ---------- Password ---------- *@
     <div class="tab-panel is-active" id="pane-password" role="tabpanel" style="padding-top:0">
         <form method="post" action="/login" data-validate>
-            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="ReturnUrl" value="@returnUrl" />
 
             <div class="field">
                 <label class="field__label" for="identifier">Email or mobile number</label>
-                <input class="input" id="identifier" name="identifier" type="text" required
+                <input class="input" id="identifier" name="Identifier" type="text" required
+                       value="@Model?.Identifier"
                        placeholder="ananya@example.com or 98765 43210"
                        autocomplete="username" aria-describedby="identifierError" />
+                <span asp-validation-for="Identifier" class="field__error" style="display:block"></span>
                 <p class="field__error" id="identifierError">
                     <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
                     <span>Enter your email or mobile number</span>
@@ -36,7 +54,7 @@
                     <a class="link t-body-sm" href="/forgot-password">Forgot password?</a>
                 </div>
                 <div class="input-group has-suffix">
-                    <input class="input" id="password" name="password" type="password" required
+                    <input class="input" id="password" name="Password" type="password" required
                            autocomplete="current-password" style="padding-left:12px" />
                     <span class="input-group__suffix">
                         <button class="icon-btn icon-btn-sm pw-toggle" type="button" aria-label="Show password">
@@ -44,11 +62,12 @@
                         </button>
                     </span>
                 </div>
+                <span asp-validation-for="Password" class="field__error" style="display:block"></span>
                 <p class="field__error">
                     <svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
                     <span>Enter your password</span>
                 </p>
-                <p class="inline-msg text-warning-c" id="capsWarning" hidden>
+                <p class="inline-msg text-warning-c" id="capsWarning" style="display:none">
                     <svg class="ico ico-xs" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
                     Caps Lock is on
                 </p>
@@ -56,7 +75,7 @@
 
             @* Default off, with the duration stated plainly. *@
             <label class="check mt-md">
-                <input type="checkbox" name="rememberMe" />
+                <input type="checkbox" name="RememberMe" value="true" @(Model?.RememberMe == true ? "checked" : "") />
                 <span class="check__label t-body-sm">
                     Keep me signed in
                     <span class="check__help">Stay signed in for 30 days on this device.</span>
@@ -73,6 +92,7 @@
     @* ---------- OTP ---------- *@
     <div class="tab-panel" id="pane-otp" role="tabpanel" style="padding-top:0">
         <form method="post" action="/signin/otp" data-validate>
+            @Html.AntiForgeryToken()
             <div class="field">
                 <label class="field__label" for="otpTarget">Mobile number</label>
                 <div class="phone-input">
@@ -107,7 +127,7 @@
 <div class="auth-divider mt-lg mb-lg">or</div>
 
 <div class="social-btns">
-    <button class="btn btn-outline btn-lg btn-block" type="button">
+    <button class="btn btn-outline btn-lg btn-block" type="button" onclick="alert('Google Sign-In is coming soon. Please use email and password above.')">
         <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="fill:none;stroke:none">
             <path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.4Z" />
             <path fill="#34A853" d="M12 22c2.7 0 4.9-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z" />
@@ -141,14 +161,23 @@
 
 @section Scripts {
     <script>
-        // Caps-lock warning — a password field that silently rejects is a dark pattern.
+        // Caps-lock warning — dynamically toggled based on modifier state
         (function () {
             var input = document.getElementById('password');
             var warning = document.getElementById('capsWarning');
             if (!input || !warning) return;
 
-            input.addEventListener('keyup', function (e) {
-                warning.hidden = !(e.getModifierState && e.getModifierState('CapsLock'));
+            function checkCaps(e) {
+                if (e.getModifierState) {
+                    var isCaps = e.getModifierState('CapsLock');
+                    warning.style.display = isCaps ? 'inline-flex' : 'none';
+                }
+            }
+
+            input.addEventListener('keydown', checkCaps);
+            input.addEventListener('keyup', checkCaps);
+            input.addEventListener('blur', function () {
+                warning.style.display = 'none';
             });
         })();
     </script>

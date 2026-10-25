@@ -105,7 +105,12 @@ public abstract class AdminCrudController<TGrid, TSave> : Controller
 
     public virtual async Task<IActionResult> Details(int id, CancellationToken ct = default)
     {
-        var response = await Client.GetByIdAsync<TGrid>(ApiEndPoint.Crud.GetById(Module), id, ct);
+        var response = await Client.GetByIdAsync<TGrid>(ApiEndPoint.Crud.Details(Module), id, ct);
+
+        if (!response.IsSuccess || response.Data is null)
+        {
+            response = await Client.GetByIdAsync<TGrid>(ApiEndPoint.Crud.GetById(Module), id, ct);
+        }
 
         if (!response.IsSuccess || response.Data is null)
         {
@@ -167,7 +172,12 @@ public abstract class AdminListController<TGrid> : Controller
 
     public virtual async Task<IActionResult> Details(int id, CancellationToken ct = default)
     {
-        var response = await Client.GetByIdAsync<TGrid>(ApiEndPoint.Crud.GetById(Module), id, ct);
+        var response = await Client.GetByIdAsync<TGrid>(ApiEndPoint.Crud.Details(Module), id, ct);
+
+        if (!response.IsSuccess || response.Data is null)
+        {
+            response = await Client.GetByIdAsync<TGrid>(ApiEndPoint.Crud.GetById(Module), id, ct);
+        }
 
         if (!response.IsSuccess || response.Data is null)
         {

@@ -1,6 +1,8 @@
 @model List<AddressViewModel>
 @{
     Layout = "_AccountLayout";
+    var search = ViewData["Search"] as string;
+    var sort = ViewData["Sort"] as string;
 }
 
 <div class="page-head" style="padding-top:0">
@@ -9,10 +11,31 @@
             <h1 class="t-heading-xl page-head__title">Addresses</h1>
             <p class="page-head__sub">Where we deliver. The default is pre-selected at checkout.</p>
         </div>
-        <button class="btn btn-primary" type="button" data-open="addAddress">
+        <button class="btn btn-primary" type="button" id="btnAddAddress" data-open="addAddress">
             <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"></use></svg>
             Add Address
         </button>
+    </div>
+</div>
+
+@* Search & Filter Toolbar *@
+<div class="row-flex wrap between gap-sm mb-md">
+    <form method="get" action="/account/addresses" class="row-flex gap-xs" style="flex:1;max-width:400px">
+        <div class="input-group has-suffix w-full">
+            <input class="input" type="text" name="search" value="@search" placeholder="Search address, city, pincode..." />
+            <span class="input-group__suffix">
+                <button class="icon-btn icon-btn-sm" type="submit" aria-label="Search">
+                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-search"></use></svg>
+                </button>
+            </span>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(search))
+        {
+            <a class="btn btn-ghost btn-sm" href="/account/addresses">Clear</a>
+        }
+    </form>
+    <div class="row-flex gap-xs">
+        <span class="t-body-sm text-secondary-c">@Model.Count @(Model.Count == 1 ? "address" : "addresses") saved</span>
     </div>
 </div>
 
@@ -22,10 +45,19 @@
         <span class="state-block__icon">
             <svg class="ico ico-2xl" aria-hidden="true"><use href="#i-map-pin"></use></svg>
         </span>
-        <h2 class="t-heading-md">No saved addresses</h2>
-        <p class="state-block__desc">Add one now and checkout takes two taps next time.</p>
+        <h2 class="t-heading-md">@(string.IsNullOrWhiteSpace(search) ? "No saved addresses" : "No addresses matched your search")</h2>
+        <p class="state-block__desc">
+            @(string.IsNullOrWhiteSpace(search) ? "Add one now and checkout takes two taps next time." : "Try clearing the search to see all your saved addresses.")
+        </p>
         <div class="state-block__actions">
-            <button class="btn btn-primary" type="button" data-open="addAddress">Add Address</button>
+            @if (string.IsNullOrWhiteSpace(search))
+            {
+                <button class="btn btn-primary" type="button" data-open="addAddress">Add Address</button>
+            }
+            else
+            {
+                <a class="btn btn-outline" href="/account/addresses">View All Addresses</a>
+            }
         </div>
     </div>
 }
@@ -34,7 +66,7 @@ else
     <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
         @foreach (var address in Model)
         {
-            <div class="card address-card">
+            <div class="card address-card" id="address-card-@address.Id">
                 <div class="row-flex wrap gap-xs mb-xs">
                     <span class="address-card__badge">
                         <svg class="ico ico-xs" aria-hidden="true">
@@ -53,18 +85,38 @@ else
                 <p class="t-body-sm text-secondary-c">@address.Phone</p>
 
                 <div class="row-flex wrap gap-md mt-md">
-                    <button class="cart-line__link" type="button" data-open="addAddress">
+                    <button class="cart-line__link btn-edit-address" type="button"
+                            data-id="@address.Id"
+                            data-fullname="@address.FullName"
+                            data-phone="@address.Phone"
+                            data-line1="@address.Line1"
+                            data-line2="@address.Line2"
+                            data-landmark="@address.Landmark"
+                            data-city="@address.City"
+                            data-state="@address.State"
+                            data-country="@address.Country"
+                            data-pin="@address.Pincode"
+                            data-label="@address.Label"
+                            data-isdefault="@(address.IsDefault ? "true" : "false")">
                         <svg class="ico ico-xs" aria-hidden="true"><use href="#i-pencil"></use></svg>
                         Edit
                     </button>
+
                     @if (!address.IsDefault)
                     {
-                        <button class="cart-line__link" type="button">
-                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"></use></svg>
-                            Set as default
-                        </button>
+                        <form method="post" action="/account/addresses/default" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@address.Id" />
+                            <button class="cart-line__link" type="submit">
+                                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"></use></svg>
+                                Set as default
+                            </button>
+                        </form>
                     }
-                    <button class="cart-line__link cart-line__link--danger" type="button" data-open="deleteAddress">
+
+                    <button class="cart-line__link cart-line__link--danger btn-delete-address" type="button"
+                            data-id="@address.Id"
+                            data-name="@address.FullName">
                         <svg class="ico ico-xs" aria-hidden="true"><use href="#i-trash"></use></svg>
                         Delete
                     </button>
@@ -74,6 +126,7 @@ else
     </div>
 }
 
+@* Add / Edit Address Modal *@
 <div class="modal-scrim" id="addAddress" role="dialog" aria-modal="true" aria-labelledby="accAddrTitle" aria-hidden="true">
     <div class="modal">
         <div class="modal__head">
@@ -83,51 +136,87 @@ else
             </button>
         </div>
         <div class="modal__body">
-            <form data-validate id="accAddressForm">
+            <form method="post" action="/account/addresses/save" data-validate id="accAddressForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="addrId" name="Id" value="0" />
+                <input type="hidden" id="addrLabel" name="Label" value="Home" />
+
                 <div class="field">
                     <label class="field__label" for="accName">Full name <span class="field__req">*</span></label>
-                    <input class="input" id="accName" type="text" required autocomplete="name" />
+                    <input class="input" id="accName" name="FullName" type="text" required autocomplete="name" />
                     <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
                 </div>
-                <div class="field">
-                    <label class="field__label" for="accPhone">Mobile number <span class="field__req">*</span></label>
-                    <div class="phone-input">
-                        <select class="select" aria-label="Country code"><option selected>+91</option></select>
-                        <input class="input" id="accPhone" type="tel" required inputmode="numeric" autocomplete="tel" />
+
+                <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+                    <div class="field">
+                        <label class="field__label" for="accPhone">Mobile number <span class="field__req">*</span></label>
+                        <div class="phone-input">
+                            <select class="select" aria-label="Country code"><option selected>+91</option></select>
+                            <input class="input" id="accPhone" name="Phone" type="tel" required inputmode="numeric" autocomplete="tel" />
+                        </div>
+                        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
                     </div>
-                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+
+                    <div class="field" style="margin-top:0">
+                        <label class="field__label" for="accAltPhone">Alternate phone <span class="field__optional">(optional)</span></label>
+                        <input class="input" id="accAltPhone" name="AlternatePhone" type="tel" inputmode="numeric" />
+                    </div>
                 </div>
-                <div class="field">
-                    <label class="field__label" for="accPin">PIN code <span class="field__req">*</span></label>
-                    <input class="input" id="accPin" type="text" required maxlength="6" inputmode="numeric"
-                           autocomplete="postal-code" style="max-width:200px" />
-                    <p class="field__help">City and state fill in automatically.</p>
-                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+
+                <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+                    <div class="field">
+                        <label class="field__label" for="accPin">PIN code <span class="field__req">*</span></label>
+                        <input class="input" id="accPin" name="Pincode" type="text" required maxlength="6" inputmode="numeric"
+                               autocomplete="postal-code" />
+                        <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                    </div>
+
+                    <div class="field" style="margin-top:0">
+                        <label class="field__label" for="accCity">City <span class="field__req">*</span></label>
+                        <input class="input" id="accCity" name="City" type="text" required />
+                    </div>
                 </div>
+
+                <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+                    <div class="field">
+                        <label class="field__label" for="accState">State <span class="field__req">*</span></label>
+                        <input class="input" id="accState" name="State" type="text" required />
+                    </div>
+
+                    <div class="field" style="margin-top:0">
+                        <label class="field__label" for="accCountry">Country</label>
+                        <input class="input" id="accCountry" name="Country" type="text" value="India" />
+                    </div>
+                </div>
+
                 <div class="field">
                     <label class="field__label" for="accLine1">Flat, house no., building <span class="field__req">*</span></label>
-                    <input class="input" id="accLine1" type="text" required autocomplete="address-line1" />
+                    <input class="input" id="accLine1" name="Line1" type="text" required autocomplete="address-line1" />
                     <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
                 </div>
+
                 <div class="field">
                     <label class="field__label" for="accLine2">Area, street, sector <span class="field__req">*</span></label>
-                    <input class="input" id="accLine2" type="text" required autocomplete="address-line2" />
+                    <input class="input" id="accLine2" name="Line2" type="text" required autocomplete="address-line2" />
                     <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
                 </div>
+
                 <div class="field">
                     <label class="field__label" for="accLandmark">Landmark <span class="field__optional">(optional)</span></label>
-                    <input class="input" id="accLandmark" type="text" />
+                    <input class="input" id="accLandmark" name="Landmark" type="text" />
                 </div>
+
                 <div class="field">
                     <span class="field__label">Address type</span>
-                    <div class="option-list">
+                    <div class="option-list" id="addrTypeOptions">
                         <button class="option-pill is-selected" type="button" data-label="Home">Home</button>
                         <button class="option-pill" type="button" data-label="Work">Work</button>
                         <button class="option-pill" type="button" data-label="Other">Other</button>
                     </div>
                 </div>
+
                 <label class="check mt-md">
-                    <input type="checkbox" />
+                    <input type="checkbox" id="accIsDefault" name="IsDefault" value="true" />
                     <span class="check__label t-body-sm">Make this my default address</span>
                 </label>
             </form>
@@ -139,6 +228,7 @@ else
     </div>
 </div>
 
+@* Delete Confirmation Modal *@
 <div class="modal-scrim" id="deleteAddress" role="dialog" aria-modal="true" aria-labelledby="delAddrTitle" aria-hidden="true">
     <div class="modal modal-sm">
         <div class="modal__head">
@@ -153,8 +243,99 @@ else
             </p>
         </div>
         <div class="modal__foot">
-            <button class="btn btn-ghost" data-close="deleteAddress">Cancel</button>
-            <button class="btn btn-danger" data-close="deleteAddress">Delete Address</button>
+            <form method="post" action="/account/addresses/delete" id="deleteAddressForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="delAddressId" name="id" value="" />
+                <button class="btn btn-ghost" type="button" data-close="deleteAddress">Cancel</button>
+                <button class="btn btn-danger" type="submit">Delete Address</button>
+            </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var modalAdd = document.getElementById('addAddress');
+            var modalDelete = document.getElementById('deleteAddress');
+            var form = document.getElementById('accAddressForm');
+            var title = document.getElementById('accAddrTitle');
+
+            // Address type pill selection
+            var pills = document.querySelectorAll('#addrTypeOptions .option-pill');
+            pills.forEach(function (pill) {
+                pill.addEventListener('click', function () {
+                    pills.forEach(function (p) { p.classList.remove('is-selected'); });
+                    pill.classList.add('is-selected');
+                    document.getElementById('addrLabel').value = pill.getAttribute('data-label');
+                });
+            });
+
+            // "Add Address" clicked
+            var btnAdd = document.getElementById('btnAddAddress');
+            if (btnAdd) {
+                btnAdd.addEventListener('click', function () {
+                    title.textContent = 'Add delivery address';
+                    form.reset();
+                    document.getElementById('addrId').value = '0';
+                    document.getElementById('addrLabel').value = 'Home';
+                    pills.forEach(function (p) {
+                        if (p.getAttribute('data-label') === 'Home') p.classList.add('is-selected');
+                        else p.classList.remove('is-selected');
+                    });
+                });
+            }
+
+            // "Edit" clicked
+            document.querySelectorAll('.btn-edit-address').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    title.textContent = 'Edit delivery address';
+                    document.getElementById('addrId').value = btn.getAttribute('data-id') || '0';
+                    document.getElementById('accName').value = btn.getAttribute('data-fullname') || '';
+                    document.getElementById('accPhone').value = btn.getAttribute('data-phone') || '';
+                    document.getElementById('accLine1').value = btn.getAttribute('data-line1') || '';
+                    document.getElementById('accLine2').value = btn.getAttribute('data-line2') || '';
+                    document.getElementById('accLandmark').value = btn.getAttribute('data-landmark') || '';
+                    document.getElementById('accCity').value = btn.getAttribute('data-city') || '';
+                    document.getElementById('accState').value = btn.getAttribute('data-state') || '';
+                    document.getElementById('accCountry').value = btn.getAttribute('data-country') || 'India';
+                    document.getElementById('accPin').value = btn.getAttribute('data-pin') || '';
+                    document.getElementById('accIsDefault').checked = btn.getAttribute('data-isdefault') === 'true';
+
+                    var label = btn.getAttribute('data-label') || 'Home';
+                    document.getElementById('addrLabel').value = label;
+                    pills.forEach(function (p) {
+                        if (p.getAttribute('data-label') === label) p.classList.add('is-selected');
+                        else p.classList.remove('is-selected');
+                    });
+
+                    // Open modal
+                    modalAdd.classList.add('is-open');
+                    modalAdd.setAttribute('aria-hidden', 'false');
+                });
+            });
+
+            // "Delete" clicked
+            document.querySelectorAll('.btn-delete-address').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var id = btn.getAttribute('data-id');
+                    document.getElementById('delAddressId').value = id;
+                    modalDelete.classList.add('is-open');
+                    modalDelete.setAttribute('aria-hidden', 'false');
+                });
+            });
+
+            // Modal close buttons
+            document.querySelectorAll('[data-close]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var targetId = btn.getAttribute('data-close');
+                    var targetModal = document.getElementById(targetId);
+                    if (targetModal) {
+                        targetModal.classList.remove('is-open');
+                        targetModal.setAttribute('aria-hidden', 'true');
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,4 +1,7 @@
 @model ShellViewModel
+@{
+    var drawerCats = Model.Categories != null && Model.Categories.Count > 0 ? Model.Categories : DemoContent.Categories();
+}
 
 @*
     CMP-NAV-MobileDrawer — left drawer, 88vw max 360, full height.
@@ -45,62 +48,27 @@
         <div class="mobile-drawer__section">
             <span class="t-overline">Shop</span>
             <div class="accordion mt-xs" data-single>
-                <div class="accordion__item">
-                    <button class="accordion__head" type="button" aria-expanded="false">
-                        Home Décor
-                        <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-                    </button>
-                    <div class="accordion__body">
-                        <div>
-                            <a class="mobile-drawer__link" href="/c/home-decor/vases">Vases &amp; Planters</a>
-                            <a class="mobile-drawer__link" href="/c/home-decor/wall-art">Wall Art</a>
-                            <a class="mobile-drawer__link" href="/c/home-decor/lamps">Lamps &amp; Lighting</a>
-                            <a class="mobile-drawer__link" href="/c/home-decor/figurines">Figurines</a>
-                            <a class="mobile-drawer__link" href="/c/home-decor">View all Home Décor</a>
+                @foreach (var cat in drawerCats.Where(c => c.ParentId == null))
+                {
+                    <div class="accordion__item">
+                        <button class="accordion__head" type="button" aria-expanded="false">
+                            @cat.Name
+                            <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                        </button>
+                        <div class="accordion__body">
+                            <div>
+                                @if (cat.Children != null && cat.Children.Count > 0)
+                                {
+                                    @foreach (var child in cat.Children)
+                                    {
+                                        <a class="mobile-drawer__link" href="@child.Url">@child.Name</a>
+                                    }
+                                }
+                                <a class="mobile-drawer__link" href="@cat.Url" style="font-weight:600">View all @cat.Name</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="accordion__item">
-                    <button class="accordion__head" type="button" aria-expanded="false">
-                        Textiles
-                        <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-                    </button>
-                    <div class="accordion__body">
-                        <div>
-                            <a class="mobile-drawer__link" href="/c/textiles/cushions">Cushion Covers</a>
-                            <a class="mobile-drawer__link" href="/c/textiles/throws">Throws &amp; Quilts</a>
-                            <a class="mobile-drawer__link" href="/c/textiles/rugs">Rugs &amp; Dhurries</a>
-                            <a class="mobile-drawer__link" href="/c/textiles">View all Textiles</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion__item">
-                    <button class="accordion__head" type="button" aria-expanded="false">
-                        Brass &amp; Metal
-                        <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-                    </button>
-                    <div class="accordion__body">
-                        <div>
-                            <a class="mobile-drawer__link" href="/c/brassware/diyas">Diyas &amp; Lamps</a>
-                            <a class="mobile-drawer__link" href="/c/brassware/urli">Urlis &amp; Bowls</a>
-                            <a class="mobile-drawer__link" href="/c/brassware/dhokra">Dhokra Art</a>
-                            <a class="mobile-drawer__link" href="/c/brassware">View all Brass &amp; Metal</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion__item">
-                    <button class="accordion__head" type="button" aria-expanded="false">
-                        Jewellery
-                        <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-                    </button>
-                    <div class="accordion__body">
-                        <div>
-                            <a class="mobile-drawer__link" href="/c/jewellery/earrings">Earrings</a>
-                            <a class="mobile-drawer__link" href="/c/jewellery/necklaces">Necklaces</a>
-                            <a class="mobile-drawer__link" href="/c/jewellery">View all Jewellery</a>
-                        </div>
-                    </div>
-                </div>
+                }
             </div>
         </div>
 
@@ -108,41 +76,30 @@
             <span class="t-overline">Quick links</span>
             <a class="mobile-drawer__link" href="/c/new-arrivals"><svg class="ico" aria-hidden="true"><use href="#i-badge-plus"></use></svg>New Arrivals</a>
             <a class="mobile-drawer__link" href="/c/sale"><svg class="ico" aria-hidden="true"><use href="#i-percent"></use></svg>Sale</a>
+            <a class="mobile-drawer__link" href="/c/festive"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"></use></svg>Festive</a>
             <a class="mobile-drawer__link" href="/c/gifting"><svg class="ico" aria-hidden="true"><use href="#i-gift"></use></svg>Gifting</a>
-            <a class="mobile-drawer__link" href="/artisans"><svg class="ico" aria-hidden="true"><use href="#i-hand-heart"></use></svg>Artisans</a>
+            <a class="mobile-drawer__link" href="/artisans"><svg class="ico" aria-hidden="true"><use href="#i-hand-heart"></use></svg>Meet the Makers</a>
             <a class="mobile-drawer__link" href="/blog"><svg class="ico" aria-hidden="true"><use href="#i-book-open"></use></svg>Stories</a>
         </div>
 
         <div class="mobile-drawer__section">
-            <span class="t-overline">Your account</span>
-            <a class="mobile-drawer__link" href="/account/orders"><svg class="ico" aria-hidden="true"><use href="#i-package"></use></svg>My Orders</a>
-            <a class="mobile-drawer__link" href="/wishlist"><svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg>Wishlist</a>
-            <a class="mobile-drawer__link" href="/account/rewards"><svg class="ico" aria-hidden="true"><use href="#i-gem"></use></svg>Rewards</a>
-            <a class="mobile-drawer__link" href="/account/addresses"><svg class="ico" aria-hidden="true"><use href="#i-map-pin"></use></svg>Addresses</a>
-        </div>
-
-        <div class="mobile-drawer__section">
-            <span class="t-overline">Help</span>
+            <span class="t-overline">Help &amp; contact</span>
             <a class="mobile-drawer__link" href="/help"><svg class="ico" aria-hidden="true"><use href="#i-circle-help"></use></svg>Help Centre</a>
-            <a class="mobile-drawer__link" href="/track"><svg class="ico" aria-hidden="true"><use href="#i-truck"></use></svg>Track Order</a>
+            <a class="mobile-drawer__link" href="/track"><svg class="ico" aria-hidden="true"><use href="#i-package"></use></svg>Track Order</a>
+            <a class="mobile-drawer__link" href="/pages/shipping"><svg class="ico" aria-hidden="true"><use href="#i-truck"></use></svg>Shipping Info</a>
+            <a class="mobile-drawer__link" href="/pages/returns"><svg class="ico" aria-hidden="true"><use href="#i-undo"></use></svg>Returns &amp; Refunds</a>
             <a class="mobile-drawer__link" href="/pages/contact"><svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg>Contact Us</a>
-            <a class="mobile-drawer__link" href="https://wa.me/919876543210" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>WhatsApp</a>
+            <a class="mobile-drawer__link" href="https://wa.me/@Model.Config.SupportWhatsApp" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>WhatsApp Us</a>
         </div>
 
         <div class="mobile-drawer__section">
-            <div class="row-flex between gap-sm">
-                <span class="t-body-sm text-secondary-c">India (₹ INR) · English</span>
-                <button class="btn btn-ghost btn-sm" data-theme-toggle>
+            <div class="row-flex wrap gap-xs">
+                <button class="btn btn-ghost btn-sm" data-theme-toggle aria-label="Switch between light and dark theme">
                     <svg class="ico ico-sm" aria-hidden="true"><use href="#i-moon"></use></svg>
                     Theme
                 </button>
             </div>
-            <div class="row-flex gap-xs mt-md">
-                <a class="icon-btn icon-btn-outline" href="https://instagram.com" rel="noopener" aria-label="Instagram"><svg class="ico" aria-hidden="true"><use href="#i-instagram"></use></svg></a>
-                <a class="icon-btn icon-btn-outline" href="https://facebook.com" rel="noopener" aria-label="Facebook"><svg class="ico" aria-hidden="true"><use href="#i-facebook"></use></svg></a>
-                <a class="icon-btn icon-btn-outline" href="https://youtube.com" rel="noopener" aria-label="YouTube"><svg class="ico" aria-hidden="true"><use href="#i-youtube"></use></svg></a>
-                <a class="icon-btn icon-btn-outline" href="https://pinterest.com" rel="noopener" aria-label="Pinterest"><svg class="ico" aria-hidden="true"><use href="#i-pinterest"></use></svg></a>
-            </div>
         </div>
+
     </div>
 </div>

@@ -1380,7 +1380,10 @@
 .acc-sidebar__link .ico { color: currentColor; }
 .acc-sidebar__group { padding: var(--space-sm) var(--space-sm) var(--space-2xs); }
 
-.profile-card { display: flex; align-items: center; gap: var(--space-md); }
+.profile-card { display: flex; align-items: center; gap: var(--space-md); min-width: 0; overflow: hidden; }
+.profile-card .grow { min-width: 0; overflow: hidden; }
+.profile-card .t-heading-xs,
+.profile-card .t-body-xs { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 
 .points-card {
     background: linear-gradient(135deg, var(--indigo-900), var(--indigo-700));

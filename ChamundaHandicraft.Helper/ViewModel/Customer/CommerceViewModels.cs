@@ -381,6 +381,18 @@ public class BannerViewModel
     public string? SecondaryCtaLabel { get; set; }
     public string? SecondaryCtaUrl { get; set; }
     public int SortOrder { get; set; }
+    public ContentStatus Status { get; set; } = ContentStatus.Published;
+    public bool IsActive { get; set; } = true;
+    public DateTime? StartsOn { get; set; }
+    public DateTime? EndsOn { get; set; }
+    public int ImpressionCount { get; set; }
+    public int ClickCount { get; set; }
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
+
+    public string DisplayName => Heading;
+    public string Title => Heading;
+    public string? Subtitle => SubHeading;
 }
 
 /// <summary>
@@ -431,4 +443,10 @@ public class ShellViewModel
 
     public bool ShowAnnouncement { get; set; } = true;
     public bool ShowBottomTabs { get; set; } = true;
+
+    /// <summary>Active mega menu categories from Admin.</summary>
+    public List<CategoryViewModel> Categories { get; set; } = new();
+
+    /// <summary>Live runtime storefront configuration from Admin Settings.</summary>
+    public StorefrontConfigViewModel Config { get; set; } = new();
 }

@@ -144,4 +144,37 @@ public class CategoryRepository : ICategoryRepository
             "dbo.usp_Category_Lookup",
             commandType: CommandType.StoredProcedure)).AsList();
     }
+
+    public async Task<List<CategoryViewModel>> GetMegaMenuAsync(CancellationToken ct = default)
+    {
+        using var connection = CreateConnection();
+        var flatList = (await connection.QueryAsync<CategoryViewModel>(
+            "dbo.usp_Category_GetMegaMenu",
+            commandType: CommandType.StoredProcedure)).AsList();
+
+        var lookup = flatList.ToDictionary(c => c.Id);
+        var roots = new List<CategoryViewModel>();
+
+        foreach (var item in flatList)
+        {
+            if (item.ParentId.HasValue && lookup.TryGetValue(item.ParentId.Value, out var parent))
+            {
+                parent.Children.Add(item);
+            }
+            else
+            {
+                roots.Add(item);
+            }
+        }
+
+        return roots;
+    }
+
+    public async Task<List<CategoryViewModel>> GetFeaturedAsync(CancellationToken ct = default)
+    {
+        using var connection = CreateConnection();
+        return (await connection.QueryAsync<CategoryViewModel>(
+            "dbo.usp_Category_GetFeatured",
+            commandType: CommandType.StoredProcedure)).AsList();
+    }
 }

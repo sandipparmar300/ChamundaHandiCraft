@@ -28,62 +28,67 @@
 
         <div class="form-section-body">
             <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Title</label>
-                        <p class="detail-value">@Model.Heading</p>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="col-12 mb-2">
+                        <label class="form-label-custom">Banner Preview</label>
+                        <div>
+                            <img src="@Model.ImageUrl" alt="@Model.ImageAlt" style="max-width: 100%; max-height: 240px; border-radius: 8px; object-fit: cover;" />
+                        </div>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Subtitle</label>
-                        <p class="detail-value">@(Model.SubHeading ?? "—")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Placement</label>
-                        <p class="detail-value">@Model.Placement</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Device</label>
-                        <p class="detail-value">@(Model.MobileImageUrl is null ? "Desktop only" : "Desktop and mobile")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Link Type</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Link Target</label>
-                        <p class="detail-value">@(Model.PrimaryCtaUrl ?? "—")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Button Text</label>
-                        <p class="detail-value">@(Model.PrimaryCtaLabel ?? "—")</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Alt Text</label>
-                        <p class="detail-value">@(string.IsNullOrWhiteSpace(Model.ImageAlt) ? "Missing — cannot publish" : Model.ImageAlt)</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Sort Order</label>
-                        <p class="detail-value">@Model.SortOrder</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Valid From</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Valid To</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Impressions</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Clicks</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Status</label>
-                        <p class="detail-value">&mdash;</p>
-                    </div>
+                }
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Title</label>
+                    <p class="detail-value">@Model.Heading</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Subtitle</label>
+                    <p class="detail-value">@(Model.SubHeading ?? "—")</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Placement</label>
+                    <p class="detail-value">@Model.Placement</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Device</label>
+                    <p class="detail-value">@(Model.MobileImageUrl is null ? "Desktop only" : "Desktop and mobile")</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Link Target</label>
+                    <p class="detail-value">@(Model.PrimaryCtaUrl ?? "—")</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Button Text</label>
+                    <p class="detail-value">@(Model.PrimaryCtaLabel ?? "—")</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Alt Text</label>
+                    <p class="detail-value">@(string.IsNullOrWhiteSpace(Model.ImageAlt) ? "Missing — cannot publish" : Model.ImageAlt)</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Sort Order</label>
+                    <p class="detail-value">@Model.SortOrder</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Valid From</label>
+                    <p class="detail-value">@(Model.StartsOn.HasValue ? Money.DateAndTime(Model.StartsOn.Value) : "—")</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Valid To</label>
+                    <p class="detail-value">@(Model.EndsOn.HasValue ? Money.DateAndTime(Model.EndsOn.Value) : "—")</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Impressions</label>
+                    <p class="detail-value">@Model.ImpressionCount</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Clicks</label>
+                    <p class="detail-value">@Model.ClickCount</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Status</label>
+                    <p class="detail-value">@(Model.IsActive ? "Active" : "Inactive")</p>
+                </div>
             </div>
         </div>
     </section>

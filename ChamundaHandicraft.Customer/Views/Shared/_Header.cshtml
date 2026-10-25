@@ -19,7 +19,7 @@
         <div class="container announcement-bar__inner">
             <span class="announcement-bar__msg is-active">
                 <svg class="ico ico-sm" aria-hidden="true"><use href="#i-truck"></use></svg>
-                Free delivery on orders above ₹999
+                Free delivery on orders above ₹@Model.Config.FreeShippingThreshold.ToString("N0")
             </span>
             <span class="announcement-bar__msg">
                 <svg class="ico ico-sm" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
@@ -168,13 +168,13 @@
                             <a class="dropdown__item" role="menuitem" href="/help"><svg class="ico" aria-hidden="true"><use href="#i-circle-help"></use></svg>Help Centre</a>
                             <a class="dropdown__item" role="menuitem" href="/track"><svg class="ico" aria-hidden="true"><use href="#i-package"></use></svg>Track Order</a>
                             <a class="dropdown__item" role="menuitem" href="/pages/contact"><svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg>Contact Us</a>
-                            <a class="dropdown__item" role="menuitem" href="https://wa.me/919876543210" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>WhatsApp</a>
+                            <a class="dropdown__item" role="menuitem" href="https://wa.me/@Model.Config.SupportWhatsApp" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-whatsapp"></use></svg>WhatsApp</a>
                         </div>
                     </div>
                 </li>
             </ul>
 
-            @await Html.PartialAsync("_MegaMenu")
+            @await Html.PartialAsync("_MegaMenu", Model.Categories)
         </div>
     </nav>
 </header>

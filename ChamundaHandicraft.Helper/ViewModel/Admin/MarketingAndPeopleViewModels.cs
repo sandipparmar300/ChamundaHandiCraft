@@ -38,6 +38,7 @@ public class OfferGridItem : AuditableViewModel, IAdminGridRow
     public int ProductCount { get; set; }
     public int OrdersInfluenced { get; set; }
     public decimal RevenueInfluenced { get; set; }
+    public string? BannerUrl { get; set; }
     public bool IsActive { get; set; }
 
     /// <summary>
@@ -431,17 +432,26 @@ public class CustomerGridItem : AuditableViewModel, IAdminGridRow
 public class SupportTicketGridItem : AuditableViewModel, IAdminGridRow
 {
     public int Id { get; set; }
-    public string TicketNumber { get; set; } = string.Empty;
+    public string? TicketNumber { get; set; }
     public string Subject { get; set; } = string.Empty;
-    public string Topic { get; set; } = string.Empty;
-    public string CustomerName { get; set; } = string.Empty;
+    public string? Topic { get; set; }
+    public string? CustomerName { get; set; }
+    public string? RequesterEmail { get; set; }
+    public string? RequesterPhone { get; set; }
+    public string? Description { get; set; }
     public string? OrderNumber { get; set; }
-    public TicketStatus Status { get; set; }
+    public TicketStatus Status { get; set; } = TicketStatus.Open;
     public string Priority { get; set; } = "Normal";
     public string? AssignedTo { get; set; }
-    public DateTime OpenedOn { get; set; }
+    public DateTime OpenedOn { get; set; } = DateTime.UtcNow;
     public DateTime? LastReplyOn { get; set; }
-    public int MessageCount { get; set; }
+    public int MessageCount { get; set; } = 1;
+
+    // Form binding aliases
+    public string? Customer { get => CustomerName; set => CustomerName = value; }
+    public string? Category { get => Topic; set => Topic = value; }
+    public string? RelatedOrder { get => OrderNumber; set => OrderNumber = value; }
+    public string? Message { get => Description; set => Description = value; }
 
     /// <summary>One working day is the promise made on the help centre.</summary>
     public bool IsBreachingSla =>
@@ -449,7 +459,7 @@ public class SupportTicketGridItem : AuditableViewModel, IAdminGridRow
         && (LastReplyOn ?? OpenedOn) < DateTime.Now.AddDays(-1);
 
     public bool IsActive => Status != TicketStatus.Closed;
-    public string DisplayName => TicketNumber;
+    public string DisplayName => string.IsNullOrWhiteSpace(TicketNumber) ? "New Ticket" : TicketNumber;
 }
 
 public class ContactSubmissionGridItem : AuditableViewModel, IAdminGridRow

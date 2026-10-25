@@ -130,4 +130,32 @@ public class CategoryService : ICategoryService
             return ResponseViewModel<List<IdNamePair>>.Fail("An error occurred while fetching category lookups.");
         }
     }
+
+    public async Task<ResponseViewModel<List<CategoryViewModel>>> GetMegaMenuAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            var data = await _repository.GetMegaMenuAsync(ct);
+            return ResponseViewModel<List<CategoryViewModel>>.Success(data, "Mega menu categories retrieved successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving mega menu categories.");
+            return ResponseViewModel<List<CategoryViewModel>>.Fail("An error occurred while fetching mega menu categories.");
+        }
+    }
+
+    public async Task<ResponseViewModel<List<CategoryViewModel>>> GetFeaturedAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            var data = await _repository.GetFeaturedAsync(ct);
+            return ResponseViewModel<List<CategoryViewModel>>.Success(data, "Featured categories retrieved successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving featured categories.");
+            return ResponseViewModel<List<CategoryViewModel>>.Fail("An error occurred while fetching featured categories.");
+        }
+    }
 }

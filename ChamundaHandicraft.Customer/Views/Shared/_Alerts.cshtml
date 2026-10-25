@@ -1,0 +1,99 @@
+@{
+    var successMsg = TempData["SuccessMessage"] as string ?? TempData["Success"] as string;
+    var errorMsg = TempData["ErrorMessage"] as string ?? TempData["Error"] as string;
+    var warningMsg = TempData["WarningMessage"] as string ?? TempData["Warning"] as string;
+    var infoMsg = TempData["InfoMessage"] as string ?? TempData["Info"] as string;
+}
+
+@if (!string.IsNullOrWhiteSpace(successMsg))
+{
+    <div class="alert alert-success mb-md alert-dismissible" role="status" style="border: 1px solid rgba(16, 185, 129, 0.35); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);">
+        <svg class="ico" aria-hidden="true" style="color: var(--success-600, #059669);"><use href="#i-circle-check"></use></svg>
+        <div class="grow">
+            <p class="alert__title" style="color: var(--success-700, #047857);">Success</p>
+            <p style="margin: 0; line-height: 1.45;">@successMsg</p>
+        </div>
+        <button type="button" class="icon-btn icon-btn-sm" aria-label="Dismiss alert" onclick="this.closest('.alert').style.display='none'" style="margin-left: auto; align-self: flex-start; opacity: 0.7;">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(warningMsg))
+{
+    <div class="alert alert-warning mb-md alert-dismissible" role="status" style="border: 1px solid rgba(245, 158, 11, 0.4); box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);">
+        <svg class="ico" aria-hidden="true" style="color: var(--warning-600, #d97706);"><use href="#i-triangle-alert"></use></svg>
+        <div class="grow">
+            <p class="alert__title" style="color: var(--warning-700, #b45309);">Notice</p>
+            <p style="margin: 0; line-height: 1.45;">@warningMsg</p>
+        </div>
+        <button type="button" class="icon-btn icon-btn-sm" aria-label="Dismiss alert" onclick="this.closest('.alert').style.display='none'" style="margin-left: auto; align-self: flex-start; opacity: 0.7;">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(errorMsg))
+{
+    <div class="alert alert-danger mb-md alert-dismissible" role="alert" style="border: 1px solid rgba(239, 68, 68, 0.35); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.08);">
+        <svg class="ico" aria-hidden="true" style="color: var(--danger-600, #dc2626);"><use href="#i-circle-alert"></use></svg>
+        <div class="grow">
+            <p class="alert__title" style="color: var(--danger-700, #b91c1c);">Error</p>
+            <p style="margin: 0; line-height: 1.45;">@errorMsg</p>
+        </div>
+        <button type="button" class="icon-btn icon-btn-sm" aria-label="Dismiss alert" onclick="this.closest('.alert').style.display='none'" style="margin-left: auto; align-self: flex-start; opacity: 0.7;">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(infoMsg))
+{
+    <div class="alert alert-info mb-md alert-dismissible" role="status" style="border: 1px solid rgba(14, 165, 233, 0.35); box-shadow: 0 2px 8px rgba(14, 165, 233, 0.08);">
+        <svg class="ico" aria-hidden="true" style="color: var(--info-600, #0284c7);"><use href="#i-info"></use></svg>
+        <div class="grow">
+            <p class="alert__title" style="color: var(--info-700, #0369a1);">Information</p>
+            <p style="margin: 0; line-height: 1.45;">@infoMsg</p>
+        </div>
+        <button type="button" class="icon-btn icon-btn-sm" aria-label="Dismiss alert" onclick="this.closest('.alert').style.display='none'" style="margin-left: auto; align-self: flex-start; opacity: 0.7;">
+            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+    </div>
+}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        @if (!string.IsNullOrWhiteSpace(successMsg))
+        {
+            <text>
+            if (window.Chamunda && typeof window.Chamunda.toast === 'function') {
+                window.Chamunda.toast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(successMsg)), { type: 'success', title: 'Success' });
+            }
+            </text>
+        }
+        @if (!string.IsNullOrWhiteSpace(warningMsg))
+        {
+            <text>
+            if (window.Chamunda && typeof window.Chamunda.toast === 'function') {
+                window.Chamunda.toast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(warningMsg)), { type: 'warning', title: 'Notice' });
+            }
+            </text>
+        }
+        @if (!string.IsNullOrWhiteSpace(errorMsg))
+        {
+            <text>
+            if (window.Chamunda && typeof window.Chamunda.toast === 'function') {
+                window.Chamunda.toast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(errorMsg)), { type: 'error', title: 'Error' });
+            }
+            </text>
+        }
+        @if (!string.IsNullOrWhiteSpace(infoMsg))
+        {
+            <text>
+            if (window.Chamunda && typeof window.Chamunda.toast === 'function') {
+                window.Chamunda.toast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(infoMsg)), { type: 'info', title: 'Info' });
+            }
+            </text>
+        }
+    });
+</script>

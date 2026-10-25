@@ -1,3 +1,4 @@
+@model ChamundaHandicraft.Helper.ViewModel.Customer.CustomerVerifyMobileRequest
 @{
     Layout = "_AuthLayout";
 }
@@ -9,17 +10,33 @@
     It also unlocks cash on delivery.
 </p>
 
+<div id="otpAlertBox" style="display:none;" class="alert alert-info mb-md" role="status">
+    <svg class="ico" aria-hidden="true"><use href="#i-info"></use></svg>
+    <div>
+        <p class="alert__title">Verification Code</p>
+        <p id="otpAlertText"></p>
+    </div>
+</div>
+
 <form method="post" action="/verify-mobile" id="verifyMobileForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Code" id="hiddenOtpCode" value="@Model?.Code" />
+
     <div class="field">
         <label class="field__label" for="mobileToVerify">Mobile number</label>
         <div class="phone-input">
             <select class="select" aria-label="Country code">
                 <option selected>+91</option>
-                <option>+1</option>
-                <option>+44</option>
             </select>
-            <input class="input" id="mobileToVerify" name="mobile" type="tel" value="98765 43210"
-                   autocomplete="tel" inputmode="numeric" />
+            <input class="input" id="mobileToVerify" name="Mobile" type="tel" value="@Model?.Mobile"
+                   required placeholder="98765 43210" autocomplete="tel" inputmode="numeric" />
+        </div>
+        <span class="field__error" asp-validation-for="Mobile" style="display:block"></span>
+        <div class="mt-xs text-right">
+            <button type="button" class="btn btn-ghost btn-sm" id="btnSendOtp">
+                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-send"></use></svg>
+                Send verification code
+            </button>
         </div>
     </div>
 
@@ -28,19 +45,123 @@
         <div class="otp">
             @for (var i = 1; i <= 6; i++)
             {
-                <input id="mvOtp@(i)" name="digit@(i)" type="text" inputmode="numeric" maxlength="1"
+                <input id="mvOtp@(i)" name="digit@(i)" type="text" inputmode="numeric" maxlength="1" class="otp-digit"
                        autocomplete="@(i == 1 ? "one-time-code" : "off")" aria-label="Digit @i of 6" />
             }
         </div>
-        <p class="field__help">Sent by SMS to the number above.</p>
+        <span class="field__error" asp-validation-for="Code" style="display:block"></span>
+        <p class="field__help">Enter the 6-digit code sent to your phone (Demo Code: <strong>123456</strong>).</p>
     </div>
 
-    <button class="btn btn-primary btn-xl btn-block mt-lg" type="submit">
+    <button class="btn btn-primary btn-xl btn-block mt-lg" type="submit" id="btnVerifySubmit">
         <span class="btn__spinner" aria-hidden="true"></span>
         <span class="btn__label">Verify Number</span>
     </button>
 </form>
 
 <p class="t-body-sm text-center text-tertiary-c mt-lg">
-    <a class="link" href="/">Not now</a> — you can verify later from your profile.
+    <a class="link" href="/account/profile">Not now</a> — you can verify later from your profile.
 </p>
+
+@section Scripts {
+    <script>
+        (function () {
+            var digits = Array.from(document.querySelectorAll('.otp-digit'));
+            var hiddenCode = document.getElementById('hiddenOtpCode');
+            var btnSend = document.getElementById('btnSendOtp');
+            var alertBox = document.getElementById('otpAlertBox');
+            var alertText = document.getElementById('otpAlertText');
+            var mobileInput = document.getElementById('mobileToVerify');
+
+            function syncCode() {
+                var val = digits.map(function (d) { return d.value.trim(); }).join('');
+                if (hiddenCode) hiddenCode.value = val;
+            }
+
+            digits.forEach(function (input, idx) {
+                input.addEventListener('input', function (e) {
+                    if (this.value.length === 1 && idx < digits.length - 1) {
+                        digits[idx + 1].focus();
+                        digits[idx + 1].select();
+                    }
+                    syncCode();
+                });
+
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && !this.value && idx > 0) {
+                        digits[idx - 1].focus();
+                        digits[idx - 1].select();
+                    }
+                });
+
+                input.addEventListener('paste', function (e) {
+                    e.preventDefault();
+                    var paste = (e.clipboardData || window.clipboardData).getData('text').trim();
+                    if (/^\d{6}$/.test(paste)) {
+                        for (var i = 0; i < 6; i++) {
+                            digits[i].value = paste[i];
+                        }
+                        syncCode();
+                        digits[5].focus();
+                    }
+                });
+            });
+
+            if (btnSend && mobileInput) {
+                btnSend.addEventListener('click', function () {
+                    var mobile = mobileInput.value.trim();
+                    if (!mobile) {
+                        alert('Please enter your mobile number first.');
+                        mobileInput.focus();
+                        return;
+                    }
+
+                    var tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+                    var token = tokenEl ? tokenEl.value : '';
+
+                    var formData = new URLSearchParams();
+                    formData.append('mobile', mobile);
+                    formData.append('__RequestVerificationToken', token);
+
+                    btnSend.disabled = true;
+                    btnSend.innerText = 'Sending...';
+
+                    fetch('/send-mobile-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: formData.toString()
+                    })
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        btnSend.disabled = false;
+                        btnSend.innerText = 'Resend Code';
+                        if (alertBox && alertText) {
+                            alertBox.style.display = 'flex';
+                            alertText.innerText = data.message || 'Verification code sent!';
+                        }
+                        // If demo OTP is present in message, extract and autofill
+                        var match = (data.message || '').match(/Demo OTP:\s*(\d{6})/i);
+                        if (match && match[1]) {
+                            var code = match[1];
+                            for (var i = 0; i < 6; i++) {
+                                if (digits[i]) digits[i].value = code[i];
+                            }
+                            syncCode();
+                        }
+                    })
+                    .catch(function () {
+                        btnSend.disabled = false;
+                        btnSend.innerText = 'Send verification code';
+                        alert('Could not dispatch OTP. You can use demo code 123456.');
+                    });
+                });
+            }
+
+            document.getElementById('verifyMobileForm').addEventListener('submit', function () {
+                syncCode();
+            });
+        })();
+    </script>
+}

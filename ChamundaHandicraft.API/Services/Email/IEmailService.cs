@@ -23,4 +23,14 @@ public interface IEmailService
     /// Specialized helper to send password reset emails using the "AdminPasswordReset" template.
     /// </summary>
     Task<bool> SendPasswordResetEmailAsync(string recipientEmail, string recipientName, string resetToken);
+
+    /// <summary>
+    /// Specialized helper to send customer password reset emails using the "CustomerPasswordReset" template.
+    /// </summary>
+    Task<bool> SendCustomerPasswordResetEmailAsync(string recipientEmail, string recipientName, string resetToken);
+
+    /// <summary>
+    /// Specialized helper to send customer welcome/onboarding emails using the "CustomerWelcome" template.
+    /// </summary>
+    Task<bool> SendCustomerWelcomeEmailAsync(string recipientEmail, string recipientName, int rewardPoints = 50);
 }

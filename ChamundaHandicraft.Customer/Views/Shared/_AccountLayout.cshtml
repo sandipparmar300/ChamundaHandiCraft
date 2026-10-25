@@ -31,6 +31,21 @@
             ("privacy", "Privacy & Data", "i-shield-check", "/account/privacy", 0)
         })
     };
+    var fullName = User.Identity?.Name ?? (!string.IsNullOrEmpty(shell.FirstName) ? shell.FirstName : "Customer");
+    var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+    string initials = "C";
+    if (!string.IsNullOrWhiteSpace(fullName))
+    {
+        var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+        {
+            initials = $"{parts[0][0]}{parts[1][0]}".ToUpperInvariant();
+        }
+        else if (parts.Length == 1 && parts[0].Length > 0)
+        {
+            initials = parts[0][..1].ToUpperInvariant();
+        }
+    }
 }
 
 <div class="container">
@@ -44,12 +59,12 @@
         <aside aria-label="Account navigation">
             @* Profile card sits at the top of the rail on desktop; on mobile it is
                the page header for the drill-down menu. *@
-            <div class="card card-craft mb-md">
-                <div class="profile-card">
-                    <span class="avatar avatar-lg">@(shell.FirstName.Length > 0 ? shell.FirstName[..1] : "A")</span>
-                    <div class="grow">
-                        <p class="t-heading-xs">@shell.FirstName Iyer</p>
-                        <p class="t-body-xs text-craft-c">ananya@example.com</p>
+            <div class="card card-craft mb-md" style="overflow:hidden">
+                <div class="profile-card" style="min-width:0; overflow:hidden">
+                    <span class="avatar avatar-lg shrink-0">@initials</span>
+                    <div class="grow" style="min-width:0; overflow:hidden">
+                        <p class="t-heading-xs" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-bottom:2px" title="@fullName">@fullName</p>
+                        <p class="t-body-xs text-craft-c" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap" title="@email">@email</p>
                         <span class="tag tag-brass mt-2xs">
                             <svg class="ico ico-xs" aria-hidden="true"><use href="#i-gem"></use></svg>
                             @shell.RewardPoints.ToString("N0") points
@@ -92,6 +107,7 @@
         </aside>
 
         <div>
+            @await Html.PartialAsync("_Alerts")
             @RenderBody()
         </div>
     </div>

@@ -76,6 +76,13 @@
                         <label class="form-label-custom">Status</label>
                         <p class="detail-value">@Model.Status</p>
                     </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <div class="col-12">
+                            <label class="form-label-custom">Description / Issue</label>
+                            <div class="p-3 bg-light rounded border">@Model.Description</div>
+                        </div>
+                    }
             </div>
         </div>
     </section>

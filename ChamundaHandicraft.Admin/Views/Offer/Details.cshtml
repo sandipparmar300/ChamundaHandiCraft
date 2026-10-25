@@ -28,10 +28,19 @@
 
         <div class="form-section-body">
             <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Offer Name</label>
-                        <p class="detail-value">@Model.Name</p>
+                @if (!string.IsNullOrWhiteSpace(Model.BannerUrl))
+                {
+                    <div class="col-12 mb-2">
+                        <label class="form-label-custom">Banner Image</label>
+                        <div>
+                            <img src="@Model.BannerUrl" alt="@Model.Name" style="max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover;" />
+                        </div>
                     </div>
+                }
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Offer Name</label>
+                    <p class="detail-value">@Model.Name</p>
+                </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Offer Type</label>
                         <p class="detail-value">@Model.OfferType</p>

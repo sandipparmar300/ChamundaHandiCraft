@@ -643,7 +643,6 @@ public class StockRateGridItem : AuditableViewModel, IAdminGridRow
     public decimal Valuation { get; set; }
     public decimal MarginAmount { get; set; }
     public decimal MarginPercent { get; set; }
-    public DateTime? UpdatedAt { get; set; }
 
     public bool IsActive => OnHand > 0;
     public string DisplayName => ProductName;

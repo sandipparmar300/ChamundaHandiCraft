@@ -25,6 +25,29 @@ public abstract class StorefrontController : Controller
         ActionExecutingContext context, ActionExecutionDelegate next)
     {
         Shell = await Client.GetShellAsync(context.HttpContext.RequestAborted);
+
+        bool isAuthenticated = context.HttpContext.User.Identity?.IsAuthenticated == true;
+        Shell.IsSignedIn = isAuthenticated;
+
+        if (isAuthenticated)
+        {
+            var name = context.HttpContext.User.Identity?.Name;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                Shell.FirstName = name.Split(' ')[0];
+            }
+            var pointsClaim = context.HttpContext.User.FindFirst("RewardPoints")?.Value;
+            if (int.TryParse(pointsClaim, out int pts))
+            {
+                Shell.RewardPoints = pts;
+            }
+        }
+        else
+        {
+            Shell.FirstName = string.Empty;
+            Shell.RewardPoints = 0;
+        }
+
         ViewData["Shell"] = Shell;
 
         await next();

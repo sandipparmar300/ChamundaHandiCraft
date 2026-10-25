@@ -13,4 +13,6 @@ public interface ICategoryService
     Task<ResponseViewModel<bool>> DeleteAsync(int id, int? adminUserId = null, CancellationToken ct = default);
     Task<ResponseViewModel<bool>> UpdateStatusAsync(UpdateStatusRequest request, int? adminUserId = null, CancellationToken ct = default);
     Task<ResponseViewModel<List<IdNamePair>>> GetLookupAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<List<CategoryViewModel>>> GetMegaMenuAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<List<CategoryViewModel>>> GetFeaturedAsync(CancellationToken ct = default);
 }

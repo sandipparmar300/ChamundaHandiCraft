@@ -1,3 +1,4 @@
+@model ChamundaHandicraft.Helper.ViewModel.Customer.CustomerProfileViewModel
 @{
     Layout = "_AccountLayout";
 }
@@ -8,60 +9,75 @@
 </div>
 
 <section class="card">
-    <form data-validate>
+    <form method="post" action="/account/profile" data-validate>
+        @Html.AntiForgeryToken()
         <div class="row-flex gap-md mb-lg">
-            <span class="avatar avatar-xl">A</span>
+            <span class="avatar avatar-xl">@(string.IsNullOrWhiteSpace(Model?.Initials) ? "C" : Model.Initials)</span>
             <div>
-                <p class="t-heading-xs">Profile photo</p>
-                <p class="t-body-sm text-secondary-c">Optional. JPG or PNG, up to 2 MB.</p>
+                <p class="t-heading-xs">@Model?.FullName</p>
+                <p class="t-body-sm text-secondary-c">Member tier: <strong>@Model?.RewardTier</strong> · @Model?.RewardPointBalance points</p>
                 <div class="row-flex gap-xs mt-sm">
-                    <button class="btn btn-outline btn-sm" type="button">
-                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-upload"></use></svg>
-                        Upload
-                    </button>
-                    <button class="btn btn-ghost btn-sm" type="button">Remove</button>
+                    <span class="tag tag-craft">Joined @(Model?.RegisteredOn.ToString("MMM yyyy") ?? "Recently")</span>
                 </div>
             </div>
         </div>
 
         <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
             <div class="field">
-                <label class="field__label" for="profFirst">First name</label>
-                <input class="input" id="profFirst" type="text" value="Ananya" required autocomplete="given-name" />
-                <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
+                <label class="field__label" for="profFirst">First name <span class="field__req">*</span></label>
+                <input class="input" id="profFirst" name="FirstName" type="text" value="@Model?.FirstName" required autocomplete="given-name" />
+                <span class="field__error" asp-validation-for="FirstName"></span>
             </div>
 
             <div class="field" style="margin-top:0">
                 <label class="field__label" for="profLast">Last name</label>
-                <input class="input" id="profLast" type="text" value="Iyer" autocomplete="family-name" />
+                <input class="input" id="profLast" name="LastName" type="text" value="@Model?.LastName" autocomplete="family-name" />
+                <span class="field__error" asp-validation-for="LastName"></span>
             </div>
         </div>
 
         <div class="field">
             <label class="field__label" for="profEmail">Email address</label>
             <div class="input-group has-suffix">
-                <input class="input" id="profEmail" type="email" value="ananya@example.com" required
-                       autocomplete="email" style="padding-left:12px" />
+                <input class="input" id="profEmail" type="email" value="@Model?.Email" readonly
+                       style="padding-left:12px;background:var(--color-bg-secondary);cursor:not-allowed;" />
                 <span class="input-group__suffix">
-                    <span class="tag tag-success">
-                        <svg class="ico ico-xs" aria-hidden="true"><use href="#i-badge-check"></use></svg>
-                        Verified
-                    </span>
+                    @if (Model?.EmailVerified == true)
+                    {
+                        <span class="tag tag-success">
+                            <svg class="ico ico-xs" aria-hidden="true"><use href="#i-badge-check"></use></svg>
+                            Verified
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="tag tag-warning">Unverified</span>
+                    }
                 </span>
             </div>
-            <p class="field__help">Changing this sends a verification link to the new address.</p>
+            <p class="field__help">Email address is your account ID and cannot be changed directly.</p>
         </div>
 
         <div class="field">
             <label class="field__label" for="profPhone">Mobile number</label>
             <div class="phone-input">
                 <select class="select" aria-label="Country code"><option selected>+91</option></select>
-                <input class="input" id="profPhone" type="tel" value="98765 43210" autocomplete="tel" inputmode="numeric" />
+                <input class="input" id="profPhone" name="Phone" type="tel" value="@Model?.Phone" autocomplete="tel" inputmode="numeric" />
             </div>
-            <p class="field__help text-warning-c">
-                <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-triangle-alert"></use></svg>
-                Not verified — <a class="link" href="/verify-mobile">verify to enable cash on delivery</a>
-            </p>
+            @if (Model?.MobileVerified == true)
+            {
+                <p class="field__help text-success-c">
+                    <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-badge-check"></use></svg>
+                    Mobile number verified
+                </p>
+            }
+            else
+            {
+                <p class="field__help text-warning-c">
+                    <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-triangle-alert"></use></svg>
+                    Not verified — <a class="link" href="/verify-mobile">verify to enable cash on delivery</a>
+                </p>
+            }
         </div>
 
         <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
@@ -69,16 +85,31 @@
                 <label class="field__label" for="profDob">
                     Date of birth <span class="field__optional">(optional)</span>
                 </label>
-                <input class="input" id="profDob" type="date" />
+                <input class="input" id="profDob" name="DateOfBirth" type="date" value="@(Model?.DateOfBirth?.ToString("yyyy-MM-dd"))" />
                 <p class="field__help">We send a birthday coupon. Nothing else.</p>
             </div>
 
             <div class="field" style="margin-top:0">
-                <label class="field__label" for="profLang">Preferred language</label>
-                <select class="select" id="profLang">
-                    <option selected>English</option>
-                    <option>हिन्दी (Hindi)</option>
+                <label class="field__label" for="profGender">Gender</label>
+                <select class="select" id="profGender" name="Gender">
+                    <option value="" selected="@(string.IsNullOrEmpty(Model?.Gender))">Prefer not to say</option>
+                    <option value="Female" selected="@(Model?.Gender == "Female")">Female</option>
+                    <option value="Male" selected="@(Model?.Gender == "Male")">Male</option>
+                    <option value="Other" selected="@(Model?.Gender == "Other")">Other</option>
                 </select>
+            </div>
+        </div>
+
+        <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
+            <div class="field">
+                <label class="field__label" for="gstin">GSTIN <span class="field__optional">(for business orders)</span></label>
+                <input class="input" id="gstin" name="Gstin" type="text" value="@Model?.Gstin" placeholder="08AABCK1234M1Z5" maxlength="15"
+                       style="text-transform:uppercase" />
+                <p class="field__help">Add your GSTIN to claim input tax credit on invoices.</p>
+            </div>
+            <div class="field" style="margin-top:0">
+                <label class="field__label" for="gstBusiness">Registered business name</label>
+                <input class="input" id="gstBusiness" name="RegisteredBusinessName" type="text" value="@Model?.RegisteredBusinessName" placeholder="Iyer Interiors Pvt. Ltd." />
             </div>
         </div>
 
@@ -87,26 +118,7 @@
                 <span class="btn__spinner" aria-hidden="true"></span>
                 <span class="btn__label">Save Changes</span>
             </button>
-            <button class="btn btn-ghost" type="reset">Cancel</button>
+            <a class="btn btn-ghost" href="/account">Cancel</a>
         </div>
     </form>
-</section>
-
-<section class="card mt-md">
-    <h2 class="t-heading-md mb-sm">GST details for business orders</h2>
-    <p class="t-body-sm text-secondary-c mb-md">
-        Add a GSTIN and we'll put it on every invoice so you can claim input credit.
-    </p>
-    <div class="layout-halves" style="align-items:start;gap:var(--space-md)">
-        <div class="field">
-            <label class="field__label" for="gstin">GSTIN</label>
-            <input class="input" id="gstin" type="text" placeholder="08AABCK1234M1Z5" maxlength="15"
-                   style="text-transform:uppercase" />
-        </div>
-        <div class="field" style="margin-top:0">
-            <label class="field__label" for="gstBusiness">Registered business name</label>
-            <input class="input" id="gstBusiness" type="text" placeholder="Iyer Interiors Pvt. Ltd." />
-        </div>
-    </div>
-    <button class="btn btn-outline mt-md" type="button">Save GST Details</button>
 </section>

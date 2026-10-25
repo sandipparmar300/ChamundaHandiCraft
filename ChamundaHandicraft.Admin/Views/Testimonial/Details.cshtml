@@ -28,10 +28,19 @@
 
         <div class="form-section-body">
             <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label-custom">Author Name</label>
-                        <p class="detail-value">@Model.CustomerName</p>
+                @if (!string.IsNullOrWhiteSpace(Model.PhotoUrl))
+                {
+                    <div class="col-12 mb-2">
+                        <label class="form-label-custom">Photo</label>
+                        <div>
+                            <img src="@Model.PhotoUrl" alt="@Model.CustomerName" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent, #e5a83b);" />
+                        </div>
                     </div>
+                }
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom">Author Name</label>
+                    <p class="detail-value">@Model.CustomerName</p>
+                </div>
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom">Designation</label>
                         <p class="detail-value">&mdash;</p>
