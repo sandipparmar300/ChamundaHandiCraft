@@ -48,7 +48,16 @@ public class GatewayStorefrontClient : IStorefrontClient
 
     // ---- Catalogue ---------------------------------------------------------
     public async Task<ResponseViewModel<ProductListingViewModel>> GetListingAsync(
-        string? categorySlug, string? subCategorySlug, PagedRequest paging, string? sort, CancellationToken ct = default)
+        string? categorySlug,
+        string? subCategorySlug,
+        PagedRequest paging,
+        string? sort,
+        string? material = null,
+        decimal? minPrice = null,
+        decimal? maxPrice = null,
+        bool? inStockOnly = null,
+        int? rating = null,
+        CancellationToken ct = default)
     {
         var response = await _api.GetAsync<ProductListingViewModel>(ApiEndPoint.Product.ShopList, new Dictionary<string, string?>
         {
@@ -56,7 +65,12 @@ public class GatewayStorefrontClient : IStorefrontClient
             ["subCategory"] = subCategorySlug,
             ["page"] = paging.Page.ToString(),
             ["pageSize"] = paging.PageSize.ToString(),
-            ["sort"] = sort
+            ["sort"] = sort,
+            ["material"] = material,
+            ["minPrice"] = minPrice?.ToString(),
+            ["maxPrice"] = maxPrice?.ToString(),
+            ["inStockOnly"] = inStockOnly?.ToString(),
+            ["rating"] = rating?.ToString()
         }, ct);
 
         if (response.IsSuccess && response.Data is not null) return response;
@@ -109,6 +123,24 @@ public class GatewayStorefrontClient : IStorefrontClient
         });
     }
 
+    public async Task<ResponseViewModel<ProductSearchResultViewModel>> GetSearchSuggestionsAsync(
+        string query, int limit = 8, CancellationToken ct = default)
+    {
+        var response = await _api.GetAsync<ProductSearchResultViewModel>(ApiEndPoint.Search.ShopSuggestions, new Dictionary<string, string?>
+        {
+            ["q"] = query,
+            ["limit"] = limit.ToString()
+        }, ct);
+
+        if (response.IsSuccess && response.Data is not null) return response;
+
+        return Ok(new ProductSearchResultViewModel
+        {
+            Products = DemoContent.AllProducts().Take(limit).ToList(),
+            Categories = DemoContent.Categories().Take(4).ToList()
+        });
+    }
+
     public async Task<ResponseViewModel<ProductDetailViewModel>> GetProductAsync(string slug, CancellationToken ct = default)
     {
         var response = await _api.GetAsync<ProductDetailViewModel>(ApiEndPoint.Product.ShopDetail,
@@ -125,16 +157,14 @@ public class GatewayStorefrontClient : IStorefrontClient
         var endpoint = railKey switch
         {
             "related" => ApiEndPoint.Product.ShopRelated,
-            "complete-the-look" => ApiEndPoint.Product.ShopCompleteTheLook,
-            "recently-viewed" => ApiEndPoint.Product.ShopRecentlyViewed,
-            "recommended" => ApiEndPoint.Product.ShopRecommended,
-            _ => ApiEndPoint.Product.ShopList
+            _ => ApiEndPoint.Product.ShopRail
         };
 
         var response = await _api.GetAsync<List<ProductCardViewModel>>(endpoint, new Dictionary<string, string?>
         {
             ["rail"] = railKey,
             ["count"] = count.ToString(),
+            ["contextSlug"] = contextSlug,
             ["slug"] = contextSlug
         }, ct);
 
@@ -166,13 +196,26 @@ public class GatewayStorefrontClient : IStorefrontClient
         var response = await _api.GetAsync<CartViewModel>(ApiEndPoint.Cart.ShopGet, null, ct);
         if (response.IsSuccess && response.Data is not null) return response;
 
-        var lines = DemoContent.CartLines();
-        return Ok(new CartViewModel
-        {
-            Lines = lines,
-            Summary = DemoContent.Summary(lines)
-        });
+        return Ok(new CartViewModel());
     }
+
+    public Task<ResponseViewModel<CartViewModel>> AddToCartAsync(AddToCartRequest request, CancellationToken ct = default) =>
+        _api.PostAsync<CartViewModel>(ApiEndPoint.Cart.ShopAddItem, request, ct);
+
+    public Task<ResponseViewModel<CartViewModel>> UpdateCartQuantityAsync(UpdateCartQuantityRequest request, CancellationToken ct = default) =>
+        _api.PostAsync<CartViewModel>(ApiEndPoint.Cart.ShopUpdateQuantity, request, ct);
+
+    public Task<ResponseViewModel<CartViewModel>> RemoveCartItemAsync(long cartItemId, CancellationToken ct = default) =>
+        _api.PostAsync<CartViewModel>(ApiEndPoint.Cart.ShopRemoveItem, new RemoveCartItemRequest { CartItemId = cartItemId }, ct);
+
+    public Task<ResponseViewModel<CartViewModel>> ApplyCouponAsync(string couponCode, CancellationToken ct = default) =>
+        _api.PostAsync<CartViewModel>(ApiEndPoint.Cart.ShopApplyCoupon, new ApplyCouponRequest { CouponCode = couponCode }, ct);
+
+    public Task<ResponseViewModel<CartViewModel>> RemoveCouponAsync(CancellationToken ct = default) =>
+        _api.PostAsync<CartViewModel>(ApiEndPoint.Cart.ShopRemoveCoupon, null, ct);
+
+    public Task<ResponseViewModel<CartViewModel>> MergeGuestCartAsync(string guestToken, CancellationToken ct = default) =>
+        _api.PostAsync<CartViewModel>(ApiEndPoint.Auth.MergeGuestCart, new MergeGuestCartRequest { GuestToken = guestToken }, ct);
 
     public async Task<ResponseViewModel<CheckoutViewModel>> GetCheckoutAsync(bool guest, CancellationToken ct = default)
     {
@@ -191,20 +234,27 @@ public class GatewayStorefrontClient : IStorefrontClient
         });
     }
 
+    public Task<ResponseViewModel<PlaceOrderResult>> PlaceOrderAsync(PlaceOrderRequest request, CancellationToken ct = default) =>
+        _api.PostAsync<PlaceOrderResult>(ApiEndPoint.Order.ShopPlaceOrder, request, ct);
+
     // ---- Account -----------------------------------------------------------
     public Task<ResponseViewModel<List<OrderSummaryCardViewModel>>> GetOrdersAsync(CancellationToken ct = default) =>
         Task.FromResult(Ok(DemoContent.Orders()));
 
-    public Task<ResponseViewModel<OrderDetailViewModel>> GetOrderAsync(string orderNumber, CancellationToken ct = default)
+    public async Task<ResponseViewModel<OrderDetailViewModel>> GetOrderAsync(string orderNumber, CancellationToken ct = default)
     {
+        var response = await _api.GetAsync<OrderDetailViewModel>(ApiEndPoint.Order.ShopOrderDetail,
+            new Dictionary<string, string?> { ["orderNumber"] = orderNumber }, ct);
+        if (response.IsSuccess && response.Data is not null) return response;
+
         var header = DemoContent.Orders().FirstOrDefault(o => o.OrderNumber == orderNumber) ?? DemoContent.Orders()[0];
-        return Task.FromResult(Ok(new OrderDetailViewModel
+        return Ok(new OrderDetailViewModel
         {
             Header = header,
             Lines = DemoContent.CartLines(),
             ShippingAddress = DemoContent.Addresses()[0],
             Timeline = DemoContent.Timeline()
-        }));
+        });
     }
 
     public Task<ResponseViewModel<List<OrderTimelineStep>>> GetTrackingAsync(string orderNumber, CancellationToken ct = default) =>

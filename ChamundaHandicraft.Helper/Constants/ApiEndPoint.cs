@@ -109,6 +109,7 @@ public static class ApiEndPoint
 
         // Storefront reads
         public const string ShopList = ShopPrefix + "Product/List";
+        public const string ShopRail = ShopPrefix + "Product/Rail";
         public const string ShopDetail = ShopPrefix + "Product/Detail";
         public const string ShopQuickView = ShopPrefix + "Product/QuickView";
         public const string ShopRelated = ShopPrefix + "Product/Related";

@@ -22,6 +22,7 @@ BEGIN
             c.IconName,
             c.SortOrder,
             c.ShowInMegaMenu,
+            c.ShowInNavbar,
             c.IsFeaturedOnHome,
             c.Depth,
             c.IsActive,
@@ -155,6 +156,7 @@ BEGIN
             c.IconName,
             c.SortOrder,
             c.ShowInMegaMenu,
+            c.ShowInNavbar,
             c.IsFeaturedOnHome,
             c.Depth,
             c.TreePath,
@@ -191,6 +193,7 @@ CREATE OR ALTER PROCEDURE dbo.usp_Category_Save
     @IconName           VARCHAR(64)     = NULL,
     @SortOrder          INT             = 0,
     @ShowInMegaMenu     BIT             = 1,
+    @ShowInNavbar       BIT             = 0,
     @IsFeaturedOnHome   BIT             = 0,
     @IsActive           BIT             = 1,
     @MetaTitle          NVARCHAR(300)   = NULL,
@@ -245,6 +248,7 @@ BEGIN
                IconName         = @IconName,
                SortOrder        = @SortOrder,
                ShowInMegaMenu   = @ShowInMegaMenu,
+               ShowInNavbar     = @ShowInNavbar,
                IsFeaturedOnHome = @IsFeaturedOnHome,
                Depth            = @Depth,
                TreePath         = @TreePath,
@@ -258,13 +262,13 @@ BEGIN
         INSERT INTO dbo.Categories
         (
             ParentId, Name, Slug, Description, IntroCopy, ImageUrl, IconName,
-            SortOrder, ShowInMegaMenu, IsFeaturedOnHome, Depth, TreePath,
+            SortOrder, ShowInMegaMenu, ShowInNavbar, IsFeaturedOnHome, Depth, TreePath,
             ProductCount, CreatedAt, CreatedBy, IsActive, IsDeleted
         )
         VALUES
         (
             @ParentId, @Name, @Slug, @Description, @IntroCopy, @ImageUrl, @IconName,
-            @SortOrder, @ShowInMegaMenu, @IsFeaturedOnHome, @Depth, '/',
+            @SortOrder, @ShowInMegaMenu, @ShowInNavbar, @IsFeaturedOnHome, @Depth, '/',
             0, SYSUTCDATETIME(), @AdminUserId, @IsActive, 0
         );
 

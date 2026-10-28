@@ -44,6 +44,10 @@
                         {
                             <span class="badge bg-info font-12">In Mega Menu</span>
                         }
+                        @if (Model.ShowInNavbar)
+                        {
+                            <span class="badge bg-primary font-12">In Navbar</span>
+                        }
                         @if (Model.IsFeaturedOnHome)
                         {
                             <span class="badge bg-warning text-dark font-12">Featured on Home</span>

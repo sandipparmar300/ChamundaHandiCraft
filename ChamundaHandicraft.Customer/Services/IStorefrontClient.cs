@@ -23,10 +23,22 @@ public interface IStorefrontClient
 
     // ---- Catalogue ---------------------------------------------------------
     Task<ResponseViewModel<ProductListingViewModel>> GetListingAsync(
-        string? categorySlug, string? subCategorySlug, PagedRequest paging, string? sort, CancellationToken ct = default);
+        string? categorySlug,
+        string? subCategorySlug,
+        PagedRequest paging,
+        string? sort,
+        string? material = null,
+        decimal? minPrice = null,
+        decimal? maxPrice = null,
+        bool? inStockOnly = null,
+        int? rating = null,
+        CancellationToken ct = default);
 
     Task<ResponseViewModel<ProductListingViewModel>> SearchAsync(
         string? query, PagedRequest paging, string? sort, CancellationToken ct = default);
+
+    Task<ResponseViewModel<ProductSearchResultViewModel>> GetSearchSuggestionsAsync(
+        string query, int limit = 8, CancellationToken ct = default);
 
     Task<ResponseViewModel<ProductDetailViewModel>> GetProductAsync(string slug, CancellationToken ct = default);
 
@@ -41,7 +53,14 @@ public interface IStorefrontClient
 
     // ---- Cart & checkout ---------------------------------------------------
     Task<ResponseViewModel<CartViewModel>> GetCartAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<CartViewModel>> AddToCartAsync(AddToCartRequest request, CancellationToken ct = default);
+    Task<ResponseViewModel<CartViewModel>> UpdateCartQuantityAsync(UpdateCartQuantityRequest request, CancellationToken ct = default);
+    Task<ResponseViewModel<CartViewModel>> RemoveCartItemAsync(long cartItemId, CancellationToken ct = default);
+    Task<ResponseViewModel<CartViewModel>> ApplyCouponAsync(string couponCode, CancellationToken ct = default);
+    Task<ResponseViewModel<CartViewModel>> RemoveCouponAsync(CancellationToken ct = default);
+    Task<ResponseViewModel<CartViewModel>> MergeGuestCartAsync(string guestToken, CancellationToken ct = default);
     Task<ResponseViewModel<CheckoutViewModel>> GetCheckoutAsync(bool guest, CancellationToken ct = default);
+    Task<ResponseViewModel<PlaceOrderResult>> PlaceOrderAsync(PlaceOrderRequest request, CancellationToken ct = default);
 
     // ---- Account -----------------------------------------------------------
     Task<ResponseViewModel<List<OrderSummaryCardViewModel>>> GetOrdersAsync(CancellationToken ct = default);

@@ -1,20 +1,18 @@
-@model ProductCardViewModel
+@model ProductDetailViewModel
 @{
     var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
     var stock = StockStyle.For(Model.Stock, Model.StockCount);
     var isOos = Model.Stock == StockState.OutOfStock;
-    var deliveryBy = DateTime.Today.AddDays(6);
-    var reviews = DemoContent.Reviews();
+    var deliveryBy = Model.Delivery?.DeliverBy ?? DateTime.Today.AddDays(5);
+    var reviews = Model.Reviews?.Recent != null && Model.Reviews.Recent.Count > 0 ? Model.Reviews.Recent : DemoContent.Reviews();
 
-    var gallery = new (string Src, string Alt, string? Kind)[]
-    {
-        (Model.ImageUrl, Model.ImageAlt, null),
-        ("/assets/images/placeholders/decor.svg", "Close macro of the hand-painted floral band showing individual brush strokes", null),
-        ("/assets/images/placeholders/lifestyle.svg", "The vase on a console table beside a brass lamp, for scale", null),
-        ("/assets/images/placeholders/lamp.svg", "The unglazed base showing the artisan's stamped mark", null),
-        ("/assets/images/placeholders/craft.svg", "360 degree view", "360"),
-        ("/assets/images/placeholders/blog.svg", "Craft process film", "video")
-    };
+    var gallery = (Model.Media != null && Model.Media.Count > 0)
+        ? Model.Media.Select(m => (Src: m.Url, Alt: m.AltText, Kind: m.MediaType == ProductMediaType.Spin360 ? "360" : (m.MediaType == ProductMediaType.Video ? "video" : (string?)null))).ToArray()
+        : new (string Src, string Alt, string? Kind)[]
+        {
+            (Src: Model.ImageUrl, Alt: Model.ImageAlt, Kind: (string?)null),
+            (Src: "/assets/images/placeholders/decor.svg", Alt: "Artisan handcrafted view", Kind: (string?)null)
+        };
 }
 
 <div class="container">
@@ -157,35 +155,32 @@
             }
             else
             {
-                @* ---- Variants ---- *@
-                <div class="stack stack-md mt-lg">
-                    <div class="option-group">
-                        <span class="option-group__label">
-                            Colour: <span class="option-group__value">Indigo Blue</span>
-                        </span>
-                        <div class="swatch-filter" role="radiogroup" aria-label="Colour">
-                            <button class="swatch is-selected" type="button" role="radio" aria-checked="true" style="background:#4F46E5" aria-label="Indigo Blue"></button>
-                            <button class="swatch" type="button" role="radio" aria-checked="false" style="background:#FFFFFF" aria-label="Ivory White"></button>
-                            <button class="swatch" type="button" role="radio" aria-checked="false" style="background:#D4714C" aria-label="Terracotta"></button>
-                            <button class="swatch is-oos" type="button" role="radio" aria-checked="false" style="background:#047857" aria-label="Forest Green, out of stock"></button>
-                        </div>
-                        <p class="t-body-xs text-tertiary-c">Indigo Blue · Ivory White · Terracotta · Forest Green (out of stock)</p>
-                    </div>
-
-                    <div class="option-group">
-                        <div class="row-flex between">
+                @* ---- Dynamic Real Variants ---- *@
+                @if (Model.Variants != null && Model.Variants.Count > 1)
+                {
+                    <div class="stack stack-md mt-lg">
+                        <div class="option-group">
                             <span class="option-group__label">
-                                Size: <span class="option-group__value">Medium</span>
+                                Option: <span class="option-group__value">@Model.Variants[0].VariantSummary</span>
                             </span>
-                            <button class="btn btn-link btn-sm" type="button" data-open="sizeGuide">Size guide</button>
-                        </div>
-                        <div class="option-list" role="radiogroup" aria-label="Size">
-                            <button class="option-pill" type="button" role="radio" aria-checked="false" data-label="Small (18 cm)">S · 18 cm</button>
-                            <button class="option-pill is-selected" type="button" role="radio" aria-checked="true" data-label="Medium (24 cm)">M · 24 cm</button>
-                            <button class="option-pill is-oos" type="button" role="radio" aria-checked="false" disabled>L · 32 cm</button>
+                            <div class="option-list" role="radiogroup" aria-label="Variant Option">
+                                @for (int i = 0; i < Model.Variants.Count; i++)
+                                {
+                                    var v = Model.Variants[i];
+                                    <button class="option-pill @(i == 0 ? "is-selected" : "") @(v.Stock == StockState.OutOfStock ? "is-oos" : "")"
+                                            type="button" role="radio" aria-checked="@(i == 0 ? "true" : "false")"
+                                            data-variant-id="@v.Id"
+                                            data-variant-price="@v.Price"
+                                            data-variant-mrp="@(v.Mrp ?? 0)"
+                                            data-label="@v.VariantSummary"
+                                            disabled="@(v.Stock == StockState.OutOfStock)">
+                                        @v.VariantSummary · @Money.Inr(v.Price)
+                                    </button>
+                                }
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
 
                 @if (stock is not null)
                 {
@@ -194,8 +189,10 @@
                             <svg class="ico ico-sm" aria-hidden="true"><use href="#@stock.Value.Icon"></use></svg>
                             @stock.Value.Label
                         </span>
-                        @* Honest social proof only — a real, verifiable figure or nothing. *@
-                        <span class="t-body-sm text-secondary-c">18 sold in the last 7 days</span>
+                        @if (Model.SoldLastSevenDays.HasValue && Model.SoldLastSevenDays.Value > 0)
+                        {
+                            <span class="t-body-sm text-secondary-c">@Model.SoldLastSevenDays.Value sold in the last 7 days</span>
+                        }
                     </div>
                 }
 
@@ -230,7 +227,7 @@
                             </button>
                         </div>
 
-                        <button class="btn btn-primary btn-xl grow" type="button" data-add-to-cart data-open-minicart>
+                        <button class="btn btn-primary btn-xl grow" type="button" data-add-to-cart data-open-minicart data-product-id="@Model.Id" data-slug="@Model.Slug">
                             <span class="btn__spinner" aria-hidden="true"></span>
                             <span class="btn__label">
                                 <svg class="ico" aria-hidden="true" style="display:inline;vertical-align:-5px"><use href="#i-cart"></use></svg>
@@ -295,21 +292,17 @@
         <div class="tab-panel is-active hide-tablet-down" id="tab-description" role="tabpanel">
             <div class="measure t-body-lg stack stack-md">
                 <p>@Model.ShortDescription</p>
-                <p>
-                    The body is thrown from a dough of quartz powder, powdered glass, fuller's earth and gum —
-                    Jaipur blue pottery contains no clay at all. That is what gives the finished piece its
-                    translucence, and why it must be fired at a lower temperature than ordinary ceramics.
-                </p>
-                <p>
-                    The floral band is drawn freehand in cobalt oxide with a squirrel-hair brush before the
-                    glaze goes on, so the motif is under the surface rather than printed on it. It will not
-                    scratch off, and it will not fade.
-                </p>
-                <ul>
-                    <li>Food-safe glaze, lead-free</li>
-                    <li>Watertight — suitable for fresh flowers</li>
-                    <li>Signed and stamped on the base by the artisan</li>
-                </ul>
+                @if (!string.IsNullOrWhiteSpace(Model.FullDescription) && Model.FullDescription != Model.ShortDescription)
+                {
+                    <p>@Model.FullDescription</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.CraftStory))
+                {
+                    <div class="card mt-md" style="padding:var(--space-md);background:var(--color-bg-subtle)">
+                        <h3 class="t-heading-xs mb-xs">The Artisan &amp; Craft Story</h3>
+                        <p class="t-body-md text-secondary-c">@Model.CraftStory</p>
+                    </div>
+                }
             </div>
         </div>
 
@@ -320,61 +313,67 @@
                         <h3 class="spec-group__title t-heading-xs">Materials &amp; craft</h3>
                         <div class="spec-list">
                             <div class="spec-list__row"><span class="spec-list__key">Material</span><span class="spec-list__val">@Model.Material</span></div>
-                            <div class="spec-list__row"><span class="spec-list__key">Technique</span><span class="spec-list__val">Wheel-thrown, hand-painted, twice-fired</span></div>
-                            <div class="spec-list__row"><span class="spec-list__key">Finish</span><span class="spec-list__val">Food-safe transparent glaze</span></div>
-                            <div class="spec-list__row"><span class="spec-list__key">Craft</span><span class="spec-list__val">Jaipur Blue Pottery (GI tagged)</span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Dimensions</span><span class="spec-list__val">@Model.Dimensions</span></div>
+                            <div class="spec-list__row"><span class="spec-list__key">Category</span><span class="spec-list__val">@Model.CategoryName</span></div>
                         </div>
                     </div>
 
-                    <div class="spec-group">
-                        <h3 class="spec-group__title t-heading-xs">Origin</h3>
-                        <div class="spec-list">
-                            <div class="spec-list__row"><span class="spec-list__key">Made in</span><span class="spec-list__val">Jaipur, Rajasthan, India</span></div>
-                            <div class="spec-list__row"><span class="spec-list__key">Artisan</span><span class="spec-list__val"><a class="link" href="/artisans/ram-prasad-sharma">Ram Prasad Sharma</a></span></div>
-                            <div class="spec-list__row"><span class="spec-list__key">Category</span><span class="spec-list__val"><a class="link" href="/c/home-decor">Home Décor</a> › <a class="link" href="/c/home-decor/vases">Vases</a></span></div>
+                    @if (Model.Artisan is not null)
+                    {
+                        <div class="spec-group">
+                            <h3 class="spec-group__title t-heading-xs">Origin &amp; Maker</h3>
+                            <div class="spec-list">
+                                <div class="spec-list__row"><span class="spec-list__key">Artisan</span><span class="spec-list__val"><a class="link" href="/artisans/@Model.Artisan.Slug">@Model.Artisan.Name</a></span></div>
+                                <div class="spec-list__row"><span class="spec-list__key">Cluster</span><span class="spec-list__val">@Model.Artisan.Cluster</span></div>
+                                <div class="spec-list__row"><span class="spec-list__key">Craft Speciality</span><span class="spec-list__val">@Model.Artisan.Craft</span></div>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
 
                 <div>
-                    <div class="spec-group">
-                        <h3 class="spec-group__title t-heading-xs">Dimensions &amp; weight</h3>
-                        <div class="spec-list">
-                            <div class="spec-list__row"><span class="spec-list__key">Dimensions</span><span class="spec-list__val">@Model.Dimensions (L × W × H)</span></div>
-                            <div class="spec-list__row"><span class="spec-list__key">Mouth diameter</span><span class="spec-list__val">8 cm</span></div>
-                            <div class="spec-list__row"><span class="spec-list__key">Weight</span><span class="spec-list__val">850 g</span></div>
-                            <div class="spec-list__row"><span class="spec-list__key">Capacity</span><span class="spec-list__val">1.2 litres</span></div>
-                        </div>
-                    </div>
-
-                    @* Dimension scale reference — measurably reduces size-related returns. *@
-                    <div class="card card-craft mt-md">
-                        <div class="row-flex gap-sm">
-                            <svg class="ico ico-lg text-craft-c shrink-0" aria-hidden="true"><use href="#i-ruler"></use></svg>
-                            <div>
-                                <p class="t-heading-xs text-craft-c">How big is 24 cm?</p>
-                                <p class="t-body-sm text-craft-c">About the height of a 1-litre water bottle, and roughly two hand-spans around.</p>
-                                <div class="segmented mt-sm">
-                                    <button class="segmented__item is-active" type="button">cm</button>
-                                    <button class="segmented__item" type="button">inches</button>
+                    @if (Model.Specifications != null && Model.Specifications.Count > 0)
+                    {
+                        @foreach (var group in Model.Specifications)
+                        {
+                            <div class="spec-group">
+                                <h3 class="spec-group__title t-heading-xs">@group.Title</h3>
+                                <div class="spec-list">
+                                    @foreach (var row in group.Rows)
+                                    {
+                                        <div class="spec-list__row">
+                                            <span class="spec-list__key">@row.Key</span>
+                                            <span class="spec-list__val">@row.Value</span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="spec-group">
+                            <h3 class="spec-group__title t-heading-xs">Dimensions &amp; details</h3>
+                            <div class="spec-list">
+                                <div class="spec-list__row"><span class="spec-list__key">Dimensions</span><span class="spec-list__val">@Model.Dimensions</span></div>
+                                <div class="spec-list__row"><span class="spec-list__key">Authenticity</span><span class="spec-list__val">100% Certified Handcrafted</span></div>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
 
         <div class="tab-panel hide-tablet-down" id="tab-care" role="tabpanel">
             <div class="measure t-body-lg stack stack-md">
-                <p>Blue pottery is durable but not indestructible — it is fired at a lower temperature than stoneware.</p>
-                <ul>
-                    <li>Wipe with a soft damp cloth. No abrasives, no scouring pads.</li>
-                    <li>Hand wash only. Not dishwasher safe.</li>
-                    <li>Not microwave or oven safe.</li>
-                    <li>Avoid sudden temperature changes — do not pour boiling water in.</li>
-                    <li>Keep out of direct, sustained sunlight to protect the cobalt.</li>
-                </ul>
+                @if (!string.IsNullOrWhiteSpace(Model.CareInstructions))
+                {
+                    <p>@Model.CareInstructions</p>
+                }
+                else
+                {
+                    <p>Wipe with a soft, slightly damp cloth. Avoid harsh chemicals, direct abrasive scrubs, and extreme temperatures to preserve handcrafted finish.</p>
+                }
             </div>
         </div>
 
@@ -732,27 +731,30 @@
 @* ══════════ Related rails ══════════ *@
 <section class="band band-subtle">
     <div class="container stack stack-xl">
-        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        @if (Model.RelatedProducts != null && Model.RelatedProducts.Count > 0)
         {
-            Heading = "Complete the look",
-            SubHeading = "Pieces our shoppers buy alongside this one.",
-            Products = DemoContent.Products(6, 2)
-        })
+            @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+            {
+                Heading = "Similar pieces",
+                SubHeading = "Handcrafted creations from the same lineage and category.",
+                ViewAllUrl = string.IsNullOrWhiteSpace(Model.CategorySlug) ? "/shop" : $"/c/{Model.CategorySlug}",
+                Products = Model.RelatedProducts
+            })
+        }
 
-        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+        @{
+            var trending = ViewBag.TrendingProducts as List<ProductCardViewModel>;
+        }
+        @if (trending != null && trending.Count > 0)
         {
-            Heading = "Similar pieces",
-            ViewAllUrl = "/c/" + Model.CategorySlug,
-            Products = DemoContent.Products(6, 5)
-        })
-
-        @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
-        {
-            Heading = "More from " + (Model.Artisan?.Name ?? "this cluster"),
-            ViewAllUrl = Model.Artisan is null ? null : $"/artisans/{Model.Artisan.Slug}",
-            Products = DemoContent.Products(5, 7),
-            Compact = true
-        })
+            @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+            {
+                Heading = "Trending handcrafted pieces",
+                SubHeading = "Artisanal pieces currently catching patron attention.",
+                ViewAllUrl = "/shop?sort=popularity",
+                Products = trending
+            })
+        }
     </div>
 </section>
 
@@ -777,7 +779,7 @@
             <button class="icon-btn icon-btn-outline wish" type="button" data-wishlist data-product-name="@Model.Name" aria-label="Save to wishlist">
                 <svg class="ico" aria-hidden="true"><use href="#i-heart"></use></svg>
             </button>
-            <button class="btn btn-primary" type="button" data-add-to-cart data-open-minicart>
+            <button class="btn btn-primary" type="button" data-add-to-cart data-open-minicart data-product-id="@Model.Id" data-slug="@Model.Slug">
                 <span class="btn__spinner" aria-hidden="true"></span>
                 <span class="btn__label">Add to Cart</span>
             </button>
@@ -796,14 +798,14 @@
             <span class="price__now">@Money.Inr(Model.Price)</span>
         </div>
     </div>
-    <button class="btn btn-primary btn-xl grow" type="button" data-add-to-cart data-open-minicart>
+    <button class="btn btn-primary btn-xl grow" type="button" data-add-to-cart data-open-minicart data-product-id="@Model.Id" data-slug="@Model.Slug">
         <span class="btn__spinner" aria-hidden="true"></span>
         <span class="btn__label">Add to Cart</span>
     </button>
 </div>
 
 @* ══════════ Overlays ══════════ *@
-@await Html.PartialAsync("_QuickView", Model)
+@await Html.PartialAsync("_QuickView", Model.Card)
 
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Product images" aria-hidden="true">
     <div class="lightbox__head">

@@ -1,4 +1,12 @@
 @model ShellViewModel
+@functions {
+    public static bool IsInNavbar(CategoryViewModel c)
+    {
+        var prop = typeof(CategoryViewModel).GetProperty("ShowInNavbar");
+        if (prop != null && prop.GetValue(c) is bool b) return b;
+        return string.Equals(c.Slug, "festive", StringComparison.OrdinalIgnoreCase);
+    }
+}
 @{
     var drawerCats = Model.Categories != null && Model.Categories.Count > 0 ? Model.Categories : DemoContent.Categories();
 }
@@ -76,7 +84,10 @@
             <span class="t-overline">Quick links</span>
             <a class="mobile-drawer__link" href="/c/new-arrivals"><svg class="ico" aria-hidden="true"><use href="#i-badge-plus"></use></svg>New Arrivals</a>
             <a class="mobile-drawer__link" href="/c/sale"><svg class="ico" aria-hidden="true"><use href="#i-percent"></use></svg>Sale</a>
-            <a class="mobile-drawer__link" href="/c/festive"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"></use></svg>Festive</a>
+            @foreach (var navCat in drawerCats.Where(c => c.ParentId == null && IsInNavbar(c)))
+            {
+                <a class="mobile-drawer__link" href="@navCat.Url"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"></use></svg>@navCat.Name</a>
+            }
             <a class="mobile-drawer__link" href="/c/gifting"><svg class="ico" aria-hidden="true"><use href="#i-gift"></use></svg>Gifting</a>
             <a class="mobile-drawer__link" href="/artisans"><svg class="ico" aria-hidden="true"><use href="#i-hand-heart"></use></svg>Meet the Makers</a>
             <a class="mobile-drawer__link" href="/blog"><svg class="ico" aria-hidden="true"><use href="#i-book-open"></use></svg>Stories</a>

@@ -2,6 +2,7 @@
 @{
     var crumbs = ViewData["Breadcrumbs"] as List<BreadcrumbItem>;
     var hasQuery = !string.IsNullOrEmpty(Model.Query);
+    var popular = ViewBag.PopularProducts as List<ProductCardViewModel>;
 }
 
 <div class="container">
@@ -43,10 +44,15 @@
                 <div>
                     <span class="t-overline">Browse by category</span>
                     <div class="cat-grid mt-xs">
-                        @foreach (var category in DemoContent.Categories())
+                        @{
+                            var categories = (Model.SubCategories != null && Model.SubCategories.Count > 0)
+                                ? Model.SubCategories
+                                : DemoContent.Categories();
+                        }
+                        @foreach (var category in categories)
                         {
                             <a class="cat-tile" href="@category.Url">
-                                <img src="@category.ImageUrl" alt="@category.Name" loading="lazy" width="480" height="360" />
+                                <img src="@(category.ImageUrl ?? "/assets/images/placeholders/decor.svg")" alt="@category.Name" loading="lazy" width="480" height="360" />
                                 <span class="cat-tile__body">
                                     <span class="cat-tile__title">@category.Name</span>
                                     <span class="cat-tile__count">@category.ProductCount pieces</span>
@@ -83,15 +89,18 @@
             </div>
         </div>
 
-        <section class="band-sm">
-            @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
-            {
-                Heading = "Popular right now",
-                SubHeading = "Where most shoppers start.",
-                ViewAllUrl = "/shop",
-                Products = DemoContent.Products(6)
-            })
-        </section>
+        if (popular != null && popular.Count > 0)
+        {
+            <section class="band-sm">
+                @await Html.PartialAsync("_ProductRail", new ProductRailViewModel
+                {
+                    Heading = "Popular right now",
+                    SubHeading = "Where most patrons start their discovery.",
+                    ViewAllUrl = "/shop",
+                    Products = popular
+                })
+            </section>
+        }
     }
     else
     {
@@ -108,16 +117,17 @@
             }
         </div>
 
-        @* ---- Cross-entity matches: categories and artisans surface above the grid ---- *@
-        <div class="row-flex wrap gap-xs mb-md">
-            <span class="t-body-sm text-secondary-c">Also in</span>
-            <a class="chip" href="/c/pottery">Pottery &amp; Ceramics <span class="text-tertiary-c">216</span></a>
-            <a class="chip" href="/artisans/ram-prasad-sharma">
-                <svg class="ico ico-xs" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
-                Ram Prasad Sharma
-            </a>
-            <a class="chip" href="/blog?q=@Model.Query">3 stories</a>
-        </div>
+        @* ---- Cross-entity matches: categories surface above the grid ---- *@
+        @if (Model.SubCategories != null && Model.SubCategories.Count > 0)
+        {
+            <div class="row-flex wrap gap-xs mb-md">
+                <span class="t-body-sm text-secondary-c">Matching categories:</span>
+                @foreach (var cat in Model.SubCategories)
+                {
+                    <a class="chip" href="/c/@cat.Slug">@cat.Name <span class="text-tertiary-c">@cat.ProductCount</span></a>
+                }
+            </div>
+        }
 
         <div class="filter-bar-mobile">
             <button class="btn btn-outline btn-sm grow" type="button" data-open="filterSheet">
@@ -143,12 +153,14 @@
                     </p>
                     <div class="sort-select hide-tablet-down">
                         <label class="t-body-sm text-secondary-c" for="searchSort">Sort by</label>
-                        <select class="select" id="searchSort">
-                            <option value="relevance" selected>Relevance</option>
-                            <option value="popularity">Popularity</option>
-                            <option value="price-asc">Price: Low to High</option>
-                            <option value="price-desc">Price: High to Low</option>
-                            <option value="rating">Rating</option>
+                        <select class="select" id="searchSort" onchange="var u = new URL(location.href); u.searchParams.set('sort', this.value); location.href = u.toString();">
+                            <option value="relevance" selected="@(Model.Sort == "relevance")">Relevance</option>
+                            <option value="popularity" selected="@(Model.Sort == "popularity")">Popularity</option>
+                            <option value="latest" selected="@(Model.Sort == "latest")">Latest</option>
+                            <option value="bestselling" selected="@(Model.Sort == "bestselling")">Bestselling</option>
+                            <option value="price-asc" selected="@(Model.Sort == "price-asc")">Price: Low to High</option>
+                            <option value="price-desc" selected="@(Model.Sort == "price-desc")">Price: High to Low</option>
+                            <option value="rating" selected="@(Model.Sort == "rating")">Rating</option>
                         </select>
                     </div>
                 </div>
@@ -160,12 +172,48 @@
                     }
                 </div>
 
-                <div class="load-more mt-2xl">
-                    <button class="btn btn-outline btn-lg" type="button">
-                        <span class="btn__spinner" aria-hidden="true"></span>
-                        <span class="btn__label">Load More (@Model.Products.Count of @Model.TotalCount)</span>
-                    </button>
-                </div>
+                @{
+                    var searchTotalPages = (int)Math.Ceiling((double)Model.TotalCount / Math.Max(1, Model.PageSize));
+                }
+                @if (searchTotalPages > 1)
+                {
+                    <div class="load-more mt-2xl">
+                        <nav class="pagination mt-sm" aria-label="Pagination">
+                            @if (Model.Page > 1)
+                            {
+                                <a class="pagination__item" href="javascript:void(0)"
+                                   onclick="var u = new URL(location.href); u.searchParams.set('page', '@(Model.Page - 1)'); location.href = u.toString();"
+                                   aria-label="Previous page">
+                                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+                                </a>
+                            }
+                            @for (var p = 1; p <= searchTotalPages; p++)
+                            {
+                                if (p == Model.Page)
+                                {
+                                    <span class="pagination__item is-current" aria-current="page">@p</span>
+                                }
+                                else if (p <= 3 || p > searchTotalPages - 2 || Math.Abs(p - Model.Page) <= 1)
+                                {
+                                    <a class="pagination__item" href="javascript:void(0)"
+                                       onclick="var u = new URL(location.href); u.searchParams.set('page', '@p'); location.href = u.toString();">@p</a>
+                                }
+                                else if (p == 4 && Model.Page > 4 || p == searchTotalPages - 2 && Model.Page < searchTotalPages - 3)
+                                {
+                                    <span class="pagination__gap">…</span>
+                                }
+                            }
+                            @if (Model.Page < searchTotalPages)
+                            {
+                                <a class="pagination__item" href="javascript:void(0)"
+                                   onclick="var u = new URL(location.href); u.searchParams.set('page', '@(Model.Page + 1)'); location.href = u.toString();"
+                                   aria-label="Next page">
+                                    <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                                </a>
+                            }
+                        </nav>
+                    </div>
+                }
             </div>
         </div>
     }
@@ -178,7 +226,7 @@
             <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
         </button>
         <h2 class="t-heading-md">Filters</h2>
-        <button class="btn btn-link btn-sm" type="button">Clear all</button>
+        <a class="btn btn-link btn-sm" href="/search?q=@Uri.EscapeDataString(Model.Query ?? "")">Clear all</a>
     </div>
     <div class="sheet__body">
         @await Html.PartialAsync("_FilterRail")
@@ -197,11 +245,12 @@
         </button>
     </div>
     <div class="sheet__body">
-        @foreach (var label in new[] { "Relevance", "Popularity", "Price: Low to High", "Price: High to Low", "Rating" })
+        @foreach (var (val, lbl) in new[] { ("relevance", "Relevance"), ("popularity", "Popularity"), ("latest", "Latest"), ("bestselling", "Bestselling"), ("price-asc", "Price: Low to High"), ("price-desc", "Price: High to Low"), ("rating", "Rating") })
         {
             <label class="check" style="min-height:48px;align-items:center">
-                <input type="radio" name="mobileSearchSort" checked="@(label == "Relevance")" />
-                <span class="check__label">@label</span>
+                <input type="radio" name="mobileSearchSort" checked="@(Model.Sort == val)"
+                       onchange="var u = new URL(location.href); u.searchParams.set('sort', '@val'); location.href = u.toString();" />
+                <span class="check__label">@lbl</span>
             </label>
         }
     </div>

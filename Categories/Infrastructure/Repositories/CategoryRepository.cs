@@ -105,6 +105,7 @@ public class CategoryRepository : ICategoryRepository
         parameters.Add("@IconName", request.IconName);
         parameters.Add("@SortOrder", request.SortOrder);
         parameters.Add("@ShowInMegaMenu", request.ShowInMegaMenu);
+        parameters.Add("@ShowInNavbar", request.ShowInNavbar);
         parameters.Add("@IsFeaturedOnHome", request.IsFeaturedOnHome);
         parameters.Add("@IsActive", request.IsActive);
         parameters.Add("@MetaTitle", request.Seo?.MetaTitle);

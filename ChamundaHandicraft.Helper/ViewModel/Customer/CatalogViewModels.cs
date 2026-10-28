@@ -96,6 +96,7 @@ public class ProductDetailViewModel
 
     public ReviewSummaryViewModel Reviews { get; set; } = new();
     public DeliveryEstimateViewModel Delivery { get; set; } = new();
+    public List<ProductCardViewModel> RelatedProducts { get; set; } = new();
 
     public SeoViewModel Seo { get; set; } = new();
     public List<BreadcrumbItem> Breadcrumbs { get; set; } = new();
@@ -104,6 +105,34 @@ public class ProductDetailViewModel
     public int? SoldLastSevenDays { get; set; }
 
     public bool ShowVariationNotice => Card.IsHandmade;
+
+    // Direct accessors delegating to Card
+    public int Id => Card.Id;
+    public string Slug => Card.Slug;
+    public string Name => Card.Name;
+    public string Sku => Card.Sku;
+    public string CategoryName => Card.CategoryName;
+    public string CategorySlug => Card.CategorySlug;
+    public string ImageUrl => Card.ImageUrl;
+    public string? HoverImageUrl => Card.HoverImageUrl;
+    public string ImageAlt => Card.ImageAlt;
+    public decimal Price => Card.Price;
+    public decimal? Mrp => Card.Mrp;
+    public decimal Rating => Card.Rating;
+    public int ReviewCount => Card.ReviewCount;
+    public ArtisanSummary? Artisan => Card.Artisan;
+    public List<ProductBadge> Badges => Card.Badges;
+    public StockState Stock => Card.Stock;
+    public int? StockCount => Card.StockCount;
+    public bool IsWishlisted => Card.IsWishlisted;
+    public bool IsHandmade => Card.IsHandmade;
+    public string ShortDescription => Card.ShortDescription;
+    public string Material => Card.Material;
+    public string Dimensions => Card.Dimensions;
+    public int DiscountPercent => Card.DiscountPercent;
+    public decimal Savings => Card.Savings;
+    public bool IsOnSale => Card.IsOnSale;
+    public string Url => Card.Url;
 }
 
 public class ProductOptionGroup
@@ -192,6 +221,7 @@ public class CategoryViewModel
     public int SubCategoryCount { get; set; }
     public int SortOrder { get; set; }
     public bool ShowInMegaMenu { get; set; } = true;
+    public bool ShowInNavbar { get; set; }
     public bool IsFeaturedOnHome { get; set; }
     public int Depth { get; set; }
     public bool IsActive { get; set; } = true;
@@ -259,4 +289,13 @@ public class ProductListingViewModel
     public List<BreadcrumbItem> Breadcrumbs { get; set; } = new();
 
     public bool IsSearch => Query is not null;
+}
+
+/// <summary>
+/// Result container for search suggestions, quick lookups, and auto-complete.
+/// </summary>
+public class ProductSearchResultViewModel
+{
+    public List<ProductCardViewModel> Products { get; set; } = new();
+    public List<CategoryViewModel> Categories { get; set; } = new();
 }

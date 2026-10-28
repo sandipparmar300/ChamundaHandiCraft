@@ -143,12 +143,12 @@ public class CustomerAuthController : ControllerBase
     }
 
     /// <summary>
-    /// Verifies mobile number for authenticated customer.
+    /// Verifies mobile number for customer.
     /// Route: POST /api/customer/auth/verify-mobile
     /// </summary>
     [HttpPost("verify-mobile")]
     [HttpPost("verifymobile")]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult<ResponseViewModel<bool>>> VerifyMobile([FromBody] CustomerVerifyMobileRequest request)
     {
         int customerId = GetCurrentCustomerId();

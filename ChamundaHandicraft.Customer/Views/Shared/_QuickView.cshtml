@@ -18,7 +18,7 @@
             <div class="layout-halves" style="align-items:start">
                 <div>
                     <div class="img-box img-1-1">
-                        <img class="img-product" src="@Model.ImageUrl" alt="@Model.ImageAlt" width="400" height="400" />
+                        <img class="img-product" data-qv-target="img" src="@Model.ImageUrl" alt="@Model.ImageAlt" width="400" height="400" />
                     </div>
                     <div class="gallery__dots mt-xs">
                         <span class="gallery__dot is-active"></span>
@@ -29,8 +29,8 @@
                 </div>
 
                 <div class="stack stack-sm">
-                    <span class="t-overline">@Model.CategoryName</span>
-                    <h2 class="t-heading-lg" id="quickViewTitle">@Model.Name</h2>
+                    <span class="t-overline" data-qv-target="cat">@Model.CategoryName</span>
+                    <h2 class="t-heading-lg" id="quickViewTitle" data-qv-target="title">@Model.Name</h2>
 
                     <div class="row-flex gap-sm wrap">
                         <span class="rating rating-compact" aria-label="Rated @Model.Rating out of 5 from @Model.ReviewCount reviews">
@@ -48,11 +48,11 @@
                     </div>
 
                     <div class="price price-lg @(Model.IsOnSale ? "is-sale" : "")">
-                        <span class="price__now">@Money.Inr(Model.Price)</span>
+                        <span class="price__now" data-qv-target="price">@Money.Inr(Model.Price)</span>
                         @if (Model.IsOnSale)
                         {
-                            <span class="price__mrp">@Money.Inr(Model.Mrp!.Value)</span>
-                            <span class="price__off">@Model.DiscountPercent% OFF</span>
+                            <span class="price__mrp" data-qv-target="mrp">@Money.Inr(Model.Mrp!.Value)</span>
+                            <span class="price__off" data-qv-target="off">@Model.DiscountPercent% OFF</span>
                             <span class="price__save">You save @Money.Inr(Model.Savings) (@Model.DiscountPercent%)</span>
                         }
                         <span class="price__tax">Inclusive of all taxes</span>
@@ -108,7 +108,7 @@
                             </button>
                         </div>
 
-                        <button class="btn btn-primary btn-lg grow" type="button" data-add-to-cart data-open-minicart>
+                        <button class="btn btn-primary btn-lg grow" type="button" data-add-to-cart data-open-minicart data-product-id="@Model.Id" data-slug="@Model.Slug">
                             <span class="btn__spinner" aria-hidden="true"></span>
                             <span class="btn__label">Add to Cart</span>
                         </button>
@@ -119,7 +119,7 @@
                         </button>
                     </div>
 
-                    <a class="link-standalone mt-xs" href="@Model.Url">
+                    <a class="link-standalone mt-xs" data-qv-target="link" href="@Model.Url">
                         View full details
                         <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
                     </a>

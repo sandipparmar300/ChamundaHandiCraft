@@ -1,153 +1,184 @@
-@*
-    CMP-FLT-Rail — 264px sticky left rail on desktop; the same markup is reused
-    inside the mobile filter sheet.
-
-    FL-02: options producing zero results are disabled and dimmed, never removed —
-    the shopper learns what the catalogue actually contains.
-    FL-07: the first four groups are expanded by default, the rest collapsed.
-*@
+@model ListingViewModel
+@{
+    var categoryFacet = Model?.Facets?.FirstOrDefault(f => f.Key == "category");
+    var materialFacet = Model?.Facets?.FirstOrDefault(f => f.Key == "material");
+    var resetUrl = Model?.CategorySlug != null ? $"/c/{Model.CategorySlug}" : "/shop";
+}
 <div class="filter-rail">
 
     <div class="row-flex between mb-md">
         <h2 class="t-heading-xs">Filters</h2>
-        <button class="btn btn-link btn-sm" type="button">Clear all</button>
+        <a class="btn btn-link btn-sm" href="@resetUrl">Clear all</a>
     </div>
 
-    @* ---- Category ---- *@
-    <div class="filter-group">
-        <button class="filter-group__head" type="button" aria-expanded="true">
-            Category
-            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-        </button>
-        <div class="filter-group__body">
-            @foreach (var (label, count, disabled) in new[]
-            {
-                ("Vases & Planters", 84, false), ("Wall Art", 102, false),
-                ("Lamps & Lighting", 68, false), ("Figurines", 41, false),
-                ("Mirrors & Frames", 0, true)
-            })
-            {
-                <label class="check" style="@(disabled ? "opacity:.45;cursor:not-allowed" : "")">
-                    <input type="checkbox" disabled="@disabled" />
-                    <span class="check__label t-body-sm grow">@label</span>
-                    <span class="filter-count">@count</span>
-                </label>
-            }
-        </div>
-    </div>
+    @* ---- Category Filter ---- *@
+    @if (categoryFacet != null && categoryFacet.Values.Count > 0)
+    {
+        var queryCat = Context.Request.Query["category"].ToString();
+        var rawSlugs = !string.IsNullOrWhiteSpace(queryCat) ? queryCat : (Model?.CategorySlug ?? "");
+        var selectedSlugs = rawSlugs
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .ToList();
 
-    @* ---- Price ---- *@
-    <div class="filter-group">
-        <button class="filter-group__head" type="button" aria-expanded="true">
-            Price
-            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-        </button>
-        <div class="filter-group__body">
-            @* Histogram behind the track so shoppers see where products cluster. *@
-            <div class="row-flex" style="align-items:flex-end;gap:2px;height:36px" aria-hidden="true">
-                @foreach (var height in new[] { 20, 42, 68, 100, 84, 56, 38, 22, 14, 8 })
+        <div class="filter-group">
+            <button class="filter-group__head" type="button" aria-expanded="true">
+                Category
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+            </button>
+            <div class="filter-group__body">
+                @foreach (var v in categoryFacet.Values)
                 {
-                    <span style="flex:1;height:@(height)%;background:var(--color-bg-subtle);border-radius:2px 2px 0 0"></span>
+                    var isSelected = v.IsSelected || selectedSlugs.Contains(v.Value, StringComparer.OrdinalIgnoreCase);
+                    <label class="check">
+                        <input type="checkbox" checked="@isSelected"
+                               onchange="window.toggleCategoryFilter('@v.Value', this.checked);" />
+                        <span class="check__label t-body-sm grow">@v.Label</span>
+                        <span class="filter-count">@v.Count</span>
+                    </label>
                 }
             </div>
+        </div>
+    }
+    else if (Model?.SubCategories != null && Model.SubCategories.Count > 0)
+    {
+        var selectedSlugs = (Model?.CategorySlug ?? "")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .ToList();
+
+        <div class="filter-group">
+            <button class="filter-group__head" type="button" aria-expanded="true">
+                Category
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+            </button>
+            <div class="filter-group__body">
+                @foreach (var c in Model.SubCategories)
+                {
+                    var isSelected = selectedSlugs.Contains(c.Slug, StringComparer.OrdinalIgnoreCase);
+                    <label class="check">
+                        <input type="checkbox" checked="@isSelected"
+                               onchange="window.toggleCategoryFilter('@c.Slug', this.checked);" />
+                        <span class="check__label t-body-sm grow">@c.Name</span>
+                        <span class="filter-count">@c.ProductCount</span>
+                    </label>
+                }
+            </div>
+        </div>
+    }
+
+<script>
+    window.toggleCategoryFilter = window.toggleCategoryFilter || function (slug, isChecked) {
+        var u = new URL(location.href);
+        var existing = [];
+        var catParam = u.searchParams.get('category');
+        if (catParam) {
+            existing = catParam.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+        } else {
+            var pathParts = u.pathname.split('/').filter(Boolean);
+            if (pathParts.length >= 2 && pathParts[0] === 'c') {
+                existing.push(pathParts[1]);
+            }
+        }
+
+        if (isChecked) {
+            if (existing.indexOf(slug) === -1) {
+                existing.push(slug);
+            }
+        } else {
+            existing = existing.filter(function (s) { return s.toLowerCase() !== slug.toLowerCase(); });
+        }
+
+        u.searchParams.set('page', '1');
+
+        if (existing.length === 0) {
+            u.pathname = '/shop';
+            u.searchParams.delete('category');
+        } else if (existing.length === 1) {
+            u.pathname = '/shop';
+            u.searchParams.set('category', existing[0]);
+        } else {
+            u.pathname = '/shop';
+            u.searchParams.set('category', existing.join(','));
+        }
+
+        location.href = u.toString();
+    };
+</script>
+
+    @* ---- Material Filter ---- *@
+    @if (materialFacet != null && materialFacet.Values.Count > 0)
+    {
+        <div class="filter-group">
+            <button class="filter-group__head" type="button" aria-expanded="true">
+                Material
+                <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+            </button>
+            <div class="filter-group__body">
+                @foreach (var v in materialFacet.Values)
+                {
+                    var isSelected = string.Equals(Model?.SelectedMaterial, v.Value, StringComparison.OrdinalIgnoreCase);
+                    var disabled = v.Count == 0 && !isSelected;
+                    <label class="check" style="@(disabled ? "opacity:.45;cursor:not-allowed" : "")">
+                        <input type="checkbox" checked="@isSelected" disabled="@disabled"
+                               onchange="var u = new URL(location.href); if (this.checked) { u.searchParams.set('material', '@v.Value'); } else { u.searchParams.delete('material'); } u.searchParams.set('page', '1'); location.href = u.toString();" />
+                        <span class="check__label t-body-sm grow">@v.Label</span>
+                        <span class="filter-count">@v.Count</span>
+                    </label>
+                }
+            </div>
+        </div>
+    }
+
+    @* ---- Price Filter ---- *@
+    <div class="filter-group">
+        <button class="filter-group__head" type="button" aria-expanded="true">
+            Price (₹)
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="filter-group__body">
             <div class="range-slider">
-                <input type="range" min="500" max="6000" value="6000" aria-label="Maximum price" />
                 <div class="range-slider__values">
-                    <input class="input" type="number" value="500" aria-label="Minimum price" />
+                    <input class="input" id="filterMinPrice" type="number" min="0" step="100" placeholder="Min"
+                           value="@Model?.SelectedMinPrice" aria-label="Minimum price" />
                     <span class="text-tertiary-c">to</span>
-                    <input class="input" type="number" value="6000" aria-label="Maximum price" />
+                    <input class="input" id="filterMaxPrice" type="number" min="0" step="100" placeholder="Max"
+                           value="@Model?.SelectedMaxPrice" aria-label="Maximum price" />
                 </div>
+                <button class="btn btn-outline btn-sm btn-block mt-xs" type="button"
+                        onclick="var u = new URL(location.href); var mn = document.getElementById('filterMinPrice').value; var mx = document.getElementById('filterMaxPrice').value; if(mn) u.searchParams.set('minPrice', mn); else u.searchParams.delete('minPrice'); if(mx) u.searchParams.set('maxPrice', mx); else u.searchParams.delete('maxPrice'); u.searchParams.set('page', '1'); location.href = u.toString();">
+                    Apply Price
+                </button>
             </div>
         </div>
     </div>
 
-    @* ---- Material ---- *@
+    @* ---- Availability ---- *@
     <div class="filter-group">
         <button class="filter-group__head" type="button" aria-expanded="true">
-            Material
+            Availability
             <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
         </button>
         <div class="filter-group__body">
-            @foreach (var (label, count) in new[]
-            {
-                ("Ceramic", 42), ("Brass", 18), ("Terracotta", 14),
-                ("Cotton", 36), ("Wood", 22), ("Marble", 6), ("Silver", 11), ("Jute", 9)
-            })
-            {
-                <label class="check">
-                    <input type="checkbox" />
-                    <span class="check__label t-body-sm grow">@label</span>
-                    <span class="filter-count">@count</span>
-                </label>
-            }
-            <button class="filter-group__more" type="button">Show all (14)</button>
+            <label class="check">
+                <input type="checkbox" checked="@(Model?.InStockOnly == true)"
+                       onchange="var u = new URL(location.href); if (this.checked) { u.searchParams.set('inStock', 'true'); } else { u.searchParams.delete('inStock'); } u.searchParams.set('page', '1'); location.href = u.toString();" />
+                <span class="check__label t-body-sm grow">In stock only</span>
+            </label>
         </div>
     </div>
 
-    @* ---- Colour ---- A11Y / CU rule: the colour name is always rendered as text. ---- *@
-    <div class="filter-group">
-        <button class="filter-group__head" type="button" aria-expanded="true">
-            Colour
-            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-        </button>
-        <div class="filter-group__body">
-            <div class="swatch-filter">
-                @foreach (var (name, hex, oos) in new[]
-                {
-                    ("Indigo", "#4F46E5", false), ("White", "#FFFFFF", false),
-                    ("Terracotta", "#D4714C", false), ("Brass", "#C99A28", false),
-                    ("Forest", "#047857", false), ("Charcoal", "#2A2724", true)
-                })
-                {
-                    <button class="swatch @(oos ? "is-oos" : "")" type="button"
-                            style="background:@hex" aria-label="Filter by colour @name" title="@name"></button>
-                }
-            </div>
-            <p class="t-body-xs text-tertiary-c mt-xs">
-                Indigo · White · Terracotta · Brass · Forest · Charcoal (out of stock)
-            </p>
-        </div>
-    </div>
-
-    @* ---- Handmade by (artisan) ---- *@
+    @* ---- Rating Filter ---- *@
     <div class="filter-group is-collapsed">
         <button class="filter-group__head" type="button" aria-expanded="false">
-            Handmade By
+            Customer Rating
             <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
         </button>
         <div class="filter-group__body">
-            <div class="search-bar mb-xs">
-                <label class="sr-only" for="artisanFilterSearch">Search artisans</label>
-                <svg class="ico search-bar__icon" aria-hidden="true"><use href="#i-search"></use></svg>
-                <input class="search-bar__input" id="artisanFilterSearch" type="search"
-                       placeholder="Search artisans" style="height:36px" />
-            </div>
-            @foreach (var artisan in DemoContent.Artisans())
+            @foreach (var stars in new[] { 4, 3 })
             {
+                var isSelected = Model?.Rating == stars;
                 <label class="check">
-                    <input type="checkbox" />
-                    <img src="@artisan.PhotoUrl" alt="" width="20" height="20"
-                         style="width:20px;height:20px;border-radius:50%;object-fit:cover" />
-                    <span class="check__label t-body-sm grow">
-                        @artisan.Name
-                        <span class="check__help">@artisan.Cluster</span>
-                    </span>
-                </label>
-            }
-        </div>
-    </div>
-
-    @* ---- Rating ---- *@
-    <div class="filter-group is-collapsed">
-        <button class="filter-group__head" type="button" aria-expanded="false">
-            Rating
-            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-        </button>
-        <div class="filter-group__body">
-            @foreach (var (stars, count) in new[] { (4, 62), (3, 78), (2, 84) })
-            {
-                <label class="check">
-                    <input type="radio" name="ratingFilter" />
+                    <input type="radio" name="ratingFilter" checked="@isSelected"
+                           onchange="var u = new URL(location.href); u.searchParams.set('rating', '@stars'); u.searchParams.set('page', '1'); location.href = u.toString();" />
                     <span class="check__label t-body-sm grow row-flex gap-2xs">
                         <span class="rating__stars">
                             @for (var i = 0; i < 5; i++)
@@ -157,70 +188,9 @@
                         </span>
                         <span>&amp; above</span>
                     </span>
-                    <span class="filter-count">@count</span>
                 </label>
             }
         </div>
     </div>
 
-    @* ---- Availability ---- *@
-    <div class="filter-group is-collapsed">
-        <button class="filter-group__head" type="button" aria-expanded="false">
-            Availability
-            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-        </button>
-        <div class="filter-group__body">
-            <label class="check">
-                <input type="checkbox" checked />
-                <span class="check__label t-body-sm grow">In stock</span>
-                <span class="filter-count">76</span>
-            </label>
-            <label class="check">
-                <input type="checkbox" />
-                <span class="check__label t-body-sm grow">Made to order</span>
-                <span class="filter-count">6</span>
-            </label>
-            <label class="check">
-                <input type="checkbox" />
-                <span class="check__label t-body-sm grow">Pre-order</span>
-                <span class="filter-count">2</span>
-            </label>
-        </div>
-    </div>
-
-    @* ---- Discount ---- *@
-    <div class="filter-group is-collapsed">
-        <button class="filter-group__head" type="button" aria-expanded="false">
-            Discount
-            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-        </button>
-        <div class="filter-group__body">
-            @foreach (var (label, count) in new[] { ("10% and above", 38), ("20% and above", 24), ("30% and above", 11), ("50% and above", 3) })
-            {
-                <label class="check">
-                    <input type="radio" name="discountFilter" />
-                    <span class="check__label t-body-sm grow">@label</span>
-                    <span class="filter-count">@count</span>
-                </label>
-            }
-        </div>
-    </div>
-
-    @* ---- Toggles ---- *@
-    <div class="filter-group">
-        <div class="filter-group__body" style="padding-top:0">
-            <label class="switch" style="justify-content:space-between;width:100%">
-                <span class="t-body-sm">New arrivals only</span>
-                <input type="checkbox" />
-            </label>
-            <label class="switch" style="justify-content:space-between;width:100%">
-                <span class="t-body-sm">Eco &amp; sustainable</span>
-                <input type="checkbox" />
-            </label>
-            <label class="switch" style="justify-content:space-between;width:100%">
-                <span class="t-body-sm">GI tagged crafts</span>
-                <input type="checkbox" />
-            </label>
-        </div>
-    </div>
 </div>

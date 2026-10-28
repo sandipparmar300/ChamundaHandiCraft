@@ -1,15 +1,18 @@
 @model ShellViewModel
-@{
-    var nav = new (string Label, string Url, string Key, string? Menu)[]
+@functions {
+    public static bool IsInNavbar(CategoryViewModel c)
     {
-        ("Shop", "/shop", "shop", "megaShop"),
-        ("New Arrivals", "/c/new-arrivals", "new", null),
-        ("Festive", "/c/festive", "festive", "megaFestive"),
-        ("Gifting", "/c/gifting", "gifting", null),
-        ("Artisans", "/artisans", "artisans", null),
-        ("Stories", "/blog", "blog", null),
-        ("Sale", "/c/sale", "sale", null)
-    };
+        var prop = typeof(CategoryViewModel).GetProperty("ShowInNavbar");
+        if (prop != null && prop.GetValue(c) is bool b) return b;
+        return string.Equals(c.Slug, "festive", StringComparison.OrdinalIgnoreCase);
+    }
+}
+@{
+    var dynamicNavCategories = Model.Categories?
+        .Where(c => c.ParentId == null && IsInNavbar(c))
+        .OrderBy(c => c.SortOrder)
+        .ThenBy(c => c.Name)
+        .ToList() ?? new List<CategoryViewModel>();
 }
 
 @* Announcement bar — rotating, dismissible, dismissal persists 7 days. *@
@@ -49,10 +52,10 @@
             </a>
 
             @* Search — 480px, expands to 640 on focus, opens the suggestions panel. *@
-            <div class="header-search search-bar">
+            <form class="header-search search-bar" action="/search" method="get" role="search">
                 <label class="sr-only" for="headerSearch">Search products</label>
                 <svg class="ico search-bar__icon" aria-hidden="true"><use href="#i-search"></use></svg>
-                <input class="search-bar__input" id="headerSearch" type="search" role="combobox"
+                <input class="search-bar__input" id="headerSearch" name="q" type="search" role="combobox"
                        aria-expanded="false" aria-controls="headerSuggest" autocomplete="off"
                        placeholder="Search for pottery, diyas, cushions…" />
                 <button class="icon-btn icon-btn-sm search-bar__clear" type="button" aria-label="Clear search">
@@ -60,7 +63,7 @@
                 </button>
 
                 @await Html.PartialAsync("_SearchSuggest")
-            </div>
+            </form>
 
             <div class="header-actions">
 
@@ -139,24 +142,65 @@
     <nav class="nav-bar" aria-label="Primary">
         <div class="container" style="position:relative">
             <ul class="nav-bar__list">
-                @foreach (var item in nav)
+                @* 1. Shop menu *@
+                <li>
+                    <button class="nav-bar__link @(Model.ActiveNav == "shop" ? "is-active" : "")"
+                            data-megamenu="megaShop" aria-expanded="false" aria-haspopup="true">
+                        Shop
+                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                    </button>
+                </li>
+
+                @* 2. New Arrivals *@
+                <li>
+                    <a class="nav-bar__link @(Model.ActiveNav == "new" ? "is-active" : "")"
+                       href="/c/new-arrivals">New Arrivals</a>
+                </li>
+
+                @* 3. Dynamic Parent Categories enabled via Admin checkbox (ShowInNavbar) *@
+                @foreach (var navCat in dynamicNavCategories)
                 {
+                    var hasChildren = navCat.Children != null && navCat.Children.Count > 0;
+                    var isActive = string.Equals(Model.ActiveNav, navCat.Slug, StringComparison.OrdinalIgnoreCase);
                     <li>
-                        @if (item.Menu is not null)
+                        @if (hasChildren)
                         {
-                            <button class="nav-bar__link @(Model.ActiveNav == item.Key ? "is-active" : "")"
-                                    data-megamenu="@item.Menu" aria-expanded="false" aria-haspopup="true">
-                                @item.Label
+                            <button class="nav-bar__link @(isActive ? "is-active" : "")"
+                                    data-megamenu="mega_@navCat.Id" aria-expanded="false" aria-haspopup="true">
+                                @navCat.Name
                                 <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
                             </button>
                         }
                         else
                         {
-                            <a class="nav-bar__link @(item.Key == "sale" ? "nav-bar__link--sale" : "") @(Model.ActiveNav == item.Key ? "is-active" : "")"
-                               href="@item.Url">@item.Label</a>
+                            <a class="nav-bar__link @(isActive ? "is-active" : "")" href="@navCat.Url">@navCat.Name</a>
                         }
                     </li>
                 }
+
+                @* 4. Gifting *@
+                <li>
+                    <a class="nav-bar__link @(Model.ActiveNav == "gifting" ? "is-active" : "")"
+                       href="/c/gifting">Gifting</a>
+                </li>
+
+                @* 5. Artisans *@
+                <li>
+                    <a class="nav-bar__link @(Model.ActiveNav == "artisans" ? "is-active" : "")"
+                       href="/artisans">Artisans</a>
+                </li>
+
+                @* 6. Stories *@
+                <li>
+                    <a class="nav-bar__link @(Model.ActiveNav == "blog" ? "is-active" : "")"
+                       href="/blog">Stories</a>
+                </li>
+
+                @* 7. Sale *@
+                <li>
+                    <a class="nav-bar__link nav-bar__link--sale @(Model.ActiveNav == "sale" ? "is-active" : "")"
+                       href="/c/sale">Sale</a>
+                </li>
                 <li style="margin-left:auto">
                     <div class="dropdown">
                         <button class="nav-bar__link" data-dropdown aria-expanded="false" aria-haspopup="menu">

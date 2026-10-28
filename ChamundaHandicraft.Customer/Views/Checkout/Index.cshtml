@@ -2,53 +2,55 @@
 @{
     Layout = "_CheckoutLayout";
     var summary = Model.Summary;
-    var deliveryBy = DateTime.Today.AddDays(6);
+    var deliveryBy = DateTime.Today.AddDays(4);
+    var defaultAddress = Model.Addresses.FirstOrDefault(a => a.IsDefault) ?? Model.Addresses.FirstOrDefault();
+    bool hasSavedAddresses = Model.Addresses != null && Model.Addresses.Count > 0;
 }
 
 <div class="container" style="padding-top:var(--space-lg)">
 
-    @* ══════════ Progress stepper (replaces the breadcrumb) ══════════ *@
+    @* ══════════ Progress stepper ══════════ *@
     <nav class="hide-tablet-down mb-xl" aria-label="Checkout progress">
         <ol class="stepper">
             <li class="stepper__step is-complete">
                 <span class="stepper__node"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"></use></svg></span>
-                <span class="stepper__label">Address</span>
+                <span class="stepper__label">Cart</span>
                 <span class="stepper__bar"></span>
             </li>
             <li class="stepper__step is-complete">
                 <span class="stepper__node"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"></use></svg></span>
-                <span class="stepper__label">Delivery</span>
+                <span class="stepper__label">Address & Delivery</span>
                 <span class="stepper__bar"></span>
             </li>
             <li class="stepper__step is-current" style="flex:0 0 auto">
                 <span class="stepper__node">3</span>
-                <span class="stepper__label">Payment</span>
+                <span class="stepper__label">Payment & Confirmation</span>
             </li>
         </ol>
     </nav>
 
     <div class="stepper-mobile only-tablet-down mb-lg">
         <div class="row-flex between">
-            <span class="t-body-sm" style="font-weight:600">Step 3 of 3 — Payment</span>
-            <span class="t-body-xs text-tertiary-c">Almost done</span>
+            <span class="t-body-sm" style="font-weight:600">Checkout & Payment</span>
+            <span class="t-body-xs text-tertiary-c">Secure Checkout</span>
         </div>
         <div class="stepper-mobile__bar"><span style="width:100%"></span></div>
     </div>
 
-    @* Mobile collapsible summary at the top — the total is never hidden. *@
+    @* Mobile collapsible summary *@
     <details class="card only-tablet-down mb-md">
         <summary class="row-flex between" style="cursor:pointer;list-style:none">
-            <span class="t-body-md">@summary.ItemCount items · <strong class="tabular">@Money.Inr(summary.Total)</strong></span>
+            <span class="t-body-md">@summary.ItemCount items · <strong class="tabular" id="mobileSummaryTotal">@Money.Inr(summary.Total)</strong></span>
             <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
         </summary>
         <div class="mt-md">
             @foreach (var line in Model.Lines)
             {
                 <div class="pcard-compact">
-                    <img class="pcard-compact__img img-product" src="@line.ImageUrl" alt="" width="64" height="64" />
+                    <img class="pcard-compact__img img-product" src="@line.ImageUrl" alt="@line.ImageAlt" width="64" height="64" />
                     <span class="grow">
                         <span class="t-body-sm clamp-1" style="display:block">@line.Name</span>
-                        <span class="t-body-xs text-tertiary-c">Qty @line.Quantity</span>
+                        <span class="t-body-xs text-tertiary-c">Qty @line.Quantity @(string.IsNullOrWhiteSpace(line.VariantSummary) ? "" : $"· {line.VariantSummary}")</span>
                     </span>
                     <span class="t-body-sm tabular">@Money.Inr(line.LineTotal)</span>
                 </div>
@@ -56,491 +58,638 @@
         </div>
     </details>
 
-    <div class="layout-content-summary">
+    <form id="checkoutForm" onsubmit="return handlePlaceOrder(event);">
+        <div class="layout-content-summary">
 
-        @* ══════════ Left column: the form ══════════ *@
-        <div class="stack stack-md">
+            @* ══════════ Left column: the form ══════════ *@
+            <div class="stack stack-md">
 
-            @if (Model.IsGuest)
-            {
-                @* MOD-01-04 · Guest or sign in — equal prominence, no confirm-shaming. *@
-                <div class="card">
-                    <h2 class="t-heading-md mb-sm">How would you like to check out?</h2>
-                    <div class="row-flex wrap gap-sm">
-                        <a class="btn btn-primary btn-lg grow" href="/checkout">Continue as Guest</a>
-                        <a class="btn btn-outline btn-lg grow" href="/login?returnUrl=/checkout">Sign In</a>
-                    </div>
-                    <p class="t-body-sm text-secondary-c mt-sm">
-                        Guest checkout is complete — you'll still get order tracking by email and SMS.
-                        You can create an account afterwards in one tap.
-                    </p>
-                </div>
-            }
-
-            @* ---- Contact ---- *@
-            <section class="card" aria-labelledby="contactHead">
-                <div class="card__head" style="margin-bottom:var(--space-xs)">
-                    <div class="row-flex gap-xs">
-                        <svg class="ico text-success-c" aria-hidden="true"><use href="#i-circle-check"></use></svg>
-                        <h2 class="t-heading-md" id="contactHead">Contact</h2>
-                    </div>
-                    <button class="btn btn-link btn-sm" type="button">Edit</button>
-                </div>
-                <p class="t-body-md">ananya@example.com · +91 98765 43210</p>
-                <p class="t-body-xs text-tertiary-c mt-2xs">Order confirmation and delivery updates go here.</p>
-            </section>
-
-            @* ---- Delivery address ---- *@
-            <section class="card" aria-labelledby="addressHead">
-                <div class="card__head" style="margin-bottom:var(--space-sm)">
-                    <div class="row-flex gap-xs">
-                        <svg class="ico text-success-c" aria-hidden="true"><use href="#i-circle-check"></use></svg>
-                        <h2 class="t-heading-md" id="addressHead">Delivery address</h2>
-                    </div>
-                    <button class="btn btn-link btn-sm" type="button" data-open="addAddress">Add new</button>
+                @* Alert container for checkout errors *@
+                <div id="checkoutAlert" class="alert alert-danger" style="display:none;" role="alert">
+                    <svg class="ico shrink-0" aria-hidden="true"><use href="#i-circle-alert"></use></svg>
+                    <div id="checkoutAlertMsg" class="grow"></div>
                 </div>
 
-                <div class="stack stack-sm" role="radiogroup" aria-label="Choose a delivery address">
-                    @foreach (var address in Model.Addresses)
+                @if (Model.IsGuest)
+                {
+                    <div class="card">
+                        <div class="row-flex between wrap gap-sm">
+                            <div>
+                                <h2 class="t-heading-md">Checking out as Guest</h2>
+                                <p class="t-body-sm text-secondary-c mt-2xs">
+                                    Have an existing account? Sign in to use saved addresses and earned reward points.
+                                </p>
+                            </div>
+                            <a class="btn btn-outline btn-sm shrink-0" href="/login?returnUrl=/checkout">Sign In</a>
+                        </div>
+                    </div>
+                }
+
+                @* ---- Contact Details ---- *@
+                <section class="card" aria-labelledby="contactHead">
+                    <div class="card__head" style="margin-bottom:var(--space-xs)">
+                        <div class="row-flex gap-xs">
+                            <svg class="ico text-success-c" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+                            <h2 class="t-heading-md" id="contactHead">Contact Information</h2>
+                        </div>
+                    </div>
+
+                    @if (!Model.IsGuest && !string.IsNullOrWhiteSpace(Model.ContactEmail))
                     {
-                        <label class="select-card @(address.IsDefault ? "is-selected" : "")" data-group="address">
-                            <input type="radio" name="addressId" value="@address.Id" checked="@address.IsDefault"
+                        <div class="row-flex between wrap gap-sm">
+                            <div>
+                                <p class="t-body-md">
+                                    <strong>@Model.ContactEmail</strong>
+                                    @(string.IsNullOrWhiteSpace(Model.ContactPhone) ? "" : $" · {Model.ContactPhone}")
+                                </p>
+                                <p class="t-body-xs text-tertiary-c mt-2xs">Order updates and invoices will be sent to this email.</p>
+                            </div>
+                        </div>
+                        <input type="hidden" id="custEmail" name="CustomerEmail" value="@Model.ContactEmail" />
+                        <input type="hidden" id="custPhone" name="CustomerPhone" value="@Model.ContactPhone" />
+                        <input type="hidden" id="custName" name="CustomerName" value="@(defaultAddress?.FullName ?? "Customer")" />
+                    }
+                    else
+                    {
+                        <div class="layout-grid-2 gap-sm mt-sm">
+                            <div class="field">
+                                <label class="field__label" for="guestFullName">Full Name <span class="field__req">*</span></label>
+                                <input class="input" id="guestFullName" name="CustomerName" type="text" required placeholder="Full Name" autocomplete="name" />
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="guestPhone">Mobile Number <span class="field__req">*</span></label>
+                                <div class="phone-input">
+                                    <span style="padding:0 8px;font-size:14px;color:var(--color-text-secondary);align-self:center;">+91</span>
+                                    <input class="input" id="guestPhone" name="CustomerPhone" type="tel" required maxlength="10" placeholder="10-digit mobile" autocomplete="tel" inputmode="numeric" />
+                                </div>
+                            </div>
+                            <div class="field" style="grid-column:1 / -1">
+                                <label class="field__label" for="guestEmail">Email Address <span class="field__req">*</span></label>
+                                <input class="input" id="guestEmail" name="CustomerEmail" type="email" required placeholder="your.name@example.com" autocomplete="email" />
+                                <p class="field__help">Order confirmation, tracking link, and tax invoice will be sent here.</p>
+                            </div>
+                        </div>
+                    }
+                </section>
+
+                @* ---- Delivery Address ---- *@
+                <section class="card" aria-labelledby="addressHead">
+                    <div class="card__head" style="margin-bottom:var(--space-sm)">
+                        <div class="row-flex gap-xs">
+                            <svg class="ico text-success-c" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+                            <h2 class="t-heading-md" id="addressHead">Delivery Address</h2>
+                        </div>
+                        @if (hasSavedAddresses)
+                        {
+                            <button class="btn btn-link btn-sm" type="button" onclick="toggleNewAddressForm()">+ Add New Address</button>
+                        }
+                    </div>
+
+                    @if (hasSavedAddresses)
+                    {
+                        <div class="stack stack-sm" role="radiogroup" aria-label="Choose a delivery address" id="savedAddressesContainer">
+                            @foreach (var address in (Model.Addresses ?? new List<AddressViewModel>()))
+                            {
+                                bool isChecked = address.Id == defaultAddress?.Id;
+                                <label class="select-card @(isChecked ? "is-selected" : "")" data-group="address" style="cursor:pointer">
+                                    <input type="radio" name="selectedAddressId" value="@address.Id"
+                                           @(isChecked ? "checked" : "")
+                                           onchange="selectSavedAddress(@address.Id, '@Html.Raw(address.FullName)', '@address.Phone', '@Html.Raw(address.Line1)', '@Html.Raw(address.Line2)', '@Html.Raw(address.Landmark)', '@Html.Raw(address.City)', '@Html.Raw(address.State)', '@address.Pincode')"
+                                           style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
+                                    <span class="grow">
+                                        <span class="row-flex wrap gap-xs">
+                                            <strong class="t-body-md">@address.FullName</strong>
+                                            <span class="address-card__badge">@address.Label</span>
+                                            @if (address.IsDefault)
+                                            {
+                                                <span class="tag">Default</span>
+                                            }
+                                        </span>
+                                        <span class="t-body-sm text-secondary-c" style="display:block;margin-top:2px">@address.OneLine</span>
+                                        <span class="t-body-sm text-secondary-c">Phone: @address.Phone</span>
+                                    </span>
+                                </label>
+                            }
+                        </div>
+                    }
+
+                    @* Address Input Form (Visible if guest, or toggled on '+ Add New Address') *@
+                    <div id="addressInputForm" style="@(hasSavedAddresses ? "display:none;" : "display:block;") margin-top:var(--space-md);">
+                        <div class="layout-grid-2 gap-sm">
+                            <div class="field">
+                                <label class="field__label" for="shipFullName">Recipient Name <span class="field__req">*</span></label>
+                                <input class="input" id="shipFullName" name="ShippingFullName" type="text"
+                                       value="@(defaultAddress?.FullName ?? "")" required placeholder="Full Name" autocomplete="name" />
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="shipPhone">Delivery Mobile <span class="field__req">*</span></label>
+                                <div class="phone-input">
+                                    <span style="padding:0 8px;font-size:14px;color:var(--color-text-secondary);align-self:center;">+91</span>
+                                    <input class="input" id="shipPhone" name="ShippingPhone" type="tel"
+                                           value="@(defaultAddress?.Phone ?? "")" required maxlength="10" placeholder="10-digit mobile" inputmode="numeric" />
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="shipPin">PIN Code <span class="field__req">*</span></label>
+                                <input class="input" id="shipPin" name="ShippingPincode" type="text"
+                                       value="@(defaultAddress?.Pincode ?? "")" required maxlength="6" inputmode="numeric"
+                                       placeholder="6-digit PIN" autocomplete="postal-code" onkeyup="checkPincode(this.value)" />
+                                <p class="field__help" id="pincodeCityStateHint"></p>
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="shipCity">City / District <span class="field__req">*</span></label>
+                                <input class="input" id="shipCity" name="ShippingCity" type="text"
+                                       value="@(defaultAddress?.City ?? "")" required placeholder="City" />
+                            </div>
+                            <div class="field" style="grid-column:1 / -1">
+                                <label class="field__label" for="shipLine1">House / Flat / Building / Floor <span class="field__req">*</span></label>
+                                <input class="input" id="shipLine1" name="ShippingLine1" type="text"
+                                       value="@(defaultAddress?.Line1 ?? "")" required placeholder="e.g. 402, Sundar Residency" />
+                            </div>
+                            <div class="field" style="grid-column:1 / -1">
+                                <label class="field__label" for="shipLine2">Area / Road / Sector / Colony</label>
+                                <input class="input" id="shipLine2" name="ShippingLine2" type="text"
+                                       value="@(defaultAddress?.Line2 ?? "")" placeholder="e.g. Near Shiv Temple, Nehru Nagar Road" />
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="shipLandmark">Landmark (optional)</label>
+                                <input class="input" id="shipLandmark" name="ShippingLandmark" type="text"
+                                       value="@(defaultAddress?.Landmark ?? "")" placeholder="e.g. Opp. City Post Office" />
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="shipState">State <span class="field__req">*</span></label>
+                                <input class="input" id="shipState" name="ShippingState" type="text"
+                                       value="@(defaultAddress?.State ?? "")" required placeholder="State" />
+                            </div>
+                        </div>
+
+                        <label class="check mt-md">
+                            <input type="checkbox" id="saveShippingAddress" name="SaveShippingAddress" value="true" checked />
+                            <span class="check__label t-body-sm">Save this address to my profile</span>
+                        </label>
+                    </div>
+                </section>
+
+                @* ---- Delivery Method ---- *@
+                <section class="card" aria-labelledby="deliveryHead">
+                    <div class="card__head" style="margin-bottom:var(--space-sm)">
+                        <div class="row-flex gap-xs">
+                            <svg class="ico text-success-c" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+                            <h2 class="t-heading-md" id="deliveryHead">Delivery Method</h2>
+                        </div>
+                    </div>
+
+                    <div class="stack stack-sm" role="radiogroup" aria-label="Choose a delivery method">
+                        <label class="select-card is-selected" data-group="delivery" style="cursor:pointer" onclick="updateDeliveryMethod(1, @(summary.QualifiesForFreeShipping ? 0 : 99))">
+                            <input type="radio" name="deliveryMethod" value="1" checked
                                    style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
                             <span class="grow">
-                                <span class="row-flex wrap gap-xs">
-                                    <strong class="t-body-md">@address.FullName</strong>
-                                    <span class="address-card__badge">@address.Label</span>
-                                    @if (address.IsDefault)
-                                    {
-                                        <span class="tag">Default</span>
-                                    }
+                                <span class="row-flex between gap-sm">
+                                    <strong class="t-body-md">Standard Delivery</strong>
+                                    <strong class="text-success-c">@(summary.QualifiesForFreeShipping ? "Free" : "₹99")</strong>
                                 </span>
-                                <span class="t-body-sm text-secondary-c" style="display:block;margin-top:2px">@address.OneLine</span>
-                                <span class="t-body-sm text-secondary-c">@address.Phone</span>
-                            </span>
-                            <span class="row-flex gap-xs shrink-0">
-                                <button class="btn btn-link btn-sm" type="button">Edit</button>
+                                <span class="t-body-sm text-secondary-c" style="display:block">
+                                    Estimated arrival by <strong class="text-primary-c">@deliveryBy.ToString("dddd, dd MMMM")</strong> · Insured surface transit
+                                </span>
                             </span>
                         </label>
-                    }
-                </div>
-            </section>
 
-            @* ---- Delivery method ---- *@
-            <section class="card" aria-labelledby="deliveryHead">
-                <div class="card__head" style="margin-bottom:var(--space-sm)">
-                    <div class="row-flex gap-xs">
-                        <svg class="ico text-success-c" aria-hidden="true"><use href="#i-circle-check"></use></svg>
-                        <h2 class="t-heading-md" id="deliveryHead">Delivery method</h2>
+                        <label class="select-card" data-group="delivery" style="cursor:pointer" onclick="updateDeliveryMethod(2, 199)">
+                            <input type="radio" name="deliveryMethod" value="2"
+                                   style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
+                            <span class="grow">
+                                <span class="row-flex between gap-sm">
+                                    <strong class="t-body-md">Express Air Priority</strong>
+                                    <strong class="tabular">₹199</strong>
+                                </span>
+                                <span class="t-body-sm text-secondary-c" style="display:block">
+                                    Estimated arrival by <strong class="text-primary-c">@DateTime.Today.AddDays(2).ToString("dddd, dd MMMM")</strong> · Blue Dart Air
+                                </span>
+                            </span>
+                        </label>
                     </div>
-                </div>
 
-                <div class="stack stack-sm" role="radiogroup" aria-label="Choose a delivery method">
-                    <label class="select-card is-selected" data-group="delivery">
-                        <input type="radio" name="delivery" checked
-                               style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
-                        <span class="grow">
-                            <span class="row-flex between gap-sm">
-                                <strong class="t-body-md">Standard delivery</strong>
-                                <strong class="text-success-c">Free</strong>
-                            </span>
-                            <span class="t-body-sm text-secondary-c" style="display:block">
-                                Get it by <strong class="text-primary-c">@Money.DeliveryDate(deliveryBy)</strong> · Delhivery
-                            </span>
-                        </span>
+                    <div class="alert alert-craft mt-md">
+                        <svg class="ico" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
+                        <div>
+                            <p class="alert__title">Direct from Master Artisans</p>
+                            <p>Each parcel is carefully packed with multi-layered protective cushioning to ensure safe arrival.</p>
+                        </div>
+                    </div>
+                </section>
+
+                @* ---- Billing Address Toggle ---- *@
+                <section class="card">
+                    <label class="check" style="cursor:pointer">
+                        <input type="checkbox" id="chkSameBilling" name="BillingSameAsShipping" value="true" checked onchange="toggleBillingAddress(this.checked)" />
+                        <span class="check__label t-body-md" style="font-weight:600">Billing address is same as delivery address</span>
                     </label>
 
-                    <label class="select-card" data-group="delivery">
-                        <input type="radio" name="delivery"
-                               style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
-                        <span class="grow">
-                            <span class="row-flex between gap-sm">
-                                <strong class="t-body-md">Express delivery</strong>
-                                <strong class="tabular">@Money.Inr(199)</strong>
-                            </span>
-                            <span class="t-body-sm text-secondary-c" style="display:block">
-                                Get it by <strong class="text-primary-c">@Money.DeliveryDate(DateTime.Today.AddDays(3))</strong> · Blue Dart
-                            </span>
-                        </span>
-                    </label>
-                </div>
-
-                <div class="alert alert-craft mt-md">
-                    <svg class="ico" aria-hidden="true"><use href="#i-hand-heart"></use></svg>
-                    <div>
-                        <p class="alert__title">Made to order items ship separately</p>
-                        <p>Nothing in this order is made to order, so it all arrives together.</p>
+                    <div id="billingAddressFields" style="display:none; margin-top:var(--space-md); border-top:1px solid var(--color-border-subtle); padding-top:var(--space-md);">
+                        <h3 class="t-heading-sm mb-sm">Billing Details</h3>
+                        <div class="layout-grid-2 gap-sm">
+                            <div class="field">
+                                <label class="field__label" for="billName">Billing Name</label>
+                                <input class="input" id="billName" name="BillingFullName" type="text" placeholder="Name or Company" />
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="billPhone">Billing Phone</label>
+                                <input class="input" id="billPhone" name="BillingPhone" type="tel" maxlength="10" placeholder="Mobile" />
+                            </div>
+                            <div class="field" style="grid-column:1 / -1">
+                                <label class="field__label" for="billLine1">Address Line 1</label>
+                                <input class="input" id="billLine1" name="BillingLine1" type="text" placeholder="Street Address" />
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="billCity">City</label>
+                                <input class="input" id="billCity" name="BillingCity" type="text" placeholder="City" />
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="billState">State</label>
+                                <input class="input" id="billState" name="BillingState" type="text" placeholder="State" />
+                            </div>
+                            <div class="field">
+                                <label class="field__label" for="billPincode">PIN Code</label>
+                                <input class="input" id="billPincode" name="BillingPincode" type="text" maxlength="6" placeholder="PIN Code" />
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            @* ---- Payment ---- *@
-            <section class="card" aria-labelledby="paymentHead">
-                <h2 class="t-heading-md mb-md" id="paymentHead">Choose how to pay</h2>
+                @* ---- Payment Selection ---- *@
+                <section class="card" aria-labelledby="paymentHead">
+                    <h2 class="t-heading-md mb-md" id="paymentHead">Choose Payment Method</h2>
 
-                <div class="stack stack-sm" role="radiogroup" aria-label="Choose a payment method">
+                    <div class="stack stack-sm" role="radiogroup" aria-label="Choose a payment method">
 
-                    @* UPI — first, because it is how most Indian shoppers pay. *@
-                    <div class="select-card is-selected" data-group="payment" style="flex-direction:column;align-items:stretch">
-                        <label class="row-flex gap-sm" style="align-items:flex-start;cursor:pointer">
-                            <input type="radio" name="payment" checked
-                                   style="appearance:none;width:20px;height:20px;border:6px solid var(--color-action-primary-bg);border-radius:50%;margin-top:2px;flex-shrink:0" />
+                        @* 1. UPI *@
+                        <label class="select-card is-selected" data-group="payment" style="cursor:pointer" onclick="updatePaymentMethod(0, 0)">
+                            <input type="radio" name="paymentMethod" value="0" checked
+                                   style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
                             <span class="grow row-flex between gap-sm">
                                 <span class="row-flex gap-sm">
                                     <span class="payment-option__logo">UPI</span>
                                     <span>
-                                        <strong class="t-body-md" style="display:block">UPI</strong>
-                                        <span class="t-body-xs text-secondary-c">GPay, PhonePe, Paytm, BHIM</span>
+                                        <strong class="t-body-md" style="display:block">Instant UPI (Zero Surcharge)</strong>
+                                        <span class="t-body-xs text-secondary-c">Google Pay, PhonePe, Paytm, BHIM, CRED</span>
                                     </span>
                                 </span>
                                 <span class="tag tag-success shrink-0">Recommended</span>
                             </span>
                         </label>
 
-                        <div class="mt-md" style="padding-left:32px">
-                            <div class="field">
-                                <label class="field__label" for="upiId">UPI ID</label>
-                                <div class="row-flex gap-xs">
-                                    <input class="input" id="upiId" type="text" placeholder="yourname@bank" autocomplete="off" />
-                                    <button class="btn btn-outline shrink-0" type="button">Verify</button>
-                                </div>
-                                <p class="field__help">Or scan the QR code in your UPI app on the next screen.</p>
-                            </div>
-                        </div>
+                        @* 2. Card *@
+                        <label class="select-card" data-group="payment" style="cursor:pointer" onclick="updatePaymentMethod(1, 0)">
+                            <input type="radio" name="paymentMethod" value="1"
+                                   style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
+                            <span class="grow row-flex between gap-sm">
+                                <span class="row-flex gap-sm">
+                                    <span class="payment-option__logo"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-credit-card"></use></svg></span>
+                                    <span>
+                                        <strong class="t-body-md" style="display:block">Credit / Debit Card</strong>
+                                        <span class="t-body-xs text-secondary-c">Visa, Mastercard, RuPay, Maestro</span>
+                                    </span>
+                                </span>
+                            </span>
+                        </label>
+
+                        @* 3. Net Banking *@
+                        <label class="select-card" data-group="payment" style="cursor:pointer" onclick="updatePaymentMethod(2, 0)">
+                            <input type="radio" name="paymentMethod" value="2"
+                                   style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
+                            <span class="grow row-flex gap-sm">
+                                <span class="payment-option__logo"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-landmark"></use></svg></span>
+                                <span>
+                                    <strong class="t-body-md" style="display:block">Net Banking</strong>
+                                    <span class="t-body-xs text-secondary-c">50+ Indian banks (SBI, HDFC, ICICI, Axis)</span>
+                                </span>
+                            </span>
+                        </label>
+
+                        @* 4. Cash on Delivery (COD) *@
+                        <label class="select-card" data-group="payment" style="cursor:pointer" onclick="updatePaymentMethod(4, 49)">
+                            <input type="radio" name="paymentMethod" value="4"
+                                   style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
+                            <span class="grow row-flex between gap-sm">
+                                <span class="row-flex gap-sm">
+                                    <span class="payment-option__logo"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-banknote"></use></svg></span>
+                                    <span>
+                                        <strong class="t-body-md" style="display:block">Cash on Delivery (COD)</strong>
+                                        <span class="t-body-xs text-secondary-c">Pay cash or UPI to courier upon arrival</span>
+                                    </span>
+                                </span>
+                                <span class="t-body-sm tabular shrink-0">+₹49 handling</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                @* Customer note / gift message *@
+                <section class="card">
+                    <div class="field">
+                        <label class="field__label" for="orderCustomerNote">Order Notes / Landmark Instructions (Optional)</label>
+                        <textarea class="input" id="orderCustomerNote" name="CustomerNote" rows="2" placeholder="e.g. Ring the bell twice, leave with security if unavailable."></textarea>
+                    </div>
+                </section>
+            </div>
+
+            @* ══════════ Right column: sticky summary ══════════ *@
+            <aside class="sticky-col hide-tablet-down" aria-labelledby="orderSummaryHead">
+                <div class="card">
+                    <div class="card__head">
+                        <h2 class="t-heading-md" id="orderSummaryHead">Order Summary</h2>
+                        <a class="btn btn-link btn-sm" href="/cart">Edit Cart</a>
                     </div>
 
-                    <label class="select-card" data-group="payment">
-                        <input type="radio" name="payment"
-                               style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
-                        <span class="grow row-flex between gap-sm">
-                            <span class="row-flex gap-sm">
-                                <span class="payment-option__logo"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-credit-card"></use></svg></span>
-                                <span>
-                                    <strong class="t-body-md" style="display:block">Credit / Debit Card</strong>
-                                    <span class="t-body-xs text-secondary-c">Visa, Mastercard, RuPay, Amex</span>
-                                </span>
-                            </span>
-                            <span class="tag tag-brass shrink-0">10% off HDFC</span>
-                        </span>
-                    </label>
+                    <details open>
+                        <summary class="row-flex between" style="cursor:pointer;list-style:none;padding-bottom:var(--space-sm)">
+                            <span class="t-body-sm text-secondary-c">@summary.ItemCount items in order</span>
+                            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                        </summary>
+                        <div class="stack stack-xs mb-sm">
+                            @foreach (var line in Model.Lines)
+                            {
+                                <div class="pcard-compact" style="padding:0">
+                                    <img class="pcard-compact__img img-product" src="@line.ImageUrl" alt="@line.ImageAlt" width="48" height="48"
+                                         style="width:48px;height:48px" />
+                                    <span class="grow">
+                                        <span class="t-body-sm clamp-1" style="display:block">@line.Name</span>
+                                        <span class="t-body-xs text-tertiary-c">Qty @line.Quantity @(string.IsNullOrWhiteSpace(line.VariantSummary) ? "" : $"· {line.VariantSummary}")</span>
+                                    </span>
+                                    <span class="t-body-sm tabular shrink-0">@Money.Inr(line.LineTotal)</span>
+                                </div>
+                            }
+                        </div>
+                    </details>
 
-                    <label class="select-card" data-group="payment">
-                        <input type="radio" name="payment"
-                               style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
-                        <span class="grow row-flex gap-sm">
-                            <span class="payment-option__logo"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-landmark"></use></svg></span>
-                            <span>
-                                <strong class="t-body-md" style="display:block">Net Banking</strong>
-                                <span class="t-body-xs text-secondary-c">All major Indian banks</span>
-                            </span>
-                        </span>
-                    </label>
+                    <div class="card__divider"></div>
 
-                    <label class="select-card" data-group="payment">
-                        <input type="radio" name="payment"
-                               style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
-                        <span class="grow row-flex gap-sm">
-                            <span class="payment-option__logo"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-wallet"></use></svg></span>
-                            <span>
-                                <strong class="t-body-md" style="display:block">Wallets</strong>
-                                <span class="t-body-xs text-secondary-c">Paytm, Amazon Pay, Mobikwik</span>
-                            </span>
-                        </span>
-                    </label>
-
-                    @* COD fee is stated on the option itself, not revealed later. *@
-                    <label class="select-card" data-group="payment">
-                        <input type="radio" name="payment"
-                               style="appearance:none;width:20px;height:20px;border:1.5px solid var(--color-border-strong);border-radius:50%;margin-top:2px;flex-shrink:0" />
-                        <span class="grow row-flex between gap-sm">
-                            <span class="row-flex gap-sm">
-                                <span class="payment-option__logo"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-banknote"></use></svg></span>
-                                <span>
-                                    <strong class="t-body-md" style="display:block">Cash on Delivery</strong>
-                                    <span class="t-body-xs text-secondary-c">Pay the courier when it arrives</span>
-                                </span>
-                            </span>
-                            <span class="t-body-sm tabular shrink-0">+@Money.Inr(49) fee</span>
-                        </span>
-                    </label>
-                </div>
-            </section>
-        </div>
-
-        @* ══════════ Right column: sticky summary ══════════ *@
-        <aside class="sticky-col hide-tablet-down" aria-labelledby="orderSummaryHead">
-            <div class="card">
-                <div class="card__head">
-                    <h2 class="t-heading-md" id="orderSummaryHead">Order summary</h2>
-                    <a class="btn btn-link btn-sm" href="/cart">Edit cart</a>
-                </div>
-
-                <details>
-                    <summary class="row-flex between" style="cursor:pointer;list-style:none;padding-bottom:var(--space-sm)">
-                        <span class="t-body-sm text-secondary-c">@summary.ItemCount items</span>
-                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
-                    </summary>
-                    <div class="stack stack-xs mb-sm">
-                        @foreach (var line in Model.Lines)
+                    <dl class="summary">
+                        <div class="summary__row">
+                            <dt>Subtotal</dt>
+                            <dd class="tabular" id="summarySubtotal">@Money.Inr(summary.Subtotal)</dd>
+                        </div>
+                        @if (summary.CouponDiscount > 0)
                         {
-                            <div class="pcard-compact" style="padding:0">
-                                <img class="pcard-compact__img img-product" src="@line.ImageUrl" alt="" width="48" height="48"
-                                     style="width:48px;height:48px" />
-                                <span class="grow">
-                                    <span class="t-body-sm clamp-1" style="display:block">@line.Name</span>
-                                    <span class="t-body-xs text-tertiary-c">Qty @line.Quantity · @line.VariantSummary</span>
-                                </span>
-                                <span class="t-body-sm tabular shrink-0">@Money.Inr(line.LineTotal)</span>
+                            <div class="summary__row summary__row--discount" id="summaryCouponRow">
+                                <dt>Coupon Discount (@summary.CouponCode)</dt>
+                                <dd class="tabular" id="summaryCouponDiscount">−@Money.Inr(summary.CouponDiscount)</dd>
                             </div>
                         }
-                    </div>
-                </details>
-
-                <div class="card__divider"></div>
-
-                <dl class="summary">
-                    <div class="summary__row">
-                        <dt>Subtotal</dt>
-                        <dd>@Money.Inr(summary.MrpTotal)</dd>
-                    </div>
-                    @if (summary.ProductSavings > 0)
-                    {
-                        <div class="summary__row summary__row--discount">
-                            <dt>Product discount</dt>
-                            <dd>−@Money.Inr(summary.ProductSavings)</dd>
+                        <div class="summary__row" id="summaryDeliveryRow">
+                            <dt>Delivery Fee</dt>
+                            <dd class="tabular" id="summaryDelivery">@(summary.Shipping == 0 ? "Free" : Money.Inr(summary.Shipping))</dd>
                         </div>
-                    }
-                    @if (summary.CouponDiscount > 0)
-                    {
-                        <div class="summary__row summary__row--discount">
-                            <dt>Coupon (@summary.CouponCode)</dt>
-                            <dd>−@Money.Inr(summary.CouponDiscount)</dd>
+                        <div class="summary__row" id="summaryCodRow" style="display:none;">
+                            <dt>COD Convenience Fee</dt>
+                            <dd class="tabular" id="summaryCodFee">₹49.00</dd>
                         </div>
+                        <div class="summary__row">
+                            <dt>Taxes (GST)</dt>
+                            <dd class="text-secondary-c">Included in price</dd>
+                        </div>
+                        <div class="summary__total">
+                            <dt>Total Payable</dt>
+                            <dd class="tabular" id="summaryTotal">@Money.Inr(summary.Total)</dd>
+                        </div>
+                    </dl>
+
+                    @if (summary.TotalSavings > 0)
+                    {
+                        <p class="summary__savings mt-sm" id="summarySavings">You save @Money.Inr(summary.TotalSavings)</p>
                     }
-                    <div class="summary__row @(summary.Shipping == 0 ? "summary__row--free" : "")">
-                        <dt>Delivery</dt>
-                        <dd>@(summary.Shipping == 0 ? "Free" : Money.Inr(summary.Shipping))</dd>
-                    </div>
-                    <div class="summary__row">
-                        <dt>Taxes (GST)</dt>
-                        <dd class="text-secondary-c">Included</dd>
-                    </div>
-                    <div class="summary__total">
-                        <dt>Total</dt>
-                        <dd>@Money.Inr(summary.Total)</dd>
-                    </div>
-                </dl>
 
-                @if (summary.TotalSavings > 0)
-                {
-                    <p class="summary__savings">You save @Money.Inr(summary.TotalSavings)</p>
-                }
+                    <div class="card__divider"></div>
 
-                <div class="card__divider"></div>
-
-                @* Reward points — opt-in slider, value shown in rupees. *@
-                <div class="stack stack-sm">
-                    <div class="row-flex between">
-                        <span class="t-body-sm row-flex gap-2xs">
-                            <svg class="ico ico-sm text-brand-c" aria-hidden="true"><use href="#i-gem"></use></svg>
-                            Use reward points
+                    <button class="btn btn-primary btn-xl btn-block mt-md" type="submit" id="btnPlaceOrder">
+                        <span id="btnText">Confirm & Place Order · <span id="btnTotalText">@Money.Inr(summary.Total)</span></span>
+                        <span id="btnSpinner" style="display:none;" class="row-flex center gap-xs">
+                            <svg class="ico animate-spin" aria-hidden="true"><use href="#i-loader"></use></svg>
+                            Placing Order...
                         </span>
-                        <span class="t-body-xs text-tertiary-c tabular">@Model.AvailablePoints.ToString("N0") available</span>
-                    </div>
-                    <div class="range-slider">
-                        <input type="range" min="0" max="2480" step="100" value="0" aria-label="Reward points to apply" />
-                        <p class="t-body-xs text-tertiary-c">100 points = ₹100 off. Points are refunded if you return an item.</p>
-                    </div>
-                    <button class="btn btn-link btn-sm" type="button" data-open="couponList" style="align-self:flex-start">
-                        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-ticket-percent"></use></svg>
-                        Add a coupon
                     </button>
-                </div>
 
-                <a class="btn btn-primary btn-xl btn-block mt-md" href="/checkout/success/HC-2026-000482">
-                    Pay @Money.Inr(summary.Total)
-                </a>
-
-                <p class="t-body-xs text-tertiary-c text-center mt-sm">
-                    By placing this order you agree to our
-                    <a class="link" href="/pages/terms">Terms</a> and
-                    <a class="link" href="/pages/privacy-policy">Privacy Policy</a>.
-                </p>
-
-                <div class="card__divider"></div>
-
-                <div class="stack stack-xs t-body-xs text-secondary-c">
-                    <span class="row-flex gap-xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-lock"></use></svg> 256-bit encrypted</span>
-                    <span class="row-flex gap-xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-undo"></use></svg> 7-day returns</span>
-                    <span class="row-flex gap-xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-hand-heart"></use></svg> 100% handmade</span>
-                </div>
-
-                <div class="payment-marks mt-sm">
-                    <span class="payment-mark">VISA</span>
-                    <span class="payment-mark">MC</span>
-                    <span class="payment-mark">RuPay</span>
-                    <span class="payment-mark">UPI</span>
-                </div>
-            </div>
-        </aside>
-    </div>
-</div>
-
-@* Mobile sticky pay bar *@
-<div class="sticky-bar no-print">
-    <div class="grow">
-        <p class="t-body-xs text-secondary-c">Total</p>
-        <p class="t-heading-sm tabular">@Money.Inr(summary.Total)</p>
-    </div>
-    <a class="btn btn-primary btn-xl shrink-0" href="/checkout/success/HC-2026-000482">Pay @Money.Inr(summary.Total)</a>
-</div>
-
-@* ---- MOD-08-02 · Add address. PIN first: it auto-fills city and state. ---- *@
-<div class="modal-scrim" id="addAddress" role="dialog" aria-modal="true" aria-labelledby="addAddressTitle" aria-hidden="true">
-    <div class="modal">
-        <div class="modal__head">
-            <h2 class="t-heading-md" id="addAddressTitle">Add delivery address</h2>
-            <button class="icon-btn" data-close="addAddress" aria-label="Close">
-                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
-            </button>
-        </div>
-        <div class="modal__body">
-            <form data-validate id="addressForm">
-                <div class="field">
-                    <label class="field__label" for="addrName">Full name <span class="field__req">*</span></label>
-                    <input class="input" id="addrName" type="text" required placeholder="Ananya Iyer" autocomplete="name" />
-                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
-                </div>
-
-                <div class="field">
-                    <label class="field__label" for="addrPhone">Mobile number <span class="field__req">*</span></label>
-                    <div class="phone-input">
-                        <select class="select" aria-label="Country code"><option selected>+91</option></select>
-                        <input class="input" id="addrPhone" type="tel" required placeholder="98765 43210"
-                               autocomplete="tel" inputmode="numeric" />
-                    </div>
-                    <p class="field__help">We'll only use this for delivery updates.</p>
-                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
-                </div>
-
-                <div class="field">
-                    <label class="field__label" for="addrPin">PIN code <span class="field__req">*</span></label>
-                    <input class="input" id="addrPin" type="text" required maxlength="6" inputmode="numeric"
-                           placeholder="380015" autocomplete="postal-code" style="max-width:200px" />
-                    <p class="field__help text-success-c">
-                        <svg class="ico ico-xs" aria-hidden="true" style="display:inline;vertical-align:-2px"><use href="#i-circle-check"></use></svg>
-                        Ahmedabad, Gujarat
+                    <p class="t-body-xs text-tertiary-c text-center mt-sm">
+                        By placing this order you agree to our
+                        <a class="link" href="/pages/terms">Terms</a> and
+                        <a class="link" href="/pages/privacy-policy">Privacy Policy</a>.
                     </p>
-                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
-                </div>
 
-                <div class="field">
-                    <label class="field__label" for="addrLine1">Flat, house no., building <span class="field__req">*</span></label>
-                    <input class="input" id="addrLine1" type="text" required placeholder="402, Sundar Residency"
-                           autocomplete="address-line1" />
-                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
-                </div>
+                    <div class="card__divider"></div>
 
-                <div class="field">
-                    <label class="field__label" for="addrLine2">Area, street, sector <span class="field__req">*</span></label>
-                    <input class="input" id="addrLine2" type="text" required placeholder="Nehru Nagar Road"
-                           autocomplete="address-line2" />
-                    <p class="field__error"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-circle-alert"></use></svg><span></span></p>
-                </div>
-
-                <div class="field">
-                    <label class="field__label" for="addrLandmark">
-                        Landmark <span class="field__optional">(optional)</span>
-                    </label>
-                    <input class="input" id="addrLandmark" type="text" placeholder="Opposite Bal Bhavan" />
-                </div>
-
-                <div class="field">
-                    <span class="field__label">Address type</span>
-                    <div class="option-list">
-                        <button class="option-pill is-selected" type="button" data-label="Home">
-                            <svg class="ico ico-sm" aria-hidden="true" style="margin-right:6px"><use href="#i-home"></use></svg>Home
-                        </button>
-                        <button class="option-pill" type="button" data-label="Work">
-                            <svg class="ico ico-sm" aria-hidden="true" style="margin-right:6px"><use href="#i-store"></use></svg>Work
-                        </button>
-                        <button class="option-pill" type="button" data-label="Other">
-                            <svg class="ico ico-sm" aria-hidden="true" style="margin-right:6px"><use href="#i-map-pin"></use></svg>Other
-                        </button>
+                    <div class="stack stack-xs t-body-xs text-secondary-c">
+                        <span class="row-flex gap-xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-lock"></use></svg> 256-bit SSL encrypted</span>
+                        <span class="row-flex gap-xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-undo"></use></svg> 7-day hassle-free return window</span>
+                        <span class="row-flex gap-xs"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-hand-heart"></use></svg> 100% genuine artisan craftsmanship</span>
                     </div>
                 </div>
-
-                <label class="check mt-md">
-                    <input type="checkbox" checked />
-                    <span class="check__label t-body-sm">Save this address for next time</span>
-                </label>
-            </form>
+            </aside>
         </div>
-        <div class="modal__foot">
-            <button class="btn btn-ghost" data-close="addAddress">Cancel</button>
-            <button class="btn btn-primary" type="submit" form="addressForm">Use This Address</button>
-        </div>
-    </div>
-</div>
 
-@* Coupons modal is shared with the cart. *@
-<div class="modal-scrim" id="couponList" role="dialog" aria-modal="true" aria-labelledby="checkoutCouponTitle" aria-hidden="true">
-    <div class="modal">
-        <div class="modal__head">
-            <h2 class="t-heading-md" id="checkoutCouponTitle">Available coupons</h2>
-            <button class="icon-btn" data-close="couponList" aria-label="Close">
-                <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
+        @* Mobile sticky pay bar *@
+        <div class="sticky-bar no-print">
+            <div class="grow">
+                <p class="t-body-xs text-secondary-c">Total Payable</p>
+                <p class="t-heading-sm tabular" id="mobileBarTotal">@Money.Inr(summary.Total)</p>
+            </div>
+            <button class="btn btn-primary btn-xl shrink-0" type="submit" id="btnMobilePlaceOrder">
+                Place Order
             </button>
         </div>
-        <div class="modal__body">
-            <div class="coupon-input mb-md">
-                <label class="sr-only" for="checkoutCoupon">Coupon code</label>
-                <input class="input" id="checkoutCoupon" type="text" placeholder="Enter code" />
-                <button class="btn btn-outline shrink-0" type="button">Apply</button>
-            </div>
-            <div class="stack stack-sm">
-                @foreach (var (code, title, detail) in new[]
-                {
-                    ("FESTIVE10", "10% off, up to ₹500", "Applied to this order."),
-                    ("WELCOME200", "₹200 off your first order", "Minimum order ₹1,500."),
-                    ("BRASS15", "15% off brass and metal", "Applies to Brass & Metal only.")
-                })
-                {
-                    <div class="coupon-card">
-                        <div class="grow">
-                            <span class="coupon-card__code">@code</span>
-                            <p class="t-heading-xs mt-xs">@title</p>
-                            <p class="t-body-sm text-secondary-c">@detail</p>
-                        </div>
-                        <button class="btn btn-primary btn-sm shrink-0" type="button">Apply</button>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
+    </form>
 </div>
 
 @section Scripts {
     <script>
-        // A11Y-20: warn before the reserved-stock window closes, with an extend option.
-        setTimeout(function () {
-            if (window.Chamunda) {
-                window.Chamunda.toast('Your cart is held for 2 more minutes.', {
-                    type: 'warning',
-                    title: 'Still there?',
-                    actionLabel: 'Give me longer',
-                    duration: 12000
-                });
-            }
-        }, 600000);
+        var subtotal = @summary.Subtotal;
+        var couponDiscount = @summary.CouponDiscount;
+        var freeShippingThreshold = @summary.FreeShippingThreshold;
+        var deliveryFee = @(summary.QualifiesForFreeShipping ? 0 : 99);
+        var codFee = 0;
+        var selectedDeliveryId = 1;
+        var selectedPaymentMethod = 0;
 
-        // The logo is the only exit; guard it so a half-filled form is never lost.
-        document.querySelectorAll('[data-guard-unsaved]').forEach(function (link) {
-            link.addEventListener('click', function (e) {
-                if (!confirm('Leave checkout? Your cart is saved, but anything typed here is not.')) {
-                    e.preventDefault();
+        function recalcTotals() {
+            var grandTotal = subtotal - couponDiscount + deliveryFee + codFee;
+            if (grandTotal < 0) grandTotal = 0;
+
+            var fmtTotal = '₹' + grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            var fmtDelivery = deliveryFee === 0 ? 'Free' : ('₹' + deliveryFee.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+            document.getElementById('summaryDelivery').textContent = fmtDelivery;
+            document.getElementById('summaryTotal').textContent = fmtTotal;
+            document.getElementById('mobileSummaryTotal').textContent = fmtTotal;
+            document.getElementById('mobileBarTotal').textContent = fmtTotal;
+            document.getElementById('btnTotalText').textContent = fmtTotal;
+
+            var codRow = document.getElementById('summaryCodRow');
+            if (codFee > 0) {
+                codRow.style.display = 'flex';
+            } else {
+                codRow.style.display = 'none';
+            }
+        }
+
+        function updateDeliveryMethod(id, fee) {
+            selectedDeliveryId = id;
+            deliveryFee = fee;
+            recalcTotals();
+        }
+
+        function updatePaymentMethod(method, extraFee) {
+            selectedPaymentMethod = method;
+            codFee = extraFee;
+            recalcTotals();
+        }
+
+        function toggleNewAddressForm() {
+            var form = document.getElementById('addressInputForm');
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                document.querySelectorAll('input[name="selectedAddressId"]').forEach(function(r) { r.checked = false; });
+                document.querySelectorAll('[data-group="address"]').forEach(function(c) { c.classList.remove('is-selected'); });
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        function selectSavedAddress(id, name, phone, l1, l2, lm, city, state, pin) {
+            document.getElementById('shipFullName').value = name;
+            document.getElementById('shipPhone').value = phone;
+            document.getElementById('shipLine1').value = l1;
+            document.getElementById('shipLine2').value = l2 || '';
+            document.getElementById('shipLandmark').value = lm || '';
+            document.getElementById('shipCity').value = city;
+            document.getElementById('shipState').value = state;
+            document.getElementById('shipPin').value = pin;
+            document.getElementById('addressInputForm').style.display = 'none';
+        }
+
+        function toggleBillingAddress(isSame) {
+            var bFields = document.getElementById('billingAddressFields');
+            bFields.style.display = isSame ? 'none' : 'block';
+        }
+
+        function checkPincode(pin) {
+            if (pin && pin.length === 6 && /^\d+$/.test(pin)) {
+                var hint = document.getElementById('pincodeCityStateHint');
+                hint.innerHTML = '<span class="text-success-c"><svg class="ico ico-xs" style="display:inline;vertical-align:-2px"><use href="#i-circle-check"></use></svg> Valid delivery zone</span>';
+            }
+        }
+
+        async function handlePlaceOrder(e) {
+            e.preventDefault();
+            var alertBox = document.getElementById('checkoutAlert');
+            var alertMsg = document.getElementById('checkoutAlertMsg');
+            alertBox.style.display = 'none';
+
+            // Resolve contact
+            var custName = document.getElementById('custName')?.value || document.getElementById('guestFullName')?.value || document.getElementById('shipFullName')?.value;
+            var custEmail = document.getElementById('custEmail')?.value || document.getElementById('guestEmail')?.value;
+            var custPhone = document.getElementById('custPhone')?.value || document.getElementById('guestPhone')?.value || document.getElementById('shipPhone')?.value;
+
+            if (!custName || !custEmail || !custPhone) {
+                alertMsg.textContent = 'Please fill in your Contact Name, Email Address, and Mobile Number.';
+                alertBox.style.display = 'flex';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return false;
+            }
+
+            // Resolve shipping
+            var shipName = document.getElementById('shipFullName').value;
+            var shipPhone = document.getElementById('shipPhone').value;
+            var shipPin = document.getElementById('shipPin').value;
+            var shipLine1 = document.getElementById('shipLine1').value;
+            var shipLine2 = document.getElementById('shipLine2').value;
+            var shipLandmark = document.getElementById('shipLandmark').value;
+            var shipCity = document.getElementById('shipCity').value;
+            var shipState = document.getElementById('shipState').value;
+
+            if (!shipName || !shipPhone || !shipPin || !shipLine1 || !shipCity || !shipState) {
+                alertMsg.textContent = 'Please complete all required fields for the Delivery Address (Name, Phone, PIN code, Address Line, City, State).';
+                alertBox.style.display = 'flex';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return false;
+            }
+
+            var selectedAddrRadio = document.querySelector('input[name="selectedAddressId"]:checked');
+            var savedAddrId = selectedAddrRadio ? parseInt(selectedAddrRadio.value) : null;
+
+            var sameBilling = document.getElementById('chkSameBilling').checked;
+            var billName = sameBilling ? shipName : (document.getElementById('billName').value || shipName);
+            var billPhone = sameBilling ? shipPhone : (document.getElementById('billPhone').value || shipPhone);
+            var billLine1 = sameBilling ? shipLine1 : (document.getElementById('billLine1').value || shipLine1);
+            var billCity = sameBilling ? shipCity : (document.getElementById('billCity').value || shipCity);
+            var billState = sameBilling ? shipState : (document.getElementById('billState').value || shipState);
+            var billPin = sameBilling ? shipPin : (document.getElementById('billPincode').value || shipPin);
+
+            var payload = {
+                CustomerName: custName,
+                CustomerEmail: custEmail,
+                CustomerPhone: custPhone,
+                CustomerNote: document.getElementById('orderCustomerNote')?.value || null,
+
+                ShippingAddressId: savedAddrId,
+                ShippingFullName: shipName,
+                ShippingPhone: shipPhone,
+                ShippingPincode: shipPin,
+                ShippingLine1: shipLine1,
+                ShippingLine2: shipLine2,
+                ShippingLandmark: shipLandmark,
+                ShippingCity: shipCity,
+                ShippingState: shipState,
+                SaveShippingAddress: document.getElementById('saveShippingAddress')?.checked || false,
+
+                BillingSameAsShipping: sameBilling,
+                BillingFullName: billName,
+                BillingPhone: billPhone,
+                BillingLine1: billLine1,
+                BillingCity: billCity,
+                BillingState: billState,
+                BillingPincode: billPin,
+
+                DeliveryMethod: selectedDeliveryId,
+                PaymentMethod: selectedPaymentMethod,
+                GiftWrapSelected: false,
+                PointsToRedeem: 0
+            };
+
+            // Loading state
+            var btn = document.getElementById('btnPlaceOrder');
+            var btnText = document.getElementById('btnText');
+            var btnSpinner = document.getElementById('btnSpinner');
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'flex';
+
+            try {
+                var res = await fetch('/checkout/place-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                var data = await res.json();
+                if (data.success && data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    alertMsg.textContent = data.message || 'We could not complete your order. Please verify your details.';
+                    alertBox.style.display = 'flex';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    btn.disabled = false;
+                    btnText.style.display = 'inline';
+                    btnSpinner.style.display = 'none';
                 }
-            });
-        });
+            } catch (err) {
+                console.error(err);
+                alertMsg.textContent = 'A network error occurred while processing your order. Please check your connection.';
+                alertBox.style.display = 'flex';
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+            }
+
+            return false;
+        }
     </script>
 }

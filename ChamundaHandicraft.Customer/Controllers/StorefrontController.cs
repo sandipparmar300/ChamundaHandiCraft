@@ -1,6 +1,8 @@
 using ChamundaHandicraft.Customer.Services;
+using ChamundaHandicraft.Helper.Constants;
 using ChamundaHandicraft.Helper.ViewModel.Common;
 using ChamundaHandicraft.Helper.ViewModel.Customer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -24,7 +26,26 @@ public abstract class StorefrontController : Controller
     public override async Task OnActionExecutionAsync(
         ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        // Ensure guest cart tracking cookie exists
+        if (!context.HttpContext.Request.Cookies.TryGetValue(SessionKeys.GuestTokenCookie, out var guestToken) || string.IsNullOrWhiteSpace(guestToken))
+        {
+            guestToken = Guid.NewGuid().ToString("N");
+            context.HttpContext.Response.Cookies.Append(SessionKeys.GuestTokenCookie, guestToken, new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(30),
+                HttpOnly = true,
+                IsEssential = true,
+                SameSite = SameSiteMode.Lax
+            });
+            context.HttpContext.Request.Headers.Append("Cookie", $"{SessionKeys.GuestTokenCookie}={guestToken}");
+        }
+
         Shell = await Client.GetShellAsync(context.HttpContext.RequestAborted);
+
+        var cartResp = await Client.GetCartAsync(context.HttpContext.RequestAborted);
+        var cart = cartResp.IsSuccess && cartResp.Data is not null ? cartResp.Data : new CartViewModel();
+        Shell.CartCount = cart.Summary?.ItemCount ?? 0;
+        ViewData["Cart"] = cart;
 
         bool isAuthenticated = context.HttpContext.User.Identity?.IsAuthenticated == true;
         Shell.IsSignedIn = isAuthenticated;

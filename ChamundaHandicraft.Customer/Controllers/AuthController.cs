@@ -82,7 +82,8 @@ public class AuthController : StorefrontController
                 new(ClaimTypes.Role, "Customer"),
                 new("CustomerId", auth.CustomerId.ToString()),
                 new("Tier", auth.RewardTier),
-                new("RewardPoints", auth.RewardPoints.ToString())
+                new("RewardPoints", auth.RewardPoints.ToString()),
+                new("CustomerToken", auth.Token ?? string.Empty)
             };
 
             if (!string.IsNullOrWhiteSpace(auth.Email))
@@ -109,9 +110,22 @@ public class AuthController : StorefrontController
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProps);
 
             // Store token in session
-            HttpContext.Session.SetString(SessionKeys.CustomerToken, auth.Token);
+            HttpContext.Session.SetString(SessionKeys.CustomerToken, auth.Token ?? string.Empty);
             HttpContext.Session.SetString(SessionKeys.CustomerId, auth.CustomerId.ToString());
             HttpContext.Session.SetString(SessionKeys.CustomerFirstName, auth.FullName.Split(' ')[0]);
+
+            // Merge anonymous guest cart into customer account if guest cart exists
+            if (Request.Cookies.TryGetValue(SessionKeys.GuestTokenCookie, out var guestToken) && !string.IsNullOrWhiteSpace(guestToken))
+            {
+                try
+                {
+                    await Client.MergeGuestCartAsync(guestToken);
+                }
+                catch (Exception mergeEx)
+                {
+                    _logger.LogWarning(mergeEx, "Failed to merge guest cart {GuestToken} for customer {CustomerId}", guestToken, auth.CustomerId);
+                }
+            }
 
             TempData["SuccessMessage"] = $"Welcome back, {auth.FullName.Split(' ')[0]}!";
 
@@ -180,7 +194,8 @@ public class AuthController : StorefrontController
                 new(ClaimTypes.Role, "Customer"),
                 new("CustomerId", auth.CustomerId.ToString()),
                 new("Tier", auth.RewardTier),
-                new("RewardPoints", auth.RewardPoints.ToString())
+                new("RewardPoints", auth.RewardPoints.ToString()),
+                new("CustomerToken", auth.Token ?? string.Empty)
             };
 
             if (!string.IsNullOrWhiteSpace(auth.Email))
@@ -204,9 +219,22 @@ public class AuthController : StorefrontController
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProps);
 
-            HttpContext.Session.SetString(SessionKeys.CustomerToken, auth.Token);
+            HttpContext.Session.SetString(SessionKeys.CustomerToken, auth.Token ?? string.Empty);
             HttpContext.Session.SetString(SessionKeys.CustomerId, auth.CustomerId.ToString());
             HttpContext.Session.SetString(SessionKeys.CustomerFirstName, auth.FullName.Split(' ')[0]);
+
+            // Merge anonymous guest cart into newly registered customer account if guest cart exists
+            if (Request.Cookies.TryGetValue(SessionKeys.GuestTokenCookie, out var guestToken) && !string.IsNullOrWhiteSpace(guestToken))
+            {
+                try
+                {
+                    await Client.MergeGuestCartAsync(guestToken);
+                }
+                catch (Exception mergeEx)
+                {
+                    _logger.LogWarning(mergeEx, "Failed to merge guest cart {GuestToken} for customer {CustomerId}", guestToken, auth.CustomerId);
+                }
+            }
 
             TempData["SuccessMessage"] = "Your account has been created successfully! Welcome to Chamunda Handicraft.";
 

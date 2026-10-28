@@ -49,7 +49,14 @@
         else
         {
             <button class="btn btn-inverse btn-sm pcard__quickview" type="button"
-                    data-open="quickView" aria-label="Quick view of @Model.Name">
+                    data-open="quickView"
+                    data-qv-name="@Model.Name"
+                    data-qv-cat="@Model.CategoryName"
+                    data-qv-price="@Money.Inr(Model.Price)"
+                    data-qv-mrp="@(Model.IsOnSale && Model.Mrp.HasValue ? Money.Inr(Model.Mrp.Value) : "")"
+                    data-qv-img="@Model.ImageUrl"
+                    data-qv-url="@Model.Url"
+                    aria-label="Quick view of @Model.Name">
                 Quick View
             </button>
         }
@@ -119,7 +126,7 @@
             else
             {
                 <button class="btn btn-primary btn-sm btn-block" type="button"
-                        data-add-to-cart data-slug="@Model.Slug" aria-label="Add @Model.Name to cart">
+                        data-add-to-cart data-open-minicart data-product-id="@Model.Id" data-slug="@Model.Slug" aria-label="Add @Model.Name to cart">
                     <span class="btn__spinner" aria-hidden="true"></span>
                     <span class="btn__label">Add to Cart</span>
                 </button>

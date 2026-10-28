@@ -63,7 +63,8 @@ public static class DemoContent
         new() { Slug = "textiles", Name = "Textiles", ImageUrl = Ph + "category-3.svg", ProductCount = 384 },
         new() { Slug = "brassware", Name = "Brass & Metal", ImageUrl = Ph + "category-2.svg", ProductCount = 192 },
         new() { Slug = "jewellery", Name = "Jewellery", ImageUrl = Ph + "category-4.svg", ProductCount = 267 },
-        new() { Slug = "gifting", Name = "Gifting", ImageUrl = Ph + "category-6.svg", ProductCount = 158 }
+        new() { Slug = "gifting", Name = "Gifting", ImageUrl = Ph + "category-6.svg", ProductCount = 158 },
+        new() { Slug = "festive", Name = "Festive & Seasonal", ImageUrl = Ph + "category.svg", ProductCount = 52, ShowInNavbar = true }
     };
 
     /// <summary>The full demo catalogue. Cards are built from this by every listing surface.</summary>

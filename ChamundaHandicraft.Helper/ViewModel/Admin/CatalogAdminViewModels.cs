@@ -185,6 +185,7 @@ public class CategoryGridItem : AuditableViewModel, IAdminGridRow
     public string? IconName { get; set; }
     public int SortOrder { get; set; }
     public bool ShowInMegaMenu { get; set; } = true;
+    public bool ShowInNavbar { get; set; }
     public bool IsFeaturedOnHome { get; set; }
     public int Depth { get; set; }
     public bool IsActive { get; set; } = true;
@@ -211,6 +212,7 @@ public class CategorySaveRequest
     public int SortOrder { get; set; }
     public bool IsActive { get; set; } = true;
     public bool ShowInMegaMenu { get; set; } = true;
+    public bool ShowInNavbar { get; set; }
     public bool IsFeaturedOnHome { get; set; }
     public int ProductCount { get; set; }
     public int SubCategoryCount { get; set; }

@@ -25,6 +25,10 @@ public class HomeController : StorefrontController
         var testimonialsResp = await Client.GetTestimonialsAsync(ct);
         var config = await Client.GetConfigAsync(ct);
 
+        var newArrivalsResp = await Client.GetRailAsync("new-arrivals", 6, null, ct);
+        var bestsellersResp = await Client.GetRailAsync("bestsellers", 6, null, ct);
+        var flashSaleProductsResp = await Client.GetRailAsync("sale", 6, null, ct);
+
         var allProducts = DemoContent.AllProducts();
 
         var model = new HomeIndexViewModel
@@ -47,9 +51,15 @@ public class HomeController : StorefrontController
                     ShowOnHome = true
                 }).ToList(),
             Config = config,
-            FlashSaleProducts = allProducts.Where(p => p.IsOnSale).Take(6).ToList(),
-            NewArrivals = allProducts.Skip(4).Take(6).ToList(),
-            Bestsellers = allProducts.Take(6).ToList(),
+            FlashSaleProducts = flashSaleProductsResp.IsSuccess && flashSaleProductsResp.Data != null && flashSaleProductsResp.Data.Count > 0
+                ? flashSaleProductsResp.Data
+                : allProducts.Where(p => p.IsOnSale).Take(6).ToList(),
+            NewArrivals = newArrivalsResp.IsSuccess && newArrivalsResp.Data != null && newArrivalsResp.Data.Count > 0
+                ? newArrivalsResp.Data
+                : allProducts.Skip(4).Take(6).ToList(),
+            Bestsellers = bestsellersResp.IsSuccess && bestsellersResp.Data != null && bestsellersResp.Data.Count > 0
+                ? bestsellersResp.Data
+                : allProducts.Take(6).ToList(),
             Artisans = DemoContent.Artisans(),
             Articles = DemoContent.Articles()
         };

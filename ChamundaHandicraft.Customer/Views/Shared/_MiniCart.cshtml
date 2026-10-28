@@ -1,6 +1,8 @@
+@model CartViewModel
 @{
-    var lines = DemoContent.CartLines();
-    var summary = DemoContent.Summary(lines, coupon: null);
+    var cart = Model ?? (ViewData["Cart"] as CartViewModel) ?? new CartViewModel();
+    var lines = cart.Lines ?? new List<CartLineViewModel>();
+    var summary = cart.Summary ?? new OrderSummaryViewModel();
 }
 
 @*
@@ -13,7 +15,7 @@
     <div class="drawer__head">
         <div>
             <h2 class="t-heading-md" id="miniCartTitle">Your cart</h2>
-            <p class="t-body-sm text-secondary-c">@summary.ItemCount items</p>
+            <p class="t-body-sm text-secondary-c">@summary.ItemCount @(summary.ItemCount == 1 ? "item" : "items")</p>
         </div>
         <button class="icon-btn" data-close aria-label="Close cart">
             <svg class="ico ico-lg" aria-hidden="true"><use href="#i-x"></use></svg>
@@ -36,7 +38,7 @@
         }
         else
         {
-            @* Free shipping progress — real threshold, no manufactured urgency. *@
+            @* Free shipping progress — real threshold from Admin Storefront Settings *@
             <div class="ship-progress mb-md">
                 @if (summary.QualifiesForFreeShipping)
                 {
@@ -52,29 +54,34 @@
                     </span>
                 }
                 <div class="progress">
-                    <span class="progress__fill @(summary.QualifiesForFreeShipping ? "" : "")"
-                          style="width:@(summary.FreeShippingProgressPercent)%"></span>
+                    <span class="progress__fill" style="width:@(summary.FreeShippingProgressPercent)%"></span>
                 </div>
             </div>
 
-            <ul>
+            <ul class="cart-lines-list">
                 @foreach (var line in lines)
                 {
-                    <li class="cart-line" style="grid-template-columns:72px minmax(0,1fr)">
+                    <li class="cart-line" style="grid-template-columns:72px minmax(0,1fr)" data-cart-item-id="@line.CartItemId">
                         <a class="cart-line__media" href="@line.Url">
-                            <img class="img-product" src="@line.ImageUrl" alt="@line.ImageAlt" width="72" height="72" loading="lazy" />
+                            <img class="img-product" src="@line.ImageUrl" alt="@line.Name" width="72" height="72" loading="lazy" />
                         </a>
                         <div>
-                            <a class="cart-line__title clamp-2" href="@line.Url">@line.Name</a>
+                            <div class="row-flex between gap-xs">
+                                <a class="cart-line__title clamp-2" href="@line.Url">@line.Name</a>
+                                <button class="icon-btn icon-btn-sm text-tertiary-c" type="button" data-mini-remove="@line.CartItemId" aria-label="Remove @line.Name">
+                                    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-x"></use></svg>
+                                </button>
+                            </div>
                             <p class="cart-line__meta">@line.VariantSummary</p>
                             <div class="row-flex between mt-xs gap-sm">
                                 <div class="qty qty-sm">
-                                    <button class="qty__btn" type="button" data-step="-1" aria-label="Decrease quantity">
+                                    <button class="qty__btn" type="button" data-mini-step="-1" data-cart-item-id="@line.CartItemId" aria-label="Decrease quantity">
                                         <svg class="ico ico-sm" aria-hidden="true"><use href="#i-minus"></use></svg>
                                     </button>
                                     <input class="qty__input" type="number" value="@line.Quantity" min="1" max="@line.MaxQuantity"
-                                           aria-label="Quantity for @line.Name" />
-                                    <button class="qty__btn" type="button" data-step="1" aria-label="Increase quantity">
+                                           data-cart-item-id="@line.CartItemId"
+                                           aria-label="Quantity for @line.Name" readonly />
+                                    <button class="qty__btn" type="button" data-mini-step="1" data-cart-item-id="@line.CartItemId" aria-label="Increase quantity">
                                         <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"></use></svg>
                                     </button>
                                 </div>
@@ -101,6 +108,13 @@
                     <dt>Subtotal</dt>
                     <dd>@Money.Inr(summary.Subtotal)</dd>
                 </div>
+                @if (summary.CouponDiscount > 0)
+                {
+                    <div class="summary__row summary__row--discount">
+                        <dt>Coupon (@summary.CouponCode)</dt>
+                        <dd>−@Money.Inr(summary.CouponDiscount)</dd>
+                    </div>
+                }
                 <div class="summary__row @(summary.QualifiesForFreeShipping ? "summary__row--free" : "")">
                     <dt>Delivery</dt>
                     <dd>@(summary.Shipping == 0 ? "Free" : Money.Inr(summary.Shipping))</dd>
@@ -110,7 +124,7 @@
                     <dd>@Money.Inr(summary.Total)</dd>
                 </div>
             </dl>
-            <p class="t-body-xs text-tertiary-c mb-sm">Inclusive of all taxes. Coupons apply at checkout.</p>
+            <p class="t-body-xs text-tertiary-c mb-sm">Inclusive of all taxes. Coupons apply in full cart.</p>
             <a class="btn btn-primary btn-lg btn-block" href="/checkout">Checkout · @Money.Inr(summary.Total)</a>
             <a class="btn btn-ghost btn-block mt-xs" href="/cart">View full cart</a>
         </div>

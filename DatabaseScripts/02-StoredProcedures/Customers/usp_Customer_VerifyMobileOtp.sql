@@ -22,6 +22,21 @@ BEGIN
     DECLARE @CleanMobile VARCHAR(24);
     SET @CleanMobile = REPLACE(REPLACE(REPLACE(@Mobile, ' ', ''), '-', ''), '+91', '');
 
+    -- Resolve customer id if not explicitly passed
+    IF @CustomerId IS NULL OR @CustomerId <= 0
+    BEGIN
+        SELECT TOP 1 @CustomerId = Id
+        FROM dbo.Customers
+        WHERE (Phone = @Mobile OR Phone = @CleanMobile OR Phone LIKE '%' + @CleanMobile)
+          AND IsDeleted = 0;
+    END
+
+    IF @CustomerId IS NULL OR @CustomerId <= 0
+    BEGIN
+        SET @ErrorMessage = 'No customer account found for this mobile number.';
+        RETURN;
+    END
+
     -- Find latest active OTP for this destination
     DECLARE @OtpId BIGINT = NULL;
     DECLARE @StoredHash CHAR(64) = NULL;

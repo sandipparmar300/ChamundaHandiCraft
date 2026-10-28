@@ -22,12 +22,14 @@ public static class CatalogConfig
         services.AddScoped<IArtisanRepository>(_ => new ArtisanRepository(connectionString));
         services.AddScoped<IAttributeRepository>(_ => new AttributeRepository(connectionString));
         services.AddScoped<IProductRepository>(_ => new ProductRepository(connectionString));
+        services.AddScoped<ICustomerProductRepository>(_ => new CustomerProductRepository(connectionString));
 
         // Application Services
         services.AddScoped<IBrandService, BrandService>();
         services.AddScoped<IArtisanService, ArtisanService>();
         services.AddScoped<IAttributeService, AttributeService>();
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<ICustomerProductService, CustomerProductService>();
 
         return services;
     }

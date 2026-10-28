@@ -49,7 +49,16 @@ public class DemoStorefrontClient : IStorefrontClient
         });
 
     public Task<ResponseViewModel<ProductListingViewModel>> GetListingAsync(
-        string? categorySlug, string? subCategorySlug, PagedRequest paging, string? sort, CancellationToken ct = default)
+        string? categorySlug,
+        string? subCategorySlug,
+        PagedRequest paging,
+        string? sort,
+        string? material = null,
+        decimal? minPrice = null,
+        decimal? maxPrice = null,
+        bool? inStockOnly = null,
+        int? rating = null,
+        CancellationToken ct = default)
     {
         var products = DemoContent.AllProducts();
 
@@ -65,6 +74,18 @@ public class DemoStorefrontClient : IStorefrontClient
                 Page = paging.Page,
                 PageSize = paging.PageSize
             }
+        }));
+    }
+
+    public Task<ResponseViewModel<ProductSearchResultViewModel>> GetSearchSuggestionsAsync(
+        string query, int limit = 8, CancellationToken ct = default)
+    {
+        var products = DemoContent.AllProducts().Take(limit).ToList();
+        var categories = DemoContent.Categories().Take(4).ToList();
+        return Task.FromResult(Ok(new ProductSearchResultViewModel
+        {
+            Products = products,
+            Categories = categories
         }));
     }
 
@@ -158,6 +179,24 @@ public class DemoStorefrontClient : IStorefrontClient
         }));
     }
 
+    public Task<ResponseViewModel<CartViewModel>> AddToCartAsync(AddToCartRequest request, CancellationToken ct = default) =>
+        GetCartAsync(ct);
+
+    public Task<ResponseViewModel<CartViewModel>> UpdateCartQuantityAsync(UpdateCartQuantityRequest request, CancellationToken ct = default) =>
+        GetCartAsync(ct);
+
+    public Task<ResponseViewModel<CartViewModel>> RemoveCartItemAsync(long cartItemId, CancellationToken ct = default) =>
+        GetCartAsync(ct);
+
+    public Task<ResponseViewModel<CartViewModel>> ApplyCouponAsync(string couponCode, CancellationToken ct = default) =>
+        GetCartAsync(ct);
+
+    public Task<ResponseViewModel<CartViewModel>> RemoveCouponAsync(CancellationToken ct = default) =>
+        GetCartAsync(ct);
+
+    public Task<ResponseViewModel<CartViewModel>> MergeGuestCartAsync(string guestToken, CancellationToken ct = default) =>
+        GetCartAsync(ct);
+
     public Task<ResponseViewModel<CheckoutViewModel>> GetCheckoutAsync(bool guest, CancellationToken ct = default)
     {
         var lines = DemoContent.CartLines();
@@ -170,6 +209,21 @@ public class DemoStorefrontClient : IStorefrontClient
             IsGuest = guest,
             AvailablePoints = 2480
         }));
+    }
+
+    public Task<ResponseViewModel<PlaceOrderResult>> PlaceOrderAsync(PlaceOrderRequest request, CancellationToken ct = default)
+    {
+        var result = new PlaceOrderResult
+        {
+            Success = true,
+            OrderId = 1,
+            OrderNumber = "CH-2026-000001",
+            GrandTotal = 2499.00m,
+            ResultCode = 0,
+            Message = "Order placed successfully.",
+            RedirectUrl = "/checkout/success/CH-2026-000001"
+        };
+        return Task.FromResult(Ok(result));
     }
 
     public Task<ResponseViewModel<List<OrderSummaryCardViewModel>>> GetOrdersAsync(CancellationToken ct = default) =>

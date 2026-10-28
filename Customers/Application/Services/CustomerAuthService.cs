@@ -227,11 +227,6 @@ public class CustomerAuthService : ICustomerAuthService
 
     public async Task<ResponseViewModel<bool>> VerifyMobileAsync(int customerId, CustomerVerifyMobileRequest request)
     {
-        if (customerId <= 0)
-        {
-            return ResponseViewModel<bool>.Fail("Unauthorized customer request.", ApiStatusCode.Unauthorized);
-        }
-
         if (string.IsNullOrWhiteSpace(request.Mobile))
         {
             return ResponseViewModel<bool>.Fail("Mobile number is required.", ApiStatusCode.ValidationFailed);

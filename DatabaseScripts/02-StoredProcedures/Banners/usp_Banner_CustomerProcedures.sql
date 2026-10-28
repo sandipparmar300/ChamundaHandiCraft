@@ -38,6 +38,6 @@ BEGIN
       AND   b.Placement = @Placement
       AND   (b.StartsOn IS NULL OR b.StartsOn <= GETDATE())
       AND   (b.EndsOn IS NULL OR b.EndsOn >= GETDATE())
-    ORDER BY b.SortOrder ASC, b.CreatedAt DESC;
+    ORDER BY b.SortOrder ASC, b.Id ASC;
 END
 GO

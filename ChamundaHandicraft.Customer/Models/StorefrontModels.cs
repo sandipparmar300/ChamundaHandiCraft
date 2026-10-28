@@ -100,6 +100,15 @@ public class ListingViewModel
     public string View { get; set; } = "grid";
     public List<ProductCardViewModel> Products { get; set; } = new();
     public int TotalCount { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 20;
+    public List<FacetGroupViewModel> Facets { get; set; } = new();
+    public List<CategoryViewModel> SubCategories { get; set; } = new();
+    public string? SelectedMaterial { get; set; }
+    public decimal? SelectedMinPrice { get; set; }
+    public decimal? SelectedMaxPrice { get; set; }
+    public bool? InStockOnly { get; set; }
+    public int? Rating { get; set; }
 
     /// <summary>Search-only: the query, and the spelling we corrected from.</summary>
     public string? Query { get; set; }

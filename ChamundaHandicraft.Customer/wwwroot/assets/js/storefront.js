@@ -161,7 +161,21 @@
         var opener = e.target.closest('[data-open]');
         if (opener) {
             e.preventDefault();
-            openOverlay(document.getElementById(opener.getAttribute('data-open')));
+            var targetId = opener.getAttribute('data-open');
+            var overlay = document.getElementById(targetId);
+            if (targetId === 'quickView' && overlay && opener.hasAttribute('data-qv-name')) {
+                var title = overlay.querySelector('[data-qv-target="title"]');
+                if (title) title.textContent = opener.getAttribute('data-qv-name') || '';
+                var cat = overlay.querySelector('[data-qv-target="cat"]');
+                if (cat) cat.textContent = opener.getAttribute('data-qv-cat') || '';
+                var price = overlay.querySelector('[data-qv-target="price"]');
+                if (price) price.textContent = opener.getAttribute('data-qv-price') || '';
+                var img = overlay.querySelector('[data-qv-target="img"]');
+                if (img && opener.getAttribute('data-qv-img')) img.src = opener.getAttribute('data-qv-img');
+                var link = overlay.querySelector('[data-qv-target="link"]');
+                if (link && opener.getAttribute('data-qv-url')) link.href = opener.getAttribute('data-qv-url');
+            }
+            openOverlay(overlay);
             return;
         }
 
@@ -481,8 +495,58 @@
         });
     });
 
+    function setCartCount(value) {
+        var el = document.getElementById('cartCount');
+        if (!el) return;
+        value = Math.max(0, parseInt(value, 10) || 0);
+        el.textContent = value;
+        el.hidden = value === 0;
+        el.classList.remove('just-changed');
+        void el.offsetWidth;
+        el.classList.add('just-changed');
+
+        var live = document.getElementById('cartLive');
+        if (live) live.textContent = 'Cart now has ' + value + ' item' + (value === 1 ? '' : 's');
+    }
+
+    function reloadMiniCart(openAfterReload, callback) {
+        var mini = document.getElementById('miniCart');
+        if (!mini) return;
+
+        fetch('/cart/mini-partial')
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+                var wasOpen = mini.classList.contains('is-open');
+                var temp = document.createElement('div');
+                temp.innerHTML = html.trim();
+                var newMini = temp.firstElementChild;
+                if (newMini && newMini.id === 'miniCart') {
+                    mini.replaceWith(newMini);
+                    if (wasOpen) {
+                        for (var i = 0; i < openStack.length; i++) {
+                            if (openStack[i].el === mini) {
+                                openStack[i].el = newMini;
+                            }
+                        }
+                        newMini.classList.add('is-open');
+                        newMini.removeAttribute('aria-hidden');
+                        var scrim = document.getElementById('globalScrim');
+                        if (scrim) scrim.classList.add('is-open');
+                        lockScroll(true);
+                    } else if (openAfterReload) {
+                        openOverlay(newMini);
+                    }
+                }
+                if (callback) callback();
+            })
+            .catch(function (err) {
+                console.error('Failed to reload minicart:', err);
+                if (callback) callback();
+            });
+    }
+
     /* ---------------------------------------------------------------------
-       Add to cart — optimistic, then a flying thumbnail to the cart icon
+       Add to cart — Live Dynamic API integration
        --------------------------------------------------------------------- */
     document.addEventListener('click', function (e) {
         var btn = e.target.closest('[data-add-to-cart]');
@@ -491,20 +555,297 @@
         e.preventDefault();
         e.stopPropagation();
 
+        var card = btn.closest('.pcard, .pdp-info, .pcard-list, [data-cta-sentinel]');
+        var container = card || btn.parentElement;
+
+        var pid = parseInt(btn.getAttribute('data-product-id') || '0', 10);
+        var slug = btn.getAttribute('data-slug') || '';
+        var varId = btn.getAttribute('data-variant-id') ? parseInt(btn.getAttribute('data-variant-id'), 10) : null;
+
+        var qtyInput = container ? container.querySelector('.qty__input') : null;
+        var qty = qtyInput ? (parseInt(qtyInput.value, 10) || 1) : (parseInt(btn.getAttribute('data-qty') || '1', 10));
+
         btn.classList.add('is-loading');
 
-        setTimeout(function () {
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                productId: pid,
+                slug: slug,
+                variantId: varId,
+                quantity: qty
+            })
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (res) {
             btn.classList.remove('is-loading');
-            bumpCounter('cartCount', parseInt(btn.getAttribute('data-qty') || '1', 10));
+            if (res.isSuccess) {
+                var newCount = res.data && res.data.summary ? res.data.summary.itemCount : null;
+                if (newCount !== null) {
+                    setCartCount(newCount);
+                } else {
+                    bumpCounter('cartCount', qty);
+                }
 
-            var card = btn.closest('.pcard, .pdp-info, .pcard-list');
-            var img = card && card.querySelector('img');
-            if (img && !reduceMotion) flyToCart(img);
+                var img = card && card.querySelector('img');
+                if (img && !reduceMotion) flyToCart(img);
 
-            var mini = document.getElementById('miniCart');
-            if (mini && btn.hasAttribute('data-open-minicart')) openOverlay(mini);
-            else toast('Added to cart', { actionLabel: 'View cart', actionHref: '/cart' });
-        }, 450);
+                var shouldOpen = btn.hasAttribute('data-open-minicart');
+                reloadMiniCart(shouldOpen);
+
+                toast(res.message || 'Added to cart', {
+                    type: 'success',
+                    actionLabel: 'View cart',
+                    actionHref: '/cart'
+                });
+            } else {
+                toast(res.message || 'Unable to add to cart', { type: 'error' });
+            }
+        })
+        .catch(function (err) {
+            btn.classList.remove('is-loading');
+            toast('Network error while adding to cart. Please try again.', { type: 'error' });
+        });
+    });
+
+    /* ---------------------------------------------------------------------
+       Mini-Cart Quantity & Remove controls
+       --------------------------------------------------------------------- */
+    document.addEventListener('click', function (e) {
+        var stepBtn = e.target.closest('[data-mini-step]');
+        if (stepBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var cartItemId = parseInt(stepBtn.getAttribute('data-cart-item-id') || '0', 10);
+            var delta = parseInt(stepBtn.getAttribute('data-mini-step') || '0', 10);
+            var parentQty = stepBtn.closest('.qty');
+            var input = parentQty ? parentQty.querySelector('.qty__input') : null;
+            var currentQty = input ? (parseInt(input.value, 10) || 1) : 1;
+            var newQty = currentQty + delta;
+
+            if (newQty <= 0) {
+                fetch('/cart/remove', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: JSON.stringify({ cartItemId: cartItemId })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res.isSuccess) {
+                        if (res.data && res.data.summary) setCartCount(res.data.summary.itemCount);
+                        reloadMiniCart(true);
+                        if (window.location.pathname.toLowerCase().startsWith('/cart')) window.location.reload();
+                    } else {
+                        toast(res.message || 'Failed to remove item', { type: 'error' });
+                    }
+                });
+            } else {
+                fetch('/cart/update-qty', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: JSON.stringify({ cartItemId: cartItemId, quantity: newQty })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res.isSuccess) {
+                        if (res.data && res.data.summary) setCartCount(res.data.summary.itemCount);
+                        reloadMiniCart(true);
+                        if (window.location.pathname.toLowerCase().startsWith('/cart')) window.location.reload();
+                    } else {
+                        toast(res.message || 'Failed to update quantity', { type: 'error' });
+                    }
+                });
+            }
+            return;
+        }
+
+        var removeBtn = e.target.closest('[data-mini-remove]');
+        if (removeBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var id = parseInt(removeBtn.getAttribute('data-mini-remove') || '0', 10);
+            fetch('/cart/remove', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ cartItemId: id })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                if (res.isSuccess) {
+                    if (res.data && res.data.summary) setCartCount(res.data.summary.itemCount);
+                    reloadMiniCart(true);
+                    if (window.location.pathname.toLowerCase().startsWith('/cart')) window.location.reload();
+                } else {
+                    toast(res.message || 'Failed to remove item', { type: 'error' });
+                }
+            });
+            return;
+        }
+    });
+
+    /* ---------------------------------------------------------------------
+       Full Cart Page Quantity, Remove & Coupons
+       --------------------------------------------------------------------- */
+    document.addEventListener('click', function (e) {
+        var cartStepBtn = e.target.closest('[data-cart-step]');
+        if (cartStepBtn) {
+            e.preventDefault();
+            var id = parseInt(cartStepBtn.getAttribute('data-cart-item-id') || '0', 10);
+            var step = parseInt(cartStepBtn.getAttribute('data-cart-step') || '0', 10);
+            var wrap = cartStepBtn.closest('.qty');
+            var input = wrap ? wrap.querySelector('.qty__input') : null;
+            var current = input ? (parseInt(input.value, 10) || 1) : 1;
+            var next = current + step;
+
+            if (next <= 0) {
+                cartStepBtn.disabled = true;
+                fetch('/cart/remove', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: JSON.stringify({ cartItemId: id })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res.isSuccess) {
+                        window.location.reload();
+                    } else {
+                        cartStepBtn.disabled = false;
+                        toast(res.message || 'Unable to remove item', { type: 'error' });
+                    }
+                })
+                .catch(function () {
+                    cartStepBtn.disabled = false;
+                    toast('Network error. Please try again.', { type: 'error' });
+                });
+            } else {
+                cartStepBtn.disabled = true;
+                fetch('/cart/update-qty', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: JSON.stringify({ cartItemId: id, quantity: next })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res.isSuccess) {
+                        window.location.reload();
+                    } else {
+                        cartStepBtn.disabled = false;
+                        toast(res.message || 'Unable to update quantity', { type: 'error' });
+                    }
+                })
+                .catch(function () {
+                    cartStepBtn.disabled = false;
+                    toast('Network error. Please try again.', { type: 'error' });
+                });
+            }
+            return;
+        }
+
+        var cartRemoveBtn = e.target.closest('[data-cart-remove]');
+        if (cartRemoveBtn) {
+            e.preventDefault();
+            var id = parseInt(cartRemoveBtn.getAttribute('data-cart-remove') || '0', 10);
+            cartRemoveBtn.disabled = true;
+            fetch('/cart/remove', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ cartItemId: id })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                if (res.isSuccess) {
+                    window.location.reload();
+                } else {
+                    cartRemoveBtn.disabled = false;
+                    toast(res.message || 'Unable to remove item', { type: 'error' });
+                }
+            })
+            .catch(function () {
+                cartRemoveBtn.disabled = false;
+                toast('Network error. Please try again.', { type: 'error' });
+            });
+            return;
+        }
+
+        var applyBtn = e.target.closest('#btnApplyCoupon');
+        if (applyBtn) {
+            e.preventDefault();
+            var codeInput = document.getElementById('couponCode');
+            var code = codeInput ? codeInput.value.trim() : '';
+            if (!code) {
+                toast('Please enter a coupon code', { type: 'warning' });
+                return;
+            }
+            applyBtn.disabled = true;
+            fetch('/cart/apply-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ couponCode: code })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                applyBtn.disabled = false;
+                if (res.isSuccess) {
+                    toast(res.message || 'Coupon applied successfully!', { type: 'success' });
+                    setTimeout(function () { window.location.reload(); }, 600);
+                } else {
+                    toast(res.message || 'Invalid coupon code', { type: 'error' });
+                }
+            })
+            .catch(function () {
+                applyBtn.disabled = false;
+                toast('Network error. Please try again.', { type: 'error' });
+            });
+            return;
+        }
+
+        var applyPresetBtn = e.target.closest('[data-apply-coupon-code]');
+        if (applyPresetBtn) {
+            e.preventDefault();
+            var code = applyPresetBtn.getAttribute('data-apply-coupon-code');
+            applyPresetBtn.disabled = true;
+            fetch('/cart/apply-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ couponCode: code })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                applyPresetBtn.disabled = false;
+                if (res.isSuccess) {
+                    toast(res.message || 'Coupon applied successfully!', { type: 'success' });
+                    setTimeout(function () { window.location.reload(); }, 600);
+                } else {
+                    toast(res.message || 'Invalid coupon code', { type: 'error' });
+                }
+            })
+            .catch(function () {
+                applyPresetBtn.disabled = false;
+                toast('Network error. Please try again.', { type: 'error' });
+            });
+            return;
+        }
+
+        var removeCouponBtn = e.target.closest('[data-cart-remove-coupon]');
+        if (removeCouponBtn) {
+            e.preventDefault();
+            fetch('/cart/remove-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                toast('Coupon removed', { type: 'success' });
+                setTimeout(function () { window.location.reload(); }, 600);
+            });
+            return;
+        }
     });
 
     function flyToCart(img) {
@@ -560,8 +901,49 @@
 
         function sync() { bar.classList.toggle('has-value', input.value.length > 0); }
 
-        input.addEventListener('input', sync);
+        var debounceTimer = null;
+        input.addEventListener('input', function () {
+            sync();
+            if (!panel) return;
+            var q = input.value.trim();
+            clearTimeout(debounceTimer);
+            if (q.length < 2) return;
+            debounceTimer = setTimeout(function () {
+                fetch('/search/suggest?q=' + encodeURIComponent(q))
+                    .then(function (r) { return r.json(); })
+                    .then(function (res) {
+                        if (!res || !res.isSuccess || !res.data) return;
+                        var pBox = panel.querySelector('[data-suggest-products]');
+                        var cBox = panel.querySelector('[data-suggest-categories]');
+                        var foot = panel.querySelector('[data-suggest-footer]');
+                        if (res.data.products && res.data.products.length > 0 && pBox) {
+                            pBox.innerHTML = res.data.products.slice(0, 4).map(function (p) {
+                                return '<a class="search-suggest__row search-suggest__product" href="/p/' + encodeURIComponent(p.slug) + '" role="option">' +
+                                    '<img src="' + (p.imageUrl || '/assets/images/placeholders/brass.svg') + '" alt="" loading="lazy" width="48" height="48" />' +
+                                    '<span class="grow"><span style="display:block">' + escapeHtml(p.name) + '</span><span class="t-body-xs text-tertiary-c">' + escapeHtml(p.categoryName || '') + '</span></span>' +
+                                    '<span class="t-body-sm tabular" style="font-weight:600">₹' + (p.price || 0).toLocaleString('en-IN') + '</span></a>';
+                            }).join('');
+                        }
+                        if (res.data.categories && res.data.categories.length > 0 && cBox) {
+                            cBox.innerHTML = res.data.categories.slice(0, 4).map(function (c) {
+                                return '<a class="search-suggest__row" href="/c/' + encodeURIComponent(c.slug) + '" role="option">' + escapeHtml(c.name) + ' <span class="text-tertiary-c">(' + (c.productCount || 0) + ')</span></a>';
+                            }).join('');
+                        }
+                        if (foot) {
+                            foot.href = '/search?q=' + encodeURIComponent(q);
+                            var span = foot.querySelector('span');
+                            if (span) span.textContent = 'See all results for “' + q + '”';
+                        }
+                    })
+                    .catch(function () { /* silent fallback */ });
+            }, 250);
+        });
         sync();
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
 
         if (clear) {
             clear.addEventListener('click', function () {
@@ -690,6 +1072,18 @@
 
         var input = group.querySelector('input[type="hidden"]');
         if (input) input.value = pill.getAttribute('data-value') || '';
+
+        var varId = pill.getAttribute('data-variant-id');
+        if (varId) {
+            document.querySelectorAll('[data-add-to-cart]').forEach(function (btn) {
+                btn.setAttribute('data-variant-id', varId);
+            });
+            var price = pill.getAttribute('data-variant-price');
+            if (price) {
+                var priceEl = document.querySelector('.pdp-info .price__now');
+                if (priceEl) priceEl.textContent = '₹' + parseFloat(price).toLocaleString('en-IN');
+            }
+        }
     });
 
     document.querySelectorAll('.select-card').forEach(function (card) {

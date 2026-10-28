@@ -1,6 +1,5 @@
-using ChamundaHandicraft.Helper.Enums;
-using ChamundaHandicraft.Helper.ViewModel.Customer;
 using ChamundaHandicraft.Customer.Services;
+using ChamundaHandicraft.Helper.ViewModel.Customer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChamundaHandicraft.Customer.Controllers;
@@ -17,18 +16,40 @@ public class ProductController : StorefrontController
     public ProductController(IStorefrontClient client) : base(client) { }
 
     [HttpGet("/p/{slug}")]
-    public IActionResult Details(string slug)
+    [HttpGet("/product/{slug}")]
+    public async Task<IActionResult> Details(string slug, CancellationToken ct = default)
     {
         ActiveNav("shop");
 
-        var product = DemoContent.Product(slug);
+        var response = await Client.GetProductAsync(slug, ct);
+        if (!response.IsSuccess || response.Data is null)
+        {
+            return NotFound();
+        }
+
+        var product = response.Data;
+
+        var trendingResp = await Client.GetRailAsync("trending", 6, ct: ct);
+        ViewBag.TrendingProducts = trendingResp.IsSuccess && trendingResp.Data != null 
+            ? trendingResp.Data 
+            : new List<ProductCardViewModel>();
 
         Page(product.Name, product.ShortDescription);
-        Crumbs(
+
+        var crumbs = new List<(string Label, string? Url)>
+        {
             ("Home", "/"),
-            (product.CategoryName, $"/c/{product.CategorySlug}"),
-            ("Vases", $"/c/{product.CategorySlug}/vases"),
-            (product.Name.Length > 40 ? product.Name[..40] + "…" : product.Name, null));
+            ("Shop", "/shop")
+        };
+
+        if (!string.IsNullOrWhiteSpace(product.CategorySlug))
+        {
+            crumbs.Add((product.CategoryName, $"/c/{product.CategorySlug}"));
+        }
+
+        crumbs.Add((product.Name.Length > 40 ? product.Name[..40] + "…" : product.Name, null));
+
+        Crumbs(crumbs.ToArray());
 
         return View(product);
     }

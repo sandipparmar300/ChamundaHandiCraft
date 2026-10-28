@@ -39,36 +39,31 @@
 
     <div class="search-suggest__group">
         <span class="t-overline">Products</span>
-        @foreach (var product in DemoContent.Products(3))
-        {
-            <a class="search-suggest__row search-suggest__product" href="@product.Url" role="option">
-                <img src="@product.ImageUrl" alt="" loading="lazy" width="48" height="48" />
-                <span class="grow">
-                    <span style="display:block">@product.Name</span>
-                    <span class="t-body-xs text-tertiary-c">@product.CategoryName</span>
-                </span>
-                <span class="t-body-sm tabular" style="font-weight:600">@Money.Inr(product.Price)</span>
-            </a>
-        }
+        <div data-suggest-products>
+            <div class="t-body-xs text-tertiary-c" style="padding:var(--space-xs) 0">Type to search handcrafted pieces...</div>
+        </div>
     </div>
 
     <div class="search-suggest__group">
         <div class="row-flex gap-lg" style="align-items:flex-start">
             <div class="grow">
                 <span class="t-overline">Categories</span>
-                <a class="search-suggest__row" href="/c/home-decor/vases" role="option">Vases <span class="text-tertiary-c">(84)</span></a>
-                <a class="search-suggest__row" href="/c/pottery" role="option">Pottery <span class="text-tertiary-c">(216)</span></a>
+                <div data-suggest-categories>
+                    <a class="search-suggest__row" href="/c/brass-and-metalware" role="option">Brass &amp; Metalware</a>
+                    <a class="search-suggest__row" href="/c/wooden-handicrafts" role="option">Wooden Handicrafts</a>
+                    <a class="search-suggest__row" href="/c/handloom-textiles" role="option">Handloom &amp; Textiles</a>
+                </div>
             </div>
             <div class="grow">
-                <span class="t-overline">Artisans</span>
-                <a class="search-suggest__row" href="/artisans/ram-prasad-sharma" role="option">Ram Prasad Sharma</a>
-                <a class="search-suggest__row" href="/artisans/meenakshi-devi" role="option">Meenakshi Devi</a>
+                <span class="t-overline">Artisan Clusters</span>
+                <a class="search-suggest__row" href="/search?q=sankheda" role="option">Sankheda Lacquerware</a>
+                <a class="search-suggest__row" href="/search?q=patan" role="option">Patan Double Ikat</a>
             </div>
         </div>
     </div>
 
-    <a class="search-suggest__footer" href="/search?q=blue+pottery">
-        <span>See all 42 results for “blue pottery”</span>
+    <a class="search-suggest__footer" href="/search" data-suggest-footer>
+        <span>Search all handcrafted items</span>
         <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
     </a>
 </div>

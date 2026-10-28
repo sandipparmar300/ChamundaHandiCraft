@@ -618,7 +618,8 @@ public static class DemoData
         CategoriesFlat().Select(c => new CategorySaveRequest
         {
             Id = c.Id, Name = c.Name, Slug = c.Slug, ParentId = c.ParentId,
-            IntroCopy = c.IntroCopy, ImageUrl = c.ImageUrl, IsActive = true
+            IntroCopy = c.IntroCopy, ImageUrl = c.ImageUrl, IsActive = true,
+            ShowInNavbar = c.ShowInNavbar
         }).ToList();
 
     public static List<CmsPageSaveRequest> CmsPageSaves() =>

@@ -6,6 +6,11 @@ namespace ChamundaHandicraft.Helper.ViewModel.Customer;
 public class CartLineViewModel
 {
     public int Id { get; set; }
+    public long CartItemId
+    {
+        get => Id;
+        set => Id = (int)value;
+    }
     public int ProductId { get; set; }
     public int? VariantId { get; set; }
     public string Slug { get; set; } = string.Empty;
@@ -77,6 +82,97 @@ public class CartViewModel
     public bool GiftWrapSelected { get; set; }
     public string? GiftMessage { get; set; }
     public bool IsEmpty => Lines.Count == 0;
+}
+
+public class AddToCartRequest
+{
+    public int ProductId { get; set; }
+    public string? Slug { get; set; }
+    public int? VariantId { get; set; }
+    public int Quantity { get; set; } = 1;
+    public string? Note { get; set; }
+}
+
+public class UpdateCartQuantityRequest
+{
+    public long CartItemId { get; set; }
+    public int Quantity { get; set; }
+}
+
+public class RemoveCartItemRequest
+{
+    public long CartItemId { get; set; }
+}
+
+public class ApplyCouponRequest
+{
+    public string CouponCode { get; set; } = string.Empty;
+    public string Code
+    {
+        get => CouponCode;
+        set => CouponCode = value;
+    }
+}
+
+public class PlaceOrderRequest
+{
+    public int? CartId { get; set; }
+    public string? GuestToken { get; set; }
+    public int? CustomerId { get; set; }
+
+    public string CustomerName { get; set; } = string.Empty;
+    public string CustomerEmail { get; set; } = string.Empty;
+    public string CustomerPhone { get; set; } = string.Empty;
+    public string? CustomerNote { get; set; }
+
+    // Shipping Address
+    public int? ShippingAddressId { get; set; }
+    public string ShippingFullName { get; set; } = string.Empty;
+    public string ShippingPhone { get; set; } = string.Empty;
+    public string? ShippingAlternatePhone { get; set; }
+    public string ShippingLine1 { get; set; } = string.Empty;
+    public string? ShippingLine2 { get; set; }
+    public string? ShippingLandmark { get; set; }
+    public string ShippingCity { get; set; } = string.Empty;
+    public string ShippingState { get; set; } = string.Empty;
+    public string ShippingPincode { get; set; } = string.Empty;
+    public bool SaveShippingAddress { get; set; }
+
+    // Billing Address
+    public bool BillingSameAsShipping { get; set; } = true;
+    public string? BillingFullName { get; set; }
+    public string? BillingPhone { get; set; }
+    public string? BillingLine1 { get; set; }
+    public string? BillingLine2 { get; set; }
+    public string? BillingCity { get; set; }
+    public string? BillingState { get; set; }
+    public string? BillingPincode { get; set; }
+
+    // Delivery & Payment
+    public int DeliveryMethod { get; set; } = 1; // 1 = Standard, 2 = Express
+    public int PaymentMethod { get; set; } = 4; // 4 = COD, 1 = UPI, 2 = Cards, 3 = NetBanking
+    public bool GiftWrapSelected { get; set; }
+    public string? GiftMessage { get; set; }
+    public int PointsToRedeem { get; set; }
+
+    public string? IpAddress { get; set; }
+    public string SourceChannel { get; set; } = "CustomerWeb";
+}
+
+public class PlaceOrderResult
+{
+    public bool Success { get; set; }
+    public int OrderId { get; set; }
+    public string OrderNumber { get; set; } = string.Empty;
+    public decimal GrandTotal { get; set; }
+    public int ResultCode { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string? RedirectUrl { get; set; }
+}
+
+public class MergeGuestCartRequest
+{
+    public string GuestToken { get; set; } = string.Empty;
 }
 
 public class AddressViewModel

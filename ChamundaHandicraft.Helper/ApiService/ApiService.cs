@@ -212,12 +212,23 @@ public class ApiService : IApiService
             return;
         }
 
-        var token = http.Session.GetString(SessionKeys.AdminToken)
-                    ?? http.Session.GetString(SessionKeys.CustomerToken);
+        var token = http.Session?.GetString(SessionKeys.AdminToken)
+                    ?? http.Session?.GetString(SessionKeys.CustomerToken)
+                    ?? http.User?.FindFirst("CustomerToken")?.Value
+                    ?? http.User?.FindFirst("AdminToken")?.Value;
 
         if (!string.IsNullOrEmpty(token))
         {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        var customerId = http.Session?.GetString(SessionKeys.CustomerId)
+                         ?? http.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                         ?? http.User?.FindFirst("CustomerId")?.Value;
+
+        if (!string.IsNullOrEmpty(customerId))
+        {
+            request.Headers.TryAddWithoutValidation("X-Customer-Id", customerId);
         }
 
         if (http.Request.Cookies.TryGetValue(SessionKeys.GuestTokenCookie, out var guest)

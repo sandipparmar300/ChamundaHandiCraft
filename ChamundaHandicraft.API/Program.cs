@@ -1,5 +1,6 @@
 using System.Text;
 using Banners.Application.Extentions;
+using Cart.Application.Extentions;
 using Catalog.Application.Extentions;
 using Categories.Application.Extentions;
 using Customers.Application.Extentions;
@@ -9,6 +10,7 @@ using Promotions.Application.Extentions;
 using Settings.Application.Extentions;
 using Support.Application.Extentions;
 using Testimonials.Application.Extentions;
+using Orders.Application.Extentions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -36,6 +38,8 @@ builder.Services.AddMemoryCache();
 // Identity & Infrastructure Services
 builder.Services.AddCustomersModule(builder.Configuration);
 builder.Services.AddIdentityModule(builder.Configuration);
+builder.Services.AddCartModule(builder.Configuration);
+builder.Services.AddOrdersModule(builder.Configuration);
 builder.Services.AddCatalogModule(builder.Configuration);
 builder.Services.AddCategoriesModule(builder.Configuration);
 builder.Services.AddInventoryModule(builder.Configuration);

@@ -1,14 +1,21 @@
 @model HomeIndexViewModel
 @{
-    var heroBanner = Model.HeroBanners.FirstOrDefault();
-    var heroImg = !string.IsNullOrWhiteSpace(heroBanner?.ImageUrl) ? heroBanner.ImageUrl : "/assets/images/placeholders/hero.svg";
-    var heroEyebrow = !string.IsNullOrWhiteSpace(heroBanner?.Eyebrow) ? heroBanner.Eyebrow : "Handmade for Diwali";
-    var heroTitle = !string.IsNullOrWhiteSpace(heroBanner?.Heading) ? heroBanner.Heading : "Light your home with pieces made by hand";
-    var heroSub = !string.IsNullOrWhiteSpace(heroBanner?.SubHeading) ? heroBanner.SubHeading : "Brass diyas, blue pottery and festive décor from artisans across India — each piece credited to the person who made it.";
-    var heroCta1Label = !string.IsNullOrWhiteSpace(heroBanner?.PrimaryCtaLabel) ? heroBanner.PrimaryCtaLabel : "Shop the Collection";
-    var heroCta1Url = !string.IsNullOrWhiteSpace(heroBanner?.PrimaryCtaUrl) ? heroBanner.PrimaryCtaUrl : "/c/festive";
-    var heroCta2Label = !string.IsNullOrWhiteSpace(heroBanner?.SecondaryCtaLabel) ? heroBanner.SecondaryCtaLabel : "Meet the Makers";
-    var heroCta2Url = !string.IsNullOrWhiteSpace(heroBanner?.SecondaryCtaUrl) ? heroBanner.SecondaryCtaUrl : "/artisans";
+    var banners = Model.HeroBanners != null && Model.HeroBanners.Count > 0
+        ? Model.HeroBanners
+        : new List<BannerViewModel>
+        {
+            new BannerViewModel
+            {
+                ImageUrl = "/assets/images/placeholders/hero.svg",
+                Eyebrow = "Handmade for Diwali",
+                Heading = "Light your home with pieces made by hand",
+                SubHeading = "Brass diyas, blue pottery and festive décor from artisans across India — each piece credited to the person who made it.",
+                PrimaryCtaLabel = "Shop the Collection",
+                PrimaryCtaUrl = "/c/festive",
+                SecondaryCtaLabel = "Meet the Makers",
+                SecondaryCtaUrl = "/artisans"
+            }
+        };
 
     var materials = new (string Label, string Slug)[]
     {
@@ -18,32 +25,101 @@
     };
 }
 
-@* ══════════ SEC-02-01 · Hero ══════════
+@* ══════════ SEC-02-01 · Hero Carousel ══════════
    LCP surface. The first slide is eager with fetchpriority=high; the rest are
-   lazy. No autoplay before LCP, and the carousel never auto-advances without a
-   pause control (A11Y-09). *@
+   lazy. Interactive carousel with smooth transitions, autoplay with pause on
+   hover/focus, clickable navigation dots, and prev/next controls (A11Y-09). *@
 <section class="container" style="padding-top:var(--space-md)" aria-label="Featured collection">
-    <div class="hero">
-        <img class="hero__img" src="@heroImg"
-             alt="@(heroBanner?.ImageAlt ?? heroTitle)"
-             fetchpriority="high" width="1200" height="500" />
+    <div class="hero hero-carousel" data-hero-carousel aria-roledescription="carousel" aria-label="Featured collection carousel">
+        <div class="hero__slides" aria-live="polite">
+            @for (int i = 0; i < banners.Count; i++)
+            {
+                var b = banners[i];
+                var bImg = !string.IsNullOrWhiteSpace(b.ImageUrl) ? b.ImageUrl : "/assets/images/placeholders/hero.svg";
+                var bTitle = !string.IsNullOrWhiteSpace(b.Heading) ? b.Heading : "Light your home with pieces made by hand";
+                var bAlt = !string.IsNullOrWhiteSpace(b.ImageAlt) ? b.ImageAlt : bTitle;
 
-        <div class="hero__body">
-            <span class="t-overline hero__eyebrow">@heroEyebrow</span>
-            <h1 class="t-display-2xl hero__title mt-xs">@heroTitle</h1>
-            <p class="hero__sub">@heroSub</p>
-            <div class="hero__actions">
-                <a class="btn btn-primary btn-xl" href="@heroCta1Url">@heroCta1Label</a>
-                <a class="btn btn-inverse btn-xl" href="@heroCta2Url">@heroCta2Label</a>
-            </div>
+                <div class="hero__slide @(i == 0 ? "is-active" : "")"
+                     role="group"
+                     aria-roledescription="slide"
+                     aria-label="Slide @(i + 1) of @banners.Count"
+                     data-slide-index="@i">
+
+                    @if (!string.IsNullOrWhiteSpace(b.MobileImageUrl))
+                    {
+                        <picture>
+                            <source media="(max-width: 640px)" srcset="@b.MobileImageUrl" />
+                            <img class="hero__img" src="@bImg" alt="@bAlt"
+                                 @(i == 0 ? Html.Raw("fetchpriority=\"high\"") : Html.Raw("loading=\"lazy\""))
+                                 width="1200" height="500" />
+                        </picture>
+                    }
+                    else
+                    {
+                        <img class="hero__img" src="@bImg" alt="@bAlt"
+                             @(i == 0 ? Html.Raw("fetchpriority=\"high\"") : Html.Raw("loading=\"lazy\""))
+                             width="1200" height="500" />
+                    }
+
+                    <div class="hero__scrim" aria-hidden="true"></div>
+
+                    @if (!string.IsNullOrWhiteSpace(b.Eyebrow) || !string.IsNullOrWhiteSpace(b.Heading) || !string.IsNullOrWhiteSpace(b.SubHeading) || !string.IsNullOrWhiteSpace(b.PrimaryCtaLabel) || !string.IsNullOrWhiteSpace(b.SecondaryCtaLabel))
+                    {
+                        <div class="hero__body">
+                            @if (!string.IsNullOrWhiteSpace(b.Eyebrow))
+                            {
+                                <span class="t-overline hero__eyebrow">@b.Eyebrow</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(b.Heading))
+                            {
+                                <h1 class="t-display-2xl hero__title mt-xs">@b.Heading</h1>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(b.SubHeading))
+                            {
+                                <p class="hero__sub">@b.SubHeading</p>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(b.PrimaryCtaLabel) || !string.IsNullOrWhiteSpace(b.SecondaryCtaLabel))
+                            {
+                                <div class="hero__actions">
+                                    @if (!string.IsNullOrWhiteSpace(b.PrimaryCtaLabel))
+                                    {
+                                        <a class="btn btn-primary btn-xl" href="@(string.IsNullOrWhiteSpace(b.PrimaryCtaUrl) ? "/c/festive" : b.PrimaryCtaUrl)">@b.PrimaryCtaLabel</a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(b.SecondaryCtaLabel))
+                                    {
+                                        <a class="btn btn-inverse btn-xl" href="@(string.IsNullOrWhiteSpace(b.SecondaryCtaUrl) ? "/artisans" : b.SecondaryCtaUrl)">@b.SecondaryCtaLabel</a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
         </div>
 
-        @if (Model.HeroBanners.Count > 1)
+        @if (banners.Count > 1)
         {
-            <div class="gallery__dots" style="position:absolute;bottom:16px;right:24px;z-index:3">
-                @for (int i = 0; i < Model.HeroBanners.Count; i++)
+            <button type="button" class="hero__nav-btn hero__nav-btn--prev" aria-label="Previous slide" data-hero-prev>
+                <svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <button type="button" class="hero__nav-btn hero__nav-btn--next" aria-label="Next slide" data-hero-next>
+                <svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+
+            <div class="hero__dots" role="tablist" aria-label="Hero carousel pagination">
+                @for (int i = 0; i < banners.Count; i++)
                 {
-                    <span class="gallery__dot @(i == 0 ? "is-active" : "")" role="img" aria-label="Slide @(i + 1) of @Model.HeroBanners.Count"></span>
+                    <button type="button"
+                            class="hero__dot @(i == 0 ? "is-active" : "")"
+                            role="tab"
+                            aria-selected="@(i == 0 ? "true" : "false")"
+                            aria-label="Go to slide @(i + 1) of @banners.Count"
+                            data-hero-dot="@i">
+                    </button>
                 }
             </div>
         }
@@ -447,6 +523,133 @@
 
 @section Scripts {
     <script>
+        // Hero Carousel — Accessible, smooth cycling with pause on hover/focus & full dot/nav controls
+        (function () {
+            var carousel = document.querySelector('[data-hero-carousel]');
+            if (!carousel) return;
+
+            var slides = carousel.querySelectorAll('.hero__slide');
+            var dots = carousel.querySelectorAll('[data-hero-dot]');
+            var prevBtn = carousel.querySelector('[data-hero-prev]');
+            var nextBtn = carousel.querySelector('[data-hero-next]');
+
+            if (slides.length <= 1) return;
+
+            var currentIndex = 0;
+            var timer = null;
+            var duration = 5000; // 5 seconds per slide
+            var isPaused = false;
+
+            function goToSlide(index) {
+                if (index < 0) index = slides.length - 1;
+                if (index >= slides.length) index = 0;
+
+                slides[currentIndex].classList.remove('is-active');
+                if (dots[currentIndex]) {
+                    dots[currentIndex].classList.remove('is-active');
+                    dots[currentIndex].setAttribute('aria-selected', 'false');
+                }
+
+                currentIndex = index;
+
+                slides[currentIndex].classList.add('is-active');
+                if (dots[currentIndex]) {
+                    dots[currentIndex].classList.add('is-active');
+                    dots[currentIndex].setAttribute('aria-selected', 'true');
+                }
+            }
+
+            function startAutoPlay() {
+                stopAutoPlay();
+                timer = setInterval(function () {
+                    if (!isPaused) {
+                        goToSlide(currentIndex + 1);
+                    }
+                }, duration);
+            }
+
+            function stopAutoPlay() {
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
+
+            // Clickable dot indicators
+            dots.forEach(function (dot) {
+                dot.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var targetIndex = parseInt(this.getAttribute('data-hero-dot'), 10);
+                    goToSlide(targetIndex);
+                    startAutoPlay();
+                });
+            });
+
+            // Previous & Next arrows
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    goToSlide(currentIndex - 1);
+                    startAutoPlay();
+                });
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    goToSlide(currentIndex + 1);
+                    startAutoPlay();
+                });
+            }
+
+            // Pause on mouse hover & focus
+            carousel.addEventListener('mouseenter', function () { isPaused = true; });
+            carousel.addEventListener('mouseleave', function () { isPaused = false; });
+            carousel.addEventListener('focusin', function () { isPaused = true; });
+            carousel.addEventListener('focusout', function () { isPaused = false; });
+
+            // Touch swipe support (mobile / tablets)
+            var touchStartX = 0;
+            var touchEndX = 0;
+            carousel.addEventListener('touchstart', function (e) {
+                if (e.changedTouches && e.changedTouches[0]) {
+                    touchStartX = e.changedTouches[0].screenX;
+                }
+            }, { passive: true });
+
+            carousel.addEventListener('touchend', function (e) {
+                if (e.changedTouches && e.changedTouches[0]) {
+                    touchEndX = e.changedTouches[0].screenX;
+                    var diff = touchStartX - touchEndX;
+                    if (Math.abs(diff) > 40) {
+                        if (diff > 0) {
+                            goToSlide(currentIndex + 1);
+                        } else {
+                            goToSlide(currentIndex - 1);
+                        }
+                        startAutoPlay();
+                    }
+                }
+            }, { passive: true });
+
+            // Keyboard navigation (Left / Right arrow)
+            carousel.setAttribute('tabindex', '0');
+            carousel.addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    goToSlide(currentIndex - 1);
+                    startAutoPlay();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    goToSlide(currentIndex + 1);
+                    startAutoPlay();
+                }
+            });
+
+            // Start auto cycling
+            startAutoPlay();
+        })();
+
         // Countdown — anchored to a real server-supplied end time. When it reaches
         // zero the band is removed rather than restarted (no fake urgency).
         (function () {

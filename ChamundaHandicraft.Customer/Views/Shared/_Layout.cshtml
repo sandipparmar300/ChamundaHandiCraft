@@ -68,13 +68,19 @@
     }
 
     <main id="main">
+        @if (!hideChrome)
+        {
+            <div class="container" style="padding-top: var(--space-xs);">
+                @await Html.PartialAsync("_Alerts")
+            </div>
+        }
         @RenderBody()
     </main>
 
     @if (!hideChrome)
     {
         @await Html.PartialAsync("_Footer", shell)
-        @await Html.PartialAsync("_MiniCart")
+        @await Html.PartialAsync("_MiniCart", ViewData["Cart"] as CartViewModel)
         @await Html.PartialAsync("_MobileDrawer", shell)
 
         @if (shell.ShowBottomTabs)

@@ -132,9 +132,11 @@ public class CustomerAddressController : ControllerBase
     [HttpPost("addressdelete")]
     [HttpDelete("address/{id:int}")]
     public async Task<ActionResult<ResponseViewModel<bool>>> Delete(
-        [FromQuery] int? id = null, [FromRoute] int? routeId = null, [FromQuery] int? customerId = null)
+        [FromRoute(Name = "id")] int? routeId = null,
+        [FromQuery(Name = "id")] int? queryId = null,
+        [FromQuery] int? customerId = null)
     {
-        int addressId = id ?? routeId ?? 0;
+        int addressId = (routeId.HasValue && routeId.Value > 0) ? routeId.Value : (queryId ?? 0);
         int cid = customerId ?? GetCustomerId();
         if (cid <= 0)
         {
@@ -152,9 +154,11 @@ public class CustomerAddressController : ControllerBase
     [HttpPost("setdefaultaddress")]
     [HttpPost("address/{id:int}/default")]
     public async Task<ActionResult<ResponseViewModel<bool>>> SetDefault(
-        [FromQuery] int? id = null, [FromRoute] int? routeId = null, [FromQuery] int? customerId = null)
+        [FromRoute(Name = "id")] int? routeId = null,
+        [FromQuery(Name = "id")] int? queryId = null,
+        [FromQuery] int? customerId = null)
     {
-        int addressId = id ?? routeId ?? 0;
+        int addressId = (routeId.HasValue && routeId.Value > 0) ? routeId.Value : (queryId ?? 0);
         int cid = customerId ?? GetCustomerId();
         if (cid <= 0)
         {
